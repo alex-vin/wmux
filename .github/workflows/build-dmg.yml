@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build & Package DMG
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 60
 
     steps:
@@ -19,8 +19,19 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
+      - name: Select Xcode
+        run: |
+          ./scripts/select-ci-xcode.sh
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
 
       - name: Install create-dmg
         run: |
