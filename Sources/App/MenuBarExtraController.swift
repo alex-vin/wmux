@@ -19,8 +19,6 @@ final class MenuBarExtraController: NSObject, NSMenuDelegate {
     private let onOpenPreferences: () -> Void
     private let onQuitApp: () -> Void
     private var notificationMenuSnapshotCancellable: AnyCancellable?
-    private let cloudMenuEntries: @MainActor () -> [CloudMenuEntry]
-    private let onCloudMenuWillOpen: @MainActor () -> Void
     private var globalFontObserver: NSObjectProtocol?
     private let buildHintTitle: String?
 

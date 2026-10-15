@@ -153,7 +153,7 @@ actor AgentHookDeliveryQueue {
                 weak self,
                 admissionSignalStream = admissionSignalPair.stream,
                 capacityStream = capacityPair.stream,
-                capacityContinuation = capacityPair.continuation,
+                capacityContinuation = capacityPair.continuation
             ] in
             var admissionSignalIterator = admissionSignalStream.makeAsyncIterator()
             for await _ in capacityStream {
