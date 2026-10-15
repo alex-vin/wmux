@@ -34,6 +34,7 @@ enum SidebarFooterButtonMetrics {
     static let buttonSize: CGFloat = 22
     static let footerIconSize = SidebarFooterCircularIconStyle.standard.pointSize
     static let helpIconSize = footerIconSize
+    static let hoverOpacity = 0.08
 }
 
 enum SidebarFooterControl: CaseIterable, Equatable {

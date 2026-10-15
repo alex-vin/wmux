@@ -698,7 +698,7 @@ struct MachinesPanelView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
                 Button(String(localized: "devices.settings", defaultValue: "Devices Settings…")) {
-                    SettingsWindowPresenter.show(navigationTarget: .computers)
+                    SettingsWindowPresenter.show(navigationTarget: .app)
                 }
             } else if let status = viewModel.listStatus {
                 // Say the true thing instead of pretending the fleet is empty:

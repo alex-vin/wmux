@@ -2040,6 +2040,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             isFirstResponder: stats.isFirstResponder
         )
     }
+#endif
 
     private func moveUITestWindowToTargetDisplayIfNeeded(attempt: Int = 0) {
         let env = ProcessInfo.processInfo.environment
@@ -2089,7 +2090,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
         self.uiTestDiagnosticsWriter.write(stage: "afterMoveToTargetDisplay")
     }
-#endif
 
     func applicationWillBecomeActive(_ notification: Notification) { if !hasVisibleMainTerminalWindow() { _ = mainWindowVisibilityController.orderFrontApplicationWindowsBeforeActivation(windows: mainWindowsForVisibilityController(), reason: .applicationWillBecomeActive) } }
 
@@ -9245,7 +9245,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
         let window = resolvedWindow(for: context) ?? preferredWindow
         guard commandPaletteCloudCapabilityAllows(
-            commandId: ContentView.commandPaletteCloudRestoreCommandId,
+            commandId: "palette.cloud.restore",
             tabManager: context.tabManager,
             preferredWindow: window
         ) else {
@@ -9319,13 +9319,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         @MainActor var commandPaletteID: String {
             switch self {
-            case .fork: return ContentView.commandPaletteCloudForkCommandId
-            case .snapshot: return ContentView.commandPaletteCloudSnapshotCommandId
-            case .ports: return ContentView.commandPaletteCloudPortsCommandId
-            case .tools: return ContentView.commandPaletteCloudToolsCommandId
-            case .handoff: return ContentView.commandPaletteCloudHandoffCommandId
-            case .promoteTemplate: return ContentView.commandPaletteCloudPromoteTemplateCommandId
-            case .status: return ContentView.commandPaletteCloudStatusCommandId
+            case .fork: return "palette.cloud.fork"
+            case .snapshot: return "palette.cloud.snapshot"
+            case .ports: return "palette.cloud.ports"
+            case .tools: return "palette.cloud.tools"
+            case .handoff: return "palette.cloud.handoff"
+            case .promoteTemplate: return "palette.cloud.promoteTemplate"
+            case .status: return "palette.cloud.status"
             }
         }
 
@@ -10574,8 +10574,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         let root = ContentView(
             windowId: windowId,
-            titlebarControlsLayoutModel: titlebarControlsLayoutModel,
-            devicesModel: devicesRegistry.map { DevicesPanelViewModel(registry: $0, windowID: windowId) }
+            titlebarControlsLayoutModel: titlebarControlsLayoutModel
         )
             .environmentObject(tabManager)
             .environmentObject(notificationStore)
