@@ -7876,7 +7876,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         // outside the viewport (so prompt/link hit-testing cannot match).
         if button == GHOSTTY_MOUSE_LEFT {
             if ghostty_surface_has_selection(surface) {
-                _ = ghostty_surface_clear_selection(surface)
+                _ = GhosttyRuntimeCInterop.clearSelection(surface)
             }
             ghostty_surface_mouse_pos(surface, -1, -1, mods)
         }
