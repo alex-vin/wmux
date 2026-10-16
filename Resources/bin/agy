@@ -133,6 +133,11 @@ REAL_AGY="$(find_real_agy)" || { echo "Error: agy not found in PATH" >&2; exit 1
 IN_CMUX=0
 if [[ -n "${CMUX_SURFACE_ID:-}" ]]; then
     IN_CMUX=1
+    # Check for per-surface Gemini account isolation
+    SURFACE_ENV="$HOME/.config/cmux/gemini_tokens/${CMUX_SURFACE_ID}.env"
+    if [[ -f "$SURFACE_ENV" ]]; then
+        source "$SURFACE_ENV"
+    fi
 fi
 
 if [[ "$IN_CMUX" == "1" && "${CMUX_ANTIGRAVITY_HOOKS_DISABLED:-}" != "1" ]] \

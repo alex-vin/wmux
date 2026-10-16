@@ -1471,6 +1471,7 @@
 		C1175700000000000000004F /* CmuxFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 5E2701040000000000000002 /* CmuxFoundation */; };
 		CF00F00000000000000000A3 /* CmuxFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = CF00F00000000000000000A2 /* CmuxFoundation */; };
 		CF00F00000000000000000A4 /* CmuxFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = CF00F00000000000000000A2 /* CmuxFoundation */; };
+		CE3100000000000000000003 /* CmuxGeminiQuota in Frameworks */ = {isa = PBXBuildFile; productRef = CE3100000000000000000002 /* CmuxGeminiQuota */; };
 		C617000000000000000000A3 /* CmuxGit in Frameworks */ = {isa = PBXBuildFile; productRef = C617000000000000000000A2 /* CmuxGit */; };
 		C0DE34020000000000000001 /* CmuxHelpCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE34020000000000000003 /* CmuxHelpCommands.swift */; };
 		C0DE34020000000000000002 /* CmuxHelpResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE34020000000000000004 /* CmuxHelpResource.swift */; };
@@ -2200,6 +2201,7 @@
 		F97300010000000000000003 /* FreestyleInteractiveShellScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97300010000000000000001 /* FreestyleInteractiveShellScript.swift */; };
 		F17F00000000000000000003 /* FullWidthTabCommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17F00000000000000000004 /* FullWidthTabCommandTests.swift */; };
 		F17F00000000000000000001 /* FullWidthTabPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17F00000000000000000002 /* FullWidthTabPersistenceTests.swift */; };
+		A30583C96BACCB4C33B59FFE /* GeminiQuotaPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792BFC2513BD5FA8A7F6302D /* GeminiQuotaPopoverView.swift */; };
 		85510001A1B2C3D4E5F60001 /* GhosttyApp+ChildExitPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85510002A1B2C3D4E5F60001 /* GhosttyApp+ChildExitPolicy.swift */; };
 		C0F16D1A0000000000000001 /* GhosttyApp+ConfigDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F16D1A0000000000000002 /* GhosttyApp+ConfigDiagnostics.swift */; };
 		A10557070000000000000001 /* GhosttyApp+ConfigurationApply.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10557070000000000000002 /* GhosttyApp+ConfigurationApply.swift */; };
@@ -3344,6 +3346,7 @@
 		A7FD1002 /* SidebarFileDropFindRoutingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7FD1001 /* SidebarFileDropFindRoutingTests.swift */; };
 		B8624C060000000000000006 /* SidebarFocusBoundaryLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8624D060000000000000006 /* SidebarFocusBoundaryLifecycleTests.swift */; };
 		A8624F0C0000000000000001 /* SidebarFocusBoundaryReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8624F0C0000000000000002 /* SidebarFocusBoundaryReference.swift */; };
+		9B5123C8EFFF80B54C8DEF68 /* SidebarGeminiQuotaButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6496337B981133AF19D580 /* SidebarGeminiQuotaButton.swift */; };
 		8175A0010000000000000001 /* SidebarGitProcessCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8175A0010000000000000002 /* SidebarGitProcessCompositionTests.swift */; };
 		F10753000000000000000001 /* SidebarGroupHeaderRowActions+NotificationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10753000000000000000002 /* SidebarGroupHeaderRowActions+NotificationState.swift */; };
 		B804A0200000000000000020 /* SidebarGroupHeaderRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B804B0200000000000000020 /* SidebarGroupHeaderRowModel.swift */; };
@@ -6738,6 +6741,7 @@
 		F97300010000000000000001 /* FreestyleInteractiveShellScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreestyleInteractiveShellScript.swift; sourceTree = "<group>"; };
 		F17F00000000000000000004 /* FullWidthTabCommandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullWidthTabCommandTests.swift; sourceTree = "<group>"; };
 		F17F00000000000000000002 /* FullWidthTabPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullWidthTabPersistenceTests.swift; sourceTree = "<group>"; };
+		792BFC2513BD5FA8A7F6302D /* GeminiQuotaPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar/GeminiQuotaPopoverView.swift; sourceTree = "<group>"; };
 		A5001017 /* ghostty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ghostty.h; sourceTree = "<group>"; };
 		85510002A1B2C3D4E5F60001 /* GhosttyApp+ChildExitPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GhosttyApp+ChildExitPolicy.swift"; sourceTree = "<group>"; };
 		C0F16D1A0000000000000002 /* GhosttyApp+ConfigDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GhosttyApp+ConfigDiagnostics.swift"; sourceTree = "<group>"; };
@@ -7866,6 +7870,7 @@
 		A7FD1001 /* SidebarFileDropFindRoutingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarFileDropFindRoutingTests.swift; sourceTree = "<group>"; };
 		B8624D060000000000000006 /* SidebarFocusBoundaryLifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarFocusBoundaryLifecycleTests.swift; sourceTree = "<group>"; };
 		A8624F0C0000000000000002 /* SidebarFocusBoundaryReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar/SidebarFocusBoundaryReference.swift; sourceTree = "<group>"; };
+		9E6496337B981133AF19D580 /* SidebarGeminiQuotaButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar/SidebarGeminiQuotaButton.swift; sourceTree = "<group>"; };
 		8175A0010000000000000002 /* SidebarGitProcessCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarGitProcessCompositionTests.swift; sourceTree = "<group>"; };
 		F10753000000000000000002 /* SidebarGroupHeaderRowActions+NotificationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sidebar/AppKitList/Cells/SidebarGroupHeaderRowActions+NotificationState.swift"; sourceTree = "<group>"; };
 		B804B0200000000000000020 /* SidebarGroupHeaderRowModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar/AppKitList/Cells/SidebarGroupHeaderRowModel.swift; sourceTree = "<group>"; };
@@ -9157,6 +9162,7 @@
 				C9A2C00000000000000000C3 /* CmuxFeedback in Frameworks */,
 				D0F1A0000000000000000003 /* CmuxFilePreviewCore in Frameworks */,
 				CF00F00000000000000000A3 /* CmuxFoundation in Frameworks */,
+				CE3100000000000000000003 /* CmuxGeminiQuota in Frameworks */,
 				C617000000000000000000A3 /* CmuxGit in Frameworks */,
 				800100000000000000000201 /* CmuxHive in Frameworks */,
 				1A0B0C0D0E0F101112132013 /* CmuxIrohTransport in Frameworks */,
@@ -12239,6 +12245,8 @@
 				7A46D27DF741643885DBBFA2 /* ProductAnalytics+App.swift */,
 				899EDFB4688088904AEC67B4 /* RightSidebarMode+ProductFeature.swift */,
 				34F76A7191862A9BFADE3869 /* PostHogContextCalls.swift */,
+				9E6496337B981133AF19D580 /* SidebarGeminiQuotaButton.swift */,
+				792BFC2513BD5FA8A7F6302D /* GeminiQuotaPopoverView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -13984,6 +13992,7 @@
 				E3B7A30000000000000000B2 /* CmuxSidebar */,
 				E3B7A30000000000000000C2 /* CmuxBrowser */,
 				E3B7A30000000000000000D2 /* CmuxNotifications */,
+				CE3100000000000000000002 /* CmuxGeminiQuota */,
 				F0C0A1000000000000000002 /* CmuxPhonePush */,
 				C0C0A2026091900000000002 /* CmuxComputerUse */,
 				E3B7A30000000000000000F2 /* CmuxPanes */,
@@ -14254,6 +14263,7 @@
 				E3B7A30000000000000000B1 /* XCLocalSwiftPackageReference "CmuxSidebar" */,
 				E3B7A30000000000000000C1 /* XCLocalSwiftPackageReference "CmuxBrowser" */,
 				E3B7A30000000000000000D1 /* XCLocalSwiftPackageReference "CmuxNotifications" */,
+				CE3100000000000000000001 /* XCLocalSwiftPackageReference "CmuxGeminiQuota" */,
 				F0C0A1000000000000000001 /* XCLocalSwiftPackageReference "CmuxPhonePush" */,
 				C0C0A2026091900000000001 /* XCLocalSwiftPackageReference "CmuxComputerUse" */,
 				E3B7A30000000000000000F1 /* XCLocalSwiftPackageReference "CmuxPanes" */,
@@ -15704,6 +15714,7 @@
 				5E55400000000000000000D1 /* FocusStealingResponderConformances.swift in Sources */,
 					C0DEFB100000000000000001 /* FocusSurfaceBroadcaster.swift in Sources */,
 				AA5269A0C0DE0002FACE0002 /* ForeignFirstResponderPolicy.swift in Sources */,
+				A30583C96BACCB4C33B59FFE /* GeminiQuotaPopoverView.swift in Sources */,
 				85510001A1B2C3D4E5F60001 /* GhosttyApp+ChildExitPolicy.swift in Sources */,
 				C0F16D1A0000000000000001 /* GhosttyApp+ConfigDiagnostics.swift in Sources */,
 				A10557070000000000000001 /* GhosttyApp+ConfigurationApply.swift in Sources */,
@@ -16410,6 +16421,7 @@
 				9212A0049212A0049212A004 /* SidebarEmptyAreaWindowDragOutcome.swift in Sources */,
 				9212A0059212A0059212A005 /* SidebarEmptyAreaWindowDragTrackingEvent.swift in Sources */,
 				A8624F0C0000000000000001 /* SidebarFocusBoundaryReference.swift in Sources */,
+				9B5123C8EFFF80B54C8DEF68 /* SidebarGeminiQuotaButton.swift in Sources */,
 				F10753000000000000000001 /* SidebarGroupHeaderRowActions+NotificationState.swift in Sources */,
 				B804A0200000000000000020 /* SidebarGroupHeaderRowModel.swift in Sources */,
 				B804A0210000000000000021 /* SidebarGroupHeaderRowView.swift in Sources */,
@@ -19720,6 +19732,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/macOS/CmuxNotifications;
 		};
+		CE3100000000000000000001 /* XCLocalSwiftPackageReference "CmuxGeminiQuota" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/macOS/CmuxGeminiQuota;
+		};
 		F0C0A1000000000000000001 /* XCLocalSwiftPackageReference "CmuxPhonePush" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/macOS/CmuxPhonePush;
@@ -20076,6 +20092,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E3B7A30000000000000000D1 /* XCLocalSwiftPackageReference "CmuxNotifications" */;
 			productName = CmuxNotifications;
+		};
+		CE3100000000000000000002 /* CmuxGeminiQuota */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE3100000000000000000001 /* XCLocalSwiftPackageReference "CmuxGeminiQuota" */;
+			productName = CmuxGeminiQuota;
 		};
 		F0C0A1000000000000000002 /* CmuxPhonePush */ = {
 			isa = XCSwiftPackageProductDependency;

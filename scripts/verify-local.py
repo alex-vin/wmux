@@ -367,8 +367,16 @@ def run(repo, selected, timeout, stream=sys.stdout, swift_files=None, swift_chan
     compiler = shutil.which("swiftc") if paths else None
     cancelled = False
     if swift_requested:
+        sdk_args = []
+        try:
+            sdk_res = subprocess.run(["xcrun", "--show-sdk-path"], capture_output=True, text=True, timeout=5)
+            sdk_path = sdk_res.stdout.strip()
+            if sdk_path:
+                sdk_args = ["-sdk", sdk_path]
+        except Exception:
+            pass
         items.insert(0, ("swift-syntax", "parsing", f"Swift syntax ({len(paths)} selected files)",
-                        ["swiftc", "-frontend", "-parse", "-swift-version", "5",
+                        ["swiftc", "-frontend", "-parse"] + sdk_args + ["-swift-version", "5",
                          "-D", "DEBUG", "-enable-bare-slash-regex"] +
                         ["./" + str(p.relative_to(repo.resolve())) for p in paths]))
         if compiler:

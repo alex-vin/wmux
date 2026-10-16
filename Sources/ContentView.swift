@@ -15641,6 +15641,9 @@ struct SidebarFooterButtons: View {
             if shows(.help) {
                 SidebarHelpMenuButton()
             }
+            if shows(.geminiQuota) {
+                SidebarGeminiQuotaButton()
+            }
             // Command-hold reveal: appears immediately before the extensions
             // button. It stays mounted while its popover is open so releasing
             // ⌘ does not dismiss it.

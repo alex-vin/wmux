@@ -226,6 +226,9 @@
          location = "group:CmuxFoundation">
       </FileRef>
       <FileRef
+         location = "group:CmuxGeminiQuota">
+      </FileRef>
+      <FileRef
          location = "group:CmuxGit">
       </FileRef>
       <FileRef

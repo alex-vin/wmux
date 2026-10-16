@@ -37,6 +37,7 @@ import CmuxFoundation
 import CmuxSentryReporting
 import CmuxSidebar
 import CmuxGit
+import CmuxGeminiQuota
 import os
 
 private nonisolated let sudoApprovalLogger = Logger(
@@ -613,6 +614,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private let cmuxThemePreviewReloadScheduler = MainActorDeferredActionScheduler()
     private let connectivityInvalidationSubscriberCoordinator = ConnectivityInvalidationSubscriberCoordinator()
     let workspacePresenceController = WorkspacePresenceController()
+    let geminiAccountStore = GeminiAccountStore()
+    lazy var geminiTerminalCoordinator = GeminiTerminalAccountCoordinator(accountStore: geminiAccountStore)
     private let sudoApprovalCoordinator: SudoApprovalCoordinator?
 
     @MainActor

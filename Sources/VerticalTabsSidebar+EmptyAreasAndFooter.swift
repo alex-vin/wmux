@@ -39,6 +39,7 @@ enum SidebarFooterButtonMetrics {
 
 enum SidebarFooterControl: CaseIterable, Equatable {
     case help
+    case geminiQuota
     case shortcutDiscovery
     case extensions
 }
