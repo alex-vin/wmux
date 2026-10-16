@@ -57,4 +57,36 @@ struct GeminiAccountTests {
         #expect(GeminiSubscriptionTier.normalize("starter-tier") == .free)
         #expect(GeminiSubscriptionTier.normalize(nil) == .free)
     }
+
+    @Test("OAuth token response decodes integer and floating-point expires_in")
+    func oAuthTokenResponseDecoding() throws {
+        let jsonInt = """
+        {
+            "access_token": "ya29.test1234",
+            "token_type": "Bearer",
+            "expires_in": 3599,
+            "refresh_token": "1//test_refresh",
+            "id_token": "eyJhbGciOi..."
+        }
+        """.data(using: .utf8)!
+
+        let decodedInt = try JSONDecoder().decode(GeminiOAuthTokenResponse.self, from: jsonInt)
+        #expect(decodedInt.accessToken == "ya29.test1234")
+        #expect(decodedInt.expiresIn == 3599.0)
+        #expect(decodedInt.refreshToken == "1//test_refresh")
+        #expect(decodedInt.idToken == "eyJhbGciOi...")
+
+        let jsonDouble = """
+        {
+            "access_token": "ya29.test5678",
+            "expires_in": 3600.5
+        }
+        """.data(using: .utf8)!
+
+        let decodedDouble = try JSONDecoder().decode(GeminiOAuthTokenResponse.self, from: jsonDouble)
+        #expect(decodedDouble.accessToken == "ya29.test5678")
+        #expect(decodedDouble.expiresIn == 3600.5)
+        #expect(decodedDouble.refreshToken == nil)
+        #expect(decodedDouble.idToken == nil)
+    }
 }

@@ -10,13 +10,11 @@ public actor GeminiOAuthCallbackServer {
     /// Creates a callback server.
     public init() {}
 
-    /// Starts listening on an ephemeral loopback port and waits for the OAuth code callback.
+    /// Starts listening on an ephemeral loopback port and returns the local redirect URI.
     ///
-    /// - Parameters:
-    ///   - state: Random state string to validate against CSRF.
-    ///   - timeoutSeconds: Maximum seconds to wait before cancelling (default: 120s).
-    /// - Returns: Tuple of (redirectURI, code).
-    public func start(state: String, timeoutSeconds: TimeInterval = 120.0) async throws -> (redirectURI: String, code: String) {
+    /// - Parameter state: Random state string to validate against CSRF.
+    /// - Returns: The full redirect URI (e.g. `http://127.0.0.1:port/oauth2callback`).
+    public func start(state: String) async throws -> String {
         self.expectedState = state
 
         let params = NWParameters.tcp
@@ -58,9 +56,16 @@ public actor GeminiOAuthCallbackServer {
 
         listener.start(queue: .global())
         let port = try await portPromise.value
-        let redirectURI = "http://127.0.0.1:\(port)/oauth2callback"
+        return "http://127.0.0.1:\(port)/oauth2callback"
+    }
 
-        let code = try await withThrowingTaskGroup(of: String.self) { group in
+    /// Waits for the browser callback with the OAuth authorization code.
+    ///
+    /// - Parameter timeoutSeconds: Maximum seconds to wait before cancelling (default: 120s).
+    /// - Returns: The received authorization code.
+    public func waitForCode(timeoutSeconds: TimeInterval = 120.0) async throws -> String {
+        defer { stop() }
+        return try await withThrowingTaskGroup(of: String.self) { group in
             group.addTask {
                 try await withCheckedThrowingContinuation { (codeCont: CheckedContinuation<String, any Error>) in
                     Task { [weak self] in
@@ -79,9 +84,18 @@ public actor GeminiOAuthCallbackServer {
             group.cancelAll()
             return firstResult
         }
+    }
 
-        stop()
-        return (redirectURI, code)
+    /// Convenience method that starts listening and waits for the OAuth code callback.
+    ///
+    /// - Parameters:
+    ///   - state: Random state string to validate against CSRF.
+    ///   - timeoutSeconds: Maximum seconds to wait before cancelling (default: 120s).
+    /// - Returns: Tuple of (redirectURI, code).
+    public func start(state: String, timeoutSeconds: TimeInterval = 120.0) async throws -> (redirectURI: String, code: String) {
+        let uri = try await start(state: state)
+        let code = try await waitForCode(timeoutSeconds: timeoutSeconds)
+        return (uri, code)
     }
 
     /// Stops the server.

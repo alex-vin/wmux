@@ -109,33 +109,28 @@ public final class GeminiAccountStore {
     /// - Returns: Newly authenticated ``GeminiAccount``.
     public func startOAuthLogin() async throws -> GeminiAccount {
         let state = UUID().uuidString
-        let callbackTask = Task {
-            try await callbackServer.start(state: state)
-        }
+        let redirectURI = try await callbackServer.start(state: state)
 
-        // Give the listener a moment to bind
-        try await Task.sleep(nanoseconds: 50_000_000)
-
-        // Generate auth URL
-        // Temporary dummy port, will be overridden once callback task starts
-        let (redirectURI, code) = try await callbackTask.value
         guard let authURL = await oAuthService.authorizationURL(redirectURI: redirectURI, state: state) else {
+            await callbackServer.stop()
             throw URLError(.badURL)
         }
 
         // Open in browser
-        _ = await Task { @MainActor in
-            NSWorkspace.shared.open(authURL)
-        }.value
+        NSWorkspace.shared.open(authURL)
 
-        let tokenData = try await oAuthService.exchangeCode(code, redirectURI: redirectURI)
-        guard let accessToken = tokenData["access_token"] as? String else {
+        // Wait for callback code
+        let code = try await callbackServer.waitForCode()
+
+        let tokenResponse = try await oAuthService.exchangeCode(code, redirectURI: redirectURI)
+        guard !tokenResponse.accessToken.isEmpty else {
             throw URLError(.userAuthenticationRequired)
         }
 
-        let refreshToken = tokenData["refresh_token"] as? String
-        let idToken = tokenData["id_token"] as? String
-        let expiresIn = (tokenData["expires_in"] as? NSNumber)?.doubleValue ?? 3600.0
+        let accessToken = tokenResponse.accessToken
+        let refreshToken = tokenResponse.refreshToken
+        let idToken = tokenResponse.idToken
+        let expiresIn = tokenResponse.expiresIn ?? 3600.0
         let expiry = Date().timeIntervalSince1970 + expiresIn
 
         let (email, name) = try await oAuthService.fetchUserInfo(accessToken: accessToken)
@@ -201,12 +196,16 @@ public final class GeminiAccountStore {
         // 1. Refresh token if needed
         if acc.needsTokenRefresh(), let rt = acc.refreshToken {
             do {
-                let tokenData = try await oAuthService.refreshAccessToken(refreshToken: rt)
-                if let newAccess = tokenData["access_token"] as? String {
-                    acc.accessToken = newAccess
-                    let expiresIn = (tokenData["expires_in"] as? NSNumber)?.doubleValue ?? 3600.0
-                    acc.expiryTimestamp = Date().timeIntervalSince1970 + expiresIn
+                let tokenResponse = try await oAuthService.refreshAccessToken(refreshToken: rt)
+                acc.accessToken = tokenResponse.accessToken
+                if let newRefreshToken = tokenResponse.refreshToken {
+                    acc.refreshToken = newRefreshToken
                 }
+                if let newIdToken = tokenResponse.idToken {
+                    acc.idToken = newIdToken
+                }
+                let expiresIn = tokenResponse.expiresIn ?? 3600.0
+                acc.expiryTimestamp = Date().timeIntervalSince1970 + expiresIn
             } catch {
                 let desc = error.localizedDescription
                 if desc.contains("invalid_grant") {
