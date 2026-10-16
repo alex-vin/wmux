@@ -11,9 +11,7 @@ from pathlib import Path
 TUI = Path(__file__).resolve().parents[1]
 README_PATHS = (
     TUI / "frontends" / "README.md",
-    TUI / "frontends" / "README.ja.md",
     TUI / "frontends" / "web" / "README.md",
-    TUI / "frontends" / "web" / "README.ja.md",
 )
 
 

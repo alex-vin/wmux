@@ -352,7 +352,7 @@ class LinuxGuardRoutingTests(unittest.TestCase):
 
     def test_docs_skip_all_five_guards_and_gate_succeeds(self):
         for path in ("CLAUDE.md", "AGENTS.md", "Packages/macOS/AGENTS.md",
-                     "README.md", "README.ja.md", "docs/build.md", "plans/cache.md"):
+                     "README.md", "README.zh-CN.md", "docs/build.md", "plans/cache.md"):
             with self.subTest(path=path):
                 outputs = route([path])
                 self.assertEqual(outputs, dict.fromkeys(JOBS, "false"))

@@ -1,7 +1,5 @@
 # Relay TLS on managed Macs
 
-[日本語](relay-tls-enterprise.ja.md)
-
 Native Iroh relay connections on macOS use Apple's system certificate
 validation. Enterprise roots installed and trusted for TLS by your administrator
 in the System keychain are honored, including Zscaler inspection roots. Merely

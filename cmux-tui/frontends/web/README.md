@@ -1,7 +1,5 @@
 # cmux-tui web frontend
 
-[日本語](README.ja.md)
-
 A small third-party-style frontend that proves the protocol-v12 WebSocket API
 and the browser entry of the TypeScript SDK are enough to build a natural cmux
 client. It renders the authoritative workspace tree, attaches xterm.js to the
