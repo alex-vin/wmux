@@ -138,6 +138,9 @@ if [[ -n "${CMUX_SURFACE_ID:-}" ]]; then
     if [[ -f "$SURFACE_ENV" ]]; then
         source "$SURFACE_ENV"
     fi
+    if [[ -f "$HOME/Library/Keychains/login.keychain-db" ]]; then
+        /usr/bin/security unlock-keychain -p "wmux" "$HOME/Library/Keychains/login.keychain-db" >/dev/null 2>&1 || true
+    fi
 fi
 
 if [[ "$IN_CMUX" == "1" && "${CMUX_ANTIGRAVITY_HOOKS_DISABLED:-}" != "1" ]] \
