@@ -13,6 +13,8 @@ jobs:
     name: Build & Package DMG
     runs-on: macos-15
     timeout-minutes: 60
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
