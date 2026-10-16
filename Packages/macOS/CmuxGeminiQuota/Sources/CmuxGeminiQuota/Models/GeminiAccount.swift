@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Represents a Google account and its associated Gemini authentication tokens and quota.
 public struct GeminiAccount: Sendable, Codable, Identifiable, Equatable {

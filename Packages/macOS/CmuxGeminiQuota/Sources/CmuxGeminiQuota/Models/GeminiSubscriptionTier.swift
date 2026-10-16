@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Represents the subscription tier of a Google Gemini user account.
 public enum GeminiSubscriptionTier: String, Sendable, Codable, CaseIterable {

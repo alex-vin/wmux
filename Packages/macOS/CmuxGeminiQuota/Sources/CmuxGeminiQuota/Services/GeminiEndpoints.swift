@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Defines standard endpoints and headers for Google Cloud Code / Code Assist quota services.
 public struct GeminiEndpoints: Sendable {

@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Represents a group of quota buckets (e.g. Gemini Models, Third-Party Models).
 public struct GeminiQuotaGroup: Sendable, Codable, Equatable {

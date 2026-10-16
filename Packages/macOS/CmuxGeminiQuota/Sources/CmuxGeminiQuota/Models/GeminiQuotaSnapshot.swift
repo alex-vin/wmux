@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Represents a consolidated snapshot of an account's model quotas and buckets.
 public struct GeminiQuotaSnapshot: Sendable, Codable, Equatable {

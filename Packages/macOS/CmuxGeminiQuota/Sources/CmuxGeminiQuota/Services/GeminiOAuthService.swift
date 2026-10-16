@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Handles Google OAuth 2.0 authorization, code exchange, token refresh, and user profile retrieval.
 public actor GeminiOAuthService {

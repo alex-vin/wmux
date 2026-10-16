@@ -1,5 +1,5 @@
-import Foundation
-import Observation
+public import Foundation
+public import Observation
 
 /// Coordinates per-terminal surface Gemini account assignments and token provisioning.
 @MainActor

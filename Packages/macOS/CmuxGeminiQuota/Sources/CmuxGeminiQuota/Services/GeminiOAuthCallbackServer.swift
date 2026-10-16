@@ -1,5 +1,5 @@
-import Foundation
-import Network
+public import Foundation
+public import Network
 
 /// Lightweight loopback HTTP server using Network.framework to handle Google OAuth 2.0 callbacks.
 public actor GeminiOAuthCallbackServer {

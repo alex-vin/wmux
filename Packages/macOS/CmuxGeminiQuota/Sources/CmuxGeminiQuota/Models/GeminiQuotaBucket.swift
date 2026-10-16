@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Represents a quota bucket from Google's `retrieveUserQuotaSummary` endpoint.
 public struct GeminiQuotaBucket: Sendable, Codable, Identifiable, Equatable {

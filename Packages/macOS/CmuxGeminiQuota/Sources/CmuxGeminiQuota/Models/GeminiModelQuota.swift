@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Represents the quota status of an individual AI model.
 public struct GeminiModelQuota: Sendable, Codable, Identifiable, Equatable {

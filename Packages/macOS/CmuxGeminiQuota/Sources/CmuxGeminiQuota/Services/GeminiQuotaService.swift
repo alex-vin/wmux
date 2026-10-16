@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 /// Fetches quota information, project IDs, and model availability from Google Cloud Code endpoints.
 public actor GeminiQuotaService {

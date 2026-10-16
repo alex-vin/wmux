@@ -1,5 +1,6 @@
-import Foundation
-import Observation
+public import AppKit
+public import Foundation
+public import Observation
 
 /// Status indicator color semantics for Gemini quota.
 public enum GeminiQuotaHealthStatus: Sendable, Equatable {
