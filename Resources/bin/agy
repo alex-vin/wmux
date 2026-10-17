@@ -134,11 +134,14 @@ IN_CMUX=0
 if [[ -n "${CMUX_SURFACE_ID:-}" ]]; then
     IN_CMUX=1
     # Check for per-surface Gemini account isolation
-    SURFACE_ENV="$HOME/.config/cmux/gemini_tokens/${CMUX_SURFACE_ID}.env"
+    USER_HOME="${REAL_USER_HOME:-$(eval echo ~"${USER:-$(id -un)}")}"
+    SURFACE_ENV="$USER_HOME/.config/cmux/gemini_tokens/${CMUX_SURFACE_ID}.env"
     if [[ -f "$SURFACE_ENV" ]]; then
         source "$SURFACE_ENV"
     fi
-    if [[ -f "$HOME/Library/Keychains/login.keychain-db" ]]; then
+    if [[ -f "$HOME/Library/Keychains/account.keychain-db" ]]; then
+        /usr/bin/security unlock-keychain -p "wmux" "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
+    elif [[ -f "$HOME/Library/Keychains/login.keychain-db" ]]; then
         /usr/bin/security unlock-keychain -p "wmux" "$HOME/Library/Keychains/login.keychain-db" >/dev/null 2>&1 || true
     fi
 fi
