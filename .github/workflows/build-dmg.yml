@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag or Release to attach DMG to (e.g. 1.0.2)'
+        description: 'Tag or Release to attach DMG to (e.g. 1.0.1)'
         required: false
         default: ''
   push:
