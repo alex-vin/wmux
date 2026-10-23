@@ -36,10 +36,12 @@ GROUPS = ["Shared", "iOS", "macOS"]
 
 # Structural workspace entries that are not Packages/<group>/* folders; kept
 # verbatim so regeneration only ever touches package membership.
-TOP_LEVEL_PROJECTS = ["group:cmux.xcodeproj", "group:ios/cmux-ios.xcodeproj"]
+TOP_LEVEL_PROJECTS = ["group:cmux.xcodeproj"]
+if os.path.exists(os.path.join(ROOT, "ios", "cmux-ios.xcodeproj")):
+    TOP_LEVEL_PROJECTS.append("group:ios/cmux-ios.xcodeproj")
 # The iOS app's own SwiftPM package lives outside Packages/; it heads the iOS
 # group.
-IOS_APP_PACKAGE_REF = "container:ios/cmuxPackage"
+IOS_APP_PACKAGE_REF = "container:ios/cmuxPackage" if os.path.exists(os.path.join(ROOT, "ios", "cmuxPackage")) else None
 # The Examples group is curated by hand and lives under a different container.
 EXAMPLES_GROUP = (
     "container:Examples",
@@ -88,7 +90,7 @@ def render() -> str:
         out += _file_ref(loc, "   ")
     for group in GROUPS:
         refs = [f"group:{name}" for name in packages_in(group)]
-        if group == "iOS":
+        if group == "iOS" and IOS_APP_PACKAGE_REF:
             refs = [IOS_APP_PACKAGE_REF] + refs
         out += _group(f"container:Packages/{group}", f"Packages ({group})", refs)
     out += _group(*EXAMPLES_GROUP)
