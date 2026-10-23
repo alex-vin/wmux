@@ -165,11 +165,13 @@ extension CmuxSurfaceTabBarBuiltInAction {
         }
     }
 
+    @MainActor
     var isAvailable: Bool {
         Workspace.surfaceTabBarBuiltInActionIsAvailable(self)
     }
 }
 
+@MainActor
 func surfaceTabBarBuiltInActionIsAvailable(_ action: CmuxSurfaceTabBarBuiltInAction) -> Bool {
     Workspace.surfaceTabBarBuiltInActionIsAvailable(action)
 }
