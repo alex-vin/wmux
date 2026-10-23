@@ -165,13 +165,11 @@ extension CmuxSurfaceTabBarBuiltInAction {
         }
     }
 
+    var isAvailable: Bool {
+        Workspace.surfaceTabBarBuiltInActionIsAvailable(self)
+    }
 }
 
 func surfaceTabBarBuiltInActionIsAvailable(_ action: CmuxSurfaceTabBarBuiltInAction) -> Bool {
-    switch action {
-    case .cloudVM, .newCloudWorkspace, .newCloudMachine, .mobileConnect:
-        return false
-    default:
-        return true
-    }
+    Workspace.surfaceTabBarBuiltInActionIsAvailable(action)
 }

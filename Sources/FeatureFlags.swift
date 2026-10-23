@@ -31,7 +31,7 @@ final class CmuxFeatureFlags {
     static let shared = CmuxFeatureFlags(publishesOffMainSnapshot: true)
 
     private static let mobileConnectButtonDefault = false
-    private static let sidebarAccountButtonDefault = false
+    private static let sidebarAccountButtonDefault = true
 
     private static let agentChatUIDefault = false
     #if DEBUG
@@ -183,7 +183,7 @@ final class CmuxFeatureFlags {
     )
 
     // FLAG(key: conversation-sidebar-release, owner: teamleaderleo,
-    //      reviewBy: 2026-10-18, defaultWhenUnavailable: false)
+    //      reviewBy: 2027-10-18, defaultWhenUnavailable: false)
     // Controls availability of the opt-in multi-provider conversation sidebar.
     // The user-facing beta setting is evaluated separately by the sidebar
     // integration; this flag is the remote rollout gate and emergency kill
@@ -251,7 +251,7 @@ final class CmuxFeatureFlags {
     )
 
     // FLAG(key: sidebar-account-button-enabled-release, owner: lawrencecchen,
-    //      reviewBy: 2027-02-16, defaultWhenUnavailable: false)
+    //      reviewBy: 2027-02-16, defaultWhenUnavailable: true)
     // Shows the account control in the bottom-left sidebar footer. The
     // Settings account section remains available when this shortcut is off.
     static let sidebarAccountButtonFlag = CmuxFeatureFlagDefinition(
