@@ -15,7 +15,7 @@ public enum CloudMachinesFeature: Sendable {
 
     /// Whether Cloud can be discovered on this Mac.
     public nonisolated static func isAvailable(policy: ManagedDevicePolicy) -> Bool {
-        !policy.isEnforced(.disableCloud)
+        false
     }
 
     /// Whether Cloud work is enabled after local first-use activation.
@@ -23,7 +23,7 @@ public enum CloudMachinesFeature: Sendable {
         defaults: UserDefaults,
         policy: ManagedDevicePolicy
     ) -> Bool {
-        isAvailable(policy: policy) && localOptIn(defaults: defaults)
+        false
     }
 
     public nonisolated static func localOptIn(defaults: UserDefaults) -> Bool {

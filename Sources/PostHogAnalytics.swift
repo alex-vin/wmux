@@ -76,23 +76,13 @@ final class PostHogAnalytics: @unchecked Sendable {
     }
 
     private var isEnabled: Bool {
-        // XCTest hosts can inherit the production PostHog configuration. Keep
-        // test launches from initializing the SDK or sending crash telemetry.
-        guard !MacSentryStartupPolicy.isRunningUnderXCTest(environment: environment) else {
-            return false
-        }
-        guard telemetryEnabled() else { return false }
-#if DEBUG
-        // Avoid polluting production analytics while iterating locally.
-        return environment["CMUX_POSTHOG_ENABLE"] == "1"
-#else
-        return !apiKey.isEmpty && apiKey != "REPLACE_WITH_POSTHOG_PUBLIC_KEY"
-#endif
+        false
     }
 
     /// Retains the prior launch's identity before replacing it with this build.
     /// Native Ghostty envelopes do not contain the host app's version.
     func recordLaunchIdentity() {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             guard let self else { return }
             guard !MacSentryStartupPolicy.isRunningUnderXCTest(environment: self.environment) else { return }
@@ -110,12 +100,14 @@ final class PostHogAnalytics: @unchecked Sendable {
     }
 
     func startIfNeeded() {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             self?.startIfNeededOnWorkQueue()
         }
     }
 
     func trackActive(reason: String) {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             guard let self else { return }
 
@@ -135,6 +127,7 @@ final class PostHogAnalytics: @unchecked Sendable {
 
     /// Registers super properties sent with every later event.
     func register(_ properties: [String: Any]) {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             guard let self else { return }
             self.startIfNeededOnWorkQueue()
@@ -148,6 +141,7 @@ final class PostHogAnalytics: @unchecked Sendable {
     /// No-op when telemetry is disabled or the SDK never started. Used by the
     /// Cloud VM request telemetry (`VMClientTelemetry`).
     func capture(_ event: String, properties: [String: Any]) {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             guard let self else { return }
             self.startIfNeededOnWorkQueue()
@@ -164,6 +158,7 @@ final class PostHogAnalytics: @unchecked Sendable {
     /// A different previously identified account is reset first so two
     /// accounts never share one person. No-op when telemetry is disabled.
     func identify(accountID: String) {
+        guard isEnabled else { return }
         guard !accountID.isEmpty else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             guard let self else { return }
@@ -193,6 +188,7 @@ final class PostHogAnalytics: @unchecked Sendable {
     /// telemetry is disabled (the stored account then stays so a later launch
     /// with telemetry on still resets before identifying someone else).
     func resetIdentity() {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             guard let self else { return }
             guard self.userDefaults.string(forKey: self.identifiedAccountIDKey) != nil else { return }
@@ -221,6 +217,7 @@ final class PostHogAnalytics: @unchecked Sendable {
     /// telemetry is disabled, the SDK never started, or this crash artifact
     /// was already reported.
     func captureCrashException(pendingCrash: GhosttyCrashBreadcrumb.PendingCrash) {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             guard let self else { return }
             self.startIfNeededOnWorkQueue()
@@ -251,12 +248,14 @@ final class PostHogAnalytics: @unchecked Sendable {
     }
 
     func trackDailyActive(reason: String) {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             self?.trackDailyActiveOnWorkQueue(reason: reason, flush: true)
         }
     }
 
     func trackHourlyActive(reason: String) {
+        guard isEnabled else { return }
         dispatchAsyncOnWorkQueue { [weak self] in
             self?.trackHourlyActiveOnWorkQueue(reason: reason, flush: true)
         }

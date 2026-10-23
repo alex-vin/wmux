@@ -159,10 +159,7 @@ final class CLISocketSentryTelemetry {
     }
 
     func breadcrumb(_ message: String, data: [String: Any] = [:]) {
-        guard shouldEmit else { return }
-#if canImport(Sentry)
-        pendingBreadcrumbs.append(PendingBreadcrumb(message: message, data: data))
-#endif
+        // Telemetry disabled: no-op
     }
 
     /// Captures an actionable CLI failure while preserving the original error
@@ -174,90 +171,11 @@ final class CLISocketSentryTelemetry {
         data: [String: Any] = [:],
         classificationError: Error? = nil
     ) {
-        guard shouldEmit,
-              let classification = classify(
-            stage: stage,
-            error: error,
-            data: data,
-            classificationError: classificationError
-        ) else {
-            return
-        }
-        let errorDescription = classification.errorDescription
-        let cliErrorMetadata = classification.metadata
-        guard !classification.isExpected else { return }
-        let fingerprintKind = Self.fingerprintKind(
-            for: classificationError ?? error,
-            message: errorDescription,
-            structuredCode: cliErrorMetadata.code
-        )
-        if let fingerprintKind,
-           CLISentryErrorFingerprint.throttledKinds.contains(fingerprintKind),
-           !claimThrottledCaptureSlot(stage: stage, kind: fingerprintKind) {
-            return
-        }
-#if DEBUG
-        recordCaptureProbe(stage: stage, error: error)
-#endif
-#if canImport(Sentry)
-        Self.ensureStarted()
-        var context = baseContext()
-        context["stage"] = stage
-        context["error"] = errorDescription
-        if let code = cliErrorMetadata.code {
-            context["cli_error_code"] = code
-        }
-        if cliErrorMetadata.isStructuredProtocolResponse {
-            context["cli_error_protocol_response"] = true
-        }
-        if cliErrorMetadata.socketPathMissing {
-            context["socket_path_missing"] = true
-        }
-        for (key, value) in socketDiagnostics() {
-            context[key] = value
-        }
-        for (key, value) in data {
-            context[key] = value
-        }
-        let subcommand = self.subcommand
-        let command = self.command
-        let event = Self.makeErrorEvent(
-            error: error,
-            context: context,
-            command: command,
-            subcommand: subcommand,
-            fingerprint: ["cmux-cli", stage, fingerprintKind ?? "{{ default }}"],
-            breadcrumbs: pendingBreadcrumbs.map { pending in
-                makeBreadcrumb(message: pending.message, data: pending.data)
-            }
-        )
-        pendingBreadcrumbs.removeAll()
-        let scrubber = SentryEventScrubber()
-        let scrubbedEvent = scrubber.scrub(event)
-        guard !Self.isExpectedCLISocketTransportEvent(
-            scrubbedEvent,
-            classificationMessage: cliErrorMetadata.legacyMessage
-        ) else {
-            return
-        }
-        let envelopeItem = SentryEnvelopeItem(event: scrubbedEvent)
-        let envelope = SentryEnvelope(id: scrubbedEvent.eventId, singleItem: envelopeItem)
-        PrivateSentrySDKOnly.store(envelope)
-        // `store` is the durable handoff. Calling SentrySDK.flush here—even
-        // with a zero timeout—still enters SentryHttpTransport's synchronous
-        // coordination path. The app's Sentry client will pick up the cached
-        // envelope on its next transport pass.
-#if DEBUG
-        recordStoreProbe(
-            eventId: scrubbedEvent.eventId.sentryIdString,
-            fingerprint: scrubbedEvent.fingerprint ?? []
-        )
-#endif
-#endif
+        // Telemetry disabled: no-op
     }
 
     private var shouldEmit: Bool {
-        !disabledByEnv && buildIdentityPolicy.allowsTelemetry
+        false
     }
 
     /// Returns whether a failure is expected and should skip telemetry work.
@@ -665,37 +583,7 @@ final class CLISocketSentryTelemetry {
 
 #if canImport(Sentry)
     private static func ensureStarted() {
-        startupLock.lock()
-        defer { startupLock.unlock() }
-        guard !started else { return }
-        SentrySDK.start { options in
-            CLISentryRuntimePolicy().configure(options)
-            options.dsn = dsn
-            options.releaseName = currentSentryReleaseName()
-#if DEBUG
-            options.environment = "development-cli"
-#else
-            options.environment = "production-cli"
-#endif
-            options.debug = false
-            // Defense-in-depth: keep default PII (user, IP, etc.) off the wire.
-            // The scrubber below additionally redacts any user fields that slip in.
-            options.sendDefaultPii = false
-            options.attachStacktrace = true
-            options.tracesSampleRate = 0.0
-            options.enableCaptureFailedRequests = false
-            // Redact file paths, emails, and secrets from every outgoing event
-            // and breadcrumb before it leaves the device.
-            let scrubber = SentryEventScrubber()
-            options.beforeSend = { event in
-                if Self.isExpectedCLISocketTransportEvent(event) {
-                    return nil
-                }
-                return scrubber.scrub(event)
-            }
-            options.beforeBreadcrumb = { breadcrumb in scrubber.scrub(breadcrumb) }
-        }
-        started = true
+        // Telemetry disabled: no-op
     }
 #endif
 }

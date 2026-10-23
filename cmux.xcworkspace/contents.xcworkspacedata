@@ -69,39 +69,6 @@
          location = "container:ios/cmuxPackage">
       </FileRef>
       <FileRef
-         location = "group:CmuxAgentChatUI">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileAnalytics">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileBilling">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileBrowser">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileBrowserStream">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileCamera">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileChanges">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileCloud">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileCloudBridge">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileCloudUI">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileCrashReporting">
-      </FileRef>
-      <FileRef
          location = "group:CmuxMobileDiagnostics">
       </FileRef>
       <FileRef
@@ -111,40 +78,13 @@
          location = "group:CmuxMobileRPC">
       </FileRef>
       <FileRef
-         location = "group:CmuxMobileShell">
-      </FileRef>
-      <FileRef
          location = "group:CmuxMobileShellModel">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileShellUI">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileSimulatorStream">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileSSH">
       </FileRef>
       <FileRef
          location = "group:CmuxMobileSupport">
       </FileRef>
       <FileRef
-         location = "group:CmuxMobileTerminal">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileTerminalKit">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileToast">
-      </FileRef>
-      <FileRef
          location = "group:CmuxMobileTransport">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileTunnel">
-      </FileRef>
-      <FileRef
-         location = "group:CmuxMobileWorkspace">
       </FileRef>
    </Group>
    <Group

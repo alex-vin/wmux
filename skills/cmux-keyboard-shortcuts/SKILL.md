@@ -15,7 +15,7 @@ Every new cmux-owned keyboard shortcut must be added to `Sources/KeyboardShortcu
 
 - Work from a cmux checkout or worktree root when possible.
 - Use `skills/cmux-settings/scripts/cmux-settings` for every read/write. It reads JSONC, writes atomically, and validates JSON plus recognized settings keys.
-- Action IDs: `skills/cmux-settings/references/shortcut-actions.md`. Current defaults: `web/data/cmux-shortcuts.ts` or `Sources/KeyboardShortcutSettings.swift`.
+- Action IDs: `skills/cmux-settings/references/shortcut-actions.md`. Current defaults: `Sources/KeyboardShortcutSettings.swift`.
 
 ```bash
 if [[ -z "${CMUX_SETTINGS:-}" ]]; then

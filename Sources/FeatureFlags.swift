@@ -31,7 +31,7 @@ final class CmuxFeatureFlags {
     static let shared = CmuxFeatureFlags(publishesOffMainSnapshot: true)
 
     private static let mobileConnectButtonDefault = false
-    private static let sidebarAccountButtonDefault = true
+    private static let sidebarAccountButtonDefault = false
 
     private static let agentChatUIDefault = false
     #if DEBUG
@@ -251,7 +251,7 @@ final class CmuxFeatureFlags {
     )
 
     // FLAG(key: sidebar-account-button-enabled-release, owner: lawrencecchen,
-    //      reviewBy: 2027-02-16, defaultWhenUnavailable: true)
+    //      reviewBy: 2027-02-16, defaultWhenUnavailable: false)
     // Shows the account control in the bottom-left sidebar footer. The
     // Settings account section remains available when this shortcut is off.
     static let sidebarAccountButtonFlag = CmuxFeatureFlagDefinition(

@@ -19,17 +19,52 @@ jobs:
     timeout-minutes: 180
     permissions:
       contents: write
+    env:
+      XCODE_VERSION: '26'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 1
+
+      - name: Resolve Submodule SHAs
+        id: submodules
+        run: |
+          GHOSTTY_SHA=$(git rev-parse HEAD:ghostty)
+          BONSPLIT_SHA=$(git rev-parse HEAD:vendor/bonsplit)
+          echo "ghostty_sha=$GHOSTTY_SHA" >> "$GITHUB_OUTPUT"
+          echo "bonsplit_sha=$BONSPLIT_SHA" >> "$GITHUB_OUTPUT"
+          echo "GHOSTTY_SHA=$GHOSTTY_SHA" >> "$GITHUB_ENV"
+
+      - name: Cache ghostty Submodule
+        id: cache-ghostty
+        uses: actions/cache@v4
+        with:
+          path: ghostty
+          key: submodule-ghostty-${{ steps.submodules.outputs.ghostty_sha }}
+
+      - name: Checkout ghostty Submodule
+        if: steps.cache-ghostty.outputs.cache-hit != 'true'
+        run: git submodule update --init --depth 1 ghostty
+
+      - name: Cache bonsplit Submodule
+        id: cache-bonsplit
+        uses: actions/cache@v4
+        with:
+          path: vendor/bonsplit
+          key: submodule-bonsplit-${{ steps.submodules.outputs.bonsplit_sha }}
+
+      - name: Checkout bonsplit Submodule
+        if: steps.cache-bonsplit.outputs.cache-hit != 'true'
+        run: git submodule update --init --depth 1 vendor/bonsplit
 
       - name: Select Xcode
         run: |
           ./scripts/select-ci-xcode.sh
+          XCODE_VER=$(xcodebuild -version | head -n 1 | awk '{print $2}')
+          echo "XCODE_VERSION=$XCODE_VER" >> "$GITHUB_ENV"
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
@@ -44,24 +79,41 @@ jobs:
 
       - name: Install create-dmg
         run: |
-          brew install create-dmg
+          sudo mkdir -p /usr/local/bin
+          sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/v1.3.0/create-dmg -o /usr/local/bin/create-dmg || sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/master/create-dmg -o /usr/local/bin/create-dmg
+          sudo chmod +x /usr/local/bin/create-dmg
+          create-dmg --version
+
+      - name: Cache GhosttyKit
+        id: cache-ghosttykit
+        uses: actions/cache@v4
+        with:
+          path: |
+            GhosttyKit.xcframework
+            ~/Library/Caches/cmux/ghosttykit
+          key: ghosttykit-${{ runner.os }}-${{ steps.submodules.outputs.ghostty_sha }}
+          restore-keys: |
+            ghosttykit-${{ runner.os }}-
 
       - name: Download Prebuilt GhosttyKit
+        if: steps.cache-ghosttykit.outputs.cache-hit != 'true'
         run: |
-          export GHOSTTY_SHA="cb1ef7091cdef0b581ee2cbd83742b653253523e"
+          export GHOSTTYKIT_ARCHIVE_CACHE_DIR="$HOME/Library/Caches/cmux/ghosttykit"
           ./scripts/download-prebuilt-ghosttykit.sh
 
-      - name: Cache Cargo & Build Dependencies
+      - name: Cache Cargo & Rust Target
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
+            Native/CommandPaletteNucleoFFI/target
             ~/Library/Caches/cmux
-          key: cargo-cmux-${{ runner.os }}-${{ hashFiles('Native/**/Cargo.lock') }}
+          key: cargo-nucleo-${{ runner.os }}-${{ hashFiles('Native/**/Cargo.lock') }}-${{ github.sha }}
           restore-keys: |
-            cargo-cmux-${{ runner.os }}-
+            cargo-nucleo-${{ runner.os }}-${{ hashFiles('Native/**/Cargo.lock') }}-
+            cargo-nucleo-${{ runner.os }}-
 
       - name: Cache SwiftPM
         uses: actions/cache@v4
@@ -72,6 +124,19 @@ jobs:
           restore-keys: |
             spm-${{ runner.os }}-
 
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/Build/Products
+            build/Build/Intermediates.noindex
+            build/SourcePackages
+            build/ModuleCache.noindex
+          key: deriveddata-${{ runner.os }}-${{ env.XCODE_VERSION }}-${{ hashFiles('**/Package.resolved', 'cmux.xcodeproj/project.pbxproj') }}-${{ github.sha }}
+          restore-keys: |
+            deriveddata-${{ runner.os }}-${{ env.XCODE_VERSION }}-${{ hashFiles('**/Package.resolved', 'cmux.xcodeproj/project.pbxproj') }}-
+            deriveddata-${{ runner.os }}-${{ env.XCODE_VERSION }}-
+
       - name: Build macOS App with xcodebuild
         env:
           GIT_TERMINAL_PROMPT: 0
@@ -79,11 +144,24 @@ jobs:
           CARGO_NET_GIT_FETCH_WITH_CLI: "true"
           CMUX_SWIFT_FRONTEND_WORKAROUND: 1
           CMUX_SWIFT_DISABLE_GLOBAL_ISEL: 1
+          XCBUILD_FILE_SYSTEM_MODE: checksum-only
+          CLANG_ENABLE_PREFIX_MAPPING: YES
+          SWIFT_ENABLE_PROJECT_PREFIX_MAPPING: YES
+          CLANG_ENABLE_PROJECT_PREFIX_MAPPING: YES
         run: |
+          SKIP_PKG_FLAG=""
+          if [ -d "build/SourcePackages/checkouts" ]; then
+            echo "Found existing build/SourcePackages/checkouts; enabling -skipPackageUpdates"
+            SKIP_PKG_FLAG="-skipPackageUpdates"
+          fi
+
           CMUX_SKIP_ZIG_BUILD=1 xcodebuild -scheme cmux \
             -configuration Release \
             -derivedDataPath build \
             -destination 'generic/platform=macOS' \
+            -parallelizeTargets \
+            -jobs "$(sysctl -n hw.ncpu || echo 4)" \
+            $SKIP_PKG_FLAG \
             ARCHS="arm64" \
             ONLY_ACTIVE_ARCH=NO \
             CODE_SIGNING_ALLOWED=NO \
