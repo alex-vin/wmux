@@ -1850,9 +1850,13 @@ struct ContentView: View {
     }
 
     private func terminalContentWithSidebarDropOverlay(appearance: WindowAppearanceSnapshot) -> some View {
-        terminalContent(appearance: appearance)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .layoutPriority(1)
+        VStack(spacing: 0) {
+            SubagentStatusBarView()
+            terminalContent(appearance: appearance)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .layoutPriority(1)
     }
 
     private func terminalContentWithRightSidebarPanel(appearance: WindowAppearanceSnapshot) -> some View {

@@ -69,7 +69,7 @@ public struct GeminiAccount: Sendable, Codable, Identifiable, Equatable {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZZZZ"
         let expiryString = formatter.string(from: Date(timeIntervalSince1970: expiryTimestamp))
 
-        var tokenDict: [String: Any] = [
+        let tokenDict: [String: Any] = [
             "access_token": accessToken ?? "",
             "token_type": "Bearer",
             "refresh_token": refreshToken ?? "",
@@ -84,7 +84,7 @@ public struct GeminiAccount: Sendable, Codable, Identifiable, Equatable {
             payload["id_token"] = idToken
         }
 
-        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: []),
+        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
               let json = String(data: data, encoding: .utf8) else {
             return "{}"
         }
@@ -96,5 +96,42 @@ public struct GeminiAccount: Sendable, Codable, Identifiable, Equatable {
         let payload = agyPayloadJSON()
         let b64 = Data(payload.utf8).base64EncodedString()
         return "go-keyring-base64:\(b64)"
+    }
+
+    /// Remaining fraction (0.0 to 1.0) for the 5-hour quota window.
+    public var fiveHourQuota: Double? {
+        if let flagship = quota.flagshipModel {
+            if let bucket = quota.bucket5h(for: flagship) {
+                return bucket.remainingFraction
+            }
+            return Double(flagship.percentage) / 100.0
+        }
+        for group in quota.groups {
+            for bucket in group.buckets {
+                let win = bucket.window.lowercased()
+                let bid = bucket.id.lowercased()
+                if win.contains("5h") || bid.contains("5h") || win.contains("hour") || bid.contains("hour") {
+                    return bucket.remainingFraction
+                }
+            }
+        }
+        return nil
+    }
+
+    /// Remaining fraction (0.0 to 1.0) for the weekly quota window.
+    public var weeklyQuota: Double? {
+        if let flagship = quota.flagshipModel, let bucket = quota.bucketWeekly(for: flagship) {
+            return bucket.remainingFraction
+        }
+        for group in quota.groups {
+            for bucket in group.buckets {
+                let win = bucket.window.lowercased()
+                let bid = bucket.id.lowercased()
+                if win.contains("week") || bid.contains("week") || win.contains("7d") || bid.contains("7d") {
+                    return bucket.remainingFraction
+                }
+            }
+        }
+        return nil
     }
 }
