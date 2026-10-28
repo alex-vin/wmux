@@ -70,6 +70,14 @@ public final class NativeTitlebarBackdropCoordinator {
             effectView.isHidden = true
         }
         window.titlebarAppearsTransparent = true
+        if let titlebarView = titlebarViews.titlebarView {
+            titlebarView.needsLayout = true
+            titlebarView.layoutSubtreeIfNeeded()
+            titlebarView.needsDisplay = true
+            for subview in titlebarView.subviews {
+                subview.needsDisplay = true
+            }
+        }
     }
 
     /// Hides standard titlebar controls when fullscreen or minimal mode needs custom controls.

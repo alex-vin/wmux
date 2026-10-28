@@ -3516,7 +3516,6 @@ struct ContentView: View {
             BrowserWindowPortalRegistry.scheduleExternalGeometrySynchronize(for: window)
         }
         AppDelegate.shared?.attachUpdateAccessory(to: window)
-        AppDelegate.shared?.applyWindowDecorations(to: window)
         // Let cmux supply the translucent titlebar fills. AppKit's native
         // material otherwise blends a lighter strip over the terminal area.
         windowChrome.nativeTitlebarBackdropCoordinator.syncNativeTitlebarBackdrop(
@@ -3524,6 +3523,14 @@ struct ContentView: View {
             enabled: true,
             usesGlassStyle: backdropResult.usesWindowGlass
         )
+        AppDelegate.shared?.applyWindowDecorations(to: window)
+        if let closeButton = window.standardWindowButton(.closeButton),
+           let titlebarView = closeButton.superview {
+            titlebarView.needsLayout = true
+            titlebarView.layoutSubtreeIfNeeded()
+            titlebarView.needsDisplay = true
+            closeButton.superview?.subviews.forEach { $0.needsDisplay = true }
+        }
         AppDelegate.shared?.registerMainWindow(
             window,
             windowId: windowId,

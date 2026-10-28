@@ -86,6 +86,9 @@ final class CmuxDebugWindowsCoordinator {
         aboutTitlebarCoordinator.showAboutTitlebarDebugWindow()
     }
 
+    func showSidebarFooterIconBalanceWindow() {
+    }
+
 }
 
 /// Short-lived helper that watches for the next workspace to appear in a
@@ -10780,6 +10783,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     "applied={\(nsRectLogDescription(window.frame))}"
             )
 #endif
+        } else {
+            window.setFrame(window.frame, display: true)
+        }
+        if let closeButton = window.standardWindowButton(.closeButton),
+           let titlebarView = closeButton.superview {
+            titlebarView.needsLayout = true
+            titlebarView.layoutSubtreeIfNeeded()
+            titlebarView.needsDisplay = true
+            for subview in titlebarView.subviews {
+                subview.needsDisplay = true
+            }
         }
 #if DEBUG
         // Honor the shared dev-only default display (set via `cmux window
