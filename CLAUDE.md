@@ -104,3 +104,32 @@ execution, access to unowned objects and local-state exposure, and include the
 required policy tests and ID scoping. Unsafe local effects must be redesigned.
 Never allowlist terminal spawn/respawn without live verification that it executes
 on the remote host. An allowlist addition without this analysis blocks review.
+
+## Codebase Knowledge Graph (codebase-memory-mcp)
+
+This project has an indexed knowledge graph managed by `codebase-memory-mcp` (Project identifier: `Users-wenxinwu-data-ai-wmux`, database cached in `~/.cache/codebase-memory-mcp/Users-wenxinwu-data-ai-wmux.db`).
+
+- **Mandatory graph-first discovery**: ALWAYS prioritize MCP graph tools (`search_graph`, `trace_path`, `get_code_snippet`, `get_architecture`, `detect_changes`) before grep/find/file-search when exploring symbols, routes, call graphs, or architecture seams.
+- **Trace impact before edits**: When changing shared interfaces or core classes, run `trace_path` (inbound/outbound) or `detect_changes` to identify affected components and consumers.
+- Fall back to text search only for raw string literals, YAML/configs, or non-code files.
+
+## Multi-agent collaborative architecture (5 agents)
+
+For multi-module tasks, architectural refactors, or feature implementations, adopt the 5-Agent Collaborative Topology:
+
+1. **`lead-orchestrator` (Lead Architect & Coordinator)**
+   - **Scope**: Requirement decomposition, task dispatching, cross-module API contracts, conflict resolution, and final compliance review against `AGENTS.md`.
+   - **Rule**: Coordinates domain agents; maintains global architecture coherence; does not perform low-level file edits directly.
+2. **`swift-client` (Swift / macOS Native Client)**
+   - **Scope**: `Sources/`, `Packages/`, `CLI/`, AppKit/SwiftUI views, state stores, window/split routing.
+   - **Rule**: Must enforce Swift 6 concurrency compatibility; never replace running cmux instance; obey scoped verification rules.
+   - **Discovery**: Use `search_graph` and `trace_path` to verify caller/callee boundaries before editing SwiftUI/AppKit states.
+3. **`rust-systems` (Rust Systems & Sidecar)**
+   - **Scope**: `cmux-tui/`, `Native/DiffSidecar/`, IPC socket protocols, TUI crates.
+   - **Rule**: Maintain memory safety, zero-copy socket parsing, and cross-platform TUI reliability.
+4. **`web-agent-chat` (Protocol & Web / Frontend)**
+   - **Scope**: `agent-chat/`, `web/`, `Resources/`, ACP (Agent Client Protocol) adapters, web extension plugins.
+   - **Rule**: Maintain ACP event streaming protocol invariants; obey browser isolation constraints.
+5. **`qa-security-auditor` (Quality, Security & Policy Auditor)**
+   - **Scope**: Independent verification and security audit across the whole repository.
+   - **Rule**: Verify `RemoteRelayCommandPolicy` (deny-by-default); enforce scoped verification via `python3 scripts/verify-local.py`; strictly forbid blind full-repository test scans; reject any unapproved bundle replacement or unverified mutations.

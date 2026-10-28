@@ -46,7 +46,7 @@ WORK_DIR="${TARGET_TEMP_DIR:-${GO_SRC_DIR}/.tmp}/wireguard-go"
 # shellcheck source=scripts/build-phase-caller-path.sh
 . "${ROOT}/scripts/build-phase-caller-path.sh"
 # Xcode build phases do not inherit a login-shell PATH.
-export PATH="/usr/local/go/bin:/opt/homebrew/bin:/usr/local/bin:${HOME}/go/bin:${PATH}"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/local/go/bin:${HOME}/go/bin:${PATH}"
 
 case "${CMUX_WIREGUARD_GO_REQUIRE:-}" in
   1|true|TRUE|yes|YES) REQUIRE_GO=1 ;;
@@ -117,7 +117,23 @@ CLANG="$(xcrun --sdk "$SDK_NAME" --find clang)"
 
 mkdir -p "$WORK_DIR" "$(dirname "$OUTPUT")"
 
-GO_BIN="${CMUX_WIREGUARD_GO_BINARY:-$(command -v go || true)}"
+find_working_go() {
+  if [[ -n "${CMUX_WIREGUARD_GO_BINARY:-}" ]] && "$CMUX_WIREGUARD_GO_BINARY" version >/dev/null 2>&1; then
+    echo "$CMUX_WIREGUARD_GO_BINARY"
+    return 0
+  fi
+  local candidate
+  for candidate in "${CMUX_WIREGUARD_GO_BINARY:-}" /opt/homebrew/bin/go /usr/local/bin/go /usr/local/go/bin/go "${HOME}/go/bin/go" "$(command -v go 2>/dev/null || true)"; do
+    [[ -n "$candidate" ]] || continue
+    if [[ -x "$candidate" ]] && "$candidate" version >/dev/null 2>&1; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+GO_BIN="$(find_working_go || true)"
 
 archives=()
 seen=""

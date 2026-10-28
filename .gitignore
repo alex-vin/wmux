@@ -62,6 +62,7 @@ web/.pagefind-site/
 web/public/pagefind/
 
 # Local scratch (screenshots, etc.)
+.codegraph/
 tmp/
 tmp-*/
 .iter-logs/
@@ -84,3 +85,11 @@ tmux-*.log
 
 # Locally downloaded prebuilt client for Packages/Shared/CmuxTerminalClient
 Packages/Shared/CmuxTerminalClient/CmuxTerminalClient.xcframework/
+
+
+.agents/*
+.claude/*
+.codegraph/*
+build-dmg.log
+dist/
+*.dmg

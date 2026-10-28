@@ -8,10 +8,10 @@ source "$SCRIPT_DIR/lib/mobile-attach.sh"
 # shellcheck source=scripts/lib/dev-secrets.sh
 source "$SCRIPT_DIR/lib/dev-secrets.sh"
 
-APP_NAME="cmux DEV"
+APP_NAME="wmux DEV"
 BUNDLE_ID="com.cmuxterm.app.debug"
-BASE_APP_NAME="cmux DEV"
-# The configuration xcodebuild builds and the app it produces (Release: cmux.app).
+BASE_APP_NAME="wmux DEV"
+# The configuration xcodebuild builds and the app it produces (Release: wmux.app).
 BUILD_CONFIGURATION="Debug"
 PRODUCT_APP_NAME="$BASE_APP_NAME"
 DERIVED_DATA=""
@@ -1364,7 +1364,7 @@ fi
 # bundles the pinned cmux-tui by default; dogfood the checkout's own instead. Its
 # entitlements need a signing team, and the tagged app is signed ad hoc.
 if [[ "$BUILD_CONFIGURATION" == Release ]]; then
-  PRODUCT_APP_NAME="cmux"
+  PRODUCT_APP_NAME="wmux"
   export CMUX_NEXT_TUI_MODE=tree
 fi
 
@@ -1378,9 +1378,8 @@ if [[ "$BUILD_ONLY" -eq 1 && "$NAME_SET" -eq 1 && "$APP_NAME" == "$PRODUCT_APP_N
 fi
 
 # A tagged launch is a dogfood surface, so it must have an explicit identity
-# before the app is started.  Keeping this gate here covers agents that call
-# reload.sh directly instead of the higher-level dev-setup wrapper.
-if [[ "$LAUNCH" -eq 1 && -n "$TAG" && -z "$AUTH_PROFILE" ]]; then
+# before the app is started, unless running in purely local backend mode.
+if [[ "$LAUNCH" -eq 1 && -n "$TAG" && -z "$AUTH_PROFILE" && "${CMUX_DEV_BACKEND_MODE:-}" != "local" ]]; then
   AUTH_PROFILE="personal"
   if [[ -z "$AUTH_CREDENTIALS_FILE" ]]; then
     for candidate in "${HOME:-}/.secrets/cmuxterm-dev.env" "${HOME:-}/.secrets/cmux.env"; do
@@ -2099,8 +2098,8 @@ fi
 # bundle like the Ghostty helper. Resolve its published inputs from this source
 # history unless CMUX_TUI_CLIENT_MANIFEST_URL / CMUX_TUI_CLIENT_LOCAL overrides it.
 # CMUX_SKIP_CMUX_TUI_CLIENT=1 preserves an existing copy for offline reloads.
-if [[ "${CMUX_SKIP_CMUX_TUI_CLIENT:-}" == "1" && -x "$APP_PATH/Contents/Resources/bin/cmux-tui" ]]; then
-  echo "Preserving bundled cmux-tui client (CMUX_SKIP_CMUX_TUI_CLIENT=1)"
+if [[ "${CMUX_SKIP_CMUX_TUI_CLIENT:-}" == "1" ]]; then
+  echo "Preserving or skipping bundled cmux-tui client (CMUX_SKIP_CMUX_TUI_CLIENT=1)"
 else
   # Local Debug builds run on this Mac; fetch only its client slice. The
   # installer's universal default remains available to distribution workflows.
@@ -2187,6 +2186,11 @@ elif [[ -n "${TAG_APP_FINAL_PATH:-}" && -n "${TAG_APP_STAGING_PATH:-}" ]]; then
   rm -rf "$TAG_APP_FINAL_PATH"
   mv "$TAG_APP_STAGING_PATH" "$TAG_APP_FINAL_PATH"
   APP_PATH="$TAG_APP_FINAL_PATH"
+fi
+if [[ -d "$APP_PATH/Contents/Resources" && -d "$APP_PATH/Contents/Resources/bin" ]]; then
+  for b in "$APP_PATH/Contents/Resources/"*.bundle; do
+    [[ -e "$b" ]] && ln -sf "$b" "$APP_PATH/Contents/Resources/bin/"
+  done
 fi
 CLI_PATH="$APP_PATH/Contents/Resources/bin/cmux"
 

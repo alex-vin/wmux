@@ -24,8 +24,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           fetch-depth: 1
+
+      - name: Initialize Submodules (Shallow)
+        run: |
+          git submodule update --init --depth 1 vendor/bonsplit ghostty
 
       - name: Select Xcode
         run: |
@@ -37,25 +41,29 @@ jobs:
           toolchain: 1.88.0
           targets: aarch64-apple-darwin
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-          cache: false
-
       - name: Install create-dmg
         run: |
-          sudo mkdir -p /usr/local/bin
-          sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/v1.3.0/create-dmg -o /usr/local/bin/create-dmg || sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/master/create-dmg -o /usr/local/bin/create-dmg
-          sudo chmod +x /usr/local/bin/create-dmg
+          if [ ! -x /usr/local/bin/create-dmg ]; then
+            sudo mkdir -p /usr/local/bin
+            sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/v1.3.0/create-dmg -o /usr/local/bin/create-dmg || sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/master/create-dmg -o /usr/local/bin/create-dmg
+            sudo chmod +x /usr/local/bin/create-dmg
+          fi
           create-dmg --version
 
+      - name: Cache GhosttyKit
+        id: cache-ghosttykit
+        uses: actions/cache@v4
+        with:
+          path: GhosttyKit.xcframework
+          key: ghosttykit-${{ runner.os }}-${{ hashFiles('scripts/ghosttykit-checksums.txt') }}
+
       - name: Download Prebuilt GhosttyKit
+        if: steps.cache-ghosttykit.outputs.cache-hit != 'true'
         run: |
           export GHOSTTY_SHA="cb1ef7091cdef0b581ee2cbd83742b653253523e"
           ./scripts/download-prebuilt-ghosttykit.sh
 
-      - name: Cache Cargo & Build Dependencies
+      - name: Cache Cargo & Rust Artifacts
         uses: actions/cache@v4
         with:
           path: |
@@ -63,18 +71,29 @@ jobs:
             ~/.cargo/registry/cache
             ~/.cargo/git/db
             ~/Library/Caches/cmux
-          key: cargo-cmux-${{ runner.os }}-${{ hashFiles('Native/**/Cargo.lock') }}
+            Native/CommandPaletteNucleoFFI/target
+            Native/DiffSidecar/target
+          key: cargo-rust-${{ runner.os }}-${{ hashFiles('Native/**/Cargo.lock') }}
           restore-keys: |
-            cargo-cmux-${{ runner.os }}-
+            cargo-rust-${{ runner.os }}-
 
-      - name: Cache SwiftPM
+      - name: Cache SwiftPM Packages
+        id: cache-spm
         uses: actions/cache@v4
         with:
           path: |
+            build/SourcePackages/checkouts
+            build/SourcePackages/artifacts
+            build/SourcePackages/repositories
             ~/Library/Caches/org.swift.swiftpm
           key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             spm-${{ runner.os }}-
+
+      - name: Sanitize SwiftPM State
+        run: |
+          # Prevent Xcode crashes caused by cached absolute paths in workspace-state.json
+          rm -f build/SourcePackages/workspace-state.json
 
       - name: Build macOS App with xcodebuild
         env:
@@ -83,11 +102,24 @@ jobs:
           CARGO_NET_GIT_FETCH_WITH_CLI: "true"
           CMUX_SWIFT_FRONTEND_WORKAROUND: 1
           CMUX_SWIFT_DISABLE_GLOBAL_ISEL: 1
+          CMUX_SKIP_ZIG_BUILD: 1
+          XCBUILD_FILE_SYSTEM_MODE: checksum-only
         run: |
-          CMUX_SKIP_ZIG_BUILD=1 xcodebuild -scheme cmux \
+          SPM_FLAGS=""
+          if [ -d "build/SourcePackages/checkouts" ]; then
+            echo "Warm SPM cache detected; enabling -skipPackageUpdates"
+            SPM_FLAGS="-skipPackageUpdates"
+          fi
+
+          xcodebuild -scheme cmux \
             -configuration Release \
             -derivedDataPath build \
             -destination 'generic/platform=macOS' \
+            -parallelizeTargets \
+            -jobs 3 \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
+            $SPM_FLAGS \
             ARCHS="arm64" \
             ONLY_ACTIVE_ARCH=NO \
             CODE_SIGNING_ALLOWED=NO \
@@ -112,6 +144,8 @@ jobs:
           # Ad-hoc code sign app bundle
           codesign --force --deep -s - "$APP_PATH"
           
+          rm -f dist/wmux-macos-arm64.dmg dist/rw.*.dmg 2>/dev/null || true
+          export LC_ALL=C
           create-dmg \
             --volname "wmux" \
             --window-pos 200 120 \
@@ -120,6 +154,8 @@ jobs:
             --icon "$APP_NAME" 175 120 \
             --app-drop-link 425 120 \
             --hide-extension "$APP_NAME" \
+            --hdiutil-retries 10 \
+            --overwrite \
             dist/wmux-macos-arm64.dmg \
             "$APP_PATH"
 
