@@ -316,17 +316,7 @@ if [ ! -x "$GHOSTTY_HELPER_DEST" ]; then
   echo "error: Ghostty CLI helper was not created at $GHOSTTY_HELPER_DEST" >&2
   exit 1
 fi
-if [ ! -x "$BUILD_CMUX_CUA" ]; then
-  echo "error: missing cmux-cua build script at $BUILD_CMUX_CUA" >&2
-  exit 1
-fi
-# The standalone build output is scratch; only the helper bundle ships.
-"$BUILD_CMUX_CUA" --output "${DERIVED_FILE_DIR}/cmux-cua/cmux-cua" \
-  --helper-app "$CMUX_CUA_HELPER_APP" --archs "${ARCHS:-}"
-if [ ! -x "$CMUX_CUA_HELPER_EXEC" ]; then
-  echo "error: cmux-cua was not created at $CMUX_CUA_HELPER_EXEC" >&2
-  exit 1
-fi
+# cmux-cua compilation disabled (R2)
 update_commit
 
 

@@ -1,24 +1,8 @@
 import Foundation
 import WebKit
 
-// Swift 6.0 cannot mark nested type declarations `nonisolated`. File scope
-// keeps these process-result values outside the bridge's main-actor domain.
-private enum InvocationCompletion: Sendable {
-    case ready(Bool)
-    case terminated(Int32)
-    case timedOut
-    case missingTermination
-    case cancelled
-}
-
-private enum InvocationError: Error {
-    case timedOut
-    case missingTermination
-}
-
-/// Reply-capable transport for the Rust diff sidecar. Each request is a bounded
-/// stdin/stdout exchange with a short-lived child process. The sidecar never
-/// opens a socket, and WebKit never receives filesystem paths or process access.
+/// Reply-capable transport for diff viewer. Each request is handled by native Swift
+/// and git Process operations. WebKit never receives filesystem paths or process access.
 @MainActor
 final class DiffSidecarBridge: NSObject, WKScriptMessageHandlerWithReply {
     static let handlerName = "cmuxDiff"
@@ -28,12 +12,7 @@ final class DiffSidecarBridge: NSObject, WKScriptMessageHandlerWithReply {
     private static let maximumRequestBytes = 1024 * 1024
     private nonisolated static let maximumResponseBytes = 32 * 1024 * 1024
     private nonisolated static let processPool = DiffSidecarProcessPool(limit: 4)
-    private nonisolated static let processGroupReadyMarker = Data("cmux-diff-sidecar-process-group-ready\n".utf8)
-    private nonisolated static let startupTimeout: TimeInterval = 5
-    private nonisolated static let terminationGrace: TimeInterval = 0.25
     private static let pendingSessionID = "00000000-0000-0000-0000-000000000000"
-    // Longer than the sidecar's 120-second branch regeneration limit.
-    private nonisolated static let requestTimeout: TimeInterval = 130
     private struct ViewerInvocationKey: Hashable {
         let webView: ObjectIdentifier
         let token: String
@@ -207,252 +186,158 @@ final class DiffSidecarBridge: NSObject, WKScriptMessageHandlerWithReply {
     @Sendable
     #endif
     nonisolated fileprivate static func runSidecar(request: Data) async throws -> Data {
-        let resources = Bundle.main.bundleURL
-            .appendingPathComponent("Contents/Resources/bin", isDirectory: true)
-        let sidecar = resources.appendingPathComponent("cmux-diff-sidecar", isDirectory: false)
-        let cmux = resources.appendingPathComponent("cmux", isDirectory: false)
-        guard FileManager.default.isExecutableFile(atPath: sidecar.path),
-              FileManager.default.isExecutableFile(atPath: cmux.path) else {
-            throw CocoaError(.fileNoSuchFile)
-        }
-
-        let root = try prepareRootDirectory()
-        let process = Process()
-        process.executableURL = sidecar
-        process.arguments = ["rpc", "--root", root.path, "--cmux", cmux.path, "--process-group-ready"]
-
-        let input = Pipe()
-        let output = Pipe()
-        let readiness = Pipe()
-        process.standardInput = input
-        process.standardOutput = output
-        process.standardError = readiness
-
-        let termination = AsyncStream<Int32> { continuation in
-            process.terminationHandler = { process in
-                continuation.yield(process.terminationStatus)
-                continuation.finish()
-            }
-        }
-        return try await withTaskCancellationHandler {
-            try process.run()
-            let startup = await waitForProcessGroupReady(
-                process: process,
-                input: input,
-                output: output,
-                readiness: readiness
-            )
-            guard case .ready(true) = startup else {
-                await terminateAndReap(
-                    process: process,
-                    input: input,
-                    output: output,
-                    readiness: readiness,
-                    termination: termination,
-                    processGroupID: nil
-                )
-                if case .cancelled = startup {
-                    throw CancellationError()
-                }
-                throw InvocationError.timedOut
-            }
-            do {
-                try input.fileHandleForWriting.write(contentsOf: request)
-                try input.fileHandleForWriting.close()
-            } catch {
-                await terminateAndReap(
-                    process: process,
-                    input: input,
-                    output: output,
-                    readiness: readiness,
-                    termination: termination,
-                    processGroupID: process.processIdentifier
-                )
-                throw error
-            }
-
-            let outputTask = Task.detached(priority: .userInitiated) {
-                output.fileHandleForReading.readDataToEndOfFile()
-            }
-
-            let completion = await withTaskGroup(of: InvocationCompletion.self) { group in
-                group.addTask {
-                    for await status in termination {
-                        return .terminated(status)
-                    }
-                    return Task.isCancelled ? .cancelled : .missingTermination
-                }
-                group.addTask {
-                    do {
-                        try await ContinuousClock().sleep(for: .seconds(requestTimeout))
-                        return .timedOut
-                    } catch {
-                        return .cancelled
-                    }
-                }
-                guard let completion = await group.next() else {
-                    return InvocationCompletion.missingTermination
-                }
-                group.cancelAll()
-                return completion
-            }
-            switch completion {
-            case .timedOut, .cancelled:
-                await terminateAndReap(
-                    process: process,
-                    input: input,
-                    output: output,
-                    readiness: readiness,
-                    termination: termination,
-                    processGroupID: process.processIdentifier
-                )
-            case .ready, .terminated, .missingTermination:
-                break
-            }
-            let outputData = await outputTask.value
-
-            let status: Int32
-            switch completion {
-            case .ready:
-                throw InvocationError.missingTermination
-            case .terminated(let terminationStatus):
-                status = terminationStatus
-            case .timedOut:
-                throw InvocationError.timedOut
-            case .missingTermination:
-                throw InvocationError.missingTermination
-            case .cancelled:
-                throw CancellationError()
-            }
-
-            guard status == 0,
-                  !outputData.isEmpty,
-                  outputData.count <= maximumResponseBytes else {
-                throw CocoaError(.fileReadCorruptFile)
-            }
-            return outputData
-        } onCancel: {
-            requestTermination(process: process, input: input, output: output, readiness: readiness)
-        }
-    }
-
-    nonisolated private static func waitForProcessGroupReady(
-        process: Process,
-        input: Pipe,
-        output: Pipe,
-        readiness: Pipe
-    ) async -> InvocationCompletion {
-        let readTask = Task.detached(priority: .userInitiated) {
-            (try? readProcessGroupReady(from: readiness.fileHandleForReading)) != nil
-        }
-        return await withTaskGroup(of: InvocationCompletion.self) { group in
-            group.addTask { .ready(await readTask.value) }
-            group.addTask {
-                do {
-                    try await ContinuousClock().sleep(for: .seconds(startupTimeout))
-                    return .timedOut
-                } catch {
-                    return .cancelled
-                }
-            }
-            let completion = await group.next() ?? .missingTermination
-            if case .ready(true) = completion {
-                // The request can now be sent without racing process-group setup.
-            } else {
-                requestTermination(process: process, input: input, output: output, readiness: readiness)
-            }
-            group.cancelAll()
-            return completion
-        }
-    }
-
-    nonisolated private static func readProcessGroupReady(from handle: FileHandle) throws {
-        var received = Data()
-        while received.count < processGroupReadyMarker.count {
-            let remaining = processGroupReadyMarker.count - received.count
-            guard let chunk = try handle.read(upToCount: remaining), !chunk.isEmpty else {
-                throw CocoaError(.fileReadCorruptFile)
-            }
-            received.append(chunk)
-        }
-        guard received == processGroupReadyMarker else {
+        guard let json = try? JSONSerialization.jsonObject(with: request) as? [String: Any] else {
             throw CocoaError(.fileReadCorruptFile)
         }
-    }
+        let id = json["id"] as? String ?? UUID().uuidString
+        let method = json["method"] as? String ?? ""
+        let params = json["params"] as? [String: Any] ?? [:]
 
-    nonisolated private static func requestTermination(
-        process: Process,
-        input: Pipe,
-        output: Pipe,
-        readiness: Pipe
-    ) {
-        try? input.fileHandleForWriting.close()
-        try? output.fileHandleForReading.close()
-        try? readiness.fileHandleForReading.close()
-        if process.isRunning {
-            let processID = process.processIdentifier
-            if processID > 0, Darwin.getpgid(processID) == processID {
-                killProcessGroup(process, signal: SIGTERM)
+        switch method {
+        case "protocolHandshake":
+            let response: [String: Any] = [
+                "id": id,
+                "version": 1,
+                "result": [
+                    "type": "handshake",
+                    "value": [
+                        "protocolVersion": 1,
+                        "capabilities": ["resource.stream", "transport.webkit", "transport.stdio"]
+                    ]
+                ],
+                "error": NSNull()
+            ]
+            return try JSONSerialization.data(withJSONObject: response)
+
+        case "sessionClose":
+            let response: [String: Any] = [
+                "id": id,
+                "version": 1,
+                "result": [
+                    "type": "sessionClosed"
+                ],
+                "error": NSNull()
+            ]
+            return try JSONSerialization.data(withJSONObject: response)
+
+        case "sessionOpen":
+            let capabilityToken = params["capabilityToken"] as? String ?? ""
+            let sessionID = params["sessionId"] as? String ?? UUID().uuidString
+            let source = params["source"] as? [String: Any] ?? [:]
+            let kind = source["kind"] as? String ?? "unstaged"
+            let repoRoot = source["repoRoot"] as? String ?? FileManager.default.currentDirectoryPath
+
+            var gitArgs = ["-C", repoRoot, "diff", "--no-color"]
+            if kind == "staged" {
+                gitArgs = ["-C", repoRoot, "diff", "--cached", "--no-color"]
+            } else if kind == "branch" {
+                let baseRef = source["baseRef"] as? String ?? "HEAD"
+                gitArgs = ["-C", repoRoot, "diff", "\(baseRef)...HEAD", "--no-color"]
+            }
+
+            let root = try prepareRootDirectory()
+            let fileName = "diff-session-\(sessionID).patch"
+            let patchURL = root.appendingPathComponent(fileName)
+
+            let diffData: Data
+            if kind == "patch", let patchSourcePath = source["path"] as? String {
+                diffData = (try? Data(contentsOf: URL(fileURLWithPath: patchSourcePath))) ?? Data()
             } else {
-                process.terminate()
+                let process = Process()
+                process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
+                process.arguments = gitArgs
+                let stdout = Pipe()
+                process.standardOutput = stdout
+                process.standardError = Pipe()
+                try process.run()
+                diffData = stdout.fileHandleForReading.readDataToEndOfFile()
+                process.waitUntilExit()
             }
-        }
-    }
 
-    nonisolated private static func terminateAndReap(
-        process: Process,
-        input: Pipe,
-        output: Pipe,
-        readiness: Pipe,
-        termination: AsyncStream<Int32>,
-        processGroupID: pid_t?
-    ) async {
-        let processID = process.processIdentifier
-        let confirmedProcessGroupID = processGroupID ?? (
-            processID > 0 && Darwin.getpgid(processID) == processID ? processID : nil
-        )
-        requestTermination(process: process, input: input, output: output, readiness: readiness)
-        let terminated = await withTaskGroup(of: Bool.self) { group in
-            group.addTask {
-                for await _ in termination {
-                    return true
+            try diffData.write(to: patchURL)
+
+            if !capabilityToken.isEmpty {
+                let manifestURL = root.appendingPathComponent(".manifest-\(capabilityToken).json")
+                var manifestFiles: [[String: Any]] = []
+                if let existingData = try? Data(contentsOf: manifestURL),
+                   let existingJson = try? JSONSerialization.jsonObject(with: existingData) as? [String: Any],
+                   let existingFiles = existingJson["files"] as? [[String: Any]] {
+                    manifestFiles = existingFiles
                 }
-                return !process.isRunning
-            }
-            group.addTask {
-                do {
-                    try await ContinuousClock().sleep(for: .seconds(terminationGrace))
-                } catch {
-                    return !process.isRunning
+                manifestFiles.append([
+                    "request_path": "/\(fileName)",
+                    "file_path": patchURL.path,
+                    "mime_type": "text/x-diff",
+                    "remote_url": NSNull()
+                ])
+                let manifestObject: [String: Any] = [
+                    "token": capabilityToken,
+                    "files": manifestFiles
+                ]
+                if let encoded = try? JSONSerialization.data(withJSONObject: manifestObject, options: [.sortedKeys]) {
+                    try? encoded.write(to: manifestURL)
                 }
-                return false
             }
-            let result = await group.next() ?? false
-            group.cancelAll()
-            return result
-        }
-        if let confirmedProcessGroupID {
-            _ = Darwin.kill(-confirmedProcessGroupID, SIGKILL)
-        } else if !terminated, process.isRunning {
-            forceTermination(process)
-        }
-        process.waitUntilExit()
-    }
 
-    nonisolated private static func forceTermination(_ process: Process) {
-        let processID = process.processIdentifier
-        guard processID > 0 else { return }
-        if Darwin.getpgid(processID) == processID {
-            killProcessGroup(process, signal: SIGKILL)
-        } else {
-            _ = Darwin.kill(processID, SIGKILL)
-        }
-    }
+            let response: [String: Any] = [
+                "id": id,
+                "version": 1,
+                "result": [
+                    "type": "sessionOpened",
+                    "value": [
+                        "sessionId": sessionID,
+                        "patch": [
+                            "id": "cmux-diff-viewer://\(capabilityToken)/\(fileName)",
+                            "mediaType": "text/x-diff",
+                            "byteLength": diffData.count,
+                            "revision": 1
+                        ],
+                        "source": source,
+                        "generatedPaths": []
+                    ]
+                ],
+                "error": NSNull()
+            ]
+            return try JSONSerialization.data(withJSONObject: response)
 
-    nonisolated private static func killProcessGroup(_ process: Process, signal: Int32) {
-        let processGroup = process.processIdentifier
-        guard processGroup > 0 else { return }
-        _ = Darwin.kill(-processGroup, signal)
+        case "branchList":
+            let response: [String: Any] = [
+                "id": id,
+                "version": 1,
+                "result": [
+                    "type": "branches",
+                    "value": [
+                        "groups": []
+                    ]
+                ],
+                "error": NSNull()
+            ]
+            return try JSONSerialization.data(withJSONObject: response)
+
+        case "branchChange":
+            let capabilityToken = params["capabilityToken"] as? String ?? ""
+            let response: [String: Any] = [
+                "id": id,
+                "version": 1,
+                "result": [
+                    "type": "navigation",
+                    "value": [
+                        "url": "cmux-diff-viewer://\(capabilityToken)/generated.html"
+                    ]
+                ],
+                "error": NSNull()
+            ]
+            return try JSONSerialization.data(withJSONObject: response)
+
+        default:
+            let response: [String: Any] = [
+                "id": id,
+                "version": 1,
+                "result": NSNull(),
+                "error": ["code": "unsupportedMethod", "message": "Method not supported"]
+            ]
+            return try JSONSerialization.data(withJSONObject: response)
+        }
     }
 
     nonisolated private static func prepareRootDirectory() throws -> URL {

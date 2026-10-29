@@ -56,15 +56,6 @@ extension TabManager {
                 userInfo: [GhosttyNotificationKey.tabId: tabId]
             )
         }
-        // A remote tmux mirror workspace rename propagates to `rename-session`,
-        // but only when the write landed (an `.auto` write rejected over a
-        // user-set title must not desync the remote session name).
-        if applied, propagateToRemoteTmux, tabs[index].isRemoteTmuxMirror {
-            AppDelegate.shared?.remoteTmuxController.handleMirrorWorkspaceRenamed(
-                workspaceId: tabId,
-                title: title
-            )
-        }
         // A local workspace standing for a cloud machine's cmux-tui workspace writes a
         // USER rename through to that daemon (persisted there, broadcast to every
         // client). Auto titles never propagate. Workspace names stay non-empty,

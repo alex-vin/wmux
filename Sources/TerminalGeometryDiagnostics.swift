@@ -2,6 +2,14 @@ import AppKit
 import CMUXMobileCore
 import CmuxTerminal
 
+final class MobileHostDiagnostics {
+    nonisolated static let log = DiagnosticLog(
+        buildStamp: DiagnosticReport.buildStamp(infoDictionary: Bundle.main.infoDictionary),
+        role: .macHost
+    )
+    private init() {}
+}
+
 /// App boundary for privacy-safe snapshots; it never reads terminal contents.
 @MainActor
 struct TerminalGeometryDiagnostics {

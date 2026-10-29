@@ -20,7 +20,7 @@ def _tracked_catalogs() -> list[Path]:
         check=True,
         capture_output=True,
     )
-    return [Path(item) for item in result.stdout.decode().split("\0") if item]
+    return [Path(item) for item in result.stdout.decode().split("\0") if item and Path(item).is_file()]
 
 
 def check_catalog(path: Path) -> list[str]:

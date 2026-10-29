@@ -34,3 +34,50 @@ struct SidebarWorkspacePresenceHeadsView: View {
         .accessibilityLabel(WorkspacePresencePolicy.accessibilityLabel(participants))
     }
 }
+
+struct StackAccountAvatarView: View {
+    var avatarURL: URL? = nil
+    var displayName: String = ""
+    var email: String = ""
+    var size: CGFloat = 18
+
+    var body: some View {
+        Circle()
+            .fill(Color.secondary.opacity(0.2))
+            .frame(width: size, height: size)
+    }
+}
+
+struct WorkspacePresencePolicy {
+    static let inactiveOpacity = 0.42
+
+    static func layout(participants: [WorkspacePresenceParticipant], maximumVisible: Int = 4) -> (visible: [WorkspacePresenceParticipant], overflow: Int) {
+        let limit = max(1, maximumVisible)
+        var active: [WorkspacePresenceParticipant] = []
+        var inactive: [WorkspacePresenceParticipant] = []
+        for participant in participants {
+            if participant.isActive {
+                if active.count < limit { active.append(participant) }
+            } else if inactive.count < limit {
+                inactive.append(participant)
+            }
+        }
+        var visible = Array(active.prefix(limit))
+        if visible.count < limit {
+            visible.append(contentsOf: inactive.prefix(limit - visible.count))
+        }
+        return (visible, max(0, participants.count - limit))
+    }
+
+    static func avatarOpacity(for participant: WorkspacePresenceParticipant) -> Double {
+        participant.isActive ? 1 : inactiveOpacity
+    }
+
+    static func names(_ participants: [WorkspacePresenceParticipant]) -> String {
+        participants.map { $0.displayName ?? "Collaborator" }.joined(separator: ", ")
+    }
+
+    static func accessibilityLabel(_ participants: [WorkspacePresenceParticipant]) -> String {
+        names(participants)
+    }
+}

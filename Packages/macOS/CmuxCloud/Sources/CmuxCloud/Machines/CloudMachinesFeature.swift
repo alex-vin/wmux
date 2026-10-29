@@ -8,6 +8,9 @@ import Foundation
 /// Cloud tab can own first-use enablement.
 /// lint:allow namespace-type: moved unchanged from the app target, where it was an internal static namespace; reshaping it is a separate change from this package move.
 public enum CloudMachinesFeature: Sendable {
+    public nonisolated static var isAvailable: Bool { false }
+    public nonisolated static var isEnabled: Bool { false }
+
     public nonisolated static var disabledMessage: String {
         if ManagedDevicePolicy().isEnforced(.disableCloud) { return ManagedCloudPolicy.disabledMessage }
         return String(localized: "cloud.feature.disabled", defaultValue: "Cloud Machines are temporarily unavailable.")
@@ -30,5 +33,13 @@ public enum CloudMachinesFeature: Sendable {
         let key = BetaFeaturesCatalogSection().cloudMachines
         guard defaults.object(forKey: key.userDefaultsKey) != nil else { return key.defaultValue }
         return defaults.bool(forKey: key.userDefaultsKey)
+    }
+
+    public nonisolated static func offMainIsEnabled(defaults: UserDefaults = .standard) -> Bool {
+        false
+    }
+
+    public nonisolated static func offMainIsAvailable(defaults: UserDefaults = .standard) -> Bool {
+        false
     }
 }

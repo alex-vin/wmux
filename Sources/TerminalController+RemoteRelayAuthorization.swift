@@ -174,12 +174,6 @@ extension TerminalController {
         var surfaceIDs = workspace.activeRemoteTerminalSurfaceIds.filter {
             workspace.surfaceRegistry.remoteTTYReportOriginWorkspaceIDs[$0] == ownerWorkspaceID
         }
-        for mirror in workspace.remoteTmuxWindowMirrors.values {
-            surfaceIDs.formUnion(mirror.surfaceIDsInLayoutOrder)
-        }
-        if let sessionMirror = workspace.remoteTmuxSessionMirror {
-            surfaceIDs.formUnion(sessionMirror.controlPaneLocations().map(\.pane.panel.id))
-        }
         return RemoteRelayAuthorizationSnapshot(
             ownerWorkspaceID: ownerWorkspaceID,
             relayTokenHex: relayToken,

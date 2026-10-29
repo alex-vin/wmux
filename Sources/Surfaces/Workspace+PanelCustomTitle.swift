@@ -67,12 +67,6 @@ extension Workspace {
             title: resolvedPanelTitle(panelId: panelId, fallback: baseTitle),
             hasCustomTitle: panelCustomTitles[panelId] != nil
         )
-        // A remote tmux mirror tab rename propagates to `rename-window`.
-        if propagateToRemoteTmux, isRemoteTmuxMirror {
-            AppDelegate.shared?.remoteTmuxController.handleMirrorWindowRenamed(
-                workspaceId: id, panelId: panelId, title: trimmed
-            )
-        }
         // A pane projecting a cloud terminal writes an admitted user/agent rename or clear through
         // to the machine's daemon tab name (`tab rename`): persisted there,
         // broadcast, and shown by every attached client (tree rows, other Macs,

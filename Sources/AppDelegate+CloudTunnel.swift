@@ -17,49 +17,8 @@ extension AppDelegate {
     /// it runs in its own window.
     @MainActor
     @discardableResult
-    func openCloudVPNSetup(preferredWindow: NSWindow? = nil, bringWindowForward: Bool = false) -> CloudVPNSetupPanel? {
-        guard CloudMachinesFeature.isAvailable,
-              !ManagedDevicePolicy().isEnforced(.disableCloud),
-              let manager = synchronizeActiveMainWindowContext(preferredWindow: preferredWindow) else {
-            return nil
-        }
-        guard CloudMachinesFeature.isEnabled else { return nil }
-        if bringWindowForward {
-            guard let context = mainWindowContext(for: manager),
-                  let window = resolvedWindow(for: context),
-                  focusWindowForAppActivation(window, reason: .workspaceCreation) else {
-                return nil
-            }
-        }
-        for workspace in manager.tabs {
-            guard let panel = workspace.panels.values.lazy.compactMap({ $0 as? CloudVPNSetupPanel }).first else {
-                continue
-            }
-            if let cloudTunnelCoordinator { panel.model.attachIfNeeded(cloudTunnelCoordinator) }
-            manager.selectedTabId = workspace.id
-            workspace.focusPanel(panel.id)
-            return panel
-        }
-
-        guard let workspace = manager.addWorkspaceIfActive(
-            title: String(localized: "cloud.vpn.setup.title", defaultValue: "Cloud VPN"),
-            select: true,
-            eagerLoadTerminal: false,
-            autoWelcomeIfNeeded: false,
-            autoRefreshMetadata: false,
-            allowTextBoxFocusDefault: false
-        ) else {
-            return nil
-        }
-        guard let initialPanelID = workspace.focusedPanelId,
-              let paneID = workspace.paneId(forPanelId: initialPanelID),
-              let panel = workspace.newCloudVPNSetupSurface(
-                inPane: paneID, coordinator: cloudTunnelCoordinator, focus: true) else {
-            manager.closeWorkspace(workspace, recordHistory: false)
-            return nil
-        }
-        _ = workspace.closePanel(initialPanelID, force: true)
-        return panel
+    func openCloudVPNSetup(preferredWindow: NSWindow? = nil, bringWindowForward: Bool = false) -> Panel? {
+        return nil
     }
 
     @MainActor

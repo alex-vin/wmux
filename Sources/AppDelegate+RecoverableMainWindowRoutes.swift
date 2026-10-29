@@ -525,9 +525,6 @@ extension AppDelegate {
     ) {
         clearTransientMainWindowState(windowId: windowId, tabManager: manager)
         let workspaces = manager.tabs
-        remoteTmuxController.handleWindowWorkspacesClosed(
-            workspaceIds: workspaces.map(\.id)
-        )
         for workspace in workspaces {
             workspace.withClosedPanelHistorySuppressed {
                 workspace.teardownAllPanels()
@@ -854,35 +851,14 @@ extension AppDelegate {
         // already finalized would otherwise re-enter this retirement for the
         // same route without bound (a stack overflow in the app host).
         mainWindowLifecycleCoordinator.removeRecoverableRoute(windowId: route.windowId)
-        let workspaceIds = recoverableRouteWorkspaceIdsForRemoteTeardown(route)
         let manager = route.tabManager
         manager?.clearRecoverableMainWindowRouteOwnerRegistration(for: route)
         route.markForTeardown()
-        remoteTmuxController.handleWindowWorkspacesClosed(workspaceIds: workspaceIds)
 #if DEBUG
         cmuxDebugLog(
             "recoverableRoute.retire reason=\(reason) windowId=\(String(route.windowId.uuidString.prefix(8)))"
         )
 #endif
-    }
-
-    /// Filters the route's creation-time workspace identities against current
-    /// ownership before detaching remote mirrors. A workspace can move into a
-    /// replacement window while the original route remains recoverable; that
-    /// moved workspace must not be torn down when the stale route retires.
-    private func recoverableRouteWorkspaceIdsForRemoteTeardown(
-        _ route: RecoverableMainWindowRoute
-    ) -> [UUID] {
-        let routeManager = route.tabManager
-        return route.workspaceIds.filter { workspaceId in
-            guard let currentOwner = tabManagerFor(tabId: workspaceId) else {
-                // A workspace can be temporarily unindexed while its route still
-                // owns the last live manager. Include it so remote mirrors cannot
-                // outlive the route merely because the ownership index is cold.
-                return true
-            }
-            return currentOwner === routeManager
-        }
     }
 
     /// A route consumed by the lifecycle coordinator is already adopted. This

@@ -27,17 +27,15 @@ import CMUXAgentLaunch
 import CoreServices
 import CoreGraphics
 import UserNotifications
-import CMUXMobileCore
-import Sentry
 import WebKit
 import Combine
 import ObjectiveC.runtime
 import Darwin
 import CmuxFoundation
-import CmuxSentryReporting
 import CmuxSidebar
 import CmuxGit
 import CmuxGeminiQuota
+import CmuxCloudTui
 import os
 
 private nonisolated let sudoApprovalLogger = Logger(
@@ -59,10 +57,6 @@ struct WorkspaceGroupNewWorkspaceTarget {
 @MainActor
 final class CmuxDebugWindowsCoordinator {
     private let aboutTitlebarCoordinator: DebugWindowsCoordinator
-#if DEBUG
-    let cloudSidebarDebugSettings = CloudSidebarDebugSettings(defaults: .standard)
-    lazy var cloudSidebarDebugLabController = CloudSidebarDebugLabWindowController(settings: cloudSidebarDebugSettings)
-#endif
     private weak var decorator: (any WindowDecorating)?
 
     init(decorator: (any WindowDecorating)?) {
@@ -565,11 +559,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     lazy var debugWindowsCoordinator = CmuxDebugWindowsCoordinator(decorator: self)
     /// About Titlebar Debug options store, applied by the About/Acknowledgments windows.
     var aboutTitlebarDebugStore: AboutTitlebarDebugStore { debugWindowsCoordinator.aboutTitlebarStore }
-    /// Coordinates remote tmux (`ssh … tmux -CC`) mirroring; composition-root owned.
-    let remoteTmuxController = RemoteTmuxController()
-    lazy var sshTuiWorkspaceCoordinator = SSHTuiWorkspaceCoordinator(
-        catalog: SurfaceCatalog.shared, clientURL: { CloudTuiClientPaths.clientURL() }, paths: CloudTuiClientPaths()
-    )
     /// Owns every main-window registration, recovery, and close phase.
     let mainWindowLifecycleCoordinator = MainWindowLifecycleCoordinator()
     /// Owns the process-scoped idle-sleep assertion shared by every local and
@@ -609,11 +598,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private var isRunningUnderXCTestCached: Bool {
         Self.cachedIsRunningUnderXCTest
     }
-    /// Bridges the Mac host's transport diagnostic ring into Sentry
-    /// (breadcrumbs, structured logs, throttled failure events with the ring
-    /// export attached). Created after `SentrySDK.start`; delivery no-ops when
-    /// the SDK is off.
-    private var transportSentryReporter: TransportSentryReporter?
+    // transportSentryReporter removed (R1)
     private let cmuxThemePreviewReloadScheduler = MainActorDeferredActionScheduler()
     private let connectivityInvalidationSubscriberCoordinator = ConnectivityInvalidationSubscriberCoordinator()
     let workspacePresenceController = WorkspacePresenceController()
@@ -843,6 +828,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private(set) var auth: MacAuthComposition?
     /// Explicit Cloud machine pins and stable fleet order, built by the composition root.
     private(set) var cloudMachinePinStore: CloudMachinePinStore?
+    lazy var sshTuiWorkspaceCoordinator = SSHTuiWorkspaceCoordinator(
+        catalog: SurfaceCatalog.shared,
+        clientURL: { CloudTuiClientPaths.clientURL() },
+        paths: CloudTuiClientPaths()
+    )
     private(set) lazy var cloudActivationCoordinator = CloudActivationCoordinator(prepare: { try await CmuxTuiSurfaceProviderRegistry.shared.prepareForActivation() }, cleanup: { await CmuxTuiSurfaceProviderRegistry.shared.cancelActivationPreparation() }, analytics: .app)
     var cloudWorkspaceCoordinator: CloudWorkspaceCoordinator?
     var cloudWorkspaceOperationController: CloudWorkspaceOperationController?
@@ -1806,80 +1796,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
 #endif
 
-        if false /* sentryStartupPolicy.shouldStart */ {
-            // Pre-warm locale before Sentry to avoid a startup data race.
-            // Locale initialization (os.locale.ensureLocale / NSLocale._preferredLanguages)
-            // on the main thread can race with Sentry's background init thread
-            // calling posix.getenv, causing a SIGSEGV ~134ms after launch.
-            // Forcing locale access here before SentrySDK.start eliminates the race.
-            // Related to: #836
-            _ = Locale.current
-            _ = NSLocale.preferredLanguages
-
-            StartupBreadcrumbLog.append("appDelegate.didFinish.sentry.begin")
-            SentrySDK.start { options in
-                options.dsn = "https://ecba1ec90ecaee02a102fba931b6d2b3@o4507547940749312.ingest.us.sentry.io/4510796264636416"
-                #if DEBUG
-                options.environment = "development"
-                options.debug = true
-                #else
-                options.environment = "production"
-                options.debug = false
-                #endif
-                options.sendDefaultPii = false
-
-                // Performance tracing is disabled. The auto-instrumented root
-                // `SentryTransaction.trace` serializes its `data` / `tags` /
-                // `description` into the payload *after* `beforeSend` runs, and
-                // the root tracer is not reachable through the public Sentry API,
-                // so those fields cannot be scrubbed. Disabling transactions
-                // removes that un-scrubbable egress path while keeping crash,
-                // error, and app-hang reporting (which are independent of the
-                // trace sample rate). cmux does not consume these performance
-                // traces today.
-                options.tracesSampleRate = 0.0
-                // Keep app-hang tracking enabled, but avoid reporting short main-thread stalls
-                // as hangs in normal user interaction flows.
-                options.appHangTimeoutInterval = 8.0
-                // Attach stack traces to all events
-                options.attachStacktrace = true
-                // Avoid recursively capturing failed requests from Sentry's own ingestion endpoint.
-                options.enableCaptureFailedRequests = false
-                // Report Objective-C exceptions that reach NSApplication's
-                // reportException: hook with their reason and throw stack. The
-                // matching executor-corruption path reaches this hook before
-                // AppKit terminates the process. Some macOS 26+ drawing paths
-                // call the class-level _crashOnException: method directly and
-                // remain outside Sentry Cocoa 9.3.0's hook; a future SDK upgrade
-                // can cover those paths too.
-                options.enableUncaughtNSExceptionReporting = true
-                // Structured logs power the transport diagnostics bridge
-                // (TransportSentryReporter on the host diagnostic ring below).
-                options.enableLogs = true
-                // Redact file paths, emails, and secrets from every outgoing
-                // event, breadcrumb, structured log, and (belt-and-suspenders,
-                // if tracing is ever re-enabled) child performance span before
-                // it leaves the device.
-                let scrubber = SentryEventScrubber()
-                options.beforeSend = { event in scrubber.scrub(event) }
-                options.beforeBreadcrumb = { breadcrumb in scrubber.scrub(breadcrumb) }
-                options.beforeSendSpan = { span in scrubber.scrub(span) }
-                options.beforeSendLog = { log in scrubber.scrub(log) }
-            }
-            // Bridge the Mac host's transport diagnostic ring into Sentry:
-            // every retained event becomes a breadcrumb + budget-limited log
-            // line, and gated failures become events carrying the ring export.
-            // The tap delivers on the ring's drain task, off the main thread.
-            let transportReporter = TransportSentryReporter(
-                role: .macHost,
-                exportRing: { await MobileHostDiagnostics.log.export() }
-            )
-            transportSentryReporter = transportReporter
-            MobileHostDiagnostics.log.setEventTap { event in
-                transportReporter.ingest(event)
-            }
-            StartupBreadcrumbLog.append("appDelegate.didFinish.sentry.complete")
-        }
+        // Sentry initialization removed (R1)
 
         if telemetryEnabled && !isRunningUnderXCTest {
             StartupBreadcrumbLog.append("appDelegate.didFinish.posthog.begin")
@@ -2164,16 +2081,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     private func deferTerminateForOwnedCleanupAndFreshSnapshot(reason: String) -> Bool {
-        let markedForKill = remoteTmuxController.windowsMarkedForKillOnClose()
+        let markedForKill: [UUID] = []
         let simulatorCleanupTasks = SimulatorPanel.beginApplicationTerminationCleanup()
         let hasSudoApprovalRuntime = sudoApprovalCoordinator?.requiresShutdown == true
-        // A mirror that owes tmux a goodbye is owned cleanup too. Without this the app can quit
-        // with the deferred phase never running, and the remote half keeps the tmux client —
-        // along with the per-window size claims that pin those windows for everyone else.
-        let mirrorsOwingDetach = remoteTmuxController.connectionsOwingDeliberateDetach.count
-        let hasOwnedRuntimeCleanup = !markedForKill.isEmpty
-            || !simulatorCleanupTasks.isEmpty
-            || mirrorsOwingDetach > 0
+        let mirrorsOwingDetach = 0
+        let hasOwnedRuntimeCleanup = !simulatorCleanupTasks.isEmpty
         let hasLocalTerminalSurfaces = hasLocalTerminalSurfacesForQuit
         guard hasOwnedRuntimeCleanup || hasLocalTerminalSurfaces
             || CloudNotificationSyncHub.shared.persistenceStore.hasPendingWrites else { return false }
@@ -2193,15 +2105,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             )
             let cleanupTask = Task { @MainActor [weak self] in
                 guard let self else { return }
-                // Before anything else: let go of the remote tmux clients, and wait for the
-                // server to say it heard us. Everything after this stops transports, which is
-                // what would otherwise swallow the goodbye.
-                await self.remoteTmuxController.detachAllAwaitingExit()
-                guard !Task.isCancelled else { return }
-                if !markedForKill.isEmpty {
-                    await self.remoteTmuxController.killMarkedSessionsBeforeTerminate()
-                }
-                guard !Task.isCancelled else { return }
                 for cleanupTask in simulatorCleanupTasks {
                     await cleanupTask.value
                     guard !Task.isCancelled else { return }
@@ -2341,9 +2244,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     private func clearMarkedRemoteTmuxKills() {
-        for windowId in remoteTmuxController.windowsMarkedForKillOnClose() {
-            remoteTmuxController.consumeKillSessionsOnWindowClose(windowId: windowId)
-        }
     }
 
     private func prepareForConfirmedAppTermination() {
@@ -2527,21 +2427,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         ClosedItemHistoryStore.shared.flushPendingSaves()
         terminationWatchdog.arm()
         sentryStopMemoryContextRefresh()
-        // Plain quit detaches local ssh clients; explicit close already killed marked sessions.
-        remoteTmuxController.detachAll()
-        // Best-effort presence goodbye; unclean exits are covered by the
-        // service's missed-heartbeat timeout.
-        PresenceHeartbeatClient.shared.appWillTerminate()
+        // PresenceHeartbeatClient removed (R1)
         connectivityInvalidationSubscriberCoordinator.appWillTerminate()
         closeAllWebInspectorsBeforeAppTeardown()
         sessionAutosaveCoordinator.stop()
-        CloudVMActionLauncher.shared.terminateAll()
-        // No Cloud session survives the app, so neither does the tunnel.
-        cloudTunnelCoordinator?.appWillTerminate()
-        CmuxTuiSurfaceProviderRegistry.shared.terminateWireGuardHubForAppQuit()
         CmuxSSHURLProcessLauncher.shared.terminateAll()
         caffeineController.setEnabled(false)
-        MobileHostService.shared.stop()
         TerminalController.shared.stopAutomationEngine()
         TerminalController.shared.stop(cleanupDiscoveryState: true)
         GhosttyApp.terminalPasteboard.cleanupAllOwnedTemporaryImageFiles()
@@ -2613,111 +2504,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         self.newMachineSheetPresenter = newMachineSheetPresenter
         self.browserDataImportCoordinator = browserDataImportCoordinator
         self.computerUseRuntimeService = computerUseRuntimeService
-        let cloudUploader = CloudTelemetryUploader(
-            auth: auth.coordinator, baseURL: CloudTelemetryUploader.telemetryBaseURL, client: .current()
-        )
-        cloudUploader.attach(to: auth.coordinator.rateLimitTelemetry)
-        Task { await cloudUploader.resumePending() }
-        let cloudOperations = CloudOperationRecorder(uploader: cloudUploader, identity: { [weak coordinator = auth.coordinator] in
-            coordinator?.authenticatedSessionIdentity
-        })
-        self.cloudOperations = cloudOperations
+        self.cloudOperations = nil
         let cloudTunnel = makeCloudTunnelCoordinator()
         cloudTunnelCoordinator = cloudTunnel
-        CmuxTuiSurfaceProviderRegistry.shared.portAccess.coordinator = cloudTunnel
-        let cloudReads = VMClient.bootstrap(
-            auth: auth.coordinator,
-            checkpointRenames: SurfaceCatalog.shared.cloudRenameCoordinator,
-            operations: cloudOperations,
-            telemetry: .live(),
-            isCloudEnabled: { CloudMachinesFeature.offMainIsEnabled() }, isCloudAvailable: { CloudMachinesFeature.offMainIsAvailable() }
-        )
         TerminalController.shared.cloudTunnel = cloudTunnel
-        // Warms the New Machine sheet's plan and network catalog per signed-in
-        // account so Cmd+Shift+Y never waits on the network.
-        NewMachineSheetDataCache.bootstrap(auth: auth.coordinator)
-        RemotesClient.bootstrap(auth: auth.coordinator)
-        TeamsClient.bootstrap(auth: auth.coordinator)
-        AIAccountsClient.bootstrap(auth: auth.coordinator)
-        CoderouterClient.bootstrap(auth: auth.coordinator)
-        MachineUsageClient.bootstrap(auth: auth.coordinator, operations: cloudOperations, readRequests: cloudReads)
-        PhonePushClient.shared.configure(auth: auth.coordinator)
-        MobileHostService.shared.configure(auth: auth.coordinator)
         caffeineController.onStateChange = { [weak self] enabled in
             self?.menuBarExtraController?.refreshForDebugControls()
-            MobileHostService.emitEvent(
-                topic: "caffeine.status.changed",
-                payload: ["enabled": enabled]
-            )
         }
-        DeviceRegistryClient.shared.configure(auth: auth.coordinator)
         self.devicesRegistry = devicesRegistry
-        if let devicesRegistry, let computersService {
-            computersService.configure(auth: auth.coordinator)
-            devicesRegistry.configure(auth: auth.coordinator, catalog: .shared, authorization: computersService)
-        }
-        configureWorkspacePresence(auth: auth.coordinator)
-        PhoneReplyInboxClient.shared.configure(auth: auth.coordinator)
-        PhoneReplyInboxCoordinator.shared.configure(client: PhoneReplyInboxClient.shared)
-        // Relayed phone replies share the direct RPC paste-and-submit path,
-        // including named Return-key submission and partial-success semantics.
-        PhoneReplyInboxCoordinator.shared.injectTerminalInput = { [weak self] params, retargetsToLiveSurfaceOwner in
-            guard let self else { return .permanentlyUndeliverable }
-            let controller = TerminalController.shared
-            // The inbox payload always carries a stable surface id. Resolve it
-            // before entering the generic mobile RPC so a launch-time workspace
-            // claim cannot route the reply to a stale manager.
-            guard let routedParams = self.phoneReplyTerminalInputParams(
-                params,
-                retargetsToLiveSurfaceOwner: retargetsToLiveSurfaceOwner
-            ) else {
-                // A valid surface can be temporarily absent while a window,
-                // Dock, or remote-tmux projection is being rebuilt. The inbox
-                // has a server-side TTL, so keep that bounded retry alive;
-                // malformed payloads are the only immediate permanent case.
-                let hasValidSurfaceID = controller.v2UUID(params, "surface_id") != nil
-                let hasWorkspaceID = controller.v2HasNonNullParam(params, "workspace_id")
-                let hasValidWorkspaceID = controller.v2UUID(params, "workspace_id") != nil
-                if !retargetsToLiveSurfaceOwner, !hasWorkspaceID {
-                    return .permanentlyUndeliverable
-                }
-                guard hasValidSurfaceID,
-                      (!hasWorkspaceID || hasValidWorkspaceID) else {
-                    return .permanentlyUndeliverable
-                }
-                return .retryable
-            }
-            switch await controller.v2MobileTerminalPaste(params: routedParams) {
-            case .ok:
-                // `terminal.paste` applies the text before it attempts the
-                // named key. A false `submitted` flag is therefore a partial
-                // success, not a safe invitation to replay the whole reply:
-                // doing so would duplicate text in the agent prompt. The
-                // accepted paste is the durable delivery boundary; the user
-                // can press Return manually if the key was rejected.
-                return .delivered
-            case .err(let code, _, _):
-                if code == "input_queue_full" || code == "surface_unavailable" {
-                    return .retryable
-                }
-                guard code == "not_found" else {
-                    return .permanentlyUndeliverable
-                }
-                // A surface can be absent while startup/session restoration is
-                // still rebuilding its workspace. Once that pass has finished,
-                // a stable-surface lookup miss is authoritative and the parked
-                // reply must be acknowledged instead of retrying until TTL.
-                let restorationPending = !self.didAttemptStartupSessionRestore
-                    || self.isApplyingSessionRestore
-                return restorationPending ? .retryable : .permanentlyUndeliverable
-            }
-        }
-        connectivityInvalidationSubscriberCoordinator.configure(auth: auth.coordinator)
-        // DEV-only: auto-publish this Mac's attach route to the signed-in user's
-        // pairedMacs backup so a fresh dev iOS build restores it (no manual host
-        // entry). No-op on Release / when the flag is off.
-        MacPairedMacBackupPublisher.shared.configure(auth: auth.coordinator)
-        TerminalController.shared.attachAuth(coordinator: auth.coordinator)
         TerminalController.shared.attachBrowserDataImportCoordinator(browserDataImportCoordinator)
         TerminalController.shared.attachCaffeineController(caffeineController)
         TerminalController.shared.agentChatTranscriptService = agentChatTranscriptService
@@ -2728,7 +2522,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
         auth.start()
         ensureMobileWorkspaceListObserver(for: tabManager)
-        MobileTerminalRenderObserver.shared.start()
         agentChatTranscriptService.start()
         SidebarAgentUsageCoordinator { [weak self] id in self?.tabManagerFor(tabId: id)?.workspacesById[id]?.sidebarMetadata }.start()
         installMobileHostSettingsObserver()
@@ -8589,8 +8382,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     /// Whether a sidebar empty-area creation targets a remote-tmux mirror or a
     /// remote Mac, whose new workspaces are placed by the remote side.
     private func sidebarEmptyAreaUsesRemoteNewWorkspaceRouting(tabManager: TabManager) -> Bool {
-        remoteTmuxController.wouldNewWorkspaceSpawnRemote(in: tabManager)
-            || tabManager.selectedWorkspace?.deviceMachineForNewWorkspace != nil
+        tabManager.selectedWorkspace?.deviceMachineForNewWorkspace != nil
     }
 
     /// Whether the window owning `tabManager` has a `ui.newWorkspace.action`.
@@ -8642,61 +8434,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         bringWindowForward: Bool = false,
         debugSource: String = "mobileConnect"
     ) -> Workspace? {
-        // Shared chokepoint for every pairing-window entry (Settings, palette,
-        // menu): pairing is unavailable under a managed remote-control disable.
-        guard MobileRemoteControlPolicy.isEnabled else {
-#if DEBUG
-            cmuxDebugLog("mobileConnect.blocked_managed_policy source=\(debugSource)")
-#endif
-            return nil
-        }
-        guard !enforceFeatureFlag || CmuxFeatureFlags.shared.isMobileConnectButtonEnabled else {
-#if DEBUG
-            cmuxDebugLog("mobileConnect.blocked_flag source=\(debugSource)")
-#endif
-            return nil
-        }
-        guard let manager = preferredTabManager
-            ?? synchronizeActiveMainWindowContext(preferredWindow: preferredWindow) else {
-            return nil
-        }
-        if bringWindowForward {
-            guard let context = mainWindowContext(for: manager),
-                  let window = resolvedWindow(for: context),
-                  focusWindowForAppActivation(window, reason: .workspaceCreation) else {
-                return nil
-            }
-        }
-
-        if let workspace = manager.tabs.first(where: { workspace in
-            workspace.panels.values.contains { $0 is MobilePairingPanel }
-        }), let panel = workspace.panels.values.first(where: { $0 is MobilePairingPanel }) {
-            if focusWorkspace {
-                manager.selectedTabId = workspace.id
-                workspace.focusPanel(panel.id)
-            }
-            return workspace
-        }
-
-        let title = String(localized: "mobile.pairing.window.title", defaultValue: "Mobile Pairing")
-        guard let workspace = manager.addWorkspaceIfActive(
-            title: title,
-            select: focusWorkspace,
-            eagerLoadTerminal: false,
-            autoWelcomeIfNeeded: false,
-            autoRefreshMetadata: false,
-            allowTextBoxFocusDefault: false
-        ) else {
-            return nil
-        }
-        guard let initialPanelID = workspace.focusedPanelId,
-              let paneID = workspace.paneId(forPanelId: initialPanelID),
-              workspace.newMobilePairingSurface(inPane: paneID, focus: focusWorkspace) != nil else {
-            manager.closeWorkspace(workspace, recordHistory: false)
-            return nil
-        }
-        _ = workspace.closePanel(initialPanelID, force: true)
-        return workspace
+        return nil
     }
 
     private func performNewWorkspaceCreationAction(
@@ -8837,13 +8575,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // Workspace" command) is the explicit escape hatch for opening local work
         // alongside mirrors. `skipConfiguredAction` only preserves the primary
         // Cmd+N/File menu behavior on ordinary local windows.
-        if initialSurface == .terminal,
-           !forceLocal,
-           let context,
-           !hasCustomConfiguredNewWorkspaceAction,
-           remoteTmuxController.handleNewWorkspaceRequested(in: context.tabManager) {
-            return true
-        }
 
         // The configured new-workspace action is the user's override for the
         // plain New Workspace behavior; the browser variant keeps its own
@@ -10711,20 +10442,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 return
             }
             let manager = exactOwner.tabManager
-            // An explicit close of the window's LAST remote workspace (a tab/session
-            // close) kills its remote session(s) — synced with tmux — even though it
-            // also closes the app window. A plain window/quit close leaves the marker
-            // unset and falls through to detach below (server stays alive for resume).
-            if self.remoteTmuxController.consumeKillSessionsOnWindowClose(
-                windowId: exactOwner.windowId
-            ) {
-                for workspace in manager.tabs where workspace.isRemoteTmuxMirror {
-                    self.remoteTmuxController.handleWorkspaceClosed(workspaceId: workspace.id)
-                }
-            }
-            self.remoteTmuxController.handleWindowWorkspacesClosed(
-                workspaceIds: manager.tabs.map { $0.id }
-            )
             self.mainWindowControllers.removeAll(where: { $0 === controller })
         }
         controller.shouldClose = { [weak self] candidateWindow in
@@ -12246,8 +11963,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     @objc func triggerSentryTestCrash(_ sender: Any?) {
-        guard SentrySDK.isEnabled else { return }
-        SentrySDK.crash()
+        // Sentry disabled (R1)
     }
 #endif
 
@@ -18038,14 +17754,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     if didStart { onExecuted?() }
                     return didStart
                 }
-                // Same routing as Cmd+N: on an active mirror workspace the
-                // built-in action creates a session on that mirror's host.
-                if remoteTmuxController.handleNewWorkspaceRequested(
-                    in: context.tabManager,
-                    onCreated: onExecuted
-                ) {
-                    return true
-                }
                 guard context.tabManager.addWorkspaceIfActive() != nil else { return false }
                 onExecuted?()
                 return true
@@ -18865,12 +18573,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func handleCancelledMainTerminalWindowClose(windowId: UUID) {
         closedWindowHistorySuppressedWindowIds.remove(windowId)
-        // A cancelled close must not leave an explicit kill-on-close marker for
-        // a later window or app close. A confirmed quit keeps the marker so
-        // applicationWillTerminate kills the remote session before exit.
-        if !isTerminatingApp {
-            remoteTmuxController.consumeKillSessionsOnWindowClose(windowId: windowId)
-        }
     }
 
     func unregisterMainWindow(_ window: NSWindow) {
@@ -19011,12 +18713,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         let closingWorkspaces = Array(closingTabManager.tabs)
         let closingWorkspaceIds = closingWorkspaces.map(\.id)
-        if remoteTmuxController.consumeKillSessionsOnWindowClose(windowId: windowId) {
-            for workspace in closingWorkspaces where workspace.isRemoteTmuxMirror {
-                remoteTmuxController.handleWorkspaceClosed(workspaceId: workspace.id)
-            }
-        }
-        remoteTmuxController.handleWindowWorkspacesClosed(workspaceIds: closingWorkspaceIds)
         closingTabManager.finalizeAllWorkspacesForWindowClose()
         closingTabManager.window = nil
         windowConfigFrames.removeValue(forKey: windowId)

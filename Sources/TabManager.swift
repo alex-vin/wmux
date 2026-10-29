@@ -226,9 +226,6 @@ class TabManager: ObservableObject {
     }
     let workspaceSwitchCoordinator = WorkspaceSwitchCoordinator()
     let cloudWorkspaceSelection: CloudWorkspaceSelectionState
-    /// Shared by the inline Cloud sidebar and any Cloud tool pane in this
-    /// window so CodeRouter reads and removals never overlap.
-    let coderouterAccountStore = CoderouterAccountStore()
 
     var tabs: [Workspace] {
         get { workspaces.tabs }
@@ -2621,19 +2618,6 @@ class TabManager: ObservableObject {
         MachineCreateCoordinator.shared.cancelOperations(forPresentationWorkspace: workspace.id)
         panelTitleUpdateCoalescer.flushNow()
         sentryBreadcrumb("workspace.close", data: ["tabCount": tabs.count - 1])
-        // Closing a mirrored remote tmux workspace DETACHES from the remote session,
-        // leaving it alive on the server for resume. Killing the session is never a
-        // side effect of closing a tab (PR #7264 review); it is only ever an explicit
-        // disconnect action.
-        if workspace.isRemoteTmuxMirror {
-            AppDelegate.shared?.remoteTmuxController.detachMirrorWorkspaceKeptOpenLocally(workspaceId: workspace.id)
-        }
-        // Closing the login cmux opened for a reconnect is the user declining it, and that is the
-        // only signal for it — a closed tab is not a filesystem or protocol event, so the waiter
-        // watching for the shared master would never hear about it.
-        if workspace.isRemoteTmuxAuthLogin {
-            AppDelegate.shared?.remoteTmuxController.noteLoginWorkspaceClosed(workspaceId: workspace.id)
-        }
         if recordHistory,
            workspace.isRestorableInSessionSnapshot,
            let index = tabs.firstIndex(where: { $0.id == workspace.id }) {
@@ -4389,51 +4373,6 @@ class TabManager: ObservableObject {
             AppDelegate.shared?.armJumpUnreadFocusRecord(tabId: tabId, surfaceId: desiredPanelId)
         }
 #endif
-        if let surfaceId,
-           let location = tab.remoteTmuxControlPane(surfaceID: surfaceId),
-           location.containerPanelID != surfaceId {
-            let requestID = UUID()
-            pendingProjectedNotificationFocusRequestID = requestID
-            let accepted = location.controlFocus { [weak self] confirmed in
-                guard let self else { return }
-                guard self.pendingProjectedNotificationFocusRequestID == requestID else { return }
-                guard effectIsCurrent() else {
-                    self.pendingProjectedNotificationFocusRequestID = nil
-                    completion?(false)
-                    return
-                }
-                self.pendingProjectedNotificationFocusRequestID = nil
-                guard confirmed else {
-                    completion?(false)
-                    return
-                }
-
-                // Present and dismiss only after tmux publishes the requested
-                // pane as authoritative. Until then, the mirror's optimistic
-                // projection routes input without focusing a stale pane.
-                tab.clearSplitZoom()
-                self.notificationDismissal.setSuppressesFocusFlash(true)
-                self.focusTab(
-                    tabId,
-                    surfaceId: surfaceId,
-                    suppressFlash: true,
-                    focusPanelIdOverride: location.containerPanelID
-                )
-                self.notificationDismissal.setSuppressesFocusFlash(false)
-                _ = self.dismissNotificationOnDirectInteraction(
-                    tabId: tabId,
-                    surfaceId: surfaceId
-                )
-                completion?(true)
-            }
-            if !accepted {
-                if pendingProjectedNotificationFocusRequestID == requestID {
-                    pendingProjectedNotificationFocusRequestID = nil
-                }
-                return false
-            }
-            return true
-        }
         // Jump-to-unread should reveal the destination pane instead of keeping an old split-zoom
         // state active around it.
         guard effectIsCurrent() else {

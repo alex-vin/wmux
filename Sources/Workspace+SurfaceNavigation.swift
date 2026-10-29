@@ -20,17 +20,6 @@ extension Workspace {
         if layoutMode == .canvas {
             return moveCanvasFocus(direction: direction)
         }
-        if let focusedPanelId,
-           let mirror = remoteTmuxWindowMirror(forPanelId: focusedPanelId) {
-            switch mirror.navigateFocus(direction: direction) {
-            case .moved:
-                return true
-            case .invalid:
-                return false
-            case .edge:
-                break
-            }
-        }
 
         let previousFocusedPanelId = focusedPanelId
         let previousFocusedPaneId = bonsplitController.focusedPaneId

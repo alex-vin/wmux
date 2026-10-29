@@ -118,10 +118,7 @@ extension Workspace {
     private func presentedTerminalHostedViews(forTabs tabs: [Bonsplit.Tab]) -> [GhosttySurfaceScrollView] {
         tabs.compactMap { tab in
             guard let panelId = panelIdFromSurfaceId(tab.id),
-                  let panel = terminalPanel(for: panelId),
-                  // A multi-pane remote-tmux window-tab is rendered by its
-                  // mirror view, which owns that panel's portal geometry.
-                  remoteTmuxWindowMirrors[panelId] == nil else { return nil }
+                  let panel = terminalPanel(for: panelId) else { return nil }
             let hostedView = panel.hostedView
             return TerminalWindowPortalRegistry.isPresented(hostedView) ? hostedView : nil
         }

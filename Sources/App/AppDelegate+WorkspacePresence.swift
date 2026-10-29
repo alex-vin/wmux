@@ -1,8 +1,7 @@
 import CmuxAuthRuntime
 
 extension AppDelegate {
-    func configureWorkspacePresence(auth: AuthCoordinator) {
-        PresenceHeartbeatClient.shared.configure(auth: auth)
-        workspacePresenceController.configure(auth: auth)
+    func configureWorkspacePresence(auth: Any? = nil) {
+        // Disconnected PresenceHeartbeatClient (15s heartbeat) (R1)
     }
 }

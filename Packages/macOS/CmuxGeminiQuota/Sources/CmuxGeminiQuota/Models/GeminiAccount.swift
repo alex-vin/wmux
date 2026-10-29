@@ -84,7 +84,7 @@ public struct GeminiAccount: Sendable, Codable, Identifiable, Equatable {
             payload["id_token"] = idToken
         }
 
-        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: []),
+        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
               let json = String(data: data, encoding: .utf8) else {
             return "{}"
         }

@@ -14,7 +14,7 @@ import Observation
 @Observable
 final class SurfaceCatalog {
     private typealias MaterializationKey = SurfaceProjectionMaterialization.Key
-    static let shared = SurfaceCatalog(sidebarOrganization: CloudSidebarOrganizationStore(defaults: .standard))
+    static let shared = SurfaceCatalog()
     /// A provider call with no remaining caller must not occupy a resource forever when the
     /// provider ignores task cancellation. The deadline starts only after the last caller
     /// detaches, so a slow but observed materialization is still allowed to finish normally.
@@ -47,11 +47,6 @@ final class SurfaceCatalog {
     var activeDisplayCreations: Set<SurfaceMachineID> = []
     /// Remote rename intents shared by all local windows.
     let cloudRenameCoordinator = CloudRenameCoordinator()
-    let sidebarOrganization: CloudSidebarOrganizationStore
-    @ObservationIgnored
-    lazy var sidebarNotifications = CloudSidebarNotificationCoordinator { [weak self] machine, resources in
-        self?.flushSidebarNotifications(on: machine, resources: resources)
-    }
     @ObservationIgnored
     lazy var cloudWorkspaceCreationCoordinator = CloudWorkspaceCreationCoordinator(catalog: self)
     let cloudWorkspaceProjectionCoordinator: CloudWorkspaceProjectionCoordinator
@@ -93,7 +88,6 @@ final class SurfaceCatalog {
         materializationClock: any Clock<Duration> = ContinuousClock(),
         cloudWorkspaceRenameService: CloudWorkspaceRenameService = CloudWorkspaceRenameService(),
         cloudPlacementCoordinator: CloudPlacementCoordinator? = nil,
-        sidebarOrganization: CloudSidebarOrganizationStore? = nil,
         cloudWorkspaceProjectionCoordinator: CloudWorkspaceProjectionCoordinator? = nil
     ) {
         precondition(abandonedMaterializationTimeout > .zero)
@@ -105,7 +99,6 @@ final class SurfaceCatalog {
         self.completedMaterializationRetention = completedMaterializationRetention
         self.maximumTrackedMaterializations = maximumTrackedMaterializations
         self.materializationClock = materializationClock
-        self.sidebarOrganization = sidebarOrganization ?? CloudSidebarOrganizationStore()
         self.cloudWorkspaceRenameService = cloudWorkspaceRenameService
         self.cloudPlacementCoordinator = cloudPlacementCoordinator ?? CloudPlacementCoordinator()
         self.cloudWorkspaceProjectionCoordinator = cloudWorkspaceProjectionCoordinator ?? CloudWorkspaceProjectionCoordinator(
@@ -298,6 +291,8 @@ final class SurfaceCatalog {
         if !restoredProjectionIDs.isEmpty { providers[machine]?.projectionsRestored(resources: restoredProjectionIDs) }
         return true
     }
+
+    func reconcileDeviceNames(on machine: SurfaceMachineID) {}
 
     /// Insert or replace one resource. A cloud provider may identify itself with `from` so a
     /// result from a retired provider cannot overwrite a replacement registration.

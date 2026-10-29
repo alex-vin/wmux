@@ -1632,6 +1632,19 @@ final class TerminalNotificationStore: ObservableObject {
         )
         return false
     }
+
+    func applySidebarOrdering(for notification: TerminalNotification, effects: TerminalNotificationPolicyEffects) {
+        guard effects.reorderWorkspace else { return }
+        switch UserDefaultsSettingsClient(defaults: .standard).value(for: SettingCatalog().app.reorderOnNotification) {
+        case .off:
+            return
+        case .notifications:
+            AppDelegate.shared?.tabManagerFor(tabId: notification.tabId)?.moveTabToTopForNotification(notification.tabId)
+        case .agentActivity:
+            WorkspaceActivityReorderController.shared.notificationRequestsReorder(workspaceId: notification.tabId)
+        }
+    }
+
     private func recordNotification(
         _ notification: TerminalNotification,
         isFocusedSurfaceArrival: Bool,

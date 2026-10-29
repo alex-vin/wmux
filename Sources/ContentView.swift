@@ -2694,11 +2694,6 @@ struct ContentView: View {
         ) { _ in
             invalidateCommandPaletteCloudWorkspaceTargets()
         })
-        view = AnyView(view.onReceive(
-            NotificationCenter.default.publisher(for: CloudSidebarOrganizationStore.didChangeNotification, object: SurfaceCatalog.shared.sidebarOrganization)
-        ) { _ in
-            invalidateCommandPaletteCloudWorkspaceTargets()
-        })
 
         view = AnyView(view.onChange(of: tabManager.selectedTabId) { newValue in
             // SwiftUI may deliver an earlier selection after the model has
@@ -5784,54 +5779,7 @@ struct ContentView: View {
     }
 
     private func commandPaletteCloudWorkspaceTargets() -> [CommandPaletteCloudWorkspaceTarget] {
-        guard CloudMachinesFeature.isEnabled else { return [] }
-        if commandPaletteCloudWorkspaceTargetsCachedRevision == commandPaletteCloudWorkspaceTargetsCacheRevision {
-            return commandPaletteCloudWorkspaceTargetsCache
-        }
-        let catalog = SurfaceCatalog.shared
-        let snapshot = catalog.snapshot
-        let allNodes = CloudTreeNodeBuilder.nodes(
-            machines: [],
-            snapshot: snapshot,
-            localWorkspaces: [],
-            includeLocalMachine: false
-        )
-        let sidebarNodes = CloudSidebarOrganizationTree(nodes: allNodes).arrange(
-            using: catalog.sidebarOrganization.state
-        )
-        let sidebarWorkspaceIDs = Set(
-            CloudTreeNodeBuilder.flattened(sidebarNodes).compactMap { node -> String? in
-                guard case .workspace(let machine, let workspace, _, _, _) = node.kind else { return nil }
-                return "\(machine.rawValue):\(workspace.id)"
-            }
-        )
-
-        let orderedNodes = CloudTreeNodeBuilder.flattened(sidebarNodes) +
-            CloudTreeNodeBuilder.flattened(allNodes).filter { node in
-                guard case .workspace(let machine, let workspace, _, _, _) = node.kind else { return false }
-                return !sidebarWorkspaceIDs.contains("\(machine.rawValue):\(workspace.id)")
-            }
-
-        var seen = Set<String>()
-        let targets: [CommandPaletteCloudWorkspaceTarget] = orderedNodes.compactMap { node in
-            guard case .workspace(let machine, let workspace, _, _, _) = node.kind,
-                  let group = node.dragGroup,
-                  seen.insert("\(machine.rawValue):\(workspace.id)").inserted else { return nil }
-            return CommandPaletteCloudWorkspaceTarget(machine: machine, workspace: workspace, group: group)
-        }
-        var fingerprintHasher = Hasher()
-        for target in targets {
-            fingerprintHasher.combine(target.machine.rawValue)
-            let machineName = catalog.machineInfo(for: target.machine)?.name ?? target.machine.rawValue
-            fingerprintHasher.combine(machineName)
-            fingerprintHasher.combine(target.workspace.id)
-            fingerprintHasher.combine(target.workspace.name)
-            fingerprintHasher.combine(target.group)
-        }
-        commandPaletteCloudWorkspaceTargetsFingerprint = fingerprintHasher.finalize()
-        commandPaletteCloudWorkspaceTargetsCache = targets
-        commandPaletteCloudWorkspaceTargetsCachedRevision = commandPaletteCloudWorkspaceTargetsCacheRevision
-        return targets
+        return []
     }
 
     private func openCommandPaletteCloudWorkspace(_ target: CommandPaletteCloudWorkspaceTarget) {
@@ -13185,10 +13133,7 @@ struct VerticalTabsSidebar: View, Equatable {
         for workspace: Workspace,
         mirrorDestinations: [UUID: String]?
     ) -> String? {
-        guard remoteTmuxOriginColorsEnabled,
-              let destination = originDestination(for: workspace, mirrorDestinations: mirrorDestinations)
-        else { return nil }
-        return AppDelegate.shared?.remoteTmuxController.hostColorRegistry.colorHex(for: destination)
+        nil
     }
 
     /// Hosts to name after colliding workspace titles (beta), over the whole workspace list because
@@ -13210,11 +13155,7 @@ struct VerticalTabsSidebar: View, Equatable {
     /// The remote destination a workspace comes from, or nil for a local workspace or a mirror whose
     /// host has not resolved yet.
     private func originDestination(for workspace: Workspace, mirrorDestinations: [UUID: String]?) -> String? {
-        var destination = workspace.remoteConfiguration?.destination
-        if destination == nil, workspace.isRemoteTmuxMirror {
-            destination = mirrorDestinations?[workspace.id]
-        }
-        guard let destination, !destination.isEmpty else { return nil }
+        guard let destination = workspace.remoteConfiguration?.destination, !destination.isEmpty else { return nil }
         return destination
     }
 
@@ -13236,9 +13177,8 @@ struct VerticalTabsSidebar: View, Equatable {
             return (nil, [:], [])
         }
 
-        let mirrorWorkspaceIds = Set(tabs.filter(\.isRemoteTmuxMirror).map(\.id))
-        let mirrorController = AppDelegate.shared?.remoteTmuxController
-        let mirrorDestinationsGeneration = mirrorController?.hostDestinationsGeneration ?? 0
+        let mirrorWorkspaceIds = Set<UUID>()
+        let mirrorDestinationsGeneration: UInt64? = 0
         let flagsChanged = sidebarOriginPresentationCache.colorsEnabled != colorsEnabled
             || sidebarOriginPresentationCache.hostTitlesEnabled != hostTitlesEnabled
         let mirrorSetChanged = sidebarOriginPresentationCache.mirrorWorkspaceIds != mirrorWorkspaceIds
@@ -13252,8 +13192,7 @@ struct VerticalTabsSidebar: View, Equatable {
             || mirrorDestinationsGenerationChanged
         let previousMirrorDestinations = sidebarOriginPresentationCache.mirrorDestinations
         if shouldReloadMirrorDestinations {
-            sidebarOriginPresentationCache.mirrorDestinations =
-                mirrorController?.hostDestinationsByWorkspaceId() ?? [:]
+            sidebarOriginPresentationCache.mirrorDestinations = [:]
             sidebarOriginPresentationCache.mirrorDestinationsGeneration = mirrorDestinationsGeneration
             sidebarOriginPresentationCache.hasLoadedMirrorDestinations = true
         }

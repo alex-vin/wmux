@@ -1,5 +1,21 @@
 import CmuxProductAnalytics
 
+struct AccountSignInModel: Sendable {
+    enum Failure: Sendable {
+        case cancelled
+        case offline
+        case network
+        case unknown
+        case timedOut
+        case server
+        case invalidLink
+        case browserUnavailable
+        case unauthorized
+        case rejected
+        case rateLimited
+    }
+}
+
 /// Turns account observations into analytics actions: identify on sign-in,
 /// a success or failure for each sign-in the user started, and sign-out. Pure, so the transitions are unit tested without auth.
 struct AccountAnalyticsState: Equatable {

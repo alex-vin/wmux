@@ -1,4 +1,3 @@
-import CmuxCloud
 import AppKit
 
 extension GhosttyNSView {
@@ -18,16 +17,6 @@ extension GhosttyNSView {
               surface.id == originSurfaceId else {
             onCompleted()
             return false
-        }
-        let handledByMirror = MainActor.assumeIsolated {
-            AppDelegate.shared?.remoteTmuxController.pasteIntoMirror(
-                surfaceId: surface.id,
-                text: text
-            ) ?? false
-        }
-        if handledByMirror {
-            onCompleted()
-            return true
         }
 
         // Keep owned temporary image files alive while a runtime clipboard

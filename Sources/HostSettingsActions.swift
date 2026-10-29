@@ -924,71 +924,30 @@ final class HostSettingsActions: SettingsHostActions {
     }
 
     func mobilePairingStatus() -> MobilePairingStatusSnapshot? {
-        Self.mobilePairingSnapshot(from: MobileHostService.shared.statusSnapshot())
+        Self.mobilePairingSnapshot()
     }
 
     func mobilePairingStatusUpdates() -> AsyncStream<MobilePairingStatusSnapshot> {
         AsyncStream { continuation in
-            // Bridge the notification through a Sendable `Void` signal stream so
-            // the non-Sendable `Notification` never crosses into the MainActor
-            // drain task. Mirrors `UserDefaultsSettingsStore.values(for:)`.
-            let (signals, signalContinuation) = AsyncStream<Void>.makeStream(
-                bufferingPolicy: .bufferingNewest(1)
-            )
-            let observer = MobileHostStatusObserverToken(
-                NotificationCenter.default.addObserver(
-                    forName: .mobileHostStatusDidChange,
-                    object: nil,
-                    queue: nil
-                ) { _ in
-                    signalContinuation.yield(())
-                }
-            )
-            let drainTask = Task { @MainActor in
-                // Seed with the current status, then forward every change.
-                continuation.yield(Self.mobilePairingSnapshot(from: MobileHostService.shared.statusSnapshot()))
-                for await _ in signals {
-                    if Task.isCancelled { break }
-                    continuation.yield(Self.mobilePairingSnapshot(from: MobileHostService.shared.statusSnapshot()))
-                }
-                continuation.finish()
-            }
-            continuation.onTermination = { _ in
-                drainTask.cancel()
-                signalContinuation.finish()
-                observer.remove()
-            }
+            continuation.yield(Self.mobilePairingSnapshot())
+            continuation.finish()
         }
     }
 
     func irohSettingsController() -> (any CmxIrohSettingsControlling)? {
-        // Exactly one runtime owns the transport slot (gated in
-        // MobileHostService.configure); Settings must read the same one, or
-        // the Networking section reports the dormant stack's stale state.
-        return MobileHostIrxRuntime.shared
+        return nil
     }
 
-    /// Maps the host's ``MobileHostServiceStatus`` into the settings package's
-    /// Foundation-only ``MobilePairingStatusSnapshot``. Static so the status
-    /// stream's forwarding task does not retain this host bridge. Internal
-    /// (not private) so the mapping is unit-testable.
-    nonisolated static func mobilePairingSnapshot(
-        from status: MobileHostServiceStatus,
-        now: Date = Date()
-    ) -> MobilePairingStatusSnapshot {
-        let routes = Array(Set(status.localSocketAddresses)).sorted().compactMap { address -> MobilePairingRoute? in
-            guard let socket = splitSocketAddress(address) else { return nil }
-            return MobilePairingRoute(id: "iroh-local:" + address,
-                kindLabel: routeKindLabel(.iroh), host: socket.host, port: socket.port)
-        }
-        return MobilePairingStatusSnapshot(
-            isRunning: status.isRunning,
-            configuredPort: status.configuredPort,
-            boundPort: status.port,
-            usesEphemeralFallback: status.usesEphemeralFallback,
-            activeConnectionCount: status.activeConnectionCount,
-            routes: routes,
-            pendingPortChange: status.pendingPortChange
+    /// Pure local mobile pairing status snapshot.
+    nonisolated static func mobilePairingSnapshot() -> MobilePairingStatusSnapshot {
+        MobilePairingStatusSnapshot(
+            isRunning: false,
+            configuredPort: 0,
+            boundPort: 0,
+            usesEphemeralFallback: false,
+            activeConnectionCount: 0,
+            routes: [],
+            pendingPortChange: false
         )
     }
 
@@ -1042,14 +1001,7 @@ final class HostSettingsActions: SettingsHostActions {
     }
 
     func applyMobilePairingPort(_ port: Int) async -> MobilePairingPortApplyResult {
-        switch await MobileHostService.shared.applyConfiguredPort(port) {
-        case .applied(let bound):
-            return .applied(port: bound)
-        case .savedForLater:
-            return .savedForLater(port: port)
-        case .invalid:
-            return .invalid(requestedPort: port)
-        }
+        .savedForLater(port: port)
     }
 
     /// Localized transport label for a pairing route shown in diagnostics.

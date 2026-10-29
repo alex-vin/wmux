@@ -27,10 +27,9 @@ public struct CommandPaletteSearchOrchestrator: Sendable {
         return dictionary
     }
 
-    /// Resolves matches for `query` over the corpus, merging nucleo results
-    /// with Swift single-edit fallback matches when needed.
+    /// Resolves matches for `query` over the corpus using native Swift fuzzy search.
     public func resolvedSearchMatches(
-        searchIndex: CommandPaletteNucleoSearchIndex<String>?,
+        searchIndex: CommandPaletteNucleoSearchIndex<String>? = nil,
         searchCorpus: [CommandPaletteSearchCorpusEntry<String>],
         searchCorpusByID providedSearchCorpusByID: [String: CommandPaletteSearchCorpusEntry<String>]? = nil,
         query: String,
@@ -41,8 +40,6 @@ public struct CommandPaletteSearchOrchestrator: Sendable {
         resultLimit: Int? = nil,
         shouldCancel: @escaping () -> Bool = { false }
     ) -> [CommandPaletteResolvedSearchMatch] {
-        let nucleoResultLimit = resultLimit ?? searchCorpus.count
-        let preparedQuery = CommandPaletteFuzzyMatcher.preparedQuery(query)
         let historyBoost: ((String, Bool) -> Int)? = usageHistory.isEmpty ? nil : { commandId, queryIsEmpty in
             Self.historyBoost(
                 for: commandId,
@@ -66,68 +63,20 @@ public struct CommandPaletteSearchOrchestrator: Sendable {
             }
         }()
 
-        func swiftSearchMatches() -> [CommandPaletteResolvedSearchMatch] {
-            let results = CommandPaletteSearchEngine(entries: searchCorpus).search(
-                query: query,
-                resultLimit: resultLimit,
-                historyBoost: scoreBoost ?? { _, _ in 0 },
-                shouldCancel: shouldCancel
-            )
-
-            return results.map { result in
-                CommandPaletteResolvedSearchMatch(
-                    commandID: result.payload,
-                    score: result.score,
-                    titleMatchIndices: result.titleMatchIndices
-                )
-            }
-        }
-
-        if let results = searchIndex?.search(
+        let results = CommandPaletteSearchEngine(entries: searchCorpus).search(
             query: query,
-            resultLimit: nucleoResultLimit,
-            historyBoost: scoreBoost,
+            resultLimit: resultLimit,
+            historyBoost: scoreBoost ?? { _, _ in 0 },
             shouldCancel: shouldCancel
-        ) {
-            let nucleoMatches = results.map { result in
-                CommandPaletteResolvedSearchMatch(
-                    commandID: result.payload,
-                    score: result.score,
-                    titleMatchIndices: result.titleMatchIndices
-                )
-            }
-            if Self.shouldConsiderSwiftSingleEditFallback(
-                preparedQuery: preparedQuery,
-                queryIsEmpty: queryIsEmpty,
-                limit: nucleoResultLimit
-            ) {
-                let searchCorpusByID = providedSearchCorpusByID ?? Self.searchCorpusByID(searchCorpus)
-                guard Self.shouldIncludeSwiftSingleEditFallback(
-                    preparedQuery: preparedQuery,
-                    nucleoMatches: nucleoMatches,
-                    searchCorpusByID: searchCorpusByID
-                ) else {
-                    return nucleoMatches
-                }
-                let fallbackMatches = Self.swiftSingleEditFallbackMatches(
-                    swiftSearchMatches(),
-                    preparedQuery: preparedQuery,
-                    searchCorpusByID: searchCorpusByID
-                )
-                guard !fallbackMatches.isEmpty else {
-                    return nucleoMatches
-                }
-                return Self.mergedSwiftFallbackMatches(
-                    fallbackMatches,
-                    nucleoMatches: nucleoMatches,
-                    searchCorpusByID: searchCorpusByID,
-                    limit: nucleoResultLimit
-                )
-            }
-            return nucleoMatches
-        }
+        )
 
-        return swiftSearchMatches()
+        return results.map { result in
+            CommandPaletteResolvedSearchMatch(
+                commandID: result.payload,
+                score: result.score,
+                titleMatchIndices: result.titleMatchIndices
+            )
+        }
     }
 
     private static func searchCorpusByID(

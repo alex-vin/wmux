@@ -1597,6 +1597,32 @@ private struct PermissionInputPreview {
 /// (permission / plan / question / filter pills / option pills).
 /// Replaces the old PermissionCTAButton / PlanCTAButton /
 /// FeedPillButton trio so styling is defined in exactly one place.
+#if DEBUG
+enum FeedButtonDebugVisualStyle: String, CaseIterable, Identifiable {
+    case solid, glass, standardGlass, standardTintedGlass, nativeGlass, nativeProminentGlass, liquid, halo, command, commandLight, outline, flat
+    var id: String { rawValue }
+}
+
+enum FeedButtonDebugColorRole: String {
+    case background, hoverBackground, foreground
+}
+
+enum FeedButtonDebugSettings {
+    static let generationKey = "feed.button.debug.generation"
+    static var visualStyle: FeedButtonDebugVisualStyle { .solid }
+    static var glassTintOpacity: Double { 0.42 }
+    static var compactCornerRadius: Double { 8 }
+    static var mediumCornerRadius: Double { 8 }
+    static var compactHorizontalPadding: Double { 8 }
+    static var mediumHorizontalPadding: Double { 12 }
+    static var compactVerticalPadding: Double { 4 }
+    static var mediumVerticalPadding: Double { 5 }
+    static var borderWidth: Double { 0.9 }
+    static func color(for kind: FeedButton.Kind, role: FeedButtonDebugColorRole, colorScheme: ColorScheme) -> Color? { nil }
+    static func bumpGeneration() {}
+}
+#endif
+
 struct FeedButton: View {
     @Environment(\.cmuxAccentColor) private var cmuxAccent
     enum Kind: String {

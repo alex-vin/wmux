@@ -264,83 +264,58 @@ struct WorkspaceContentView: View {
                     isWorkspaceManuallyUnread: isWorkspaceManuallyUnread,
                     isWorkspaceManualUnreadRepresentative: workspaceManualUnreadPanelId == panel.id
                 )
-                if let windowMirror = workspace.remoteTmuxWindowMirror(forPanelId: panel.id) {
-                    // Every tmux window renders through one stable container,
-                    // including its initial one-pane layout.
-                    RemoteTmuxWindowMirrorSplitView(
-                        mirror: windowMirror,
-                        appearance: appearance,
-                        isOuterFocused: isFocused,
-                        isVisibleInUI: isVisibleInUI,
-                        portalPriority: workspacePortalPriority,
-                        onOuterFocus: { workspace.focusRemoteTmuxContainerPaneIfNeeded(paneId) },
-                        unreadSurfaceIDs: Set(
-                            windowMirror.surfaceIDsInLayoutOrder.lazy
-                                .filter {
-                                    notificationStore.hasVisibleNotificationIndicator(
-                                        forTabId: workspace.id,
-                                        surfaceId: $0
-                                    )
-                                }
+                WorkspacePanelContentHostView(
+                    workspace: workspace,
+                    panel: panel,
+                    paneId: paneId,
+                    isFocused: isFocused,
+                    isSelectedInPane: isSelectedInPane,
+                    isVisibleInUI: isVisibleInUI,
+                    allowsPointerInput: isWorkspaceInputActive
+                        && isWorkspaceVisible
+                        && isSelectedInPane,
+                    portalPriority: workspacePortalPriority,
+                    isSplit: isSplit,
+                    appearance: appearance,
+                    windowAppearance: windowAppearance,
+                    customSidebarTabManager: workspace.owningTabManager,
+                    hasUnreadNotification: showsNotificationRing && !overlayTarget.usesWorkspacePaneOverlay,
+                    onFocus: {
+                        // Keep bonsplit focus in sync with the AppKit first responder for the
+                        // active workspace. This prevents divergence between the blue focused-tab
+                        // indicator and where keyboard input/flash-focus actually lands.
+                        guard isWorkspaceInputActive else { return }
+                        guard workspace.panels[panel.id] != nil else { return }
+                        workspace.focusPanel(
+                            panel.id,
+                            trigger: .terminalFirstResponder,
+                            focusTransactionId: workspace.activeFocusTransactionId
                         )
-                    )
-                    .onTapGesture {
-                        workspace.focusRemoteTmuxContainerPaneIfNeeded(paneId)
-                    }
-                } else {
-                    WorkspacePanelContentHostView(
-                        workspace: workspace,
-                        panel: panel,
-                        paneId: paneId,
-                        isFocused: isFocused,
-                        isSelectedInPane: isSelectedInPane,
-                        isVisibleInUI: isVisibleInUI,
-                        allowsPointerInput: isWorkspaceInputActive
-                            && isWorkspaceVisible
-                            && isSelectedInPane,
-                        portalPriority: workspacePortalPriority,
-                        isSplit: isSplit,
-                        appearance: appearance,
-                        windowAppearance: windowAppearance,
-                        customSidebarTabManager: workspace.owningTabManager,
-                        hasUnreadNotification: showsNotificationRing && !overlayTarget.usesWorkspacePaneOverlay,
-                        onFocus: {
-                            // Keep bonsplit focus in sync with the AppKit first responder for the
-                            // active workspace. This prevents divergence between the blue focused-tab
-                            // indicator and where keyboard input/flash-focus actually lands.
-                            guard isWorkspaceInputActive else { return }
-                            guard workspace.panels[panel.id] != nil else { return }
-                            workspace.focusPanel(
-                                panel.id,
-                                trigger: .terminalFirstResponder,
-                                focusTransactionId: workspace.activeFocusTransactionId
-                            )
-                        },
-                        onRequestPanelFocus: {
-                            guard isWorkspaceInputActive else { return }
-                            guard workspace.panels[panel.id] != nil else { return }
-                            AppDelegate.shared?.noteMainPanelKeyboardFocusIntent(
-                                workspaceId: workspace.id,
-                                panelId: panel.id,
-                                in: NSApp.keyWindow ?? NSApp.mainWindow
-                            )
-                            workspace.focusPanel(panel.id)
-                        },
-                        onResumeAgentHibernation: {
-                            guard isWorkspaceInputActive else { return }
-                            guard workspace.panels[panel.id] != nil else { return }
-                            workspace.resumeAgentHibernation(panelId: panel.id, focus: true)
-                        },
-                        onAutoResumeAgentHibernation: {
-                            guard isWorkspaceInputActive else { return }
-                            guard workspace.panels[panel.id] != nil else { return }
-                            workspace.resumeAgentHibernation(panelId: panel.id, focus: false)
-                        },
-                        onTriggerFlash: { workspace.triggerDebugFlash(panelId: panel.id) }
-                    )
-                    .onTapGesture {
-                        workspace.bonsplitController.focusPane(paneId)
-                    }
+                    },
+                    onRequestPanelFocus: {
+                        guard isWorkspaceInputActive else { return }
+                        guard workspace.panels[panel.id] != nil else { return }
+                        AppDelegate.shared?.noteMainPanelKeyboardFocusIntent(
+                            workspaceId: workspace.id,
+                            panelId: panel.id,
+                            in: NSApp.keyWindow ?? NSApp.mainWindow
+                        )
+                        workspace.focusPanel(panel.id)
+                    },
+                    onResumeAgentHibernation: {
+                        guard isWorkspaceInputActive else { return }
+                        guard workspace.panels[panel.id] != nil else { return }
+                        workspace.resumeAgentHibernation(panelId: panel.id, focus: true)
+                    },
+                    onAutoResumeAgentHibernation: {
+                        guard isWorkspaceInputActive else { return }
+                        guard workspace.panels[panel.id] != nil else { return }
+                        workspace.resumeAgentHibernation(panelId: panel.id, focus: false)
+                    },
+                    onTriggerFlash: { workspace.triggerDebugFlash(panelId: panel.id) }
+                )
+                .onTapGesture {
+                    workspace.bonsplitController.focusPane(paneId)
                 }
             } else if workspace.cloudVMID != nil {
                 TerminalPanelUnavailableView(appearance: appearance)

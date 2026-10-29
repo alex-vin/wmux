@@ -248,9 +248,6 @@ extension Workspace {
         if let dock = _dockSplit {
             terminalPanels.append(contentsOf: dock.panels.values.compactMap { $0 as? TerminalPanel })
         }
-        for mirror in remoteTmuxWindowMirrors.values {
-            terminalPanels.append(contentsOf: mirror.panelsByPaneId.values)
-        }
         terminalPanels.append(contentsOf: additionalTerminalPanels)
 
         var seenPanelIds: Set<UUID> = []

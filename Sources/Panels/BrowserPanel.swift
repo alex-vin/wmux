@@ -1,4 +1,5 @@
 import CmuxCloud
+import CmuxSurfaceCatalogModel
 import CmuxMobileHost
 import Foundation
 import CMUXMobileCore
@@ -12045,4 +12046,111 @@ extension BrowserPanel {
         return nil
 #endif
     }
+}
+
+enum BrowserAppSessionRecoveryAction: Sendable {
+    case isolatedBrowser
+    case beginSignIn
+}
+
+enum BrowserAppSessionRequestOutcome {
+    case navigation(BrowserAppSessionNavigation)
+    case notAuthenticated
+    case cancelled
+    case transientFailure
+    case failed
+
+    var shouldBeginSignIn: Bool {
+        if case .notAuthenticated = self { return true }
+        return false
+    }
+
+    var shouldRetry: Bool {
+        if case .transientFailure = self { return true }
+        return false
+    }
+
+    var recoveryAction: BrowserAppSessionRecoveryAction? {
+        switch self {
+        case .navigation:
+            nil
+        case .cancelled, .transientFailure, .failed:
+            .isolatedBrowser
+        case .notAuthenticated:
+            .beginSignIn
+        }
+    }
+}
+
+struct CloudPortAccessModel: Sendable {
+    enum Route: Equatable {
+        case loopback
+        case direct
+    }
+    var route: Route = .direct
+    func url(for target: URL) -> URL? { target }
+
+    enum Phase: Equatable {
+        case needsVPN
+        case connecting
+        case stopping
+        case direct
+        case forwarded(UInt16)
+        case failed(String)
+        case closed
+    }
+    var phase: Phase = .closed
+    var isReady: Bool = false
+    var usesBrowserProxy: Bool = false
+    var usesRemoteNetwork: Bool = false
+    var target: Target = Target()
+    var localAddress: String? { nil }
+    var browserProxy: CloudBrowserProxyEndpoint? = nil
+    struct Target: Sendable {
+        var host: String = ""
+        var port: UInt16 = 0
+    }
+    func connect() {}
+    func retry() {}
+}
+
+@MainActor
+final class CloudBrowserAccessState {
+    var model: CloudPortAccessModel? = nil
+    var remoteURL: URL?
+    var resourceID: SurfaceResourceID? = nil
+    var isPreparingDocument: Bool = false
+    var showsPage: Bool = true
+    var error: Error?
+
+    func automaticallyNavigateRequest(_ handler: @escaping (URLRequest) -> Void) {}
+    func sessionURL(currentURL: URL?) -> URL? { nil }
+    func configure(model: Any? = nil, url: Any? = nil, resourceID: Any? = nil, request: Any? = nil) {}
+    func showRestoring(retry: Any? = nil, unavailableMessage: Any? = nil) {}
+    func retryUnavailable() {}
+    func isRetiredListener(_ url: URL) -> Bool { false }
+
+    func didStart(url: URL?, navigationID: ObjectIdentifier? = nil) {}
+    func didCommit(url: URL?, navigationID: ObjectIdentifier? = nil) {}
+    func didFinish(url: URL?) {}
+    func didFail(url: URL?, message: String? = nil, navigationID: ObjectIdentifier? = nil) {}
+    func didCancel(navigationID: ObjectIdentifier? = nil) {}
+    func leave() {}
+    func retry() {}
+    func rememberNavigationRequest(_ request: URLRequest) {}
+    func owns(_ url: URL) -> Bool { false }
+    func displayURL(_ url: URL?) -> URL? { nil }
+    func rewrittenLoopbackURL(_ url: URL) -> URL? { nil }
+    func showUnavailable(_ message: String? = nil, retry: ((Any) async -> Void)? = nil) {}
+    func retainResource(_ id: SurfaceResourceID?) { self.resourceID = id }
+    func isCurrentUnavailableRetry(_ request: Any? = nil) -> Bool { false }
+    func desktopConnectionIsConnecting(url: URL?) {}
+    func desktopConnectionDidChange(url: URL?, isConnected: Bool) {}
+    func adoptCommittedRoute(model: CloudPortAccessModel?, url: URL?, resourceID: SurfaceResourceID?) {
+        self.model = model
+        self.remoteURL = url
+        self.resourceID = resourceID
+    }
+    func failRestore(_ message: String? = nil) {}
+    func showStarting(_ starting: Any? = nil) {}
 }

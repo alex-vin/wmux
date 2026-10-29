@@ -223,28 +223,11 @@ struct PanelContentView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         case .mobilePairing:
-            if panel is MobilePairingPanel {
-                MobilePairingPanelView(
-                    appearance: appearance,
-                    onRequestPanelFocus: onRequestPanelFocus
-                )
-            }
+            EmptyView()
         case .accountSignIn:
-            if let accountSignInPanel = panel as? AccountSignInPanel {
-                AccountSignInPanelView(
-                    panel: accountSignInPanel,
-                    appearance: appearance,
-                    onRequestPanelFocus: onRequestPanelFocus
-                )
-            }
+            EmptyView()
         case .cloudVPNSetup:
-            if let cloudVPNSetupPanel = panel as? CloudVPNSetupPanel {
-                CloudVPNSetupPanelView(
-                    model: cloudVPNSetupPanel.model,
-                    appearance: appearance,
-                    onRequestPanelFocus: onRequestPanelFocus
-                )
-            }
+            EmptyView()
 
         }
     }

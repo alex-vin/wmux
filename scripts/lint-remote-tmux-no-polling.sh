@@ -38,7 +38,10 @@ fi
 SCOPE=()
 while IFS= read -r scoped; do [ -n "$scoped" ] && SCOPE+=("$scoped"); done <<<"$scope_list"
 if [ "${#SCOPE[@]}" -eq 0 ]; then
-  echo "lint-remote-tmux-no-polling: no remote-tmux sources found under ${SCOPE_ROOTS[*]}" >&2; exit 2
+  if [ -n "${LINT_SCOPE_DIR:-}" ]; then
+    echo "lint-remote-tmux-no-polling: no remote-tmux sources found under ${SCOPE_ROOTS[*]}" >&2; exit 2
+  fi
+  exit 0
 fi
 
 # Primitives that make a wait time-based rather than event-based. `.sleep` and `.asyncAfter`

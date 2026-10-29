@@ -125,7 +125,7 @@ extension TerminalController {
         if ManagedDevicePolicy().isEnforced(.disableCloud) || !CloudMachinesFeature.offMainIsEnabled() {
             return v2Error(id: id, code: "cloud_disabled", message: CloudMachinesFeature.disabledMessage)
         }
-        if Self.surfaceBool(params["sidebar"]) == true { return socketWorkerCloudSidebarResponse(id: id, params: params) }
+        if Self.surfaceBool(params["sidebar"]) == true { return v2Error(id: id, code: "cloud_disabled", message: CloudMachinesFeature.disabledMessage) }
         let vmId = Self.surfaceString(params["id"]) ?? Self.surfaceString(params["machine"])
         let refresh = Self.surfaceBool(params["refresh"]) ?? false
         return v2VmCall(id: id, timeoutSeconds: 120) {

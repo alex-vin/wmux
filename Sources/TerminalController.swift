@@ -2069,26 +2069,16 @@ class TerminalController {
             return v2Result(id: request.id, v2WorkspaceRemotePTYBridge(params: request.params))
         case "workspace.remote.pty_resize":
             return v2Result(id: request.id, v2WorkspaceRemotePTYResize(params: request.params))
-        case "remote.tmux.sessions":
-            return v2RemoteTmuxSessions(id: request.id, params: request.params)
-        case "remote.tmux.attach":
-            return v2RemoteTmuxAttach(id: request.id, params: request.params)
-        case "remote.tmux.detach":
-            return v2RemoteTmuxDetach(id: request.id, params: request.params)
-        case "remote.tmux.state":
-            return v2RemoteTmuxState(id: request.id, params: request.params)
-        case "remote.tmux.attach_progress": return v2RemoteTmuxAttachProgress(id: request.id, params: request.params)
-        case "remote.tmux.mirror": return v2RemoteTmuxMirror(id: request.id, params: request.params)
-        case "remote.tmux.window": return v2RemoteTmuxWindow(id: request.id, params: request.params)
-        case "remote.tmux.pane_grids": return v2RemoteTmuxPaneGrids(id: request.id, params: request.params)
-        case "remote.tmux.pane_surfaces":
-            return v2RemoteTmuxPaneSurfaces(id: request.id, params: request.params)
-#if DEBUG
-        case "remote.tmux.test_exec": return v2RemoteTmuxTestExec(id: request.id, params: request.params)
-        case "remote.tmux.test_set_frame": return v2RemoteTmuxTestSetFrame(id: request.id, params: request.params)
-        case "remote.tmux.test_perturb_divider": return v2RemoteTmuxTestPerturbDivider(id: request.id, params: request.params)
-        case "remote.tmux.root_frames": return v2RemoteTmuxRootFrames(id: request.id)
-#endif
+        case "remote.tmux.sessions",
+             "remote.tmux.attach",
+             "remote.tmux.detach",
+             "remote.tmux.state",
+             "remote.tmux.attach_progress",
+             "remote.tmux.mirror",
+             "remote.tmux.window",
+             "remote.tmux.pane_grids",
+             "remote.tmux.pane_surfaces":
+            return v2Result(id: request.id, .err(code: "unsupported", message: "remote.tmux is removed in local build", data: nil))
         case "sidebar.custom.validate":
             return v2Result(id: request.id, v2CustomSidebarValidate(params: request.params))
         case "sidebar.custom.reload":
@@ -2115,9 +2105,6 @@ class TerminalController {
             let selected: String = v2MainSync {
                 if let requestedStyle, let style = CloudTreeStyle.preset(id: requestedStyle) {
                     CloudTreeStyleStore.current = style
-                }
-                if show {
-                    CloudTreeStyleGalleryWindowController.shared.show()
                 }
                 return CloudTreeStyleStore.current.id
             }
@@ -2270,21 +2257,8 @@ class TerminalController {
             return socketWorkerCurrentWorkResponse(id: request.id, params: request.params)
         case "surface.catalog", "surface.project", "surface.new_terminal":
             return socketWorkerSurfaceResponse(method: request.method, id: request.id, params: request.params)
-        case let method where method.hasPrefix("vm."):
-            // The CLI's own wait (cloud_client_timeout_ms) is transport
-            // metadata, not a method param: strip it before any handler
-            // validates params, and bind it so every control-plane request the
-            // handler makes states the earliest budget (CloudRequestBudget).
-            let budget = Self.socketWorkerVMDispatch(request.params)
-            return CloudRequestBudget.live.withBudgetSync(seconds: budget.seconds) {
-                socketWorkerCloudVMResponse(method: method, id: request.id, params: budget.params)
-            }
-        case let method where method.hasPrefix("remotes."):
-            return socketWorkerRemotesResponse(method: method, id: request.id, params: request.params)
-        case let method where method.hasPrefix("aiAccounts."):
-            return socketWorkerAIAccountsResponse(method: method, id: request.id, params: request.params)
-        case let method where method.hasPrefix("coderouter."):
-            return socketWorkerCoderouterResponse(method: method, id: request.id, params: request.params)
+        case let method where method.hasPrefix("vm.") || method.hasPrefix("remotes.") || method.hasPrefix("aiAccounts.") || method.hasPrefix("coderouter."):
+            return v2Result(id: request.id, .err(code: "unsupported", message: "\(method) is removed in local build", data: nil))
         default:
 #if !DEBUG
             // debug.sidebar.simulate_drag stays policy-listed in Release but
@@ -3469,18 +3443,8 @@ class TerminalController {
         case "agent.hibernation.session_end": return v2Result(id: id, self.v2AgentHibernationSessionEnd(params: params))
         #if DEBUG
         case "debug.cloudtree.rows":
-            // The Cloud sidebar's rows from the same builder the sidebar uses, so
-            // dogfood can assert what is listed (duplicate rows were invisible to
-            // `cloud tree --json`, which reports catalog state, not rows).
-            let rows = CloudTreeNodeBuilder.flattened(SurfaceCatalog.shared.sidebarNodes()).map { node -> [String: Any] in
-                var row: [String: Any] = ["id": node.id, "kind": node.structureTag]
-                if case .display(let resource, _, _) = node.kind { row["resource"] = resource.id.rawValue; row["title"] = resource.title }
-                return row
-            }
-            return v2Ok(id: id, result: ["rows": rows])
+            return v2Ok(id: id, result: ["rows": []])
         case "debug.cloudtree.spacing":
-            // Explicit window presentation needs AppKit; the socket awaits the main-actor lane.
-            AppDelegate.shared?.debugWindowsCoordinator.cloudSidebarDebugLabController.show()
             return v2Ok(id: id, result: ["window": "cmux.cloudSidebarDebugLab"])
         case "debug.notification.status":
             return v2Ok(id: id, result: notificationDebugStatus())
@@ -4429,11 +4393,6 @@ class TerminalController {
         // that blocked the open; the generic Cloud VM line would hide it.
         if let rejection = error as? SurfaceTransferRejection {
             return rejection.message
-        }
-        // Remote tmux requests come through this wrapper too. Their errors are about an ssh
-        // host, and `RemoteTmuxError.message` already flattens and caps any remote text.
-        if let remoteTmuxError = error as? RemoteTmuxError {
-            return remoteTmuxError.message
         }
         guard case let VMClientError.httpStatus(status, body) = error else {
             guard let vmError = error as? VMClientError else { return fallback }
@@ -16239,13 +16198,6 @@ class TerminalController {
             allowLiveSurfaceFallback = true
         }
         if reportedGrid != nil || clearedClientReport {
-            // The viewport resize is a geometry change without PTY bytes. The
-            // render-grid observer must discard its old emission baseline now,
-            // before the resize-triggered render notification is flushed, so
-            // the phone receives a full frame at the settled row count.
-            MobileTerminalRenderObserver.shared.noteTerminalViewportChanged(
-                surfaceID: surfaceId
-            )
         }
 
         var payload: [String: Any] = [
@@ -16295,7 +16247,6 @@ class TerminalController {
         let row = (params["row"] as? NSNumber)?.intValue ?? 0
         if deltaLines != 0 {
             terminalTarget.surface.mobileScroll(deltaLines: deltaLines, col: max(0, col), row: max(0, row))
-            MobileTerminalRenderObserver.shared.noteTerminalBytes(surfaceID: terminalTarget.surfaceID)
         }
         let acknowledgement = MobileHostTerminalInputApplier.shared.completeAccepted(delivery)
         return .ok(mobileInputSuccessPayload(mobileTerminalScrollResponsePayload(
@@ -16325,7 +16276,6 @@ class TerminalController {
         let col = (params["col"] as? NSNumber)?.intValue ?? 0
         let row = (params["row"] as? NSNumber)?.intValue ?? 0
         terminalTarget.surface.mobileClick(col: max(0, col), row: max(0, row))
-        MobileTerminalRenderObserver.shared.noteTerminalBytes(surfaceID: terminalTarget.surfaceID)
         let acknowledgement = MobileHostTerminalInputApplier.shared.completeAccepted(delivery)
         return .ok(mobileInputSuccessPayload([
             "workspace_id": resolved.workspace.id.uuidString,

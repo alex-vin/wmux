@@ -116,7 +116,6 @@ extension AppDelegate {
                 )
             }
         }
-        remoteTmuxController.detachAllForManagedPolicy()
     }
 
     /// `DisableCloud` transitions, both directions. Activation ends Cloud

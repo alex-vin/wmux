@@ -29,10 +29,6 @@ extension TerminalSurface {
            workspace.remotePTYSessionIDsByPanelId[id] != nil {
             return .remote(.workspaceRemote)
         }
-        // Manual tmux mirrors have no local TTY for the SSH process detector.
-        if let target = AppDelegate.shared?.remoteTmuxController.remoteUploadTarget(forSurfaceId: id) {
-            return .remote(target)
-        }
         return .local
     }
 

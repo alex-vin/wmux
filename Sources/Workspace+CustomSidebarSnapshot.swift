@@ -136,10 +136,7 @@ extension Workspace {
             for tab in bonsplitController.tabs(inPane: paneId) {
                 guard let panelId = panelIdFromSurfaceId(tab.id) else { continue }
                 // Keep tab identity stable, but expose only IDs accepted by surface.*.
-                // A mirror without a projection stays visible without a focus target.
-                let focusSurfaceId = isRemoteTmuxControlContainer(panelId)
-                    ? activeRemoteTmuxControlSurfaceProjection(containerPanelID: panelId)?.surfaceID
-                    : panelId
+                let focusSurfaceId = panelId
                 let git = reportedPanelGitBranch(panelId: panelId)
                 let prompt = panelPrompts[panelId]
                 surfaces.append(

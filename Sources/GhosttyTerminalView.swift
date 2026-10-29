@@ -340,9 +340,7 @@ class GhosttyApp {
         globalFontMagnificationPercent: {
             GhosttyApp.shared.appliedGlobalFontMagnificationPercent
         },
-        terminalWork: TerminalSurfaceWorkDiagnostics(log: MobileHostDiagnostics.log) { workspaceID in
-            TerminalGeometryDiagnostics().context(workspaceID: workspaceID, transition: .unknown)
-        }
+        terminalWork: TerminalSurfaceWorkDiagnostics()
     )
 
     private static let releaseBundleIdentifier = "com.cmuxterm.app"
@@ -9759,11 +9757,6 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
 
     private func canSplitCurrentSurface() -> Bool {
         guard let surfaceId = terminalSurface?.id else { return false }
-        // Mirror panes are not workspace panels, but their split command routes
-        // to tmux and the resulting layout change rebuilds the mirrored panes.
-        if AppDelegate.shared?.remoteTmuxController.isMirrorPaneSurface(surfaceId) == true {
-            return true
-        }
         guard let tabId,
               let app = AppDelegate.shared,
               let manager = app.tabManagerFor(tabId: tabId) ?? app.tabManager,
@@ -9790,12 +9783,6 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
     @discardableResult
     private func splitCurrentSurface(direction: SplitDirection) -> Bool {
         guard let surfaceId = terminalSurface?.id else { return false }
-        // Remote tmux mirror pane: never fall through to a local split. The tmux
-        // command either reaches the live stream, or the action reports false.
-        if let controller = AppDelegate.shared?.remoteTmuxController,
-           controller.isMirrorPaneSurface(surfaceId) {
-            return controller.handleMirrorSplitRequested(surfaceId: surfaceId, vertical: !direction.isHorizontal, focusIntent: .focusCreatedPane)
-        }
         guard let tabId,
               let app = AppDelegate.shared,
               let manager = app.tabManagerFor(tabId: tabId) ?? app.tabManager else {
