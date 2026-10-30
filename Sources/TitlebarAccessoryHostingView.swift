@@ -6,15 +6,8 @@ final class TitlebarAccessoryHostingView<Content: View>: NSHostingView<Content> 
 
     override func hitTest(_ point: NSPoint) -> NSView? {
         guard bounds.contains(point) else { return nil }
-        guard TitlebarAccessoryContainerView.shouldResolveWindowDragHit(eventType: NSApp.currentEvent?.type) else {
-            return super.hitTest(point)
-        }
-        guard let window else { return nil }
-
-        let locationInWindow = convert(point, to: nil)
-        guard isMinimalModeTitlebarControlHit(window: window, locationInWindow: locationInWindow) else {
-            return nil
-        }
+        // Deliver hits directly to the hosting view and its SwiftUI controls.
+        // TitlebarAccessoryContainerView handles drag in the surrounding titlebar areas.
         return super.hitTest(point) ?? self
     }
 }

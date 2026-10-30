@@ -38,15 +38,19 @@ final class WindowDecorationsController {
     }
 
     func apply(to window: NSWindow) {
-        if isMainWorkspaceWindow(window), WorkspacePresentationModeSettings.isMinimal() {
-            WindowMouseMovedEventsCoordinator.enable(for: window, owner: self)
-        } else {
+        if isMainWorkspaceWindow(window) {
             WindowMouseMovedEventsCoordinator.disable(for: window, owner: self)
+            window.standardWindowButton(.closeButton)?.isHidden = false
+            window.standardWindowButton(.miniaturizeButton)?.isHidden = false
+            window.standardWindowButton(.zoomButton)?.isHidden = false
+            window.standardWindowButton(.closeButton)?.alphaValue = 1.0
+            window.standardWindowButton(.miniaturizeButton)?.alphaValue = 1.0
+            window.standardWindowButton(.zoomButton)?.alphaValue = 1.0
+        } else {
+            let shouldHideButtons = shouldHideTrafficLights(for: window)
+            hideStandardButtons(on: window, hidden: shouldHideButtons)
         }
-        let shouldHideButtons = shouldHideTrafficLights(for: window)
-        hideStandardButtons(on: window, hidden: shouldHideButtons)
-        // Native traffic-light frames are AppKit-owned. cmux reads them for layout but never moves them.
-        applyMinimalModeSidebarTitlebarClickTarget(to: window)
+        removeMinimalModeSidebarTitlebarClickTarget(from: window)
     }
 
     private func installObservers() {
@@ -344,7 +348,7 @@ final class WindowDecorationsController {
             }
             switch slot {
             case .toggleSidebar:
-                context.sidebarState.toggle()
+                break
             case .showNotifications:
                 let resolvedAnchorView = NotificationsAnchorRegistry.shared.closestAnchor(
                     in: window,
@@ -389,6 +393,15 @@ final class WindowDecorationsController {
     }
 
     private func hideStandardButtons(on window: NSWindow, hidden: Bool) {
+        if isMainWorkspaceWindow(window) {
+            window.standardWindowButton(.closeButton)?.isHidden = false
+            window.standardWindowButton(.miniaturizeButton)?.isHidden = false
+            window.standardWindowButton(.zoomButton)?.isHidden = false
+            window.standardWindowButton(.closeButton)?.alphaValue = 1.0
+            window.standardWindowButton(.miniaturizeButton)?.alphaValue = 1.0
+            window.standardWindowButton(.zoomButton)?.alphaValue = 1.0
+            return
+        }
         window.standardWindowButton(.closeButton)?.isHidden = hidden
         window.standardWindowButton(.miniaturizeButton)?.isHidden = hidden
         window.standardWindowButton(.zoomButton)?.isHidden = hidden

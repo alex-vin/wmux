@@ -8,6 +8,7 @@ struct GeminiQuotaPopoverView: View {
     @Bindable var store: GeminiAccountStore
     @Bindable var coordinator: GeminiTerminalAccountCoordinator
     let currentSurfaceID: UUID?
+    var onClose: (() -> Void)? = nil
 
     @State private var isAddingAccount = false
     @State private var errorMessage: String?
@@ -93,6 +94,18 @@ struct GeminiQuotaPopoverView: View {
             .buttonStyle(.plain)
             .help("添加 Google 账号")
             .disabled(isAddingAccount)
+
+            if let onClose {
+                Button {
+                    onClose()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help("关闭面板")
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)

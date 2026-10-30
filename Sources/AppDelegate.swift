@@ -7427,43 +7427,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     @discardableResult
     func toggleSidebarInActiveMainWindow(preferredWindow: NSWindow? = nil) -> Bool {
-        func toggle(_ context: MainWindowContext) -> Bool {
-            guard let window = resolvedWindow(for: context) else {
-                discardOrphanedMainWindowContext(context)
-                return false
-            }
-            setActiveMainWindow(window)
-            context.sidebarState.toggle()
-            return true
-        }
-
-        if let preferredWindow {
-            guard let preferredContext = prepareSenderRelativeMainWindowAction(
-                in: preferredWindow
-            ) else {
-                return false
-            }
-            preferredContext.sidebarState.toggle()
-            return true
-        }
-        if let keyWindow = shortcutRoutingKeyWindow,
-           let keyContext = contextForMainTerminalWindow(keyWindow),
-           toggle(keyContext) {
-            return true
-        }
-        if let mainWindow = NSApp.mainWindow,
-           let mainContext = contextForMainTerminalWindow(mainWindow),
-           toggle(mainContext) {
-            return true
-        }
-        if let activeManager = tabManager,
-           let activeContext = mainWindowContexts.values.first(where: { $0.tabManager === activeManager }),
-           toggle(activeContext) {
-            return true
-        }
-        for fallbackContext in Array(mainWindowContexts.values) where toggle(fallbackContext) {
-            return true
-        }
+        // Left sidebar has been decommissioned; toggle is a no-op.
         return false
     }
 
@@ -10275,9 +10239,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let shouldStartWithHiddenSidebarForTerminalViewportUITest = false
 #endif
         let sidebarState = SidebarState(
-            isVisible: shouldStartWithHiddenSidebarForTerminalViewportUITest
-                ? false
-                : (sessionWindowSnapshot?.sidebar.isVisible ?? true),
+            isVisible: false,
             persistedWidth: CGFloat(sidebarWidth)
         )
         let sidebarSelectionState = SidebarSelectionState(
@@ -10293,7 +10255,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // this seed, the first-frame layout can mispaint in the new window until
         // ContentView.onAppear eventually runs syncTrafficLightInset (#2737).
         let initialTabBarLeadingInset: CGFloat =
-            (WorkspacePresentationModeSettings.isMinimal() && !sidebarState.isVisible)
+            WorkspacePresentationModeSettings.isMinimal()
                 ? MinimalModeTitlebarDebugSettings.trafficLightTabBarLeadingInset()
                 : 0
         tabManager.syncWorkspaceTabBarLeadingInset(initialTabBarLeadingInset)
@@ -10368,6 +10330,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             backing: .buffered,
             defer: false
         )
+        window.identifier = NSUserInterfaceItemIdentifier("cmux.main.\(windowId.uuidString)")
         let minimumWindowSize = CmuxMainWindow.minimumContentSize
         window.minSize = minimumWindowSize
         window.contentMinSize = minimumWindowSize
@@ -10505,6 +10468,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
         if let closeButton = window.standardWindowButton(.closeButton),
            let titlebarView = closeButton.superview {
+            closeButton.isHidden = false
+            window.standardWindowButton(.miniaturizeButton)?.isHidden = false
+            window.standardWindowButton(.zoomButton)?.isHidden = false
+            closeButton.alphaValue = 1.0
+            window.standardWindowButton(.miniaturizeButton)?.alphaValue = 1.0
+            window.standardWindowButton(.zoomButton)?.alphaValue = 1.0
             titlebarView.needsLayout = true
             titlebarView.layoutSubtreeIfNeeded()
             titlebarView.needsDisplay = true

@@ -589,7 +589,6 @@ func titlebarShortcutHintVerticalOffset(for config: TitlebarControlsStyleConfig)
 }
 
 enum TitlebarShortcutHintActionSlot: Int, CaseIterable {
-    case toggleSidebar
     case showNotifications
     case newTab
     case focusHistoryBack
@@ -597,8 +596,6 @@ enum TitlebarShortcutHintActionSlot: Int, CaseIterable {
 
     var action: KeyboardShortcutSettings.Action? {
         switch self {
-        case .toggleSidebar:
-            return .toggleSidebar
         case .showNotifications:
             return .showNotifications
         case .newTab:
@@ -638,8 +635,6 @@ enum TitlebarControlsLayoutMetrics {
         config: TitlebarControlsStyleConfig
     ) -> CGFloat {
         let actionSlot: MinimalModeSidebarControlActionSlot = switch slot {
-        case .toggleSidebar:
-            .toggleSidebar
         case .showNotifications:
             .showNotifications
         case .newTab:
@@ -1134,24 +1129,6 @@ struct TitlebarControlsView: View {
         let hintLayoutItems = titlebarHintLayoutItems(config: config)
         let focusHistoryAvailability = focusHistoryNavigationAvailabilitySnapshot
         let content = HStack(spacing: config.spacing) {
-            TitlebarControlButton(
-                config: config,
-                foregroundColor: foregroundColor,
-                accessibilityIdentifier: "titlebarControl.toggleSidebar",
-                accessibilityLabel: String(localized: "titlebar.sidebar.accessibilityLabel", defaultValue: "Toggle Sidebar"),
-                action: {
-                #if DEBUG
-                cmuxDebugLog("titlebar.toggleSidebar")
-                #endif
-                onToggleSidebar()
-            },
-                rightClickAction: { anchorView, event in
-                    CmuxExtensionSidebarSelection.showMenu(anchorView: anchorView, event: event)
-                }) {
-                sidebarIconLabel(config: config, iconGeometryKeyPrefix: "titlebarControl_toggleSidebarIcon")
-            }
-            .safeHelp(KeyboardShortcutSettings.Action.toggleSidebar.tooltip(String(localized: "titlebar.sidebar.tooltip", defaultValue: "Show or hide the sidebar")))
-
             TitlebarControlButton(
                 config: config,
                 foregroundColor: foregroundColor,
@@ -2844,7 +2821,7 @@ final class UpdateTitlebarAccessoryController {
     }
 
     func attach(to window: NSWindow) {
-        attachIfNeeded(to: window)
+        removeAccessoryIfPresent(from: window)
     }
 
     private func installObservers() {
@@ -2858,7 +2835,7 @@ final class UpdateTitlebarAccessoryController {
             let windowIdentifier = ObjectIdentifier(window)
             Task { @MainActor [weak self] in
                 guard let self, let window = self.liveWindow(withIdentifier: windowIdentifier) else { return }
-                self.attachIfNeeded(to: window)
+                self.removeAccessoryIfPresent(from: window)
             }
         })
 
@@ -2871,7 +2848,7 @@ final class UpdateTitlebarAccessoryController {
             let windowIdentifier = ObjectIdentifier(window)
             Task { @MainActor [weak self] in
                 guard let self, let window = self.liveWindow(withIdentifier: windowIdentifier) else { return }
-                self.attachIfNeeded(to: window)
+                self.removeAccessoryIfPresent(from: window)
             }
         })
 
@@ -2903,7 +2880,7 @@ final class UpdateTitlebarAccessoryController {
 
     private func attachToExistingWindows() {
         for window in NSApp.windows {
-            attachIfNeeded(to: window)
+            removeAccessoryIfPresent(from: window)
         }
     }
 
@@ -2912,87 +2889,10 @@ final class UpdateTitlebarAccessoryController {
     }
 
     private func scheduleStartupWindowScans() {
-        // We want to be robust to SwiftUI/AppKit timing and to XCTest automation. Scanning
-        // NSApp.windows briefly at startup is cheap and ensures accessories are attached even
-        // if key/main/visible notifications are missed.
-        let delays: [TimeInterval] = [0.05, 0.15, 0.3, 0.6, 1.0, 2.0, 3.0]
-        for delay in delays {
-            let item = DispatchWorkItem { [weak self] in
-                Task { @MainActor [weak self] in
-                    self?.attachToExistingWindows()
-                }
-#if DEBUG
-                let env = ProcessInfo.processInfo.environment
-                if env["CMUX_UI_TEST_MODE"] == "1" {
-                    let ids = NSApp.windows.map { $0.identifier?.rawValue ?? "<nil>" }
-                    let delayText = String(format: "%.2f", delay)
-                    self?.updateLog.append("startup window scan (delay=\(delayText)) count=\(NSApp.windows.count) ids=\(ids.joined(separator: ","))")
-                }
-#endif
-            }
-            startupScanWorkItems.append(item)
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: item)
-        }
     }
 
     private func attachIfNeeded(to window: NSWindow) {
-        guard NSApp.windows.contains(where: { $0 === window }) else {
-            pendingAttachRetries.removeValue(forKey: ObjectIdentifier(window))
-            return
-        }
-        guard !isSettingsWindow(window) else { return }
-
-        // Window identifiers are assigned by SwiftUI via WindowAccessor, which can run
-        // after didBecomeKey/didBecomeMain notifications. Retry briefly to avoid missing
-        // attaching accessories (notably in UI tests).
-        if !isMainTerminalWindow(window) {
-            let key = ObjectIdentifier(window)
-            let attempts = pendingAttachRetries[key, default: 0]
-            if attempts < 40 {
-                pendingAttachRetries[key] = attempts + 1
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
-                    Task { @MainActor [weak self] in
-                        guard let self, let window = self.liveWindow(withIdentifier: key) else { return }
-                        self.attachIfNeeded(to: window)
-                    }
-                }
-            } else {
-                pendingAttachRetries.removeValue(forKey: key)
-            }
-            return
-        }
-
-        pendingAttachRetries.removeValue(forKey: ObjectIdentifier(window))
-        guard canAccessTitlebarAccessories(on: window) else { return }
-
-        // Don't re-attach controls if already attached.
-        guard !attachedWindows.contains(window) else {
-            applyAccessoryVisibility(for: window)
-            return
-        }
-
-        if !window.titlebarAccessoryViewControllers.contains(where: { $0.view.identifier == controlsIdentifier }) {
-            let controls = TitlebarControlsAccessoryViewController(
-                notificationStore: TerminalNotificationStore.shared,
-                settingsRuntime: settingsRuntime,
-                layoutModel: layoutModel
-            )
-            controls.layoutAttribute = .left
-            controls.view.identifier = controlsIdentifier
-            window.addTitlebarAccessoryViewController(controls)
-            controlsControllers.add(controls)
-        }
-
-        attachedWindows.add(window)
-        applyAccessoryVisibility(for: window)
-
-#if DEBUG
-        let env = ProcessInfo.processInfo.environment
-        if env["CMUX_UI_TEST_MODE"] == "1" {
-            let ident = window.identifier?.rawValue ?? "<nil>"
-            updateLog.append("attached titlebar accessories to window id=\(ident)")
-        }
-#endif
+        removeAccessoryIfPresent(from: window)
     }
 
     private func applyAccessoryVisibility(for window: NSWindow) {

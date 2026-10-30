@@ -412,6 +412,10 @@ final class WindowBrowserHostView: NSView {
             return hitView === self ? nil : hitView
         }
 
+        if shouldPassThroughToFloatingGeminiQuotaButton(at: point) {
+            return nil
+        }
+
         let dividerHit = splitDividerHit(at: point)
         let hostedInspectorHit = dividerHit == nil ? hostedInspectorDividerHit(at: point) : nil
         updateDividerCursor(at: point, dividerHit: dividerHit, hostedInspectorHit: hostedInspectorHit)
@@ -695,6 +699,12 @@ final class WindowBrowserHostView: NSView {
             }
             return cachedHitView
         }
+    }
+
+    private func shouldPassThroughToFloatingGeminiQuotaButton(at point: NSPoint) -> Bool {
+        guard let window else { return false }
+        let windowPoint = convert(point, to: nil)
+        return FloatingGeminiQuotaButtonHitRegionRegistry.containsWindowPoint(windowPoint, in: window)
     }
 
     private func shouldPassThroughToTitlebar(

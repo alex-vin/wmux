@@ -1402,7 +1402,7 @@ struct ContentView: View {
     }
 
     private func updateSidebarResizerBandState(using _: NSEvent? = nil) {
-        guard sidebarState.isVisible || rightSidebarVisible,
+        guard rightSidebarVisible,
               let window = observedWindow,
               let contentView = window.contentView else {
             isResizerBandActive = false
@@ -1416,8 +1416,8 @@ struct ContentView: View {
         let isInDividerBand = sidebarResizerOcclusionResolver.dividerBandContains(
             point: pointInContent,
             contentBounds: contentView.bounds,
-            isLeftSidebarVisible: sidebarState.isVisible,
-            leftDividerX: sidebarWidth,
+            isLeftSidebarVisible: false,
+            leftDividerX: 0,
             isRightSidebarVisible: rightSidebarVisible,
             rightDividerX: contentView.bounds.maxX - rightSidebarWidth
         )
@@ -2106,6 +2106,7 @@ struct ContentView: View {
             // Enable window dragging from the titlebar strip without making the entire content
             // view draggable (which breaks drag gestures like tab reordering).
             WindowDragHandleView()
+                .padding(.leading, 80)
 
             TitlebarLeadingInsetReader(
                 inset: $titlebarLeadingInset,
@@ -2113,58 +2114,36 @@ struct ContentView: View {
             )
                 .allowsHitTesting(false)
 
-            SidebarWidthReader(layout: sidebarLayout) { width in
-                HStack(spacing: 8) {
-                    if isFullScreen && !sidebarState.isVisible {
-                        // Reserve the controls' width so the title flows to their right.
-                        // The visible controls are rendered once in the band overlay (see
-                        // `workspaceTitlebarBand`) so their position never depends on
-                        // sidebar visibility.
-                        Color.clear
-                            .frame(width: fullscreenControlsWidth, height: titlebarContentHeight)
-                            .allowsHitTesting(false)
-                    }
-
-                    // Draggable folder icon + focused command name
-                    if let directory = focusedDirectory {
-                        DetachedFolderDragIcon(directory: directory)
-                            .frame(width: 16, height: 16)
-                            .padding(.leading, -6)
-                    }
-
-                    Text(titlebarText)
-                        .cmuxFont(size: 13, weight: .bold)
-                        .foregroundColor(fakeTitlebarTextColor(appearance: appearance))
-                        .lineLimit(1)
-                        .allowsHitTesting(false)
-
-                    Spacer()
-
+            HStack(spacing: 8) {
+                // Draggable folder icon + focused command name
+                if let directory = focusedDirectory {
+                    DetachedFolderDragIcon(directory: directory)
+                        .frame(width: 16, height: 16)
+                        .padding(.leading, -6)
                 }
-                .frame(height: titlebarContentHeight)
-                .padding(.top, 2)
-                .padding(.leading, Self.customTitlebarLeadingPadding(
-                    isFullScreen: isFullScreen,
-                    isSidebarVisible: sidebarState.isVisible,
-                    sidebarWidth: width,
-                    minimumSidebarWidth: minimumSidebarWidth,
-                    titlebarLeadingInset: titlebarLeadingInset
-                ))
-                .padding(.trailing, 8)
+
+                Text(titlebarText)
+                    .cmuxFont(size: 13, weight: .bold)
+                    .foregroundColor(fakeTitlebarTextColor(appearance: appearance))
+                    .lineLimit(1)
+                    .allowsHitTesting(false)
+
+                Spacer()
             }
+            .frame(height: titlebarContentHeight)
+            .padding(.top, 2)
+            .padding(.leading, max(titlebarLeadingInset, 78))
+            .padding(.trailing, 8)
         }
         .frame(height: WindowChromeMetrics.appTitlebarHeight)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
         .background(TitlebarDoubleClickMonitorView())
         .overlay(alignment: .bottom) {
-            SidebarWidthReader(layout: sidebarLayout) { width in
-                WindowChromeBorder(
-                    orientation: .horizontal,
-                    backgroundColor: appearance.resolvedChromeBackgroundColor
-                )
-                    .padding(.leading, sidebarState.isVisible ? width : 0)
-            }
+            WindowChromeBorder(
+                orientation: .horizontal,
+                backgroundColor: appearance.resolvedChromeBackgroundColor
+            )
         }
     }
 
@@ -2174,50 +2153,14 @@ struct ContentView: View {
             .frame(maxWidth: .infinity)
             .overlay(alignment: .topLeading) {
                 customTitlebar(appearance: appearance)
-                    // The workspace titlebar band spans the full window width and sits at
-                    // zIndex(100) over the content/sidebar layout. Its drag/double-click
-                    // surface (`WindowDragHandleView` + `.contentShape(Rectangle())`) must
-                    // not cover the right sidebar, whose mode bar (Files/Search/Feed/Vault)
-                    // lives inside the titlebar-height strip — otherwise the band wins the
-                    // hit-test and swallows every click/hover on those buttons (#5099).
-                    // Confine the interactive titlebar surface to the area left of the
-                    // right sidebar, matching the pre-#5017 "only over terminal content,
-                    // not the sidebar" intent. The left sidebar's titlebar controls live in
-                    // the AppKit titlebar accessory (above this band), so only the trailing
-                    // (right-sidebar) edge needs to be ceded here.
-                    //
-                    // `rightSidebarWidth` is already `rightSidebarVisible ? fileExplorerWidth : 0`,
-                    // so it collapses to 0 when the sidebar is hidden. The sidebar panel itself
-                    // snaps without animation (`.transaction { $0.animation = nil }`), so we match
-                    // that here — otherwise this inset could animate out of step with the panel on
-                    // toggle and momentarily expose (or re-cover) the mode bar mid-transition.
                     .padding(.trailing, rightSidebarWidth)
                     .animation(nil, value: rightSidebarWidth)
-            }
-            .overlay(alignment: .topLeading) {
-                if let placement = Self.fullscreenControlsPlacement(
-                    isFullScreen: isFullScreen,
-                    isSidebarVisible: sidebarState.isVisible
-                ) {
-                    fullscreenControls
-                        .environment(
-                            \.colorScheme,
-                            sidebarState.isVisible
-                                ? appearance.sidebarContentColorScheme
-                                : appearance.chromeColorScheme
-                        )
-                        // Same vertical frame as the title row (`customTitlebar`)
-                        // so the controls' center matches the folder icon / title.
-                        .frame(height: max(1, WindowChromeMetrics.appTitlebarHeight - 2), alignment: .center)
-                        .padding(.top, placement.topPadding)
-                        .padding(.leading, placement.leadingPadding)
-                }
             }
     }
 
     private func syncTrafficLightInset(isMinimalMode: Bool? = nil) {
         let resolvedIsMinimalMode = isMinimalMode ?? currentIsMinimalMode
-        let inset: CGFloat = (resolvedIsMinimalMode && !sidebarState.isVisible && !isFullScreen)
+        let inset: CGFloat = (resolvedIsMinimalMode && !isFullScreen)
             ? CGFloat(titlebarDebugChromeSnapshot.trafficLightTabBarLeadingInset)
             : 0
         tabManager.syncWorkspaceTabBarLeadingInset(inset)
@@ -2477,72 +2420,12 @@ struct ContentView: View {
     }
 
     private func contentAndSidebarLayout(appearance: WindowAppearanceSnapshot) -> AnyView {
-        let layout: AnyView
-        // The legacy SwiftUI path uses HStack while matching so both sidebar
-        // and terminal sit directly on the window background.
-        let useWithinWindow = sidebarBlendMode == SidebarBlendModeOption.withinWindow.rawValue
-            && !sidebarMatchTerminalBackground
-        if retainsDefaultAppKitSidebarWhenHidden {
-            // Native sidebar identity is independent of presentation. Keep its
-            // full-width subtree mounted behind a zero-width clipping shell so
-            // hide/show and backdrop changes cannot cold-start the table.
-            layout = AnyView(
-                ZStack(alignment: .leading) {
-                    terminalContentWithRightSidebarPanel(appearance: appearance)
-                        .modifier(SidebarWidthLeadingPaddingModifier(
-                            layout: sidebarLayout,
-                            enabled: sidebarState.isVisible
-                        ))
-                    SidebarWidthReader(layout: sidebarLayout) { width in
-                        sidebarPanelWithBackdrop(appearance: appearance)
-                            .frame(width: sidebarState.isVisible ? width : 0, alignment: .leading)
-                            .clipped()
-                            .allowsHitTesting(sidebarState.isVisible)
-                            .accessibilityHidden(!sidebarState.isVisible)
-                    }
-                }
-            )
-        } else if useWithinWindow {
-            // Overlay mode keeps the left sidebar on top, but the right
-            // sidebar stays in an HStack so terminal rows are clipped before
-            // the sidebar backdrop samples the window.
-            layout = AnyView(
-                ZStack(alignment: .leading) {
-                    HStack(spacing: 0) {
-                        terminalContentWithSidebarDropOverlay(appearance: appearance)
-                            .modifier(SidebarWidthLeadingPaddingModifier(
-                                layout: sidebarLayout,
-                                enabled: sidebarState.isVisible
-                            ))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .layoutPriority(1)
-                        rightSidebarPanelWithBackdrop(appearance: appearance)
-                    }
-                    if sidebarState.isVisible {
-                        sidebarPanelWithBackdrop(appearance: appearance)
-                    }
-                }
-            )
-        } else {
-            // Standard HStack mode for behindWindow blur
-            layout = AnyView(
-                HStack(spacing: 0) {
-                    if sidebarState.isVisible {
-                        sidebarPanelWithBackdrop(appearance: appearance)
-                    }
-                    terminalContentWithRightSidebarPanel(appearance: appearance)
-                }
-            )
-        }
+        let layout = AnyView(
+            terminalContentWithRightSidebarPanel(appearance: appearance)
+        )
 
         return AnyView(
             layout
-                .overlay(alignment: .leading) {
-                    if sidebarState.isVisible {
-                        sidebarResizerOverlay
-                            .zIndex(1000)
-                    }
-                }
                 .overlay(alignment: .leading) {
                     if rightSidebarVisible {
                         rightSidebarResizerOverlay
@@ -2600,6 +2483,12 @@ struct ContentView: View {
                     workspaceTitlebarBand(appearance: appearance)
                         .zIndex(100)
                 }
+
+                FloatingGeminiQuotaButton()
+                    .padding(.leading, 14)
+                    .padding(.bottom, 12)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                    .zIndex(900)
             }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .frame(minWidth: CGFloat(SessionPersistencePolicy.minimumWindowWidth), minHeight: CGFloat(SessionPersistencePolicy.minimumWindowHeight))
@@ -3348,7 +3237,7 @@ struct ContentView: View {
                 // A right sidebar collapsed for lack of room may fit again.
                 fitSidePanelsToWindow()
             }
-            setMinimalModeSidebarTitlebarControlsAvailable(isVisible, in: observedWindow)
+            setMinimalModeSidebarTitlebarControlsAvailable(true, in: observedWindow)
             if let observedWindow {
                 AppDelegate.shared?.applyWindowDecorations(to: observedWindow)
             }
@@ -3453,7 +3342,7 @@ struct ContentView: View {
     ) {
         window.identifier = NSUserInterfaceItemIdentifier(windowIdentifier)
         window.isRestorable = false
-        setMinimalModeSidebarTitlebarControlsAvailable(sidebarState.isVisible, in: window)
+        setMinimalModeSidebarTitlebarControlsAvailable(true, in: window)
         window.titlebarAppearsTransparent = true
         // Native AppKit titlebar dragging steals pane-tab drags in minimal
         // mode. Keep the main window immovable by default; explicit chrome
@@ -3521,6 +3410,12 @@ struct ContentView: View {
         AppDelegate.shared?.applyWindowDecorations(to: window)
         if let closeButton = window.standardWindowButton(.closeButton),
            let titlebarView = closeButton.superview {
+            closeButton.isHidden = false
+            window.standardWindowButton(.miniaturizeButton)?.isHidden = false
+            window.standardWindowButton(.zoomButton)?.isHidden = false
+            closeButton.alphaValue = 1.0
+            window.standardWindowButton(.miniaturizeButton)?.alphaValue = 1.0
+            window.standardWindowButton(.zoomButton)?.alphaValue = 1.0
             titlebarView.needsLayout = true
             titlebarView.layoutSubtreeIfNeeded()
             titlebarView.needsDisplay = true
@@ -7703,14 +7598,6 @@ struct ContentView: View {
                 keywords: ["reopen", "closed", "recently", "history", "tab", "workspace", "window"]
             )
         )
-        contributions.append(
-            CommandPaletteCommandContribution(
-                commandId: "palette.toggleSidebar",
-                title: constant(String(localized: "command.toggleLeftSidebar.title", defaultValue: "Toggle Left Sidebar")),
-                subtitle: constant(String(localized: "command.toggleSidebar.subtitle", defaultValue: "Layout")),
-                keywords: ["toggle", "sidebar", "left", "layout"]
-            )
-        )
         // "Sidebar: <provider>" switch commands for each available view. The
         // built-in views are always offered; `descriptors` adds the hosted
         // extension sidebar only while the experimental Extensions beta is on.
@@ -9010,9 +8897,6 @@ struct ContentView: View {
             } else {
                 _ = tabManager.reopenMostRecentlyClosedWorkspace()
             }
-        }
-        registry.register(commandId: "palette.toggleSidebar") {
-            sidebarState.toggle()
         }
         // Register a handler for every possible view (including the hosted
         // extension sidebar) regardless of the beta flag, so a contribution that

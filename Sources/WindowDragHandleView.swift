@@ -558,7 +558,10 @@ struct TitlebarInteractiveControlRegion: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSView {
-        RegisteredView(frame: .zero)
+        let view = RegisteredView(frame: .zero)
+        view.autoresizingMask = [.width, .height]
+        MinimalModeTitlebarControlHitRegionRegistry.register(view)
+        return view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {
@@ -1214,6 +1217,19 @@ func windowDragHandleShouldCaptureHit(
 
     if let dragHandleWindow {
         let locationInWindow = dragHandleView.convert(point, to: nil)
+        let contentBounds = dragHandleWindow.contentView?.bounds ?? NSRect(
+            x: 0,
+            y: 0,
+            width: dragHandleWindow.frame.width,
+            height: dragHandleWindow.frame.height
+        )
+        let titlebarHeight = WindowChromeMetrics.appTitlebarHeight
+        if locationInWindow.x < 80 && locationInWindow.y >= contentBounds.maxY - titlebarHeight {
+            #if DEBUG
+            cmuxDebugLog("titlebar.dragHandle.hitTest capture=false reason=trafficLights locationInWindow=\(windowDragHandleFormatPoint(locationInWindow))")
+            #endif
+            return false
+        }
         if isMinimalModeTitlebarControlHit(window: dragHandleWindow, locationInWindow: locationInWindow) {
             #if DEBUG
             cmuxDebugLog("titlebar.dragHandle.hitTest capture=false reason=minimalTitlebarControl point=\(windowDragHandleFormatPoint(point))")
@@ -1556,6 +1572,7 @@ func minimalModeTitlebarDoubleClickBandHeight(for window: NSWindow) -> CGFloat {
 }
 
 func isMainWorkspaceWindow(_ window: NSWindow) -> Bool {
+    if window is CmuxMainWindow { return true }
     guard let raw = window.identifier?.rawValue else { return false }
     return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
 }

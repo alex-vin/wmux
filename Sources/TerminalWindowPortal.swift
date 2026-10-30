@@ -137,6 +137,11 @@ final class WindowTerminalHostView: NSView {
         if routingContext.allowsPortalPointerHitTesting {
             let resolveHostedTerminalHitView = hostedTerminalHitViewResolver(at: point)
 
+            if shouldPassThroughToFloatingGeminiQuotaButton(at: point) {
+                clearActiveDividerCursor(restoreArrow: false)
+                return nil
+            }
+
             if shouldPassThroughToTitlebar(at: point, hostedTerminalHitView: resolveHostedTerminalHitView) {
                 clearActiveDividerCursor(restoreArrow: false)
                 return nil
@@ -218,6 +223,12 @@ final class WindowTerminalHostView: NSView {
         // Non-pointer event: skip divider/drag routing, just do standard hit testing.
         let hitView = super.hitTest(point)
         return hitView === self ? nil : hitView
+    }
+
+    private func shouldPassThroughToFloatingGeminiQuotaButton(at point: NSPoint) -> Bool {
+        guard let window else { return false }
+        let windowPoint = convert(point, to: nil)
+        return FloatingGeminiQuotaButtonHitRegionRegistry.containsWindowPoint(windowPoint, in: window)
     }
 
     private func shouldPassThroughToTitlebar(at point: NSPoint, hostedTerminalHitView: () -> NSView?) -> Bool {

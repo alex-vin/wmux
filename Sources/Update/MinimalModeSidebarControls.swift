@@ -42,8 +42,7 @@ enum TitlebarControlsHitRegions {
         config: TitlebarControlsStyleConfig
     ) -> ClosedRange<CGFloat>? {
         let startX = outerLeadingPadding + config.groupPadding.leading
-        let sidebarX = startX
-        let notificationsX = sidebarX + config.buttonSize + config.spacing
+        let notificationsX = startX
         let newTabX = notificationsX + config.buttonSize + config.spacing
         let newTabWidth = TitlebarNewWorkspaceSplitButtonMetrics.primaryWidth(config: config)
         let newWorkspaceMenuX = newTabX + newTabWidth
@@ -51,9 +50,9 @@ enum TitlebarControlsHitRegions {
         let focusBackX = newWorkspaceMenuX + newWorkspaceMenuWidth + config.spacing
         let focusForwardX = focusBackX + config.buttonSize + config.spacing
 
-        let minX: CGFloat = switch slot {
+        let minX: CGFloat? = switch slot {
         case .toggleSidebar:
-            sidebarX
+            nil
         case .showNotifications:
             notificationsX
         case .newTab:
@@ -65,6 +64,7 @@ enum TitlebarControlsHitRegions {
         case .focusHistoryForward:
             focusForwardX
         }
+        guard let minX else { return nil }
         let width: CGFloat = switch slot {
         case .newTab:
             newTabWidth
@@ -80,8 +80,10 @@ enum TitlebarControlsHitRegions {
         at point: NSPoint,
         config: TitlebarControlsStyleConfig
     ) -> MinimalModeSidebarControlActionSlot? {
-        for (index, range) in buttonXRanges(config: config).enumerated() where range.contains(point.x) {
-            return MinimalModeSidebarControlActionSlot(rawValue: index)
+        for slot in MinimalModeSidebarControlActionSlot.allCases {
+            if let range = buttonXRange(for: slot, config: config), range.contains(point.x) {
+                return slot
+            }
         }
         return nil
     }
@@ -247,10 +249,12 @@ final class MinimalModeSidebarControlActionView: NSView {
 
     override func layout() {
         super.layout()
-        let ranges = TitlebarControlsHitRegions.buttonXRanges(config: config)
-        for (index, range) in ranges.enumerated() {
-            guard let slot = MinimalModeSidebarControlActionSlot(rawValue: index),
-                  let button = buttons[slot] else { continue }
+        for slot in MinimalModeSidebarControlActionSlot.allCases {
+            guard let button = buttons[slot] else { continue }
+            guard let range = TitlebarControlsHitRegions.buttonXRange(for: slot, config: config) else {
+                button.frame = .zero
+                continue
+            }
             button.frame = NSRect(
                 x: range.lowerBound,
                 y: max(0, (bounds.height - config.buttonSize) / 2),

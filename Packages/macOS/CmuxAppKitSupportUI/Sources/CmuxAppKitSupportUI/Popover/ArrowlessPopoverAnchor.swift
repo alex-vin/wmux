@@ -39,7 +39,8 @@ public struct ArrowlessPopoverAnchor<PopoverContent: View>: NSViewRepresentable 
     }
 
     public func makeNSView(context: Context) -> NSView {
-        let view = NSView()
+        let view = ArrowlessPopoverAnchorView(frame: .zero)
+        view.autoresizingMask = [.width, .height]
         context.coordinator.anchorView = view
         return view
     }
@@ -246,41 +247,56 @@ public struct ArrowlessPopoverAnchor<PopoverContent: View>: NSViewRepresentable 
             preferredEdge: NSRectEdge,
             detachedGap: CGFloat
         ) -> CGRect {
+            let activeBounds: CGRect
+            if bounds.width > 0 && bounds.height > 0 {
+                activeBounds = bounds
+            } else if let superBounds = anchorView?.superview?.bounds, superBounds.width > 0, superBounds.height > 0 {
+                activeBounds = superBounds
+            } else {
+                activeBounds = CGRect(x: 0, y: 0, width: 30, height: 30)
+            }
+
             let hiddenArrowInset: CGFloat = 13
             let compensation = max(hiddenArrowInset - detachedGap, 0)
 
             switch preferredEdge {
             case .maxY:
                 return NSRect(
-                    x: bounds.minX,
-                    y: bounds.maxY - compensation,
-                    width: bounds.width,
+                    x: activeBounds.minX,
+                    y: activeBounds.maxY - compensation,
+                    width: activeBounds.width,
                     height: compensation
                 )
             case .minY:
                 return NSRect(
-                    x: bounds.minX,
-                    y: bounds.minY,
-                    width: bounds.width,
+                    x: activeBounds.minX,
+                    y: activeBounds.minY,
+                    width: activeBounds.width,
                     height: compensation
                 )
             case .maxX:
                 return NSRect(
-                    x: bounds.maxX - compensation,
-                    y: bounds.minY,
+                    x: activeBounds.maxX - compensation,
+                    y: activeBounds.minY,
                     width: compensation,
-                    height: bounds.height
+                    height: activeBounds.height
                 )
             case .minX:
                 return NSRect(
-                    x: bounds.minX,
-                    y: bounds.minY,
+                    x: activeBounds.minX,
+                    y: activeBounds.minY,
                     width: compensation,
-                    height: bounds.height
+                    height: activeBounds.height
                 )
             @unknown default:
-                return bounds
+                return activeBounds
             }
         }
+    }
+}
+
+private final class ArrowlessPopoverAnchorView: NSView {
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        nil
     }
 }
