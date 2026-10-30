@@ -102,7 +102,7 @@ public final class SubagentTaskStore {
     private var directoryFileDescriptor: Int32 = -1
     private var tickerTask: Task<Void, Never>?
 
-    public static var defaultDirectoryURL: URL {
+    nonisolated public static var defaultDirectoryURL: URL {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return home.appendingPathComponent(".config/cmux/subagents")
     }
@@ -115,11 +115,13 @@ public final class SubagentTaskStore {
     }
 
     deinit {
-        tickerTask?.cancel()
-        if let directorySource {
-            directorySource.cancel()
-        } else if directoryFileDescriptor >= 0 {
-            close(directoryFileDescriptor)
+        MainActor.assumeIsolated {
+            tickerTask?.cancel()
+            if let directorySource {
+                directorySource.cancel()
+            } else if directoryFileDescriptor >= 0 {
+                close(directoryFileDescriptor)
+            }
         }
     }
 
@@ -195,10 +197,7 @@ public final class SubagentTaskStore {
     /// Focuses the workspace pane/surface corresponding to the subagent task.
     public func focusSurface(surfaceID: String) {
         let cleanID = surfaceID.replacingOccurrences(of: "surface:", with: "")
-        guard let uuid = UUID(uuidString: cleanID) else {
-            _ = AppDelegate.shared?.terminalController.focusSurface(surfaceID)
-            return
-        }
+        guard let uuid = UUID(uuidString: cleanID) else { return }
 
         if let located = AppDelegate.shared?.locateSurface(surfaceId: uuid) {
             _ = AppDelegate.shared?.focusMainWindow(windowId: located.windowId)
@@ -206,8 +205,6 @@ public final class SubagentTaskStore {
                 located.tabManager.selectTab(tab)
                 located.tabManager.focusSurface(tabId: located.workspaceId, surfaceId: uuid)
             }
-        } else {
-            _ = AppDelegate.shared?.terminalController.focusSurface(surfaceID)
         }
     }
 

@@ -3100,6 +3100,9 @@
 		F20F85FC5900550685FA33AD /* StackAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A8BD195031FC4B82B4354297 /* StackAuth */; };
 		C0DE70500000000000000002 /* start-cmux-profiling in Copy CLI */ = {isa = PBXBuildFile; fileRef = C0DE70500000000000000001 /* start-cmux-profiling */; };
 		D35B71010000000000000001 /* StartupBreadcrumbLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D35B71010000000000000002 /* StartupBreadcrumbLog.swift */; };
+		57B49BD6240C1FA0F6A27EF6 /* SubagentStatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C81F2597393441FA595AD2 /* SubagentStatusBarView.swift */; };
+		1C40181A735311582E890B31 /* SubagentTaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875FDE66A8CA73BBF6F2133F /* SubagentTaskStore.swift */; };
+		22B8C8CAE2C7F88BC91ADDD1 /* SubagentTaskStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15643071E50A448318F455C2 /* SubagentTaskStoreTests.swift */; };
 		C0DE70530000000000000002 /* submit-cmux-profile in Copy CLI */ = {isa = PBXBuildFile; fileRef = C0DE70530000000000000001 /* submit-cmux-profile */; };
 		D7AB00000000000000B041 /* SupersededPhoneDismissBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7AB00000000000000B040 /* SupersededPhoneDismissBuffer.swift */; };
 		C935C833B18F4CC18711BD77 /* SurfaceAgentNaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019F9382B99C46AAAEB9C91C /* SurfaceAgentNaming.swift */; };
@@ -7036,6 +7039,9 @@
 		A11C00050000000000000002 /* StackAccountAvatarViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackAccountAvatarViewTests.swift; sourceTree = "<group>"; };
 		C0DE70500000000000000001 /* start-cmux-profiling */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "Resources/bin/start-cmux-profiling"; sourceTree = SOURCE_ROOT; };
 		D35B71010000000000000002 /* StartupBreadcrumbLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/StartupBreadcrumbLog.swift; sourceTree = "<group>"; };
+		F9C81F2597393441FA595AD2 /* SubagentStatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subagent/SubagentStatusBarView.swift; sourceTree = "<group>"; };
+		875FDE66A8CA73BBF6F2133F /* SubagentTaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subagent/SubagentTaskStore.swift; sourceTree = "<group>"; };
+		15643071E50A448318F455C2 /* SubagentTaskStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SubagentTaskStoreTests.swift"; sourceTree = "<group>"; };
 		C0DE70530000000000000001 /* submit-cmux-profile */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "Resources/bin/submit-cmux-profile"; sourceTree = SOURCE_ROOT; };
 		D7AB00000000000000B040 /* SupersededPhoneDismissBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupersededPhoneDismissBuffer.swift; sourceTree = "<group>"; };
 		019F9382B99C46AAAEB9C91C /* SurfaceAgentNaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SurfaceAgentNaming.swift"; sourceTree = "<group>"; };
@@ -10622,6 +10628,8 @@
 				34F76A7191862A9BFADE3869 /* PostHogContextCalls.swift */,
 				9E6496337B981133AF19D580 /* SidebarGeminiQuotaButton.swift */,
 				792BFC2513BD5FA8A7F6302D /* GeminiQuotaPopoverView.swift */,
+				F9C81F2597393441FA595AD2 /* SubagentStatusBarView.swift */,
+				875FDE66A8CA73BBF6F2133F /* SubagentTaskStore.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -12127,6 +12135,7 @@
 				BA13D9C82962402EAA0FABC1 /* UpgradeAnalyticsTests.swift */,
 				6F6A2754CDC4A872BCEFD3EA /* AgentAcknowledgedTurnNotificationTests.swift */,
 				62038FEBE991E6F6022BD52F /* SSHTuiAttachRetryTests.swift */,
+				15643071E50A448318F455C2 /* SubagentTaskStoreTests.swift */,
 			);
 			path = cmuxTests;
 			sourceTree = "<group>";
@@ -14316,6 +14325,8 @@
 				C7BB9987974451FAD2D5F467 /* SSHTuiLinkManager.swift in Sources */,
 				0754B84093909FD27762E206 /* SSHTuiWorkspaceCoordinator.swift in Sources */,
 				D35B71010000000000000001 /* StartupBreadcrumbLog.swift in Sources */,
+				57B49BD6240C1FA0F6A27EF6 /* SubagentStatusBarView.swift in Sources */,
+				1C40181A735311582E890B31 /* SubagentTaskStore.swift in Sources */,
 				D7AB00000000000000B041 /* SupersededPhoneDismissBuffer.swift in Sources */,
 				C935C833B18F4CC18711BD77 /* SurfaceAgentNaming.swift in Sources */,
 				FB3A15A096C8270E929D34B6 /* SurfaceCatalog+AgentIcons.swift in Sources */,
@@ -16415,6 +16426,7 @@
 				B9B1DC92B6B88F225DAD7ABB /* SSHTuiPreflightTests.swift in Sources */,
 				A11C00030000000000000001 /* StackAccountAvatarImageLoaderTests.swift in Sources */,
 				A11C00050000000000000001 /* StackAccountAvatarViewTests.swift in Sources */,
+				22B8C8CAE2C7F88BC91ADDD1 /* SubagentTaskStoreTests.swift in Sources */,
 				0CFAE1C22B0BB59F4A0B75F3 /* SurfaceCatalogObservationTests.swift in Sources */,
 				D01100800000000000000004 /* SurfaceCatalogQueryServiceTests.swift in Sources */,
 				5873A6BE37C34CC1082864E2 /* SurfaceCatalogTests.swift in Sources */,
