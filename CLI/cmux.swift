@@ -8538,33 +8538,13 @@ struct CMUXCLI {
             )
 
         case "new-split":
-            let (wsArg, rem0) = parseOption(commandArgs, name: "--workspace")
-            let (panelArg, rem1) = parseOption(rem0, name: "--panel")
-            let (sfArg, rem2) = parseOption(rem1, name: "--surface")
-            let (focusOpt, rem3) = parseOption(rem2, name: "--focus")
-            let (windowOpt, rem4) = parseOption(rem3, name: "--window")
-            let (commandOpt, rem5) = try parseTerminalCreationCommandOption(
-                rem4,
-                commandName: "new-split"
+            try runNewSplitCommand(
+                commandArgs: commandArgs,
+                client: client,
+                jsonOutput: jsonOutput,
+                idFormat: idFormat,
+                windowOverride: windowId
             )
-            let windowRaw = windowOpt ?? windowId
-            let surfaceRaw = sfArg ?? panelArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
-            let workspaceArg = wsArg ?? callerWorkspace(owningSurface: surfaceRaw, windowRaw: windowRaw, client: client)
-            let direction = try validatedSplitDirection(rem5.first, commandName: "new-split")
-            if let unknown = rem5.dropFirst().first(where: { $0.hasPrefix("--") }) {
-                throw CLIError(message: "new-split: unknown flag '\(unknown)'")
-            }
-            var params: [String: Any] = ["direction": direction]
-            let winId = try normalizeWindowHandle(windowRaw, client: client)
-            if let winId { params["window_id"] = winId }
-            let wsId = try normalizeWorkspaceHandle(workspaceArg, client: client, windowHandle: winId)
-            if let wsId { params["workspace_id"] = wsId }
-            let sfId = try normalizeSurfaceHandle(surfaceRaw, client: client, workspaceHandle: wsId, windowHandle: winId)
-            if let sfId { params["surface_id"] = sfId }
-            applyTerminalCreationCommandOption(commandOpt, to: &params)
-            try applyFocusOption(focusOpt, defaultValue: false, to: &params)
-            let payload = try client.sendV2(method: "surface.split", params: params)
-            printV2Payload(payload, jsonOutput: jsonOutput, idFormat: idFormat, fallbackText: v2CreationSummary(payload, idFormat: idFormat))
 
         case "list-panes":
             let workspaceArg = workspaceFromArgsOrEnv(commandArgs, windowOverride: windowId)
@@ -8764,66 +8744,13 @@ struct CMUXCLI {
             )
 
         case "close-surface":
-            let csWsFlag = optionValue(commandArgs, name: "--workspace")
-            // An explicit but blank --workspace or --window (for example an unset
-            // `--workspace "$VAR"`) must fail instead of falling back to the focused
-            // workspace or window and closing its focused surface. Only an omitted
-            // flag may use the caller's context.
-            if let csWsFlag, csWsFlag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                throw CLIError(message: String(
-                    localized: "cli.workspace.error.handleBlank",
-                    defaultValue: "Workspace handle is blank"
-                ))
-            }
-            let windowRaw = windowFromArgsOrOverride(commandArgs, windowOverride: windowId)
-            if let windowRaw, windowRaw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                throw CLIError(message: String(
-                    localized: "cli.window.error.handleBlank",
-                    defaultValue: "Window handle is blank"
-                ))
-            }
-            let explicitSurfaceRaw = optionValue(commandArgs, name: "--surface") ?? optionValue(commandArgs, name: "--panel")
-            let surfaceRaw = explicitSurfaceRaw ?? (csWsFlag == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
-            let workspaceArg = csWsFlag ?? callerWorkspace(owningSurface: surfaceRaw, windowRaw: windowRaw, client: client)
-            var params: [String: Any] = [:]
-            let winId = try normalizeWindowHandle(windowRaw, client: client)
-            if let winId { params["window_id"] = winId }
-            let wsId = try normalizeWorkspaceHandle(workspaceArg, client: client, windowHandle: winId)
-            if let wsId { params["workspace_id"] = wsId }
-            let sfId: String?
-            if let explicitSurfaceRaw {
-                let explicitSurfaceHandle = explicitSurfaceRaw.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !explicitSurfaceHandle.isEmpty else {
-                    throw CLIError(message: String(
-                        localized: "cli.surface.error.handleBlank",
-                        defaultValue: "Surface handle is blank"
-                    ))
-                }
-                if let wsId {
-                    sfId = try resolveSurfaceId(explicitSurfaceHandle, workspaceId: wsId, client: client)
-                } else if let winId {
-                    sfId = try normalizeSurfaceHandle(explicitSurfaceHandle, client: client, workspaceHandle: nil, windowHandle: winId)
-                } else {
-                    throw CLIError(message: String(
-                        localized: "cli.closeSurface.error.explicitSurfaceRequiresWorkspaceOrWindow",
-                        defaultValue: "close-surface requires --workspace or --window with explicit --surface"
-                    ))
-                }
-            } else {
-                sfId = try normalizeSurfaceHandle(surfaceRaw, client: client, workspaceHandle: wsId, windowHandle: winId)
-            }
-            if let sfId { params["surface_id"] = sfId }
-            params["force"] = commandArgs.contains("--force")
-            let payload = try client.sendV2(method: "surface.close", params: params)
-            if let closedWorkspaceId = (payload["workspace_id"] as? String) ?? wsId,
-               let closedSurfaceId = (payload["surface_id"] as? String) ?? sfId {
-                try tmuxPruneCompatSurfaceState(
-                    workspaceId: closedWorkspaceId,
-                    surfaceId: closedSurfaceId,
-                    client: client
-                )
-            }
-            printV2Payload(payload, jsonOutput: jsonOutput, idFormat: idFormat, fallbackText: v2OKSummary(payload, idFormat: idFormat))
+            try runCloseSurfaceCommand(
+                commandArgs: commandArgs,
+                client: client,
+                jsonOutput: jsonOutput,
+                idFormat: idFormat,
+                windowOverride: windowId
+            )
 
         case "drag-surface-to-split":
             try runSplitOff(commandName: "drag-surface-to-split", commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat)
@@ -11423,9 +11350,137 @@ struct CMUXCLI {
                 client: client,
                 jsonOutput: jsonOutput
             )
+        case "split":
+            try runNewSplitCommand(
+                commandArgs: Array(commandArgs.dropFirst()),
+                client: client,
+                jsonOutput: jsonOutput,
+                idFormat: idFormat,
+                windowOverride: windowOverride,
+                commandName: "surface split"
+            )
+        case "close":
+            try runCloseSurfaceCommand(
+                commandArgs: Array(commandArgs.dropFirst()),
+                client: client,
+                jsonOutput: jsonOutput,
+                idFormat: idFormat,
+                windowOverride: windowOverride,
+                commandName: "surface close"
+            )
         default:
             throw CLIError(message: "Unsupported surface subcommand: \(subcommand)\n\n\(Self.surfaceUsage)")
         }
+    }
+
+    private func runNewSplitCommand(
+        commandArgs: [String],
+        client: SocketClient,
+        jsonOutput: Bool,
+        idFormat: CLIIDFormat,
+        windowOverride: String?,
+        commandName: String = "new-split"
+    ) throws {
+        let (dirOpt, remDir) = parseOption(commandArgs, name: "--direction")
+        let (wsArg, rem0) = parseOption(remDir, name: "--workspace")
+        let (panelArg, rem1) = parseOption(rem0, name: "--panel")
+        let (sfArg, rem2) = parseOption(rem1, name: "--surface")
+        let (focusOpt, rem3) = parseOption(rem2, name: "--focus")
+        let (windowOpt, rem4) = parseOption(rem3, name: "--window")
+        let (commandOpt, rem5) = try parseTerminalCreationCommandOption(
+            rem4,
+            commandName: commandName
+        )
+        let windowRaw = windowOpt ?? windowOverride
+        let surfaceRaw = sfArg ?? panelArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+        let workspaceArg = wsArg ?? callerWorkspace(owningSurface: surfaceRaw, windowRaw: windowRaw, client: client)
+        let rawDir = dirOpt ?? rem5.first
+        let direction = try validatedSplitDirection(rawDir, commandName: commandName)
+        let remainingPos = dirOpt != nil ? rem5 : Array(rem5.dropFirst())
+        if let unknown = remainingPos.first(where: { $0.hasPrefix("--") }) {
+            throw CLIError(message: "\(commandName): unknown flag '\(unknown)'")
+        }
+        var params: [String: Any] = ["direction": direction]
+        let winId = try normalizeWindowHandle(windowRaw, client: client)
+        if let winId { params["window_id"] = winId }
+        let wsId = try normalizeWorkspaceHandle(workspaceArg, client: client, windowHandle: winId)
+        if let wsId { params["workspace_id"] = wsId }
+        let sfId = try normalizeSurfaceHandle(surfaceRaw, client: client, workspaceHandle: wsId, windowHandle: winId)
+        if let sfId { params["surface_id"] = sfId }
+        applyTerminalCreationCommandOption(commandOpt, to: &params)
+        try applyFocusOption(focusOpt, defaultValue: false, to: &params)
+        let payload = try client.sendV2(method: "surface.split", params: params)
+        printV2Payload(payload, jsonOutput: jsonOutput, idFormat: idFormat, fallbackText: v2CreationSummary(payload, idFormat: idFormat))
+    }
+
+    private func runCloseSurfaceCommand(
+        commandArgs: [String],
+        client: SocketClient,
+        jsonOutput: Bool,
+        idFormat: CLIIDFormat,
+        windowOverride: String?,
+        commandName: String = "close-surface"
+    ) throws {
+        let csWsFlag = optionValue(commandArgs, name: "--workspace")
+        // An explicit but blank --workspace or --window (for example an unset
+        // `--workspace "$VAR"`) must fail instead of falling back to the focused
+        // workspace or window and closing its focused surface. Only an omitted
+        // flag may use the caller's context.
+        if let csWsFlag, csWsFlag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            throw CLIError(message: String(
+                localized: "cli.workspace.error.handleBlank",
+                defaultValue: "Workspace handle is blank"
+            ))
+        }
+        let windowRaw = windowFromArgsOrOverride(commandArgs, windowOverride: windowOverride)
+        if let windowRaw, windowRaw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            throw CLIError(message: String(
+                localized: "cli.window.error.handleBlank",
+                defaultValue: "Window handle is blank"
+            ))
+        }
+        let explicitSurfaceRaw = optionValue(commandArgs, name: "--surface") ?? optionValue(commandArgs, name: "--panel")
+        let surfaceRaw = explicitSurfaceRaw ?? (csWsFlag == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+        let workspaceArg = csWsFlag ?? callerWorkspace(owningSurface: surfaceRaw, windowRaw: windowRaw, client: client)
+        var params: [String: Any] = [:]
+        let winId = try normalizeWindowHandle(windowRaw, client: client)
+        if let winId { params["window_id"] = winId }
+        let wsId = try normalizeWorkspaceHandle(workspaceArg, client: client, windowHandle: winId)
+        if let wsId { params["workspace_id"] = wsId }
+        let sfId: String?
+        if let explicitSurfaceRaw {
+            let explicitSurfaceHandle = explicitSurfaceRaw.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !explicitSurfaceHandle.isEmpty else {
+                throw CLIError(message: String(
+                    localized: "cli.surface.error.handleBlank",
+                    defaultValue: "Surface handle is blank"
+                ))
+            }
+            if let wsId {
+                sfId = try resolveSurfaceId(explicitSurfaceHandle, workspaceId: wsId, client: client)
+            } else if let winId {
+                sfId = try normalizeSurfaceHandle(explicitSurfaceHandle, client: client, workspaceHandle: nil, windowHandle: winId)
+            } else {
+                throw CLIError(message: String(
+                    localized: "cli.closeSurface.error.explicitSurfaceRequiresWorkspaceOrWindow",
+                    defaultValue: "\(commandName) requires --workspace or --window with explicit --surface"
+                ))
+            }
+        } else {
+            sfId = try normalizeSurfaceHandle(surfaceRaw, client: client, workspaceHandle: wsId, windowHandle: winId)
+        }
+        if let sfId { params["surface_id"] = sfId }
+        params["force"] = commandArgs.contains("--force")
+        let payload = try client.sendV2(method: "surface.close", params: params)
+        if let closedWorkspaceId = (payload["workspace_id"] as? String) ?? wsId,
+           let closedSurfaceId = (payload["surface_id"] as? String) ?? sfId {
+            try tmuxPruneCompatSurfaceState(
+                workspaceId: closedWorkspaceId,
+                surfaceId: closedSurfaceId,
+                client: client
+            )
+        }
+        printV2Payload(payload, jsonOutput: jsonOutput, idFormat: idFormat, fallbackText: v2OKSummary(payload, idFormat: idFormat))
     }
 
     private func runSurfaceResumeCommand(
