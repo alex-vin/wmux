@@ -771,7 +771,7 @@ EOF
         echo "  Task ID:  $TASK_ID"
         echo "  Title:    $TITLE"
         echo "  Account:  $ACCOUNT_ID"
-        if [[ -n "$SUBAGENT_SURFACE_ID" ]]; then
+        if [[ -n "${SUBAGENT_SURFACE_ID:-}" ]]; then
             echo "  Surface:  $SUBAGENT_SURFACE_ID"
         fi
         if [[ "$WORKTREE" == "1" ]]; then

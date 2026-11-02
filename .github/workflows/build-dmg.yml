@@ -43,11 +43,7 @@ jobs:
 
       - name: Install create-dmg
         run: |
-          if [ ! -x /usr/local/bin/create-dmg ]; then
-            sudo mkdir -p /usr/local/bin
-            sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/v1.3.0/create-dmg -o /usr/local/bin/create-dmg || sudo curl -fsSL https://raw.githubusercontent.com/create-dmg/create-dmg/master/create-dmg -o /usr/local/bin/create-dmg
-            sudo chmod +x /usr/local/bin/create-dmg
-          fi
+          brew list create-dmg &>/dev/null || HOMEBREW_NO_AUTO_UPDATE=1 brew install create-dmg
           create-dmg --version
 
       - name: Cache GhosttyKit
