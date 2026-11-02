@@ -105,6 +105,18 @@ required policy tests and ID scoping. Unsafe local effects must be redesigned.
 Never allowlist terminal spawn/respawn without live verification that it executes
 on the remote host. An allowlist addition without this analysis blocks review.
 
+## Subagent Panes and Account Pool (wmux-subagent)
+
+**核心执行红线：在 wmux 环境中严禁调用内置 `invoke_subagent` 工具！**
+当用户要求指派 Agent、拆解并行子任务、进行模块审查或验证（如“指派3个agent对工作区改动进行验证”）时：
+- **严禁**使用 `invoke_subagent`（该内置工具只会在单进程后台静默运行，无法触发终端分屏与账号池调度）。
+- **必须**使用 `run_command` 执行 `wmux-subagent run --title "<title>" --prompt "<prompt>" [--worktree] [--wait]`。
+- **核心机制**：
+  1. **真实 Pane 隔离与实时观测**：在当前工作区自动拉起右侧 Split Pane，实时展示子任务的执行过程与日志。
+  2. **账号池智能调度**：自动从 Gemini 账号池中分配非冲突、最健康的独立账号（`GeminiAccountPoolScheduler`），实现额度最大化利用。
+  3. **顶部状态条胶囊**：主窗口上方 `SubagentStatusBarView` 实时显示 `[ 🟢 Title (account) 15s ]` 状态胶囊，支持点击跳转聚焦。
+  4. **自动平滑关闭（选项 B）**：子任务执行完毕后，回传结果并平滑关闭收拢 Pane，释放账号并发计数。
+
 ## Codebase Knowledge Graph (codebase-memory-mcp)
 
 This project has an indexed knowledge graph managed by `codebase-memory-mcp` (Project identifier: `Users-wenxinwu-data-ai-wmux`, database cached in `~/.cache/codebase-memory-mcp/Users-wenxinwu-data-ai-wmux.db`).
@@ -116,6 +128,7 @@ This project has an indexed knowledge graph managed by `codebase-memory-mcp` (Pr
 ## Multi-agent collaborative architecture (5 agents)
 
 For multi-module tasks, architectural refactors, or feature implementations, adopt the 5-Agent Collaborative Topology:
+**执行方式（强制）**：严禁调用 `invoke_subagent`！指派任意角色（如 `swift-client`, `web-agent-chat`, `qa-security-auditor` 等）时，必须通过 `wmux-subagent run --title "<Role>" --prompt "<Task Prompt>" --wait` 在专用分屏 Pane 中执行。
 
 1. **`lead-orchestrator` (Lead Architect & Coordinator)**
    - **Scope**: Requirement decomposition, task dispatching, cross-module API contracts, conflict resolution, and final compliance review against `AGENTS.md`.

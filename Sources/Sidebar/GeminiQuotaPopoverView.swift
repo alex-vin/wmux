@@ -158,6 +158,9 @@ struct GeminiQuotaPopoverView: View {
                     Button("跟随全局默认") {
                         coordinator.unbind(surfaceID: surfaceID)
                     }
+                    Button("智能账号池 (自动调度)") {
+                        coordinator.bindAuto(surfaceID: surfaceID)
+                    }
                     Divider()
                     ForEach(store.accounts) { acc in
                         Button(acc.email) {

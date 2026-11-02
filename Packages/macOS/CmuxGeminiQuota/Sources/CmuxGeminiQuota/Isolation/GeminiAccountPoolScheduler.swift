@@ -33,7 +33,7 @@ public final class GeminiAccountPoolScheduler {
     /// - Returns: The account with the highest score, or `nil` if no viable accounts exist.
     public func pickOptimalAccount(excludingAccountID: String? = nil) -> GeminiAccount? {
         let now = Date()
-        let availableAccounts = accountStore.accounts.filter { account in
+        var availableAccounts = accountStore.accounts.filter { account in
             if account.isDisabled || account.quota.isForbidden {
                 return false
             }
@@ -47,6 +47,22 @@ public final class GeminiAccountPoolScheduler {
                 return false
             }
             return true
+        }
+
+        // If excluding parent account leaves no options, gracefully fall back to all healthy accounts
+        if availableAccounts.isEmpty, excludingAccountID != nil {
+            availableAccounts = accountStore.accounts.filter { account in
+                if account.isDisabled || account.quota.isForbidden {
+                    return false
+                }
+                if let coolUntil = coolingAccounts[account.id], coolUntil > now {
+                    return false
+                }
+                if let weekly = account.weeklyQuota, weekly <= 0.05 {
+                    return false
+                }
+                return true
+            }
         }
 
         return availableAccounts.max { a, b in

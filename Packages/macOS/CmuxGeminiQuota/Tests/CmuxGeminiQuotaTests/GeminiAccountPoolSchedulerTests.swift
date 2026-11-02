@@ -103,6 +103,63 @@ struct GeminiAccountPoolSchedulerTests {
         #expect(picked?.id == "subagent@example.com")
     }
 
+    @Test("Subagent exclusion falls back gracefully when no other accounts are available")
+    func subagentExclusionFallback() {
+        let (store, tempURL) = makeTestStore()
+        defer { try? FileManager.default.removeItem(at: tempURL) }
+
+        let accA = makeAccount(id: "parent@example.com", fiveHour: 0.9, weekly: 0.9)
+        store.addOrUpdateAccount(accA)
+
+        let scheduler = GeminiAccountPoolScheduler(accountStore: store)
+        // With only parent account available, excluding it should gracefully fall back to parent
+        let picked = scheduler.pickOptimalAccount(excludingAccountID: "parent@example.com")
+        #expect(picked?.id == "parent@example.com")
+    }
+
+    @Test("Coordinator rebind and unbind correctly pairs active session counts")
+    func coordinatorRebindAndUnbind() {
+        let (store, tempURL) = makeTestStore()
+        let tempAccountsDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_accounts_\(UUID().uuidString)")
+        let tempTokensDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_tokens_\(UUID().uuidString)")
+
+        defer {
+            try? FileManager.default.removeItem(at: tempURL)
+            try? FileManager.default.removeItem(at: tempAccountsDir)
+            try? FileManager.default.removeItem(at: tempTokensDir)
+        }
+
+        let acc1 = makeAccount(id: "acc1@example.com", fiveHour: 0.8, weekly: 0.8)
+        let acc2 = makeAccount(id: "acc2@example.com", fiveHour: 0.6, weekly: 0.6)
+        store.addOrUpdateAccount(acc1)
+        store.addOrUpdateAccount(acc2)
+
+        let coordinator = GeminiTerminalAccountCoordinator(
+            accountStore: store,
+            accountsBaseDirectory: tempAccountsDir,
+            tokenCacheDirectory: tempTokensDir
+        )
+        let surface = UUID()
+
+        // 1. Manually bind surface to acc1
+        coordinator.bind(surfaceID: surface, to: "acc1@example.com")
+        #expect(coordinator.surfaceBindings[surface] == "acc1@example.com")
+        #expect(coordinator.scheduler.activeSessionCounts["acc1@example.com"] == 1)
+
+        // 2. Re-bind same surface to acc2 (switching account)
+        coordinator.bind(surfaceID: surface, to: "acc2@example.com")
+        #expect(coordinator.surfaceBindings[surface] == "acc2@example.com")
+        #expect(coordinator.scheduler.activeSessionCounts["acc1@example.com"] == nil)
+        #expect(coordinator.scheduler.activeSessionCounts["acc2@example.com"] == 1)
+
+        // 3. Unbind surface
+        coordinator.unbind(surfaceID: surface)
+        #expect(coordinator.surfaceBindings[surface] == nil)
+        #expect(coordinator.scheduler.activeSessionCounts["acc2@example.com"] == nil)
+    }
+
     @Test("Cooldown filtering respects timeout duration")
     func cooldownFiltering() {
         let (store, tempURL) = makeTestStore()
@@ -197,6 +254,7 @@ struct GeminiAccountPoolSchedulerTests {
         #expect(bound1?.id == "acc1@example.com")
         #expect(coordinator.surfaceBindings[surface1] == "acc1@example.com")
         #expect(coordinator.scheduler.activeSessionCounts["acc1@example.com"] == 1)
+        #expect(FileManager.default.fileExists(atPath: tempAccountsDir.appendingPathComponent("acc1_at_example_com/.config/cmux").path))
 
         // 2. Auto-bind second surface (acc1 score now penalized by active terminal -20, so acc2 should be preferred:
         // acc1: 80 * 0.9 - 20 = 52. acc2: 60 * 0.9 = 54 -> acc2 is picked!)

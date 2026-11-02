@@ -97,4 +97,16 @@ struct SubagentTaskStoreTests {
         store.removeTask(id: "custom-task")
         #expect(store.activeTasks.isEmpty)
     }
+
+    @Test("SubagentTaskStore focusSurface handles various handle formats safely")
+    func focusSurfaceFormats() {
+        let tempDir = makeTempDirectory()
+        defer { try? FileManager.default.removeItem(at: tempDir) }
+
+        let store = SubagentTaskStore(directoryURL: tempDir)
+        store.focusSurface(surfaceID: "")
+        store.focusSurface(surfaceID: "surface:1")
+        store.focusSurface(surfaceID: "surface:\(UUID().uuidString)")
+        store.focusSurface(surfaceID: UUID().uuidString)
+    }
 }

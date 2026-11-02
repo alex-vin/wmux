@@ -89,4 +89,21 @@ struct GeminiAccountTests {
         #expect(decodedDouble.refreshToken == nil)
         #expect(decodedDouble.idToken == nil)
     }
+
+    @Test("GeminiAccountStore saves file with 0600 POSIX permissions")
+    @MainActor
+    func accountStoreFilePermissions() throws {
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_store_perms_\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: tempURL) }
+
+        let store = GeminiAccountStore(storageURL: tempURL)
+        let account = GeminiAccount(id: "perms@example.com", email: "perms@example.com")
+        store.addOrUpdateAccount(account)
+
+        #expect(FileManager.default.fileExists(atPath: tempURL.path))
+        let attributes = try FileManager.default.attributesOfItem(atPath: tempURL.path)
+        let perms = attributes[.posixPermissions] as? NSNumber
+        #expect(perms?.intValue == 0o600)
+    }
 }

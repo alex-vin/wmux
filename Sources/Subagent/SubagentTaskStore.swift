@@ -196,8 +196,33 @@ public final class SubagentTaskStore {
 
     /// Focuses the workspace pane/surface corresponding to the subagent task.
     public func focusSurface(surfaceID: String) {
-        let cleanID = surfaceID.replacingOccurrences(of: "surface:", with: "")
-        guard let uuid = UUID(uuidString: cleanID) else { return }
+        let trimmed = surfaceID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        var targetUUID: UUID?
+
+        // 1. Direct UUID
+        if let uuid = UUID(uuidString: trimmed) {
+            targetUUID = uuid
+        } else if trimmed.lowercased().hasPrefix("surface:") {
+            // 2. "surface:<UUID>" format
+            let tail = String(trimmed.dropFirst("surface:".count))
+            if let uuid = UUID(uuidString: tail) {
+                targetUUID = uuid
+            }
+        }
+
+        // 3. Resolve handle ref format (e.g. "surface:1") via TerminalController
+        if targetUUID == nil {
+            let handle = trimmed.lowercased().hasPrefix("surface:") ? trimmed : "surface:\(trimmed)"
+            targetUUID = TerminalController.shared.v2ResolveHandleRef(handle)
+            if targetUUID == nil {
+                TerminalController.shared.v2RefreshKnownRefs()
+                targetUUID = TerminalController.shared.v2ResolveHandleRef(handle)
+            }
+        }
+
+        guard let uuid = targetUUID else { return }
 
         if let located = AppDelegate.shared?.locateSurface(surfaceId: uuid) {
             _ = AppDelegate.shared?.focusMainWindow(windowId: located.windowId)

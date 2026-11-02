@@ -1,4 +1,4 @@
-public import AppKit
+import AppKit
 public import Foundation
 public import Observation
 
@@ -111,7 +111,7 @@ public final class GeminiAccountStore {
         let state = UUID().uuidString
         let redirectURI = try await callbackServer.start(state: state)
 
-        guard let authURL = await oAuthService.authorizationURL(redirectURI: redirectURI, state: state) else {
+        guard let authURL = oAuthService.authorizationURL(redirectURI: redirectURI, state: state) else {
             await callbackServer.stop()
             throw URLError(.badURL)
         }
@@ -226,6 +226,7 @@ public final class GeminiAccountStore {
 
     private func loadFromDisk() {
         guard FileManager.default.fileExists(atPath: storageURL.path) else { return }
+        try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: storageURL.path)
         do {
             let data = try Data(contentsOf: storageURL)
             let decoded = try JSONDecoder().decode(GeminiStoragePayload.self, from: data)
@@ -244,6 +245,7 @@ public final class GeminiAccountStore {
         encoder.outputFormatting = [.prettyPrinted]
         if let data = try? encoder.encode(payload) {
             try? data.write(to: storageURL, options: .atomic)
+            try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: storageURL.path)
         }
     }
 }

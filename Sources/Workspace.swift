@@ -4978,7 +4978,8 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     }
     func configureNewTerminalPanel(
         _ terminalPanel: TerminalPanel,
-        allowTextBoxFocusDefault: Bool = true
+        allowTextBoxFocusDefault: Bool = true,
+        excludingAccountID: String? = nil
     ) {
         // Record the workspace env this freshly-created panel inherited, so a later
         // respawn (which reuses this panel even after a move to another workspace)
@@ -4987,6 +4988,11 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         // uses configureTerminalPanel — so it keeps reflecting the workspace the
         // surface's env was built from until the panel is respawned.
         terminalPanel.seededWorkspaceEnvironment = workspaceEnvironment
+        // Automatically allocate an optimal Gemini account from the pool
+        AppDelegate.shared?.geminiTerminalCoordinator.bindAuto(
+            surfaceID: terminalPanel.id,
+            excludingAccountID: excludingAccountID
+        )
         if TerminalTextBoxInputSettings.focusOnNewTerminals(), allowTextBoxFocusDefault {
             terminalPanel.preferTextBoxInputWhenActivated()
         } else if TerminalTextBoxInputSettings.focusOnNewTerminals() {
@@ -9186,9 +9192,11 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             additionalEnvironment: effectiveStartupEnvironment,
             isRemoteTerminal: tracksRemoteTerminalSurface
         )
+        let parentAccountID = AppDelegate.shared?.geminiTerminalCoordinator.surfaceBindings[panelId]
         configureNewTerminalPanel(
             newPanel,
-            allowTextBoxFocusDefault: focus && allowTextBoxFocusDefault
+            allowTextBoxFocusDefault: focus && allowTextBoxFocusDefault,
+            excludingAccountID: parentAccountID
         )
         panels[newPanel.id] = newPanel
         panelTitles[newPanel.id] = newPanel.displayTitle
@@ -9240,6 +9248,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
                 )
             }
         guard let newPaneId else {
+            AppDelegate.shared?.geminiTerminalCoordinator.release(surfaceID: newPanel.id)
             panels.removeValue(forKey: newPanel.id)
             panelTitles.removeValue(forKey: newPanel.id)
             remotePTYSessionIDsByPanelId.removeValue(forKey: newPanel.id)
@@ -9524,6 +9533,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             isPinned: false,
             inPane: paneId
         ) else {
+            AppDelegate.shared?.geminiTerminalCoordinator.release(surfaceID: newPanel.id)
             panels.removeValue(forKey: newPanel.id)
             panelTitles.removeValue(forKey: newPanel.id)
             remotePTYSessionIDsByPanelId.removeValue(forKey: newPanel.id)
@@ -13181,6 +13191,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         isProgrammaticSplit = true
         defer { isProgrammaticSplit = false }
         guard let newPaneId = bonsplitController.splitPane(paneId, orientation: orientation, withTab: newTab, insertFirst: insertFirst) else {
+            AppDelegate.shared?.geminiTerminalCoordinator.release(surfaceID: newPanel.id)
             panels.removeValue(forKey: newPanel.id)
             panelTitles.removeValue(forKey: newPanel.id)
             removeSurfaceMapping(forSurfaceId: newTab.id)
@@ -14662,6 +14673,7 @@ extension Workspace: BonsplitDelegate {
             isPinned: false,
             inPane: newPane
         ) else {
+            AppDelegate.shared?.geminiTerminalCoordinator.release(surfaceID: newPanel.id)
             panels.removeValue(forKey: newPanel.id)
             panelTitles.removeValue(forKey: newPanel.id)
             return

@@ -18,6 +18,7 @@ public final class GeminiTerminalAccountCoordinator {
     public let tokenCacheDirectory: URL
 
     private let accountStore: GeminiAccountStore
+    private var provisionedKeychains: [String: String] = [:]
 
     /// Default base directory for per-surface token bridge files.
     public static var defaultTokenCacheDirectory: URL {
@@ -79,9 +80,6 @@ public final class GeminiTerminalAccountCoordinator {
     ///
     /// - Parameter surfaceID: Unique UUID of the terminal pane.
     public func release(surfaceID: UUID) {
-        if let boundAccountID = surfaceBindings[surfaceID] {
-            scheduler.decrementActive(for: boundAccountID)
-        }
         unbind(surfaceID: surfaceID)
     }
 
@@ -91,7 +89,11 @@ public final class GeminiTerminalAccountCoordinator {
     ///   - surfaceID: Unique UUID of the terminal pane.
     ///   - accountID: ID (email) of the Gemini account.
     public func bind(surfaceID: UUID, to accountID: String) {
+        if let previousID = surfaceBindings[surfaceID] {
+            scheduler.decrementActive(for: previousID)
+        }
         surfaceBindings[surfaceID] = accountID
+        scheduler.incrementActive(for: accountID)
         syncTokenCache(for: surfaceID)
     }
 
@@ -99,6 +101,9 @@ public final class GeminiTerminalAccountCoordinator {
     ///
     /// - Parameter surfaceID: Unique UUID of the terminal pane.
     public func unbind(surfaceID: UUID) {
+        if let boundAccountID = surfaceBindings[surfaceID] {
+            scheduler.decrementActive(for: boundAccountID)
+        }
         surfaceBindings.removeValue(forKey: surfaceID)
         clearTokenCache(for: surfaceID)
     }
@@ -150,6 +155,14 @@ public final class GeminiTerminalAccountCoordinator {
         symlinkIfMissing(source: userHome.appendingPathComponent(".ssh"), target: accountHome.appendingPathComponent(".ssh"))
         symlinkIfMissing(source: userHome.appendingPathComponent(".gemini"), target: accountHome.appendingPathComponent(".gemini"))
 
+        // Share cmux/wmux config so new panes never trigger first-run onboarding or settings prompts
+        let accountConfigDir = accountHome.appendingPathComponent(".config")
+        let accountCmuxDir = accountConfigDir.appendingPathComponent("cmux")
+        try? fm.createDirectory(at: accountCmuxDir, withIntermediateDirectories: true)
+        symlinkIfMissing(source: userHome.appendingPathComponent(".config/cmux/cmux.json"), target: accountCmuxDir.appendingPathComponent("cmux.json"))
+        symlinkIfMissing(source: userHome.appendingPathComponent(".config/cmux/subagents"), target: accountCmuxDir.appendingPathComponent("subagents"))
+        symlinkIfMissing(source: userHome.appendingPathComponent(".config/cmux/gemini_tokens"), target: accountCmuxDir.appendingPathComponent("gemini_tokens"))
+
         // 3. Populate dedicated keychain
         let token = account.agyKeyringSecretValue()
         provisionKeychain(at: keychainDB, homeDirectory: accountHome, secret: token)
@@ -163,6 +176,8 @@ public final class GeminiTerminalAccountCoordinator {
         export REAL_USER_HOME="\(userHome.path)"
         export HOME="\(accountHome.path)"
         export CMUX_AGY_ISOLATED_ACCOUNT="\(account.id)"
+        export CMUX_DEV_BACKEND_MODE="local"
+        export CMUX_SKIP_ONBOARDING="1"
         /usr/bin/security unlock-keychain -p "" "\(keychainDB.path)" >/dev/null 2>&1 || true
         """
         try? envScriptContent.write(to: envScriptPath, atomically: true, encoding: .utf8)
@@ -182,6 +197,13 @@ public final class GeminiTerminalAccountCoordinator {
     private func provisionKeychain(at keychainURL: URL, homeDirectory: URL, secret: String) {
         let path = keychainURL.path
         let fm = FileManager.default
+
+        // Keychain cache: avoid executing subprocesses if already provisioned with identical secret
+        if provisionedKeychains[path] == secret && fm.fileExists(atPath: path) {
+            try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
+            return
+        }
+
         let env = [
             "HOME": homeDirectory.path,
             "PATH": "/usr/bin:/bin"
@@ -219,8 +241,10 @@ public final class GeminiTerminalAccountCoordinator {
         // Delete existing item if present to prevent macOS SecurityAgent popup on update (-U)
         _ = runSecurity(arguments: ["delete-generic-password", "-s", "gemini", "-a", "antigravity", path])
         _ = runSecurity(arguments: ["add-generic-password", "-s", "gemini", "-a", "antigravity", "-w", secret, "-A", path])
-        _ = runSecurity(arguments: ["default-keychain", "-d", "user", "-s", path])
-        _ = runSecurity(arguments: ["list-keychains", "-d", "user", "-s", path])
+
+        // Restrict keychain file to owner read/write (0600)
+        try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: path)
+        provisionedKeychains[path] = secret
     }
 
     private static func cleanupHostUserKeychainListIfNeeded() {
@@ -241,8 +265,13 @@ public final class GeminiTerminalAccountCoordinator {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).trimmingCharacters(in: CharacterSet(charactersIn: "\"")) }
             .filter { !$0.isEmpty }
 
-        let filtered = currentPaths.filter { !$0.contains(".config/cmux/accounts") }
-        if filtered.count != currentPaths.count && !filtered.isEmpty {
+        let filtered = currentPaths.filter { path in
+            !path.contains(".config/cmux/accounts") &&
+            !path.contains("/private/tmp/") &&
+            !path.contains("/tmp/") &&
+            FileManager.default.fileExists(atPath: path)
+        }
+        if filtered != currentPaths && !filtered.isEmpty {
             let setProcess = Process()
             setProcess.executableURL = URL(fileURLWithPath: "/usr/bin/security")
             setProcess.arguments = ["list-keychains", "-d", "user", "-s"] + filtered

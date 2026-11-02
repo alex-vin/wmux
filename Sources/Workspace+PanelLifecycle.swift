@@ -540,6 +540,9 @@ extension Workspace {
                     preservingTransfer:
                         preservesTerminalForTransfer
                 )
+            if !preservesTerminalForTransfer {
+                AppDelegate.shared?.geminiTerminalCoordinator.release(surfaceID: panelId)
+            }
         }
         retireRemoteTerminalLifecycle(
             panelId: panelId,
