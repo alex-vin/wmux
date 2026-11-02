@@ -147,6 +147,29 @@ public final class SubagentTaskStore {
                   let item = try? JSONDecoder().decode(SubagentTaskItem.self, from: data) else {
                 continue
             }
+
+            // Self-healing prune: If the terminal surface is no longer alive in cmux,
+            // prune the manifest file regardless of status to prevent stuck ghost tasks.
+            if !item.surfaceID.isEmpty, let delegate = AppDelegate.shared {
+                let trimmed = item.surfaceID.trimmingCharacters(in: .whitespacesAndNewlines)
+                let uuidStr = trimmed.lowercased().hasPrefix("surface:") ? String(trimmed.dropFirst(8)) : trimmed
+                if let uuid = UUID(uuidString: uuidStr), delegate.locateSurface(surfaceId: uuid) == nil {
+                    try? fm.removeItem(at: url)
+                    delegate.geminiTerminalCoordinator.completeTask(surfaceID: uuid)
+                    continue
+                }
+            }
+
+            // Early-release account concurrency once task finishes (status done or error),
+            // while preserving terminal surface open for user inspection.
+            if item.status != .running, !item.surfaceID.isEmpty {
+                let trimmed = item.surfaceID.trimmingCharacters(in: .whitespacesAndNewlines)
+                let uuidStr = trimmed.lowercased().hasPrefix("surface:") ? String(trimmed.dropFirst(8)) : trimmed
+                if let uuid = UUID(uuidString: uuidStr) {
+                    AppDelegate.shared?.geminiTerminalCoordinator.completeTask(surfaceID: uuid)
+                }
+            }
+
             loaded.append(item)
         }
 

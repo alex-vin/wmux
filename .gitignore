@@ -93,3 +93,6 @@ Packages/Shared/CmuxTerminalClient/CmuxTerminalClient.xcframework/
 build-dmg.log
 dist/
 *.dmg
+
+# wmux subagent scratch, worktrees, and reports
+.wmux/

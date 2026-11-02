@@ -14,10 +14,12 @@ show_help() {
     cat <<'EOF'
 Usage:
   wmux-subagent run --title <title> --prompt <prompt> [--account <id>] [--worktree] [--wait]
+  wmux-subagent report [--latest | --list | <task-id>]
   wmux-subagent help | --help | -h
 
 Commands:
   run                     Launch a subagent in a coordinated pane
+  report                  View or list subagent conclusion reports (.wmux/reports)
 
 Options:
   --title <title>         Brief name or role of the subtask (required)
@@ -30,6 +32,8 @@ Options:
 Examples:
   wmux-subagent run --title "Code Review" --prompt "Review recent changes in auth module"
   wmux-subagent run --title "Bugfix" --prompt "Fix null pointer in parser" --worktree --wait
+  wmux-subagent report --latest
+  wmux-subagent report --list
 EOF
 }
 
@@ -209,6 +213,28 @@ extract_surface_id() {
     extract_surface_ref "$@"
 }
 
+extract_pane_ref() {
+    local json_text="$1"
+    local pref=""
+
+    if command -v python3 >/dev/null 2>&1; then
+        pref="$(python3 -c '
+import sys, json
+try:
+    data = json.loads(sys.stdin.read())
+    print(data.get("pane_ref") or data.get("pane_id") or "")
+except Exception:
+    pass
+' <<< "$json_text" 2>/dev/null || true)"
+    fi
+
+    if [[ -z "$pref" ]]; then
+        pref="$(printf '%s' "$json_text" | grep -oE 'pane:[0-9a-zA-Z-]+' | head -n 1 || true)"
+    fi
+
+    printf '%s' "$pref"
+}
+
 extract_workspace_ref() {
     local json_text="$1"
     local wid=""
@@ -277,6 +303,7 @@ cleanup_on_exit() {
 trap cleanup_on_exit EXIT ERR
 trap 'exit 130' INT
 trap 'exit 143' TERM
+trap 'exit 129' HUP
 
 cmd_run() {
     local TITLE=""
@@ -456,7 +483,7 @@ cleanup_runner() {
     fi
     exit 130
 }
-trap cleanup_runner INT TERM
+trap cleanup_runner INT TERM HUP
 
 cd "\$TARGET_DIR" || {
     echo "Error: Failed to cd to \$TARGET_DIR" >&2
@@ -580,8 +607,69 @@ fi
 echo "\$SUBAGENT_EXIT" > "\$STATE_DIR/status"
 touch "\$STATE_DIR/done"
 
+# Generate Subagent Conclusion Report in .wmux/reports/<task_id>.md
+REPORT_ROOT="\$TARGET_DIR"
+if command -v git >/dev/null 2>&1 && git -C "\$TARGET_DIR" rev-parse --show-toplevel >/dev/null 2>&1; then
+    REPORT_ROOT="\$(git -C "\$TARGET_DIR" rev-parse --show-toplevel)"
+fi
+REPORT_DIR="\$REPORT_ROOT/.wmux/reports"
+mkdir -p "\$REPORT_DIR"
+REPORT_FILE="\$REPORT_DIR/\${TASK_ID}.md"
+LATEST_REPORT="\$REPORT_DIR/latest.md"
+
+END_TIME="\$(date +%s)"
+DURATION=\$(( END_TIME - START_TIME ))
+START_DATE="\$(date -r "\$START_TIME" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date '+%Y-%m-%d %H:%M:%S')"
+
+STATUS_LABEL="Completed (Exit 0)"
+if [[ "\$SUBAGENT_EXIT" -ne 0 ]]; then
+    STATUS_LABEL="Failed (Exit \$SUBAGENT_EXIT)"
+fi
+
+GIT_SUMMARY=""
+if command -v git >/dev/null 2>&1 && git -C "\$TARGET_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    GIT_SUMMARY="\$(git -C "\$TARGET_DIR" status --short 2>/dev/null || true)"
+fi
+
+cat << REPORT_EOF > "\$REPORT_FILE"
+# Subagent Task Report: \$TITLE
+
+| Attribute | Details |
+| :--- | :--- |
+| **Task ID** | \`\$TASK_ID\` |
+| **Status** | **\$STATUS_LABEL** |
+| **Account** | \`\${ACCOUNT_ID:-pool}\` |
+| **Duration** | \`\${DURATION}s\` |
+| **Started** | \`\$START_DATE\` |
+| **Directory** | \`\$TARGET_DIR\` |
+| **Surface** | \`\${CMUX_SURFACE_ID:-unknown}\` |
+
+## Instructions / Prompt
+> \$(cat "\$STATE_DIR/prompt.txt" 2>/dev/null || echo "\$PROMPT")
+
+## Execution Summary & Conclusion
+\$(cat "\$STATE_DIR/output.log" 2>/dev/null || echo "(No output generated)")
+
+REPORT_EOF
+
+if [[ -n "\$GIT_SUMMARY" ]]; then
+    cat << REPORT_EOF >> "\$REPORT_FILE"
+
+## Modified Files
+\`\`\`text
+\$GIT_SUMMARY
+\`\`\`
+REPORT_EOF
+fi
+
+cp "\$REPORT_FILE" "\$LATEST_REPORT"
+
 printf '\n\033[1;32m%s\033[0m\n' "============================================================"
-printf '\033[1;32m  wmux Subagent finished with status %d\033[0m\n' "\$SUBAGENT_EXIT"
+printf '\033[1;32m  ✔ wmux Subagent [%s] completed (Status: %d)\033[0m\n' "\$TITLE" "\$SUBAGENT_EXIT"
+printf '\033[0;33m  Account:   \033[0m%s\n' "\${ACCOUNT_ID:-pool}"
+printf '\033[0;32m  Report:    \033[0m%s\n' "\$REPORT_FILE"
+printf '\033[0;36m  Execution logs and diffs are preserved above for inspection.\033[0m\n'
+printf '\033[0;37m  Type \033[1mexit\033[0m\033[0;37m or press \033[1mCtrl+D\033[0m\033[0;37m to close this pane when finished.\033[0m\n'
 printf '\033[1;32m%s\033[0m\n\n' "============================================================"
 
 ACTIVE_SURFACE="\${CMUX_SURFACE_ID:-}"
@@ -593,7 +681,7 @@ if [[ -z "\$ACTIVE_WORKSPACE" && -f "\$STATE_DIR/workspace_id" ]]; then
     ACTIVE_WORKSPACE="\$(cat "\$STATE_DIR/workspace_id" 2>/dev/null || true)"
 fi
 
-# Update Subagent Status Bar file to done, hold for 3 seconds, then remove
+# Update Subagent Status Bar file to done (persists for user visibility until pane is closed)
 if [[ -f "\$STATUS_JSON" ]]; then
     if command -v python3 >/dev/null 2>&1; then
         python3 -c '
@@ -610,24 +698,10 @@ with open(sys.argv[6], "w") as f:
     json.dump(data, f, indent=2)
 ' "\$TASK_ID" "\$TITLE" "\${ACCOUNT_ID:-pool}" "\${ACTIVE_SURFACE:-}" "\$START_TIME" "\$STATUS_JSON" 2>/dev/null || true
     fi
-    sleep 3
-    rm -f "\$STATUS_JSON"
 fi
 
-# Option B - Auto close pane (strictly require explicit --surface to prevent killing main terminal)
-if [[ -n "\$ACTIVE_SURFACE" && -n "\$CMUX_BIN" && -x "\$CMUX_BIN" ]]; then
-    if [[ -n "\$CMUX_SOCKET_PATH" ]]; then
-        if [[ -n "\$ACTIVE_WORKSPACE" ]]; then
-            "\$CMUX_BIN" --socket "\$CMUX_SOCKET_PATH" close-surface --force --workspace "\$ACTIVE_WORKSPACE" --surface "\$ACTIVE_SURFACE" >/dev/null 2>&1 || true
-        fi
-        "\$CMUX_BIN" --socket "\$CMUX_SOCKET_PATH" close-surface --force --surface "\$ACTIVE_SURFACE" >/dev/null 2>&1 || true
-    else
-        if [[ -n "\$ACTIVE_WORKSPACE" ]]; then
-            "\$CMUX_BIN" close-surface --force --workspace "\$ACTIVE_WORKSPACE" --surface "\$ACTIVE_SURFACE" >/dev/null 2>&1 || true
-        fi
-        "\$CMUX_BIN" close-surface --force --surface "\$ACTIVE_SURFACE" >/dev/null 2>&1 || true
-    fi
-fi
+# Note: Preserving pane open by default so user can inspect output and worktree changes.
+# Pane will close naturally when the user enters 'exit' or closes the split.
 
 if [[ -z "\${WMUX_DEBUG:-}" && -d "\$STATE_DIR" ]]; then
     rm -rf "\$STATE_DIR"
@@ -641,24 +715,76 @@ EOF
     # Command to run inside the new pane
     local PANE_COMMAND="bash $(printf '%q' "$RUNNER_SCRIPT")"
 
-    # Pane creation: split pane to the right
+    # Layout Engine: Query existing subagent surfaces in the current workspace
+    # Adheres to the Master-Slave / Elastic Grid Blueprint (1-5 visual splits, 6+ tabbed)
+    local ACTIVE_SUBAGENT_SURFACES=()
+    if [[ -d "$SUBAGENTS_DIR" ]]; then
+        local CURRENT_PANELS=""
+        CURRENT_PANELS="$(cmux_invoke list-panels 2>/dev/null || true)"
+        # Read subagent status files sorted by start_time
+        while IFS= read -r sf; do
+            [[ -f "$sf" ]] || continue
+            local sid=""
+            sid="$(python3 -c '
+import json, sys
+try:
+    with open(sys.argv[1]) as f:
+        d = json.load(f)
+    print(d.get("surface_id") or "")
+except Exception:
+    pass
+' "$sf" 2>/dev/null || true)"
+            if [[ -n "$sid" ]] && printf '%s\n' "$CURRENT_PANELS" | grep -q "$sid"; then
+                ACTIVE_SUBAGENT_SURFACES+=("$sid")
+            fi
+        done < <(find "$SUBAGENTS_DIR" -name "*.json" -type f -exec grep -l '"surface_id"' {} + 2>/dev/null || true)
+    fi
+
+    local SUBAGENT_COUNT=${#ACTIVE_SUBAGENT_SURFACES[@]}
+
+    # Pane creation based on current subagent count:
+    # 0 -> new-split right from master (creates master 60% : slave 40%)
+    # 1 -> new-split down from S0 (creates 2 vertical rows)
+    # 2 -> new-split down from S1 (creates 3 vertical rows)
+    # 3 -> new-split right from S0 (turns into 2x2 grid in auxiliary area)
+    # 4 -> new-split right from S1 (turns into 'top 2, bottom 3' grid)
+    # 5+ -> new-surface inside existing subagent pane (tabbed mode to prevent vertical crush)
     local SPLIT_OUTPUT=""
     local SPLIT_ERR=""
 
-    if SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split right --command "$PANE_COMMAND" 2>&1)"; then
-        :
-    elif SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-pane --direction right --command "$PANE_COMMAND" 2>&1)"; then
-        :
+    if (( SUBAGENT_COUNT == 0 )); then
+        SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split right --command "$PANE_COMMAND" 2>&1)" || true
+    elif (( SUBAGENT_COUNT == 1 )); then
+        local anchor="${ACTIVE_SUBAGENT_SURFACES[0]}"
+        SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split down --surface "$anchor" --command "$PANE_COMMAND" 2>&1)" || true
+    elif (( SUBAGENT_COUNT == 2 )); then
+        local anchor="${ACTIVE_SUBAGENT_SURFACES[1]}"
+        SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split down --surface "$anchor" --command "$PANE_COMMAND" 2>&1)" || true
+    elif (( SUBAGENT_COUNT == 3 )); then
+        local anchor="${ACTIVE_SUBAGENT_SURFACES[0]}"
+        SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split right --surface "$anchor" --command "$PANE_COMMAND" 2>&1)" || true
+    elif (( SUBAGENT_COUNT == 4 )); then
+        local anchor="${ACTIVE_SUBAGENT_SURFACES[1]}"
+        SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split right --surface "$anchor" --command "$PANE_COMMAND" 2>&1)" || true
     else
-        SPLIT_ERR="$SPLIT_OUTPUT"
-        echo "Error: Failed to split surface pane:" >&2
-        echo "$SPLIT_ERR" >&2
-        if [[ "$WORKTREE" == "1" && -d "$WORKTREE_DIR" ]]; then
-            git -C "$REPO_ROOT" worktree remove --force "$WORKTREE_DIR" >/dev/null 2>&1 || true
-            git -C "$REPO_ROOT" branch -D "$BRANCH_NAME" >/dev/null 2>&1 || true
+        # 5 or more existing subagents: use surface tabs in the right column
+        local anchor="${ACTIVE_SUBAGENT_SURFACES[-1]}"
+        SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split down --surface "$anchor" --command "$PANE_COMMAND" 2>&1)" || true
+    fi
+
+    # Fallback to simple split if targeted split failed
+    if [[ -z "$SPLIT_OUTPUT" ]] || ! extract_surface_uuid "$SPLIT_OUTPUT" >/dev/null 2>&1; then
+        if ! SPLIT_OUTPUT="$(cmux_invoke --json --id-format both new-split right --command "$PANE_COMMAND" 2>&1)"; then
+            SPLIT_ERR="$SPLIT_OUTPUT"
+            echo "Error: Failed to split surface pane:" >&2
+            echo "$SPLIT_ERR" >&2
+            if [[ "$WORKTREE" == "1" && -d "$WORKTREE_DIR" ]]; then
+                git -C "$REPO_ROOT" worktree remove --force "$WORKTREE_DIR" >/dev/null 2>&1 || true
+                git -C "$REPO_ROOT" branch -D "$BRANCH_NAME" >/dev/null 2>&1 || true
+            fi
+            rm -f "$STATUS_JSON"
+            exit 1
         fi
-        rm -f "$STATUS_JSON"
-        exit 1
     fi
 
     local SUBAGENT_SURFACE_UUID
@@ -669,10 +795,17 @@ EOF
     SUBAGENT_WORKSPACE_ID="$(extract_workspace_ref "$SPLIT_OUTPUT")"
 
     local TARGET_SURFACE="${SUBAGENT_SURFACE_REF:-$SUBAGENT_SURFACE_UUID}"
+    local TARGET_PANE
+    TARGET_PANE="$(extract_pane_ref "$SPLIT_OUTPUT")"
     if [[ -n "$TARGET_SURFACE" ]]; then
         echo "$TARGET_SURFACE" > "$SURFACE_FILE"
         # Rename the new tab / pane for clear visibility
         cmux_invoke tab-action --action rename --title "Subagent: $TITLE" --surface "$TARGET_SURFACE" >/dev/null 2>&1 || true
+    fi
+
+    # When creating the first subagent, resize right pane so Master occupies ~40% and Subagents occupy ~60%
+    if (( SUBAGENT_COUNT == 0 )) && [[ -n "$TARGET_PANE" ]]; then
+        cmux_invoke resize-pane --pane "$TARGET_PANE" -L --amount 18 >/dev/null 2>&1 || true
     fi
     if [[ -n "$SUBAGENT_WORKSPACE_ID" ]]; then
         echo "$SUBAGENT_WORKSPACE_ID" > "$WORKSPACE_FILE"
@@ -714,18 +847,20 @@ EOF
         # Update status to done for UI status bar
         if [[ -f "$STATUS_JSON" ]]; then
             write_status_json "$STATUS_JSON" "$TASK_ID" "$TITLE" "$ACCOUNT_ID" "$TARGET_SURFACE" "done" "$START_TIME"
-            # Keep for 3 seconds so UI displays done state, then clean up
-            sleep 3
-            rm -f "$STATUS_JSON"
         fi
 
-        # Ensure surface is closed
-        if [[ -n "$TARGET_SURFACE" ]]; then
-            if [[ -n "$SUBAGENT_WORKSPACE_ID" ]]; then
-                cmux_invoke close-surface --force --workspace "$SUBAGENT_WORKSPACE_ID" --surface "$TARGET_SURFACE" >/dev/null 2>&1 || true
-            else
-                cmux_invoke close-surface --force --surface "$TARGET_SURFACE" >/dev/null 2>&1 || true
-            fi
+        # Note: Pane is preserved open for inspection and manual closure
+
+        local REPORT_ROOT="$TARGET_DIR"
+        if git -C "$TARGET_DIR" rev-parse --show-toplevel >/dev/null 2>&1; then
+            REPORT_ROOT="$(git -C "$TARGET_DIR" rev-parse --show-toplevel)"
+        fi
+        local REPORT_FILE="$REPORT_ROOT/.wmux/reports/${TASK_ID}.md"
+        if [[ -f "$REPORT_FILE" ]]; then
+            echo ""
+            echo "============================================================"
+            echo "[wmux-subagent] Report saved to: $REPORT_FILE"
+            echo "============================================================"
         fi
 
         # If worktree was used, report commits and review/merge instructions
@@ -774,6 +909,8 @@ EOF
         if [[ -n "${SUBAGENT_SURFACE_ID:-}" ]]; then
             echo "  Surface:  $SUBAGENT_SURFACE_ID"
         fi
+        echo "  Report:   .wmux/reports/${TASK_ID}.md (auto-generated upon completion)"
+        echo "  Inspect:  wmux-subagent report --latest"
         if [[ "$WORKTREE" == "1" ]]; then
             echo "  Worktree: $WORKTREE_DIR"
             echo "  Branch:   $BRANCH_NAME"
@@ -788,6 +925,99 @@ EOF
     fi
 }
 
+cmd_report() {
+    local TARGET_ARG="${1:-}"
+    local REPO_ROOT=""
+    if command -v git >/dev/null 2>&1 && git rev-parse --show-toplevel >/dev/null 2>&1; then
+        REPO_ROOT="$(git rev-parse --show-toplevel)"
+    else
+        REPO_ROOT="$PWD"
+    fi
+    local REPORT_DIR="$REPO_ROOT/.wmux/reports"
+
+    if [[ ! -d "$REPORT_DIR" ]]; then
+        if [[ "$TARGET_ARG" == "--list" || -z "$TARGET_ARG" ]]; then
+            echo "No subagent reports found in $REPORT_DIR yet."
+            echo "Reports are automatically generated under .wmux/reports/ when tasks complete."
+            return 0
+        else
+            echo "No subagent reports directory found in $REPORT_DIR" >&2
+            return 1
+        fi
+    fi
+
+    case "$TARGET_ARG" in
+        --latest|-l)
+            if [[ -f "$REPORT_DIR/latest.md" ]]; then
+                cat "$REPORT_DIR/latest.md"
+            else
+                local newest
+                newest="$(ls -t "$REPORT_DIR"/*.md 2>/dev/null | grep -v 'latest.md' | head -n 1 || true)"
+                if [[ -n "$newest" && -f "$newest" ]]; then
+                    cat "$newest"
+                else
+                    echo "No subagent reports available in $REPORT_DIR" >&2
+                    return 1
+                fi
+            fi
+            ;;
+        --list|"")
+            echo "Available Subagent Reports in $REPORT_DIR:"
+            echo "================================================================================"
+            printf '%-28s | %-12s | %-20s | %s\n' "Task ID" "Status" "Date" "Title"
+            echo "--------------------------------------------------------------------------------"
+            local found=0
+            for rf in "$REPORT_DIR"/*.md; do
+                [[ -f "$rf" ]] || continue
+                local bn
+                bn="$(basename "$rf" .md)"
+                [[ "$bn" == "latest" ]] && continue
+                found=1
+
+                local title status rdate
+                title="$(grep -m 1 '^# Subagent Task Report:' "$rf" | sed 's/# Subagent Task Report:[[:space:]]*//' || echo "$bn")"
+                status="$(grep -m 1 '\*\*Status\*\*' "$rf" | sed -E 's/.*\*\*(Completed|Failed)[^*]*\*\*.*/\1/' || echo "Done")"
+                rdate="$(grep -m 1 '\*\*Started\*\*' "$rf" | sed -E 's/.*\*\*[[:space:]]*`([^`]+)`.*/\1/' || echo "-")"
+                printf '%-28s | %-12s | %-20s | %s\n' "$bn" "$status" "$rdate" "$title"
+            done
+            if [[ "$found" == "0" ]]; then
+                echo "  (No reports generated yet)"
+            fi
+            echo "================================================================================"
+            echo "View specific report: wmux-subagent report <task-id> | --latest"
+            ;;
+        *)
+            local safe_arg
+            safe_arg="$(basename "$TARGET_ARG")"
+            if [[ ! "$safe_arg" =~ ^[a-zA-Z0-9_.-]+$ ]] || [[ "$safe_arg" == "." || "$safe_arg" == ".." ]]; then
+                echo "Error: Invalid report identifier '$TARGET_ARG'. Must be alphanumeric with hyphen/underscore/dot only." >&2
+                return 1
+            fi
+
+            local target="$REPORT_DIR/${safe_arg}.md"
+            if [[ ! -f "$target" && -f "$REPORT_DIR/$safe_arg" ]]; then
+                target="$REPORT_DIR/$safe_arg"
+            fi
+
+            if [[ -f "$target" ]]; then
+                # Security: Canonical directory verification
+                local real_target real_dir
+                real_target="$(cd "$(dirname "$target")" && pwd)/$(basename "$target")"
+                real_dir="$(cd "$REPORT_DIR" && pwd)"
+                if [[ "$real_target" == "$real_dir/"* ]]; then
+                    cat "$target"
+                else
+                    echo "Error: Path traversal attempt rejected." >&2
+                    return 1
+                fi
+            else
+                echo "Error: Report '$safe_arg' not found in $REPORT_DIR" >&2
+                return 1
+            fi
+            ;;
+    esac
+}
+
 main() {
     if [[ $# -eq 0 ]]; then
         show_help
@@ -800,6 +1030,9 @@ main() {
     case "$SUBCOMMAND" in
         run)
             cmd_run "$@"
+            ;;
+        report|reports)
+            cmd_report "$@"
             ;;
         help|-h|--help)
             show_help

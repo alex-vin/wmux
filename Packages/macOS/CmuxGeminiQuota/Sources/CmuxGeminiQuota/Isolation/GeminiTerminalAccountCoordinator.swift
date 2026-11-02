@@ -8,6 +8,9 @@ public final class GeminiTerminalAccountCoordinator {
     /// Maps each Terminal Surface UUID to its designated Gemini account ID.
     public private(set) var surfaceBindings: [UUID: String] = [:]
 
+    /// Tracks surfaces whose active tasks have completed and session count already decremented.
+    public private(set) var completedSurfaces: Set<UUID> = []
+
     /// Load-balancing and session-aware scheduler for multi-account pools.
     public let scheduler: GeminiAccountPoolScheduler
 
@@ -67,9 +70,10 @@ public final class GeminiTerminalAccountCoordinator {
         guard let optimal = scheduler.pickOptimalAccount(excludingAccountID: excludingAccountID) else {
             return nil
         }
-        if let previousID = surfaceBindings[surfaceID] {
+        if let previousID = surfaceBindings[surfaceID], !completedSurfaces.contains(surfaceID) {
             scheduler.decrementActive(for: previousID)
         }
+        completedSurfaces.remove(surfaceID)
         surfaceBindings[surfaceID] = optimal.id
         scheduler.incrementActive(for: optimal.id)
         syncTokenCache(for: surfaceID)
@@ -89,12 +93,25 @@ public final class GeminiTerminalAccountCoordinator {
     ///   - surfaceID: Unique UUID of the terminal pane.
     ///   - accountID: ID (email) of the Gemini account.
     public func bind(surfaceID: UUID, to accountID: String) {
-        if let previousID = surfaceBindings[surfaceID] {
+        if let previousID = surfaceBindings[surfaceID], !completedSurfaces.contains(surfaceID) {
             scheduler.decrementActive(for: previousID)
         }
+        completedSurfaces.remove(surfaceID)
         surfaceBindings[surfaceID] = accountID
         scheduler.incrementActive(for: accountID)
         syncTokenCache(for: surfaceID)
+    }
+
+    /// Early-releases the active session count for a surface whose subagent task has completed,
+    /// while preserving token cache and account binding for ongoing terminal inspection.
+    ///
+    /// - Parameter surfaceID: Unique UUID of the terminal pane.
+    public func completeTask(surfaceID: UUID) {
+        guard !completedSurfaces.contains(surfaceID) else { return }
+        if let boundAccountID = surfaceBindings[surfaceID] {
+            scheduler.decrementActive(for: boundAccountID)
+            completedSurfaces.insert(surfaceID)
+        }
     }
 
     /// Removes any custom account assignment for a surface, falling back to the default account.
@@ -102,8 +119,11 @@ public final class GeminiTerminalAccountCoordinator {
     /// - Parameter surfaceID: Unique UUID of the terminal pane.
     public func unbind(surfaceID: UUID) {
         if let boundAccountID = surfaceBindings[surfaceID] {
-            scheduler.decrementActive(for: boundAccountID)
+            if !completedSurfaces.contains(surfaceID) {
+                scheduler.decrementActive(for: boundAccountID)
+            }
         }
+        completedSurfaces.remove(surfaceID)
         surfaceBindings.removeValue(forKey: surfaceID)
         clearTokenCache(for: surfaceID)
     }
