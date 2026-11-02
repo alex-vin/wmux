@@ -125,6 +125,31 @@ public final class SubagentTaskStore {
         }
     }
 
+    /// Resolves any surface representation (UUID string, "surface:<UUID>", or short handle ref like "surface:1") to its canonical UUID.
+    public static func resolveSurfaceUUID(_ surfaceID: String) -> UUID? {
+        let trimmed = surfaceID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        // 1. Direct UUID
+        if let uuid = UUID(uuidString: trimmed) {
+            return uuid
+        }
+        // 2. "surface:<UUID>" format
+        if trimmed.lowercased().hasPrefix("surface:") {
+            let tail = String(trimmed.dropFirst("surface:".count))
+            if let uuid = UUID(uuidString: tail) {
+                return uuid
+            }
+        }
+        // 3. Resolve handle ref format (e.g. "surface:1") via TerminalController
+        let handle = trimmed.lowercased().hasPrefix("surface:") ? trimmed : "surface:\(trimmed)"
+        if let resolved = TerminalController.shared.v2ResolveHandleRef(handle) {
+            return resolved
+        }
+        TerminalController.shared.v2RefreshKnownRefs()
+        return TerminalController.shared.v2ResolveHandleRef(handle)
+    }
+
     /// Reloads all `.json` task manifests from the subagents directory.
     public func reloadTasks() {
         let fm = FileManager.default
@@ -151,21 +176,19 @@ public final class SubagentTaskStore {
             // Self-healing prune: If the terminal surface is no longer alive in cmux,
             // prune the manifest file regardless of status to prevent stuck ghost tasks.
             if !item.surfaceID.isEmpty, let delegate = AppDelegate.shared {
-                let trimmed = item.surfaceID.trimmingCharacters(in: .whitespacesAndNewlines)
-                let uuidStr = trimmed.lowercased().hasPrefix("surface:") ? String(trimmed.dropFirst(8)) : trimmed
-                if let uuid = UUID(uuidString: uuidStr), delegate.locateSurface(surfaceId: uuid) == nil {
-                    try? fm.removeItem(at: url)
-                    delegate.geminiTerminalCoordinator.completeTask(surfaceID: uuid)
-                    continue
+                if let uuid = Self.resolveSurfaceUUID(item.surfaceID) {
+                    if delegate.locateSurface(surfaceId: uuid) == nil {
+                        try? fm.removeItem(at: url)
+                        delegate.geminiTerminalCoordinator.completeTask(surfaceID: uuid)
+                        continue
+                    }
                 }
             }
 
             // Early-release account concurrency once task finishes (status done or error),
             // while preserving terminal surface open for user inspection.
             if item.status != .running, !item.surfaceID.isEmpty {
-                let trimmed = item.surfaceID.trimmingCharacters(in: .whitespacesAndNewlines)
-                let uuidStr = trimmed.lowercased().hasPrefix("surface:") ? String(trimmed.dropFirst(8)) : trimmed
-                if let uuid = UUID(uuidString: uuidStr) {
+                if let uuid = Self.resolveSurfaceUUID(item.surfaceID) {
                     AppDelegate.shared?.geminiTerminalCoordinator.completeTask(surfaceID: uuid)
                 }
             }
@@ -219,33 +242,7 @@ public final class SubagentTaskStore {
 
     /// Focuses the workspace pane/surface corresponding to the subagent task.
     public func focusSurface(surfaceID: String) {
-        let trimmed = surfaceID.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
-
-        var targetUUID: UUID?
-
-        // 1. Direct UUID
-        if let uuid = UUID(uuidString: trimmed) {
-            targetUUID = uuid
-        } else if trimmed.lowercased().hasPrefix("surface:") {
-            // 2. "surface:<UUID>" format
-            let tail = String(trimmed.dropFirst("surface:".count))
-            if let uuid = UUID(uuidString: tail) {
-                targetUUID = uuid
-            }
-        }
-
-        // 3. Resolve handle ref format (e.g. "surface:1") via TerminalController
-        if targetUUID == nil {
-            let handle = trimmed.lowercased().hasPrefix("surface:") ? trimmed : "surface:\(trimmed)"
-            targetUUID = TerminalController.shared.v2ResolveHandleRef(handle)
-            if targetUUID == nil {
-                TerminalController.shared.v2RefreshKnownRefs()
-                targetUUID = TerminalController.shared.v2ResolveHandleRef(handle)
-            }
-        }
-
-        guard let uuid = targetUUID else { return }
+        guard let uuid = Self.resolveSurfaceUUID(surfaceID) else { return }
 
         if let located = AppDelegate.shared?.locateSurface(surfaceId: uuid) {
             _ = AppDelegate.shared?.focusMainWindow(windowId: located.windowId)

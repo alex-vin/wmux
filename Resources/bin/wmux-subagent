@@ -476,6 +476,7 @@ CMUX_SOCKET_PATH=$(printf '%q' "${CMUX_SOCKET_PATH:-}")
 STATUS_JSON=$(printf '%q' "$STATUS_JSON")
 START_TIME=$(printf '%q' "$START_TIME")
 ACCOUNT_ID=$(printf '%q' "${ACCOUNT:-}")
+WAIT=$(printf '%q' "$WAIT")
 
 cleanup_runner() {
     if [[ -n "\$STATUS_JSON" && -f "\$STATUS_JSON" ]]; then
@@ -609,8 +610,13 @@ touch "\$STATE_DIR/done"
 
 # Generate Subagent Conclusion Report in .wmux/reports/<task_id>.md
 REPORT_ROOT="\$TARGET_DIR"
-if command -v git >/dev/null 2>&1 && git -C "\$TARGET_DIR" rev-parse --show-toplevel >/dev/null 2>&1; then
-    REPORT_ROOT="\$(git -C "\$TARGET_DIR" rev-parse --show-toplevel)"
+if command -v git >/dev/null 2>&1; then
+    COMMON_GIT_DIR="\$(git -C "\$TARGET_DIR" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+    if [[ -n "\$COMMON_GIT_DIR" && -d "\$COMMON_GIT_DIR" ]]; then
+        REPORT_ROOT="\$(cd "\$COMMON_GIT_DIR/.." && pwd)"
+    elif git -C "\$TARGET_DIR" rev-parse --show-toplevel >/dev/null 2>&1; then
+        REPORT_ROOT="\$(git -C "\$TARGET_DIR" rev-parse --show-toplevel)"
+    fi
 fi
 REPORT_DIR="\$REPORT_ROOT/.wmux/reports"
 mkdir -p "\$REPORT_DIR"
@@ -702,8 +708,8 @@ fi
 
 # Note: Preserving pane open by default so user can inspect output and worktree changes.
 # Pane will close naturally when the user enters 'exit' or closes the split.
-
-if [[ -z "\${WMUX_DEBUG:-}" && -d "\$STATE_DIR" ]]; then
+# In wait mode ($WAIT == 1), parent wmux-subagent run will clean up $STATE_DIR after reading outputs.
+if [[ "\$WAIT" == "0" && -z "\${WMUX_DEBUG:-}" && -d "\$STATE_DIR" ]]; then
     rm -rf "\$STATE_DIR"
 fi
 
@@ -852,8 +858,14 @@ except Exception:
         # Note: Pane is preserved open for inspection and manual closure
 
         local REPORT_ROOT="$TARGET_DIR"
-        if git -C "$TARGET_DIR" rev-parse --show-toplevel >/dev/null 2>&1; then
-            REPORT_ROOT="$(git -C "$TARGET_DIR" rev-parse --show-toplevel)"
+        if command -v git >/dev/null 2>&1; then
+            local COMMON_GIT_DIR
+            COMMON_GIT_DIR="$(git -C "$TARGET_DIR" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+            if [[ -n "$COMMON_GIT_DIR" && -d "$COMMON_GIT_DIR" ]]; then
+                REPORT_ROOT="$(cd "$COMMON_GIT_DIR/.." && pwd)"
+            elif git -C "$TARGET_DIR" rev-parse --show-toplevel >/dev/null 2>&1; then
+                REPORT_ROOT="$(git -C "$TARGET_DIR" rev-parse --show-toplevel)"
+            fi
         fi
         local REPORT_FILE="$REPORT_ROOT/.wmux/reports/${TASK_ID}.md"
         if [[ -f "$REPORT_FILE" ]]; then
@@ -928,9 +940,16 @@ except Exception:
 cmd_report() {
     local TARGET_ARG="${1:-}"
     local REPO_ROOT=""
-    if command -v git >/dev/null 2>&1 && git rev-parse --show-toplevel >/dev/null 2>&1; then
-        REPO_ROOT="$(git rev-parse --show-toplevel)"
-    else
+    if command -v git >/dev/null 2>&1; then
+        local COMMON_GIT_DIR
+        COMMON_GIT_DIR="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+        if [[ -n "$COMMON_GIT_DIR" && -d "$COMMON_GIT_DIR" ]]; then
+            REPO_ROOT="$(cd "$COMMON_GIT_DIR/.." && pwd)"
+        elif git rev-parse --show-toplevel >/dev/null 2>&1; then
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
+        fi
+    fi
+    if [[ -z "$REPO_ROOT" ]]; then
         REPO_ROOT="$PWD"
     fi
     local REPORT_DIR="$REPO_ROOT/.wmux/reports"
@@ -995,17 +1014,22 @@ cmd_report() {
             fi
 
             local target="$REPORT_DIR/${safe_arg}.md"
-            if [[ ! -f "$target" && -f "$REPORT_DIR/$safe_arg" ]]; then
+            if [[ ! -f "$target" && -f "$REPORT_DIR/$safe_arg" && "$safe_arg" == *.md ]]; then
                 target="$REPORT_DIR/$safe_arg"
             fi
 
+            if [[ -L "$target" ]]; then
+                echo "Error: Symlink reports are not permitted." >&2
+                return 1
+            fi
+
             if [[ -f "$target" ]]; then
-                # Security: Canonical directory verification
+                # Security: Canonical directory and symlink traversal verification
                 local real_target real_dir
-                real_target="$(cd "$(dirname "$target")" && pwd)/$(basename "$target")"
-                real_dir="$(cd "$REPORT_DIR" && pwd)"
-                if [[ "$real_target" == "$real_dir/"* ]]; then
-                    cat "$target"
+                real_target="$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$target" 2>/dev/null || true)"
+                real_dir="$(python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$REPORT_DIR" 2>/dev/null || true)"
+                if [[ -n "$real_target" && -n "$real_dir" && "$real_target" == "$real_dir/"* && -f "$real_target" && ! -L "$target" ]]; then
+                    cat "$real_target"
                 else
                     echo "Error: Path traversal attempt rejected." >&2
                     return 1

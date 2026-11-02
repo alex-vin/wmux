@@ -141,6 +141,8 @@ if [[ -n "${CMUX_SURFACE_ID:-}" ]]; then
     fi
     if [[ -f "$HOME/Library/Keychains/account.keychain-db" ]]; then
         /usr/bin/security unlock-keychain -p "" "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
+        /usr/bin/security default-keychain -d user -s "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
+        /usr/bin/security list-keychains -d user -s "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
     elif [[ -f "$HOME/Library/Keychains/login.keychain-db" ]]; then
         /usr/bin/security unlock-keychain -p "" "$HOME/Library/Keychains/login.keychain-db" >/dev/null 2>&1 || true
     fi

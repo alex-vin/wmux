@@ -109,4 +109,13 @@ struct SubagentTaskStoreTests {
         store.focusSurface(surfaceID: "surface:\(UUID().uuidString)")
         store.focusSurface(surfaceID: UUID().uuidString)
     }
+
+    @Test("SubagentTaskStore resolveSurfaceUUID parses raw UUID and surface prefix")
+    func resolveSurfaceUUIDFormats() {
+        let testUUID = UUID()
+        #expect(SubagentTaskStore.resolveSurfaceUUID(testUUID.uuidString) == testUUID)
+        #expect(SubagentTaskStore.resolveSurfaceUUID("surface:\(testUUID.uuidString)") == testUUID)
+        #expect(SubagentTaskStore.resolveSurfaceUUID("  surface:\(testUUID.uuidString)  ") == testUUID)
+        #expect(SubagentTaskStore.resolveSurfaceUUID("") == nil)
+    }
 }
