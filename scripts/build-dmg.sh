@@ -91,9 +91,21 @@ mkdir -p dist
 DMG_PATH="dist/wmux-macos-arm64.dmg"
 rm -f "$DMG_PATH" dist/rw.*.dmg 2>/dev/null || true
 
-# LC_ALL=C is critical so that create-dmg's regex matches English "Resource busy"
-# on non-English locales during hdiutil detach retries.
+# macOS CoreFoundation tools like hdiutil ignore LC_ALL and follow system AppleLanguages.
+# create-dmg specifically greps for "Resource busy" to trigger its unmount retry loop.
+# Provide a temporary hdiutil shim that translates localized busy errors (e.g. Chinese "资源忙")
+# into "Resource busy" so create-dmg unmount retries succeed on any system language.
+HDIUTIL_SHIM_DIR="$(mktemp -d)"
+cat << 'EOF' > "$HDIUTIL_SHIM_DIR/hdiutil"
+#!/bin/bash
+/usr/bin/hdiutil "$@" 2>&1 | sed -e 's/资源忙/Resource busy/g'
+exit "${PIPESTATUS[0]}"
+EOF
+chmod +x "$HDIUTIL_SHIM_DIR/hdiutil"
+OLD_PATH="$PATH"
+export PATH="$HDIUTIL_SHIM_DIR:$PATH"
 export LC_ALL=C
+
 create-dmg \
   --volname "wmux" \
   --window-pos 200 120 \
@@ -106,6 +118,9 @@ create-dmg \
   --overwrite \
   "$DMG_PATH" \
   "$APP_PATH"
+
+export PATH="$OLD_PATH"
+rm -rf "$HDIUTIL_SHIM_DIR"
 
 log_step "DMG packaging"
 
