@@ -11421,7 +11421,7 @@ struct CMUXCLI {
         windowOverride: String?,
         commandName: String = "close-surface"
     ) throws {
-        let csWsFlag = optionValue(commandArgs, name: "--workspace")
+        let (csWsFlag, rem0) = parseOption(commandArgs, name: "--workspace")
         // An explicit but blank --workspace or --window (for example an unset
         // `--workspace "$VAR"`) must fail instead of falling back to the focused
         // workspace or window and closing its focused surface. Only an omitted
@@ -11432,14 +11432,24 @@ struct CMUXCLI {
                 defaultValue: "Workspace handle is blank"
             ))
         }
-        let windowRaw = windowFromArgsOrOverride(commandArgs, windowOverride: windowOverride)
+        let (windowOpt, rem1) = parseOption(rem0, name: "--window")
+        let windowRaw = windowOpt ?? windowOverride
         if let windowRaw, windowRaw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             throw CLIError(message: String(
                 localized: "cli.window.error.handleBlank",
                 defaultValue: "Window handle is blank"
             ))
         }
-        let explicitSurfaceRaw = optionValue(commandArgs, name: "--surface") ?? optionValue(commandArgs, name: "--panel")
+        let (surfaceOpt, rem2) = parseOption(rem1, name: "--surface")
+        let (panelOpt, rem3) = parseOption(rem2, name: "--panel")
+        let positional = rem3.filter { $0 != "--force" }
+        if let unknown = positional.first(where: { $0.hasPrefix("--") }) {
+            throw CLIError(message: "\(commandName): unknown flag '\(unknown)'")
+        }
+        if positional.count > 1 {
+            throw CLIError(message: "\(commandName): unexpected argument '\(positional[1])'")
+        }
+        let explicitSurfaceRaw = surfaceOpt ?? panelOpt ?? positional.first
         let surfaceRaw = explicitSurfaceRaw ?? (csWsFlag == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
         let workspaceArg = csWsFlag ?? callerWorkspace(owningSurface: surfaceRaw, windowRaw: windowRaw, client: client)
         var params: [String: Any] = [:]

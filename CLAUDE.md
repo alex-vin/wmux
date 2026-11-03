@@ -115,7 +115,7 @@ on the remote host. An allowlist addition without this analysis blocks review.
   1. **真实 Pane 隔离与实时观测**：在当前工作区自动拉起右侧 Split Pane，实时展示子任务的执行过程与日志。
   2. **账号池智能调度**：自动从 Gemini 账号池中分配非冲突、最健康的独立账号（`GeminiAccountPoolScheduler`），实现额度最大化利用。
   3. **顶部状态条胶囊**：主窗口上方 `SubagentStatusBarView` 实时显示 `[ 🟢 Title (account) 15s ]` 状态胶囊，支持点击跳转聚焦。
-  4. **自动平滑关闭（选项 B）**：子任务执行完毕后，回传结果并平滑关闭收拢 Pane，释放账号并发计数。
+  4. **现场保留与并发自动释放**：子任务执行完毕后，Pane 会保持打开以便用户审查执行日志与 diff（用户可按 `Ctrl+D` 或输入 `exit` 手动关闭）。系统已自动解绑并释放账号并发计数（`completeTask`），绝不阻塞账号池后续调度。**主 Agent 严禁对子任务 Pane 调用 `cmux close-surface`**，以免误伤主会话。
 
 ## Codebase Knowledge Graph (codebase-memory-mcp)
 

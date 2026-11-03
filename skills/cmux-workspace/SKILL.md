@@ -91,7 +91,7 @@ wmux-subagent run --title "Module Feature" --prompt "Implement auth API" --workt
 
 - **Account Pool**: Automatically allocates an optimal, non-colliding Gemini account from the pool.
 - **Top Status Bar**: Live capsule `[ 🟢 Title (account) 15s ]` appears at the top of the UI with click-to-focus.
-- **Auto-close**: Subagent pane automatically cleans up and closes when finished, preserving workspace hygiene.
+- **Pane Preservation & Concurrency Release**: Subagent panes stay open for user inspection of diffs and outputs. Account concurrency is automatically early-released upon completion. Do not run close-surface from the parent session.
 
 ## Moving surfaces
 
