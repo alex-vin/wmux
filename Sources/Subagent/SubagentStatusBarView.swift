@@ -32,16 +32,45 @@ public struct SubagentStatusBarView: View {
                             SubagentTaskBadge(
                                 task: task,
                                 currentTimestamp: store.currentTimestamp,
-                                isPulsing: isPulsing
-                            ) {
-                                store.focusSurface(surfaceID: task.surfaceID)
-                            }
+                                isPulsing: isPulsing,
+                                onFocus: {
+                                    store.focusSurface(surfaceID: task.surfaceID)
+                                },
+                                onDismiss: {
+                                    store.dismissTask(id: task.id)
+                                }
+                            )
                         }
                     }
                     .padding(.vertical, 2)
                 }
 
                 Spacer(minLength: 0)
+
+                // Trailing button to clear all completed or inactive tasks
+                if store.hasCompletedTasks {
+                    Button(action: {
+                        store.clearCompletedTasks()
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 9))
+                            Text("Clear Done")
+                                .font(.system(size: 10, weight: .medium))
+                        }
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule().fill(Color.primary.opacity(0.06))
+                        )
+                        .overlay(
+                            Capsule().strokeBorder(Color.primary.opacity(0.12), lineWidth: 0.5)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .help("Clear all completed or inactive subagent tasks")
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 5)
@@ -65,70 +94,109 @@ struct SubagentTaskBadge: View {
     let task: SubagentTaskItem
     let currentTimestamp: Date
     let isPulsing: Bool
-    let action: () -> Void
+    let onFocus: () -> Void
+    let onDismiss: () -> Void
 
     @State private var isHovered: Bool = false
+    @State private var isCloseHovered: Bool = false
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                // Status indicator icon
-                switch task.status {
-                case .running:
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 7, height: 7)
-                        .scaleEffect(isPulsing ? 1.25 : 0.8)
-                        .opacity(isPulsing ? 1.0 : 0.5)
-                case .done:
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.green)
-                case .error:
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.red)
+        HStack(spacing: 6) {
+            // Main clickable area: Focus target pane
+            Button(action: onFocus) {
+                HStack(spacing: 6) {
+                    // Status indicator icon
+                    switch task.status {
+                    case .running:
+                        Circle()
+                            .fill(Color.green)
+                            .frame(width: 7, height: 7)
+                            .scaleEffect(isPulsing ? 1.25 : 0.8)
+                            .opacity(isPulsing ? 1.0 : 0.5)
+                    case .done:
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(Color.green)
+                    case .error:
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(Color.red)
+                    }
+
+                    // Title
+                    Text(task.title)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color.primary)
+                        .lineLimit(1)
+
+                    // Account label
+                    Text("(\(formatAccount(task.accountID)))")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+
+                    // Elapsed time
+                    Text(formatElapsed(from: task.startTime, to: currentTimestamp))
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(.secondary)
                 }
-
-                // Title
-                Text(task.title)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(Color.primary)
-                    .lineLimit(1)
-
-                // Account label
-                Text("(\(formatAccount(task.accountID)))")
-                    .font(.system(size: 10))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-
-                // Elapsed time
-                Text(formatElapsed(from: task.startTime, to: currentTimestamp))
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(
-                Capsule()
-                    .fill(isHovered ? Color.primary.opacity(0.12) : Color.primary.opacity(0.06))
-            )
-            .overlay(
-                Capsule()
-                    .strokeBorder(
-                        isHovered ? Color.green.opacity(0.5) : Color.primary.opacity(0.12),
-                        lineWidth: 1
-                    )
-            )
+            .buttonStyle(.plain)
+
+            // Close / Dismiss button (visible on hover)
+            if isHovered {
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(isCloseHovered ? Color.red.opacity(0.85) : Color.secondary.opacity(0.8))
+                }
+                .buttonStyle(.plain)
+                .contentShape(Circle())
+                .onHover { hovering in
+                    isCloseHovered = hovering
+                }
+                .help("Dismiss task")
+                .transition(.opacity.combined(with: .scale(scale: 0.85)))
+            }
         }
-        .buttonStyle(.plain)
+        .padding(.leading, 10)
+        .padding(.trailing, isHovered ? 6 : 10)
+        .padding(.vertical, 4)
+        .background(
+            Capsule()
+                .fill(isHovered ? Color.primary.opacity(0.12) : Color.primary.opacity(0.06))
+        )
+        .overlay(
+            Capsule()
+                .strokeBorder(
+                    isHovered ? Color.green.opacity(0.5) : Color.primary.opacity(0.12),
+                    lineWidth: 1
+                )
+        )
         .contentShape(Capsule())
         .onHover { hovering in
-            isHovered = hovering
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isHovered = hovering
+            }
             if hovering {
                 NSCursor.pointingHand.push()
             } else {
                 NSCursor.pop()
+            }
+        }
+        .contextMenu {
+            Button {
+                onFocus()
+            } label: {
+                Label("Focus Pane", systemImage: "macwindow")
+            }
+
+            Divider()
+
+            Button(role: .destructive) {
+                onDismiss()
+            } label: {
+                Label("Dismiss / Remove", systemImage: "xmark.circle")
             }
         }
         .help(

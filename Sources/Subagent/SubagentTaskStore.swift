@@ -175,13 +175,18 @@ public final class SubagentTaskStore {
 
             // Self-healing prune: If the terminal surface is no longer alive in cmux,
             // prune the manifest file regardless of status to prevent stuck ghost tasks.
-            if !item.surfaceID.isEmpty, let delegate = AppDelegate.shared {
+            if !item.surfaceID.isEmpty {
                 if let uuid = Self.resolveSurfaceUUID(item.surfaceID) {
-                    if delegate.locateSurface(surfaceId: uuid) == nil {
+                    if let delegate = AppDelegate.shared, delegate.locateSurface(surfaceId: uuid) == nil {
                         try? fm.removeItem(at: url)
                         delegate.geminiTerminalCoordinator.completeTask(surfaceID: uuid)
                         continue
                     }
+                } else if AppDelegate.shared != nil {
+                    // Surface reference cannot be resolved in cmux anymore (pane was closed and unmapped).
+                    // Prune the manifest file to eliminate ghost tasks.
+                    try? fm.removeItem(at: url)
+                    continue
                 }
             }
 
@@ -253,6 +258,48 @@ public final class SubagentTaskStore {
         }
     }
 
+    /// Whether there are any completed or error tasks that can be cleared.
+    public var hasCompletedTasks: Bool {
+        activeTasks.contains { $0.status != .running }
+    }
+
+    /// Dismisses a task by ID, removing its manifest file from disk and notifying the coordinator.
+    public func dismissTask(id: String) {
+        let fileURL = directoryURL.appendingPathComponent("\(id).json")
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            try? FileManager.default.removeItem(at: fileURL)
+        } else {
+            if let urls = try? FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil) {
+                for u in urls where u.pathExtension == "json" {
+                    if let data = try? Data(contentsOf: u),
+                       let item = try? JSONDecoder().decode(SubagentTaskItem.self, from: data),
+                       item.id == id {
+                        try? FileManager.default.removeItem(at: u)
+                        break
+                    }
+                }
+            }
+        }
+
+        if let idx = activeTasks.firstIndex(where: { $0.id == id }) {
+            let task = activeTasks[idx]
+            if let uuid = Self.resolveSurfaceUUID(task.surfaceID) {
+                AppDelegate.shared?.geminiTerminalCoordinator.completeTask(surfaceID: uuid)
+            }
+        }
+        withAnimation(.easeInOut(duration: 0.2)) {
+            activeTasks.removeAll { $0.id == id }
+        }
+    }
+
+    /// Clears all completed or error tasks from disk and memory.
+    public func clearCompletedTasks() {
+        let completed = activeTasks.filter { $0.status != .running }
+        for task in completed {
+            dismissTask(id: task.id)
+        }
+    }
+
     // MARK: - Testing / Mutation Helpers
 
     public func addTask(_ task: SubagentTaskItem) {
@@ -264,6 +311,6 @@ public final class SubagentTaskStore {
     }
 
     public func removeTask(id: String) {
-        activeTasks.removeAll { $0.id == id }
+        dismissTask(id: id)
     }
 }

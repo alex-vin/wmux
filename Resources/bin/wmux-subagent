@@ -801,10 +801,11 @@ except Exception:
     SUBAGENT_WORKSPACE_ID="$(extract_workspace_ref "$SPLIT_OUTPUT")"
 
     local TARGET_SURFACE="${SUBAGENT_SURFACE_REF:-$SUBAGENT_SURFACE_UUID}"
+    local PERSISTENT_SURFACE="${SUBAGENT_SURFACE_UUID:-$TARGET_SURFACE}"
     local TARGET_PANE
     TARGET_PANE="$(extract_pane_ref "$SPLIT_OUTPUT")"
     if [[ -n "$TARGET_SURFACE" ]]; then
-        echo "$TARGET_SURFACE" > "$SURFACE_FILE"
+        echo "$PERSISTENT_SURFACE" > "$SURFACE_FILE"
         # Rename the new tab / pane for clear visibility
         cmux_invoke tab-action --action rename --title "Subagent: $TITLE" --surface "$TARGET_SURFACE" >/dev/null 2>&1 || true
     fi
@@ -821,8 +822,8 @@ except Exception:
     local ACCOUNT_ID
     ACCOUNT_ID="$(resolve_account_id "$ACCOUNT" "$SUBAGENT_SURFACE_UUID")"
 
-    # Register running task in Status Bar with accurate child account
-    write_status_json "$STATUS_JSON" "$TASK_ID" "$TITLE" "$ACCOUNT_ID" "$TARGET_SURFACE" "running" "$START_TIME"
+    # Register running task in Status Bar with accurate child account and persistent surface UUID
+    write_status_json "$STATUS_JSON" "$TASK_ID" "$TITLE" "$ACCOUNT_ID" "$PERSISTENT_SURFACE" "running" "$START_TIME"
 
     # Handle completion / waiting
     if [[ "$WAIT" == "1" ]]; then
