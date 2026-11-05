@@ -117,11 +117,7 @@ extension WMUXCLI {
     /// implementation so machine selection, sync, detached terminals, and
     /// reattach output have one owner.
     private func runCoderouterAgentCommand(commandArgs: [String], client: SocketClient, jsonOutput: Bool) throws {
-        if WmuxTuiRemoteRouting.vmAgentRequestsHelp(commandArgs) {
-            print(Self.vmAgentUsage.replacingOccurrences(of: "wmux vm agent", with: "wmux coderouter agent"))
-            return
-        }
-        try runVMAgentCommand(rest: Self.vmAgentAliasArgs(commandArgs), client: client, jsonOutput: jsonOutput)
+        throw CLIError(message: "coderouter agent is not supported in minimal local build.")
     }
 
     private func runCoderouterClaudeCommand(commandArgs: [String], client: SocketClient, jsonOutput: Bool) throws {

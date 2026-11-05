@@ -67,7 +67,7 @@ extension WMUXCLI {
         }
 
         guard let recordMode = AgentRestoreRequestMode(rawValue: record.mode),
-              recordMode != .relaunchAgent else {
+              recordMode != AgentRestoreRequestMode.relaunchAgent else {
             throw loggedForkError(
                 .unsupportedMode,
                 stage: "record.mode",
@@ -77,7 +77,7 @@ extension WMUXCLI {
         // A direct record is an exact command replay, not an agent session
         // with fork authority. Failing closed here prevents `cmux fork` from
         // accidentally executing a recorded resume command unchanged.
-        guard recordMode != .direct else {
+        guard recordMode != AgentRestoreRequestMode.direct else {
             throw loggedForkError(
                 .unsupported,
                 stage: "record.mode.direct",
