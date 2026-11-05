@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// Regression coverage for the AppKit sidebar accessibility ownership boundary.
 @Suite(.serialized)

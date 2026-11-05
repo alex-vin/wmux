@@ -1,13 +1,13 @@
-import CMUXAuthCore
-import CmuxAuthRuntime
+import WMUXAuthCore
+import WmuxAuthRuntime
 import Foundation
 
 /// Holds team loading across the pairing deadline without making network requests.
 actor MobilePairingRecoveryAuthClient: AuthClient {
-    static let user = CMUXAuthUser(id: "pairing-recovery", primaryEmail: "pairing@example.test", displayName: "Pairing")
+    static let user = WMUXAuthUser(id: "pairing-recovery", primaryEmail: "pairing@example.test", displayName: "Pairing")
     private var failTeamRequests = false
     private var teamRequestCount = 0
-    private var teamResult: CheckedContinuation<[CMUXAuthTeam], Never>?
+    private var teamResult: CheckedContinuation<[WMUXAuthTeam], Never>?
     private var requestWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
 
     func failTeams(_ fail: Bool) { failTeamRequests = fail }
@@ -20,10 +20,10 @@ actor MobilePairingRecoveryAuthClient: AuthClient {
     func completeTeamRequest() {
         let continuation = teamResult
         teamResult = nil
-        continuation?.resume(returning: [CMUXAuthTeam(id: "pairing-team", displayName: "Pairing")])
+        continuation?.resume(returning: [WMUXAuthTeam(id: "pairing-team", displayName: "Pairing")])
     }
 
-    func listTeams() async throws -> [CMUXAuthTeam] {
+    func listTeams() async throws -> [WMUXAuthTeam] {
         teamRequestCount += 1
         if failTeamRequests { throw URLError(.notConnectedToInternet) }
         return await withCheckedContinuation { continuation in
@@ -37,7 +37,7 @@ actor MobilePairingRecoveryAuthClient: AuthClient {
     func accessToken() async -> String? { "fixture-access" }
     func refreshToken() async -> String? { "fixture-refresh" }
     func forceRefreshAccessToken() async -> String? { "fixture-access" }
-    func currentUser(throwOnMissing: Bool) async throws -> CMUXAuthUser? { Self.user }
+    func currentUser(throwOnMissing: Bool) async throws -> WMUXAuthUser? { Self.user }
     func sendMagicLinkEmail(email: String, callbackURL: String) async throws -> String { "fixture" }
     func signInWithMagicLink(code: String) async throws {}
     func signInWithCredential(email: String, password: String) async throws {}

@@ -29,7 +29,7 @@ enum FileExplorerFileActivation: Equatable, Sendable {
 
 enum FileExplorerDoubleClickActionSettings {
     static let key = "fileExplorerDoubleClickAction"
-    static let didChangeNotification = Notification.Name("cmux.fileExplorerDoubleClickActionDidChange")
+    static let didChangeNotification = Notification.Name("wmux.fileExplorerDoubleClickActionDidChange")
     static let defaultValue: FileExplorerDoubleClickAction = .preview
 
     /// Parse a raw config/UserDefaults string into an action, falling back to

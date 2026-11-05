@@ -1,8 +1,8 @@
 import Combine
-import CmuxCore
-import CmuxWorkspaces
+import WmuxCore
+import WmuxWorkspaces
 import Foundation
-import CmuxSidebar
+import WmuxSidebar
 import SwiftUI
 
 private struct SidebarPanelObservationState: Equatable {

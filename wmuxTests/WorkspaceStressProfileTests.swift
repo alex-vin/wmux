@@ -1,8 +1,8 @@
 import XCTest
-import struct CmuxSettings.AccountCatalogSection
+import struct WmuxSettings.AccountCatalogSection
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -21,16 +21,16 @@ final class WorkspaceStressProfileTests: XCTestCase {
         /// broken workspace lifecycle, and small enough to stay off the
         /// critical path. A real profiling run raises them through the
         /// environment (and then supplies the p95 budgets), e.g.
-        /// `CMUX_WORKSPACE_STRESS_WORKSPACES=48
-        ///  CMUX_WORKSPACE_STRESS_TABS_PER_WORKSPACE=10
-        ///  CMUX_WORKSPACE_STRESS_SWITCH_PASSES=6`.
+        /// `WMUX_WORKSPACE_STRESS_WORKSPACES=48
+        ///  WMUX_WORKSPACE_STRESS_TABS_PER_WORKSPACE=10
+        ///  WMUX_WORKSPACE_STRESS_SWITCH_PASSES=6`.
         static func current(environment: [String: String] = ProcessInfo.processInfo.environment) -> StressConfig {
             StressConfig(
-                workspaceCount: parseInt(environment["CMUX_WORKSPACE_STRESS_WORKSPACES"], default: 12, minimum: 2),
-                tabsPerWorkspace: parseInt(environment["CMUX_WORKSPACE_STRESS_TABS_PER_WORKSPACE"], default: 4, minimum: 1),
-                switchPasses: parseInt(environment["CMUX_WORKSPACE_STRESS_SWITCH_PASSES"], default: 2, minimum: 1),
-                createP95BudgetMs: parseDouble(environment["CMUX_WORKSPACE_STRESS_CREATE_P95_BUDGET_MS"]),
-                switchP95BudgetMs: parseDouble(environment["CMUX_WORKSPACE_STRESS_SWITCH_P95_BUDGET_MS"])
+                workspaceCount: parseInt(environment["WMUX_WORKSPACE_STRESS_WORKSPACES"], default: 12, minimum: 2),
+                tabsPerWorkspace: parseInt(environment["WMUX_WORKSPACE_STRESS_TABS_PER_WORKSPACE"], default: 4, minimum: 1),
+                switchPasses: parseInt(environment["WMUX_WORKSPACE_STRESS_SWITCH_PASSES"], default: 2, minimum: 1),
+                createP95BudgetMs: parseDouble(environment["WMUX_WORKSPACE_STRESS_CREATE_P95_BUDGET_MS"]),
+                switchP95BudgetMs: parseDouble(environment["WMUX_WORKSPACE_STRESS_SWITCH_P95_BUDGET_MS"])
             )
         }
 

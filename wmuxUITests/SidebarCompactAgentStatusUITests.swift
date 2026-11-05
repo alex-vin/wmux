@@ -3,7 +3,7 @@ import XCTest
 
 /// Launches cmux with `sidebar.compactAgentStatus` on and off, seeds one
 /// workspace per glyph state with in-app socket commands
-/// (`CMUX_UI_TEST_SOCKET_COMMANDS`), and keeps a sidebar screenshot so
+/// (`WMUX_UI_TEST_SOCKET_COMMANDS`), and keeps a sidebar screenshot so
 /// reviewers and agents can see the rows (`scripts/ci/e2e-frames.py`).
 final class SidebarCompactAgentStatusUITests: XCTestCase {
     override func setUp() {
@@ -89,10 +89,10 @@ final class SidebarCompactAgentStatusUITests: XCTestCase {
         // real (non-repo) state of the terminal's directory at each prompt,
         // clearing them, and with git watching off it clears them outright.
         app.launchArguments += ["-sidebarShellIntegration", "<false/>"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-compact-status-\(token.prefix(8))"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_COMMANDS"] = commands.joined(separator: "\n")
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_COMMANDS_RESULT_PATH"] = resultPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-compact-status-\(token.prefix(8))"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_COMMANDS"] = commands.joined(separator: "\n")
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_COMMANDS_RESULT_PATH"] = resultPath
 
         launchAndEnsureRunning(app)
         var result: [String: Any] = [:]

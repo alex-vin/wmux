@@ -1,6 +1,6 @@
-import CmuxSettings
+import WmuxSettings
 
-extension CmuxSettingsFileStore {
+extension WmuxSettingsFileStore {
     func parseSidebarIndicatorPositionSettings(
         _ section: [String: Any],
         sourcePath: String,

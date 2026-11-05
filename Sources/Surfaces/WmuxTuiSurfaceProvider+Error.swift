@@ -1,8 +1,8 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 
 /// Errors surfaced by a Cloud machine provider. Preview credentials never enter error text.
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     enum ProviderError: Error, LocalizedError {
         case notSignedIn
         case machineAsleep(String)
@@ -22,7 +22,7 @@ extension CmuxTuiSurfaceProvider {
         case stateUnavailable(String)
         case tabStateUnavailable(String)
         case invalidPreviewURL
-        /// No user-space WireGuard hub in this build (no bundled cmux-tui client).
+        /// No user-space WireGuard hub in this build (no bundled wmux-tui client).
         case hubUnavailable
         /// The private URL could not be rewritten onto the loopback forward.
         case localForwardURLUnavailable
@@ -34,7 +34,7 @@ extension CmuxTuiSurfaceProvider {
             case .machineAsleep(let id):
                 return "\(id) is asleep; open it (`cmux vm shell \(id)`) to wake it before listing its terminals."
             case .noWorkspaceOnMachine(let id):
-                return "\(id) has no cmux-tui workspace yet."
+                return "\(id) has no wmux-tui workspace yet."
             case .remoteWorkspaceNotFound(let id):
                 return String(
                     format: String(
@@ -60,7 +60,7 @@ extension CmuxTuiSurfaceProvider {
                     id
                 )
             case .terminalNotCreated(let detail):
-                return "cmux-tui did not report the new terminal: \(detail)"
+                return "wmux-tui did not report the new terminal: \(detail)"
             case .browserNotCreated:
                 return String(localized: "cloud.browser.creationUnavailable", defaultValue: "Cloud browsers are unavailable on this machine. Refresh the machine and retry.")
             case .terminalExited(let id):
@@ -81,12 +81,12 @@ extension CmuxTuiSurfaceProvider {
                     failure.localizedDescription
                 )
             case .invalidSnapshot(let id):
-                return "cmux-tui returned an unversioned or malformed session snapshot for \(id)."
+                return "wmux-tui returned an unversioned or malformed session snapshot for \(id)."
             case .snapshotOnly(let id):
                 return String(
                     format: String(
                         localized: "cloudTree.error.snapshotOnly",
-                        defaultValue: "%@ uses an older cmux-tui protocol. Refresh it to enable live sync and rename operations."
+                        defaultValue: "%@ uses an older wmux-tui protocol. Refresh it to enable live sync and rename operations."
                     ),
                     id
                 )
@@ -119,7 +119,7 @@ extension CmuxTuiSurfaceProvider {
             case .localForwardURLUnavailable:
                 return String(
                     localized: "cloudTree.error.localForwardURLUnavailable",
-                    defaultValue: "cmux could not build a local address for this port forward."
+                    defaultValue: "wmux could not build a local address for this port forward."
                 )
             }
         }

@@ -3,8 +3,8 @@ import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,21 +14,21 @@ import Testing
 
     @Test(arguments: ["claude", "codex", "opencode", "pi"], ["--help", "-h"])
     func helpKeepsTheProviderArgumentBoundary(agent: String, help: String) {
-        #expect(CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, help]) == ["--agent", agent, help])
-        #expect(CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--", help]) == ["--agent", agent, "--", help])
-        #expect(CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "prompt", help]) == ["--agent", agent, "--", "prompt", help])
-        #expect(CmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, help]))
-        #expect(!CmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--", help]))
-        #expect(!CmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "prompt", help]))
-        #expect(!CmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--name", help]))
-        #expect(!CmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--machine", "--", help]))
+        #expect(WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, help]) == ["--agent", agent, help])
+        #expect(WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--", help]) == ["--agent", agent, "--", help])
+        #expect(WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "prompt", help]) == ["--agent", agent, "--", "prompt", help])
+        #expect(WmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, help]))
+        #expect(!WmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--", help]))
+        #expect(!WmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "prompt", help]))
+        #expect(!WmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--name", help]))
+        #expect(!WmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--machine", "--", help]))
     }
 
     @Test func agentSubcommandMatchingIgnoresCase() {
-        #expect(CmuxTuiRemoteRouting.isAgentSubcommand("agent"))
-        #expect(CmuxTuiRemoteRouting.isAgentSubcommand("Agent"))
-        #expect(CmuxTuiRemoteRouting.isAgentSubcommand("AGENT"))
-        #expect(!CmuxTuiRemoteRouting.isAgentSubcommand("agents"))
+        #expect(WmuxTuiRemoteRouting.isAgentSubcommand("agent"))
+        #expect(WmuxTuiRemoteRouting.isAgentSubcommand("Agent"))
+        #expect(WmuxTuiRemoteRouting.isAgentSubcommand("AGENT"))
+        #expect(!WmuxTuiRemoteRouting.isAgentSubcommand("agents"))
     }
 
     @Test(arguments: ["claude", "codex", "opencode", "pi"], ["--help", "-h"])
@@ -116,9 +116,9 @@ import Testing
             let process = Process()
             process.executableURL = binary
             process.arguments = ["--socket", socketPath] + arguments
-            var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("CMUX_") }
+            var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("WMUX_") }
             environment["HOME"] = directory.path
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
             process.environment = environment
             process.standardOutput = handle
             process.standardError = handle
@@ -145,10 +145,10 @@ import Testing
 
     @Test(arguments: ["claude", "codex", "opencode", "pi"], ["--machine", "--size", "--cwd", "--name", "--remote-workspace", "--timeout"])
     func incompleteVMOptionRemainsAnOption(agent: String, option: String) {
-        #expect(CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, option]) == ["--agent", agent, option])
-        #expect(CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--no-open", option]) == ["--agent", agent, "--no-open", option])
-        #expect(CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--", option]) == ["--agent", agent, "--", option])
-        #expect(CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "prompt", option]) == ["--agent", agent, "--", "prompt", option])
+        #expect(WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, option]) == ["--agent", agent, option])
+        #expect(WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--no-open", option]) == ["--agent", agent, "--no-open", option])
+        #expect(WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--", option]) == ["--agent", agent, "--", option])
+        #expect(WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "prompt", option]) == ["--agent", agent, "--", "prompt", option])
     }
 
     /// The until-done flags belong to `cmux vm agent`, not to the agent: the
@@ -157,15 +157,15 @@ import Testing
     @Test(arguments: ["claude", "codex", "opencode", "pi"])
     func untilDoneOptionsStayVMOptions(agent: String) {
         #expect(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--wait", "--output", "--timeout", "30", "fix the tests"])
+            WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--wait", "--output", "--timeout", "30", "fix the tests"])
                 == ["--agent", agent, "--wait", "--output", "--timeout", "30", "--", "fix the tests"]
         )
         #expect(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--timeout", "30", "--", "--wait"])
+            WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--timeout", "30", "--", "--wait"])
                 == ["--agent", agent, "--timeout", "30", "--", "--wait"]
         )
-        #expect(CmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--timeout", "30", "--help"]))
-        #expect(CmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--wait", "-h"]))
+        #expect(WmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--timeout", "30", "--help"]))
+        #expect(WmuxTuiRemoteRouting.vmAgentRequestsHelp([agent, "--wait", "-h"]))
     }
 
     /// `--focus` takes an optional value only when the next token is exactly a
@@ -173,23 +173,23 @@ import Testing
     @Test(arguments: ["claude", "codex", "opencode", "pi"])
     func focusFlagsStayVMOptions(agent: String) {
         #expect(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--focus", "true", "fix it"])
+            WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--focus", "true", "fix it"])
                 == ["--agent", agent, "--focus", "true", "--", "fix it"]
         )
         #expect(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--focus", "fix it"])
+            WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--focus", "fix it"])
                 == ["--agent", agent, "--focus", "--", "fix it"]
         )
         #expect(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--focus=no", "--no-focus", "fix it"])
+            WmuxTuiRemoteRouting.vmAgentAliasArgs([agent, "--focus=no", "--no-focus", "fix it"])
                 == ["--agent", agent, "--focus=no", "--no-focus", "--", "fix it"]
         )
     }
 
     @Test func focusFlagValueAcceptsOnlyBooleanWords() {
-        for token in ["true", "TRUE", "1", "yes"] { #expect(CmuxTuiRemoteRouting.focusFlagValue(token) == true) }
-        for token in ["false", "0", "No"] { #expect(CmuxTuiRemoteRouting.focusFlagValue(token) == false) }
-        for token in ["", "fix", "truely", "on"] { #expect(CmuxTuiRemoteRouting.focusFlagValue(token) == nil) }
+        for token in ["true", "TRUE", "1", "yes"] { #expect(WmuxTuiRemoteRouting.focusFlagValue(token) == true) }
+        for token in ["false", "0", "No"] { #expect(WmuxTuiRemoteRouting.focusFlagValue(token) == false) }
+        for token in ["", "fix", "truely", "on"] { #expect(WmuxTuiRemoteRouting.focusFlagValue(token) == nil) }
     }
 }
 
@@ -287,8 +287,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment.removeValue(forKey: "CLAUDE_CODE_OAUTH_TOKEN")
         environment.removeValue(forKey: "ANTHROPIC_API_KEY")
         for (key, value) in extraEnvironment {
@@ -303,7 +303,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             .appendingPathComponent("cmux-coderouter-terminal-\(UUID().uuidString)").path
         defer { unlink(doneSignal) }
         if underTerminal {
-            environment["CMUX_TEST_TERMINAL_INPUT"] = standardInput ?? ""
+            environment["WMUX_TEST_TERMINAL_INPUT"] = standardInput ?? ""
         }
         let result = runProcess(
             executablePath: underTerminal ? "/bin/sh" : cliPath,
@@ -322,7 +322,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
     private static let terminalRunner = #"""
         done="$1"; shift
         mkfifo "$done" || exit 125
-        { printf '%s' "$CMUX_TEST_TERMINAL_INPUT"; read _ < "$done"; } |
+        { printf '%s' "$WMUX_TEST_TERMINAL_INPUT"; read _ < "$done"; } |
             { /usr/bin/script -q /dev/null "$@"; status=$?; echo > "$done"; exit "$status"; }
         """#
 
@@ -758,16 +758,16 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
     func testProviderFirstAgentAliasAddsTheCanonicalSeparator() {
         XCTAssertEqual(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs(["claude", "--machine", "vm-agent-test", "reply exactly pong"]),
+            WmuxTuiRemoteRouting.vmAgentAliasArgs(["claude", "--machine", "vm-agent-test", "reply exactly pong"]),
             ["--agent", "claude", "--machine", "vm-agent-test", "--", "reply exactly pong"]
         )
         XCTAssertEqual(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs(["codex", "--", "exec", "summarize"]),
+            WmuxTuiRemoteRouting.vmAgentAliasArgs(["codex", "--", "exec", "summarize"]),
             ["--agent", "codex", "--", "exec", "summarize"]
         )
         // Focus flags belong to `vm agent`, not to the agent's prompt.
         XCTAssertEqual(
-            CmuxTuiRemoteRouting.vmAgentAliasArgs(["claude", "--no-focus", "reply exactly pong"]),
+            WmuxTuiRemoteRouting.vmAgentAliasArgs(["claude", "--no-focus", "reply exactly pong"]),
             ["--agent", "claude", "--no-focus", "--", "reply exactly pong"]
         )
     }

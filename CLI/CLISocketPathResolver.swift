@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 
 enum CLIExecutableLocator {
     static func currentExecutableURL() -> URL? {
@@ -151,7 +151,7 @@ struct CLISocketPathResolver {
     /// Tests that spawn the CLI under a temporary home set it so the machine-wide
     /// `/tmp` marker files and legacy `/tmp` socket aliases, which a real cmux running
     /// as the same user publishes, cannot route them to that app. Release builds ignore it.
-    static let isolatedDiscoveryEnvironmentKey = "CMUX_TEST_ISOLATED_SOCKET_DISCOVERY"
+    static let isolatedDiscoveryEnvironmentKey = "WMUX_TEST_ISOLATED_SOCKET_DISCOVERY"
 
     /// Creates a resolver with explicit discovery inputs and filesystem probes.
     ///
@@ -171,7 +171,7 @@ struct CLISocketPathResolver {
         self.currentUserID = currentUserID
         self.inspectSocketPathEntry = inspectSocketPathEntry
         self.socketAcceptsConnections = socketAcceptsConnections
-        self.stateDirectory = stateDirectory ?? CmuxStateDirectory.url(homeDirectory: fileManager.homeDirectoryForCurrentUser)
+        self.stateDirectory = stateDirectory ?? WmuxStateDirectory.url(homeDirectory: fileManager.homeDirectoryForCurrentUser)
 #if DEBUG
         self.confinesDiscoveryToStateDirectory = environment[Self.isolatedDiscoveryEnvironmentKey] == "1"
 #else
@@ -525,13 +525,13 @@ struct CLISocketPathResolver {
 
     /// The directory holding the control socket and its marker files.
     ///
-    /// Resolves to ``CmuxStateDirectory`` (`~/.local/state/cmux`), matching the
+    /// Resolves to ``WmuxStateDirectory`` (`~/.local/state/cmux`), matching the
     /// app's `SocketControlSettings.stableSocketDirectoryURL()`. This keeps the
     /// CLI off the app's TCC-protected Application Support data on the agent hook
     /// path (https://github.com/manaflow-ai/cmux/issues/5146). The CLI is a
     /// composition root, so it names the concrete `FileManager.default` here.
     private static func stableSocketDirectoryURL() -> URL? {
-        CmuxStateDirectory.url(homeDirectory: FileManager.default.homeDirectoryForCurrentUser)
+        WmuxStateDirectory.url(homeDirectory: FileManager.default.homeDirectoryForCurrentUser)
     }
 
     private static func dedupe(_ paths: [String]) -> [String] {

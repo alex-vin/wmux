@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -82,8 +82,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         environment["HOME"] = home.path
         environment["CFFIXED_USER_HOME"] = home.path
         environment["XDG_CONFIG_HOME"] = home.appendingPathComponent(".config").path
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         return environment
     }
 
@@ -317,7 +317,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
         for namespace in ["vm", "cloud"] {
             var environment = vmLayoutEnvEnvironment(socketPath: socketPath)
-            environment["CMUX_SOCKET_PASSWORD"] = "invalid-env-fixture-password"
+            environment["WMUX_SOCKET_PASSWORD"] = "invalid-env-fixture-password"
             let result = runProcess(
                 executablePath: cliPath,
                 arguments: [namespace, "env", "set", "brave-otter", "1BAD=value"],
@@ -458,7 +458,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = vmLayoutEnvEnvironment(socketPath: socketPath)
-        environment["CMUX_SOCKET_PASSWORD"] = "layout-fixture-password"
+        environment["WMUX_SOCKET_PASSWORD"] = "layout-fixture-password"
         let result = runProcess(
             executablePath: cliPath,
             arguments: ["vm", "layout", "apply", "brave-otter", layoutFile.path] + targetArguments,
@@ -614,7 +614,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         var environment = vmLayoutEnvEnvironment(socketPath: socketPath)
         // Every attempt fails here, so do not wait out the one second between them.
-        environment["CMUX_VM_LAYOUT_OPEN_RETRY_DELAY_SECONDS"] = "0.05"
+        environment["WMUX_VM_LAYOUT_OPEN_RETRY_DELAY_SECONDS"] = "0.05"
         let result = runProcess(
             executablePath: cliPath,
             arguments: ["vm", "layout", "apply", "brave-otter", layoutFile.path, "--open"],
@@ -674,7 +674,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = vmLayoutEnvEnvironment(socketPath: socketPath)
-        environment["CMUX_VM_LAYOUT_OPEN_RETRY_DELAY_SECONDS"] = "3600"
+        environment["WMUX_VM_LAYOUT_OPEN_RETRY_DELAY_SECONDS"] = "3600"
         let result = runProcess(
             executablePath: cliPath,
             arguments: ["vm", "layout", "apply", "brave-otter", layoutFile.path, "--open"],

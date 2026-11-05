@@ -1,4 +1,4 @@
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Foundation
 
 @MainActor

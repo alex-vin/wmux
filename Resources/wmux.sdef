@@ -36,7 +36,7 @@
     </class>
 
     <class name="window" code="CMwn" plural="windows" description="A cmux window containing one or more workspaces.">
-      <cocoa class="CmuxScriptWindow"/>
+      <cocoa class="WmuxScriptWindow"/>
       <property name="id" code="ID  " type="text" access="r" description="Stable ID for this window."/>
       <property name="name" code="pnam" type="text" access="r" description="The title of the window.">
         <cocoa key="title"/>
@@ -59,7 +59,7 @@
     </class>
 
     <class name="tab" code="CMtb" plural="tabs" description="A cmux workspace.">
-      <cocoa class="CmuxScriptTab"/>
+      <cocoa class="WmuxScriptTab"/>
       <property name="id" code="ID  " type="text" access="r" description="Stable ID for this workspace."/>
       <property name="name" code="pnam" type="text" access="r" description="The title of the workspace.">
         <cocoa key="title"/>
@@ -81,7 +81,7 @@
     </class>
 
     <class name="terminal" code="CMtr" plural="terminals" description="An individual terminal panel.">
-      <cocoa class="CmuxScriptTerminal"/>
+      <cocoa class="WmuxScriptTerminal"/>
       <property name="id" code="ID  " type="text" access="r" description="Stable ID for this terminal panel."/>
       <property name="name" code="pnam" type="text" access="r" description="Current terminal title.">
         <cocoa key="title"/>
@@ -107,7 +107,7 @@
       <enumerator name="up" code="GSup" description="Split upward."/>
     </enumeration>
 
-    <command name="perform action" code="CmuxPfAc" description="Perform a Ghostty action string on a terminal.">
+    <command name="perform action" code="WmuxPfAc" description="Perform a Ghostty action string on a terminal.">
       <direct-parameter type="text" description="The Ghostty action string."/>
       <parameter name="on" code="CMoT" type="terminal" description="Target terminal.">
         <cocoa key="on"/>
@@ -115,18 +115,18 @@
       <result type="boolean" description="True when the action was performed."/>
     </command>
 
-    <command name="new window" code="CmuxNWin" description="Create a new cmux window.">
+    <command name="new window" code="WmuxNWin" description="Create a new cmux window.">
       <result type="window" description="The newly created window."/>
     </command>
 
-    <command name="new tab" code="CmuxNTab" description="Create a new workspace.">
+    <command name="new tab" code="WmuxNTab" description="Create a new workspace.">
       <parameter name="in" code="CMtW" type="window" optional="yes" description="Target window for the new workspace.">
         <cocoa key="window"/>
       </parameter>
       <result type="tab" description="The newly created workspace."/>
     </command>
 
-    <command name="split" code="CmuxSplt" description="Split a terminal in the given direction.">
+    <command name="split" code="WmuxSplt" description="Split a terminal in the given direction.">
       <direct-parameter type="specifier" description="The terminal to split."/>
       <parameter name="direction" code="CMpd" type="split direction" description="The direction to split.">
         <cocoa key="direction"/>
@@ -134,32 +134,32 @@
       <result type="terminal" description="The newly created terminal."/>
     </command>
 
-    <command name="focus" code="CmuxFcus" description="Focus a terminal, bringing its window to the front.">
+    <command name="focus" code="WmuxFcus" description="Focus a terminal, bringing its window to the front.">
       <direct-parameter type="specifier" description="The terminal to focus."/>
     </command>
 
-    <command name="close" code="CmuxClos" description="Close a terminal.">
+    <command name="close" code="WmuxClos" description="Close a terminal.">
       <direct-parameter type="specifier" description="The terminal to close."/>
     </command>
 
-    <command name="activate window" code="CmuxAcWn" description="Activate a cmux window, bringing it to the front.">
+    <command name="activate window" code="WmuxAcWn" description="Activate a cmux window, bringing it to the front.">
       <direct-parameter type="specifier" description="The window to activate."/>
     </command>
 
-    <command name="select tab" code="CmuxSlTb" description="Select a workspace in its window.">
+    <command name="select tab" code="WmuxSlTb" description="Select a workspace in its window.">
       <direct-parameter type="specifier" description="The workspace to select."/>
     </command>
 
-    <command name="close tab" code="CmuxClTb" description="Close a workspace.">
+    <command name="close tab" code="WmuxClTb" description="Close a workspace.">
       <direct-parameter type="specifier" description="The workspace to close."/>
     </command>
 
-    <command name="close window" code="CmuxClWn" description="Close a window.">
+    <command name="close window" code="WmuxClWn" description="Close a window.">
       <direct-parameter type="specifier" description="The window to close."/>
     </command>
 
-    <command name="input text" code="CmuxInTx" description="Input text to a terminal as if it was pasted.">
-      <cocoa class="CmuxScriptInputTextCommand"/>
+    <command name="input text" code="WmuxInTx" description="Input text to a terminal as if it was pasted.">
+      <cocoa class="WmuxScriptInputTextCommand"/>
       <direct-parameter type="text" description="The text to input."/>
       <parameter name="to" code="CMiT" type="terminal" description="The terminal to input text to.">
         <cocoa key="terminal"/>

@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,7 +14,7 @@ struct CloudPortDiscoveryStateTests {
 
     @Test("The authenticated browser route discovers loopback and wildcard services")
     func scanMatchesBrowserProxy() throws {
-        let scan = try #require(CmuxTuiSurfaceProvider.portScan(from: VMExecResult(exitCode: 0, stdout: """
+        let scan = try #require(WmuxTuiSurfaceProvider.portScan(from: VMExecResult(exitCode: 0, stdout: """
         LISTEN 0 128 127.0.0.1:3000 0.0.0.0:*
         LISTEN 0 128 0.0.0.0:8000 0.0.0.0:*
         LISTEN 0 128 10.0.0.7:9000 0.0.0.0:*
@@ -38,7 +38,7 @@ struct CloudPortDiscoveryStateTests {
         // A diagnostic or UNCONN row beside real rows does not void the inventory.
         #expect(CloudPortScanResult(socketListing: "inventory unavailable\nLISTEN 0 128 127.0.0.1:3000 0.0.0.0:*")?.ports == [3000])
         #expect(CloudPortScanResult(socketListing: "UNCONN 0 0 127.0.0.53%lo:53 0.0.0.0:*")?.state == .empty(.noListeningService))
-        #expect(CmuxTuiSurfaceProvider.portScan(from: VMExecResult(exitCode: 127, stdout: "", stderr: "missing")) == nil)
+        #expect(WmuxTuiSurfaceProvider.portScan(from: VMExecResult(exitCode: 127, stdout: "", stderr: "missing")) == nil)
     }
 
     @Test("System loopback aliases such as systemd-resolved's stub are not other-interface services")
@@ -191,8 +191,8 @@ struct CloudPortDiscoveryStateTests {
     @Test("Unavailable scans never retain resources belonging to another machine")
     func foreignPortsAreRejected() {
         let owner = SurfaceMachineID.cloud("owner")
-        let foreign = CmuxTuiSnapshotParser.portBrowser(machine: .cloud("other"), port: 3000)
-        #expect(CmuxTuiSurfaceProvider.portResources(machine: owner, scannedPorts: nil,
+        let foreign = WmuxTuiSnapshotParser.portBrowser(machine: .cloud("other"), port: 3000)
+        #expect(WmuxTuiSurfaceProvider.portResources(machine: owner, scannedPorts: nil,
             previousResources: [foreign], privateAddress: "10.0.0.7").isEmpty)
     }
 
@@ -202,7 +202,7 @@ struct CloudPortDiscoveryStateTests {
         let states: [CloudPortDiscoveryState] = [.notRequested, .loading, .available, .loopbackOnly,
             .empty(.noListeningService), .unavailable(.privateAddress), .unavailable(.transport), .stale, .unsupported]
         for state in states {
-            let info = CmuxTuiSurfaceProvider.info(
+            let info = WmuxTuiSurfaceProvider.info(
                 from: VMSummary(id: "port-owner", provider: "freestyle", status: "running", image: "base", createdAt: 0, base: nil),
                 linkState: .connected, linkError: nil, stats: nil, portDiscoveryState: state)
             let payload = TerminalController.surfaceMachinePayload(info)

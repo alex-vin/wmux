@@ -1,5 +1,5 @@
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 extension RestorableAgentSessionIndex {
     static func forkParentFallbackWrapperLaunch(
@@ -52,7 +52,7 @@ extension RestorableAgentSessionIndex {
             return nil
         }
         // codex-teams keeps the cmux wrapper process alive; its exec-time env does
-        // not carry CMUX_AGENT_LAUNCH_KIND, so cached validation has no teams/base
+        // not carry WMUX_AGENT_LAUNCH_KIND, so cached validation has no teams/base
         // kind mismatch to reject.
         let executable = wrapperExecutable(arguments: arguments)
         return (
@@ -69,16 +69,16 @@ extension RestorableAgentSessionIndex {
         arguments: [String],
         environment: [String: String]
     ) -> Bool {
-        let bundledCLIPath = normalizedWrapperValue(environment["CMUX_BUNDLED_CLI_PATH"])
+        let bundledCLIPath = normalizedWrapperValue(environment["WMUX_BUNDLED_CLI_PATH"])
         let candidates = [arguments.first, processPath, processName].compactMap(normalizedWrapperValue)
         return candidates.contains { candidate in
-            executableBasename(candidate).compare("cmux", options: [.caseInsensitive, .literal]) == .orderedSame
+            executableBasename(candidate).compare("wmux", options: [.caseInsensitive, .literal]) == .orderedSame
                 || bundledCLIPath.map { ($0 as NSString).standardizingPath == (candidate as NSString).standardizingPath } == true
         }
     }
 
     private static func wrapperExecutable(arguments: [String]) -> String {
-        normalizedWrapperValue(arguments.first) ?? "cmux"
+        normalizedWrapperValue(arguments.first) ?? "wmux"
     }
 
     private static func normalizedWrapperUUID(_ value: String) -> String? {

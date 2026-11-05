@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -128,9 +128,9 @@ final class CloudWorkspaceCreationSidebarProvider: SurfaceProvider {
             "browsers": [], "agents": []
         ]
         if !hasCursor { document.removeValue(forKey: "cursor") }
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
         let resources = revision < 10 && generation == "creation"
-            ? createdWorkspaces.map { terminal(in: $0) } : CmuxTuiSnapshotParser.resources(from: state)
+            ? createdWorkspaces.map { terminal(in: $0) } : WmuxTuiSnapshotParser.resources(from: state)
         catalog.replaceCloudState(state, resources: resources, info: info)
         catalog.reconcileCloudRemoteState(machine: machine, state: state)
     }

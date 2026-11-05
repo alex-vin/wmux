@@ -1,12 +1,11 @@
 import Testing
 import AppKit
-import CmuxSidebar
-import CmuxNotifications
-import CmuxUpdater
+import WmuxSidebar
+import WmuxNotifications
 import SwiftUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -101,7 +100,7 @@ final class SidebarLazyLayoutScaleTests {
 
         // Hermetic defaults: VerticalTabsSidebar picks between the workspace
         // list and extension/built-in sidebars via
-        // @AppStorage(CmuxExtensionSidebarSelection.defaultsKey). A persisted
+        // @AppStorage(WmuxExtensionSidebarSelection.defaultsKey). A persisted
         // non-default provider on the host would mount the wrong sidebar and
         // the probes would never fire. Same pattern as
         // WorkspaceContentViewVisibilityTests.
@@ -109,16 +108,16 @@ final class SidebarLazyLayoutScaleTests {
         let defaults = try #require(UserDefaults(suiteName: defaultsSuiteName))
         defaults.removePersistentDomain(forName: defaultsSuiteName)
         defaults.set(
-            CmuxExtensionSidebarSelection.defaultProviderId,
-            forKey: CmuxExtensionSidebarSelection.defaultsKey
+            WmuxExtensionSidebarSelection.defaultProviderId,
+            forKey: WmuxExtensionSidebarSelection.defaultsKey
         )
         // This suite measures SwiftUI lazy row bodies and pointer ownership.
         // Keep that implementation explicit now that AppKit is the default.
-        let featureFlags = CmuxFeatureFlags(
+        let featureFlags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in nil }
         )
-        featureFlags.setOverride(false, for: CmuxFeatureFlags.appKitSidebarListFlag)
+        featureFlags.setOverride(false, for: WmuxFeatureFlags.appKitSidebarListFlag)
 
         let tabManager = TabManager()
         while tabManager.tabs.count < workspaceCount {
@@ -179,7 +178,7 @@ final class SidebarLazyLayoutScaleTests {
         )
         .frame(width: 280)
         .environmentObject(tabManager)
-        .environmentObject(CmuxConfigStore())
+        .environmentObject(WmuxConfigStore())
         .environmentObject(TerminalNotificationStore.shared)
         .environmentObject(SidebarState())
         .environmentObject(SidebarSelectionState())

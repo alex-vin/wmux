@@ -1,5 +1,5 @@
 import Foundation
-import CmuxBrowser
+import WmuxBrowser
 
 extension TerminalController {
     func v2BrowserImportDialog(params: [String: Any]) -> V2CallResult {

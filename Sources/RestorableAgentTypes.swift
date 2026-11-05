@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 enum RestorableAgentKind: Codable, Hashable, Sendable {
@@ -69,12 +69,12 @@ enum RestorableAgentKind: Codable, Hashable, Sendable {
         case "muse": self = .muse
         case "ollama": self = .ollama
         default:
-            guard CmuxVaultAgentRegistration.isValidID(value) else { return nil }
+            guard WmuxVaultAgentRegistration.isValidID(value) else { return nil }
             self = .custom(value)
         }
     }
 
-    init?(persistedRawValue rawValue: String, registration: CmuxVaultAgentRegistration?) {
+    init?(persistedRawValue rawValue: String, registration: WmuxVaultAgentRegistration?) {
         guard let kind = RestorableAgentKind(rawValue: rawValue) else { return nil }
         guard let registration,
               registration.id == kind.rawValue,
@@ -202,7 +202,7 @@ enum RestorableAgentKind: Codable, Hashable, Sendable {
         environment: [String: String] = ProcessInfo.processInfo.environment
     ) -> URL {
         let directory: URL
-        if let override = environment["CMUX_AGENT_HOOK_STATE_DIR"]?
+        if let override = environment["WMUX_AGENT_HOOK_STATE_DIR"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !override.isEmpty {
             directory = URL(fileURLWithPath: NSString(string: override).expandingTildeInPath, isDirectory: true)

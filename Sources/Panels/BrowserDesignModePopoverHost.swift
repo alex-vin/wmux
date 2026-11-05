@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import SwiftUI
 
 /// Hosts the Design Mode composer overlay above the portal-hosted WKWebView.

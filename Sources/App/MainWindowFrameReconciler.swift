@@ -1,5 +1,5 @@
 import AppKit
-import CmuxWindowing
+import WmuxWindowing
 
 /// Repairs main-window geometry after AppKit or the display system changes it.
 /// Display changes, activation, and restoration share one policy: recover
@@ -52,7 +52,7 @@ final class MainWindowFrameReconciler {
     ) -> Bool {
         guard !displays.isEmpty else { return false }
 
-        let mainWindows = windows.compactMap { $0 as? CmuxMainWindow }
+        let mainWindows = windows.compactMap { $0 as? WmuxMainWindow }
         guard !mainWindows.isEmpty else { return true }
 
         // A ramping display set may expose one usable screen before the others

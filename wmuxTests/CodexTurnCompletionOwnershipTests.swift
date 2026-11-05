@@ -2,8 +2,8 @@ import Dispatch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -37,10 +37,10 @@ struct CodexTurnCompletionOwnershipTests {
         var environment = harness.environment
         environment["HOME"] = home.path
         environment["PWD"] = project.path
-        environment["CMUX_AGENT_LAUNCH_CWD"] = project.path
-        environment.removeValue(forKey: "CMUX_AGENT_HOOK_STATE_DIR")
-        environment.removeValue(forKey: "CMUX_CODEX_TURN_LEDGER_PATH")
-        environment["CMUX_CLAUDE_HOOK_STATE_PATH"] = home
+        environment["WMUX_AGENT_LAUNCH_CWD"] = project.path
+        environment.removeValue(forKey: "WMUX_AGENT_HOOK_STATE_DIR")
+        environment.removeValue(forKey: "WMUX_CODEX_TURN_LEDGER_PATH")
+        environment["WMUX_CLAUDE_HOOK_STATE_PATH"] = home
             .appendingPathComponent(".cmuxterm/codex-hook-sessions.json", isDirectory: false)
             .path
 
@@ -84,8 +84,8 @@ struct CodexTurnCompletionOwnershipTests {
         let beforeNestedStop = harness.context.state.snapshot().count
         var nestedEnvironment = harness.environment
         // This is the exact failure mode from #7520: the child process keeps
-        // the outer CMUX_CODEX_PID, while the hook's observed process is new.
-        nestedEnvironment["CMUX_CODEX_HOOK_PID"] = "4243"
+        // the outer WMUX_CODEX_PID, while the hook's observed process is new.
+        nestedEnvironment["WMUX_CODEX_HOOK_PID"] = "4243"
         let nestedResult = runProcess(
             harness,
             subcommand: "stop",
@@ -276,19 +276,19 @@ struct CodexTurnCompletionOwnershipTests {
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": context.root.path,
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": context.workspaceId,
-            "CMUX_SURFACE_ID": context.surfaceId,
-            "CMUX_CLI_TTY_NAME": "ttys-\(name)",
-            "CMUX_CODEX_PID": "4242",
-            "CMUX_CODEX_HOOK_PID": "4242",
-            "CMUX_CODEX_INVOCATION_ID": token,
-            "CMUX_AGENT_HOOK_STATE_DIR": context.root.path,
-            "CMUX_CODEX_TURN_LEDGER_PATH": context.root.appendingPathComponent("codex-turn-ledger.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "codex",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/codex",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": context.workspaceId,
+            "WMUX_SURFACE_ID": context.surfaceId,
+            "WMUX_CLI_TTY_NAME": "ttys-\(name)",
+            "WMUX_CODEX_PID": "4242",
+            "WMUX_CODEX_HOOK_PID": "4242",
+            "WMUX_CODEX_INVOCATION_ID": token,
+            "WMUX_AGENT_HOOK_STATE_DIR": context.root.path,
+            "WMUX_CODEX_TURN_LEDGER_PATH": context.root.appendingPathComponent("codex-turn-ledger.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "codex",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/codex",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
         ]
         return Harness(
             support: support,

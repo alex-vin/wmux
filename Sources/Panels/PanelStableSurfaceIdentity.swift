@@ -1,4 +1,4 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 
 /// Boxed restart-stable surface identity for durable deep links.

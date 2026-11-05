@@ -1,10 +1,10 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
-import CmuxCore
+import WmuxCore
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -73,7 +73,7 @@ struct CloudWorkspaceDeletionLedgerTests {
     }
 
     private func graph(_ ids: [String], revision: Int, generation: String = "delete") throws -> CloudVMState {
-        try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": generation, "revision": String(revision)],
             "workspaces": ids.map { ["id": $0, "name": $0] },
             "screens": [], "panes": [], "tabs": [], "terminals": [], "browsers": [], "agents": []

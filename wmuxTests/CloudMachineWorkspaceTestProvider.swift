@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -25,7 +25,7 @@ final class CloudMachineWorkspaceTestProvider: SurfaceProvider {
     }
 
     func install(in catalog: SurfaceCatalog, generation: String = "created") throws {
-        let graph = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        let graph = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": generation, "revision": "1"],
             "workspaces": [["id": "ws-first", "name": "workspace-1", "index": 0, "focused": true]],
             "screens": [["id": "screen", "workspace_id": "ws-first"]],
@@ -34,7 +34,7 @@ final class CloudMachineWorkspaceTestProvider: SurfaceProvider {
             "terminals": [["id": "term-first", "title": "terminal", "lifecycle": "running", "cwd": "/home/cmux"]],
             "browsers": [], "agents": []
         ], machine: machine))
-        catalog.replaceCloudState(graph, resources: CmuxTuiSnapshotParser.resources(from: graph), info: info)
+        catalog.replaceCloudState(graph, resources: WmuxTuiSnapshotParser.resources(from: graph), info: info)
         catalog.reconcileCloudRemoteState(machine: machine, state: graph)
     }
 

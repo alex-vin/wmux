@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxTestSupport
+import WmuxTestSupport
 import SwiftUI
 
 enum WindowMouseMovedEventsCoordinator {
@@ -1061,7 +1061,7 @@ func recordMinimalModeSidebarChromeHoverForUITest(
     eventType: NSEvent.EventType
 ) {
     let env = ProcessInfo.processInfo.environment
-    guard env["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" else { return }
+    guard env["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" else { return }
     let defaults = UserDefaults.standard
     let isMinimal = WorkspacePresentationModeSettings.isMinimal(defaults: defaults)
     let isFullScreen = window.styleMask.contains(.fullScreen)
@@ -1083,7 +1083,7 @@ func recordMinimalModeSidebarChromeHoverForUITest(
             locationInWindow,
             in: window
         )
-    _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
+    _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
         let count = (payload["minimalSidebarHoverEventCount"] as? String).flatMap(Int.init) ?? 0
         payload["minimalSidebarHoverEventCount"] = String(count + 1)
         payload["minimalSidebarHoverEventType"] = String(describing: eventType)
@@ -1316,7 +1316,7 @@ func windowDragHandleShouldCaptureHit(
 /// This lets us keep `window.isMovableByWindowBackground = false` so drags in the app content
 /// (e.g. sidebar tab reordering) don't move the whole window.
 struct WindowDragHandleView: NSViewRepresentable {
-    static let viewIdentifier = NSUserInterfaceItemIdentifier("cmux.titlebarDragHandle")
+    static let viewIdentifier = NSUserInterfaceItemIdentifier("wmux.titlebarDragHandle")
 
     var doubleClickBehavior: TitlebarDoubleClickBehavior = .standardAction
 
@@ -1572,9 +1572,9 @@ func minimalModeTitlebarDoubleClickBandHeight(for window: NSWindow) -> CGFloat {
 }
 
 func isMainWorkspaceWindow(_ window: NSWindow) -> Bool {
-    if window is CmuxMainWindow { return true }
+    if window is WmuxMainWindow { return true }
     guard let raw = window.identifier?.rawValue else { return false }
-    return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+    return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
 }
 
 func shouldHandleMinimalModeWindowTitlebarDoubleClick(
@@ -1752,8 +1752,8 @@ struct MinimalModeTitlebarEventSurfaceView: NSViewRepresentable {
             }
 
             #if DEBUG
-            if ProcessInfo.processInfo.environment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" {
-                _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
+            if ProcessInfo.processInfo.environment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" {
+                _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
                     let count = (payload["minimalTitlebarEventSurfaceMouseDownCount"] as? String).flatMap(Int.init) ?? 0
                     payload["minimalTitlebarEventSurfaceMouseDownCount"] = String(count + 1)
                     payload["minimalTitlebarEventSurfaceLastPoint"] = windowDragHandleFormatPoint(locationInWindow)

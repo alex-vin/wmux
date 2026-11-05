@@ -1,10 +1,10 @@
-import CmuxCore
-import CmuxFoundation
+import WmuxCore
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -86,7 +86,7 @@ struct SessionRemoteWorkspaceMoshRestoreTests {
         let command = try #require(configuration.terminalStartupCommand)
 
         #expect(configuration.terminalTransport == .mosh)
-        #expect(command.contains("cmux_mosh_remote_ip_mode"), "\(command)")
+        #expect(command.contains("wmux_mosh_remote_ip_mode"), "\(command)")
         #expect(command.contains("dev@example.com"), "\(command)")
         #expect(command.contains("2222"), "\(command)")
         #expect(command.contains("ProxyJump=bastion"), "\(command)")
@@ -200,7 +200,7 @@ struct SessionRemoteWorkspaceMoshRestoreTests {
         #expect(configuration.relayToken?.isEmpty == false)
         #expect(configuration.localSocketPath == "/tmp/cmux.sock")
         #expect(configuration.terminalStartupCommand?.contains("52000.bootstrap.sh") == true)
-        #expect(configuration.terminalStartupCommand?.contains("cmux_remote_bootstrap_b64") == true)
+        #expect(configuration.terminalStartupCommand?.contains("wmux_remote_bootstrap_b64") == true)
         let startupCommand = try #require(configuration.terminalStartupCommand)
         #expect(
             startupCommand.contains("rpc workspace.remote.terminal_session_launching"),

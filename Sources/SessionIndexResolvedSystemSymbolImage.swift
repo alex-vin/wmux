@@ -1,6 +1,6 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import SwiftUI
 
 /// Renders a magnified system symbol through the AppKit-backed icon renderer.
@@ -12,11 +12,11 @@ struct SessionIndexResolvedSystemSymbolImage: View {
     let size: CGFloat
     let weight: NSFont.Weight
     let tintColor: NSColor
-    let fallbackSource: CmuxResolvedIconSource?
+    let fallbackSource: WmuxResolvedIconSource?
 
     var body: some View {
         let rasterSize = GlobalFontMagnification.scaledSize(pointSize, percent: globalFontPercent)
-        CmuxResolvedIconImage(request: CmuxResolvedIconRequest(
+        WmuxResolvedIconImage(request: WmuxResolvedIconRequest(
             source: .systemSymbol(name: systemName, accessibilityDescription: nil),
             size: NSSize(width: rasterSize, height: rasterSize),
             tintColor: tintColor,
@@ -24,7 +24,7 @@ struct SessionIndexResolvedSystemSymbolImage: View {
             fallbackSource: fallbackSource
         ))
         // Keep the magnified raster's own layout size, then center it in the
-        // design-size slot. This mirrors `CmuxSystemSymbolImage(magnified:)`
+        // design-size slot. This mirrors `WmuxSystemSymbolImage(magnified:)`
         // and prevents the AppKit image view from scaling the larger bitmap
         // back down to the unscaled slot.
         .frame(width: rasterSize, height: rasterSize)

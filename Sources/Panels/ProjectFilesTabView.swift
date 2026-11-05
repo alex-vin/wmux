@@ -1,6 +1,6 @@
-import CmuxFoundation
+import WmuxFoundation
 import AppKit
-import CMUXProjectModel
+import WMUXProjectModel
 import SwiftUI
 
 /// Files tab inside ``ProjectPanelView``.

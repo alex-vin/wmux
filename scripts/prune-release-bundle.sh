@@ -26,10 +26,6 @@ fi
 echo "=== Pruning Bloat Assets from $APP_PATH ==="
 
 # 1. Remove Computer Use.app helper (-13MB)
-if [ -d "$APP_PATH/Contents/Library/cmux Computer Use.app" ]; then
-  echo "Removing Computer Use helper..."
-  rm -rf "$APP_PATH/Contents/Library/cmux Computer Use.app"
-fi
 find "$APP_PATH/Contents/Library" -maxdepth 1 -name "*Computer Use*" -exec rm -rf {} + 2>/dev/null || true
 
 # 2. Prune redundant localization lproj directories (-10.1MB)
@@ -81,12 +77,8 @@ if [ -d "$HL_DIR" ]; then
     -delete 2>/dev/null || true
 fi
 
-# 4. Direct wmux CLI branding (remove cmux binary completely)
-if [ -f "$APP_PATH/Contents/Resources/bin/cmux" ]; then
-  echo "Renaming CLI binary from cmux directly to wmux..."
-  mv -f "$APP_PATH/Contents/Resources/bin/cmux" "$APP_PATH/Contents/Resources/bin/wmux"
-fi
-rm -f "$APP_PATH/Contents/Resources/bin/cmux"
+# 4. Direct wmux CLI branding
+rm -f "$APP_PATH/Contents/Resources/bin/cmux" 2>/dev/null || true
 
 # 5. Eliminate external private frameworks (0 bytes guarantee)
 rm -rf "$APP_PATH/Contents/Frameworks" 2>/dev/null || true

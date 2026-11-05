@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxFoundation
+import WmuxBrowser
+import WmuxFoundation
 import WebKit
 
 @MainActor
@@ -175,7 +175,7 @@ final class MarkdownWebRenderingCoordinator {
 }
 
 @MainActor
-final class MarkdownWebView: CmuxUndoableWebView {
+final class MarkdownWebView: WmuxUndoableWebView {
     var onPointerDown: (() -> Void)?
     /// Invoked after this view is attached to a window. Keep this separate
     /// from pointer focus so a panel can complete a focus request made before

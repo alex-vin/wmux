@@ -1,5 +1,5 @@
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxTerminal
+import WmuxTerminalCore
 import Foundation
 
 extension WorkspaceTerminalFontSizeSnapshotProjection {

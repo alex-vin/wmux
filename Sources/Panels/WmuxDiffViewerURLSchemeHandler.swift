@@ -1,4 +1,4 @@
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 import WebKit
 
@@ -6,14 +6,14 @@ import WebKit
 /// main actor. Background workers may produce response values, but they never
 /// retain or invoke a ``WKURLSchemeTask``.
 @MainActor
-final class CmuxDiffViewerURLSchemeHandler: NSObject, WKURLSchemeHandler {
-    nonisolated static let scheme = "cmux-diff-viewer"
-    static let shared = CmuxDiffViewerURLSchemeHandler()
+final class WmuxDiffViewerURLSchemeHandler: NSObject, WKURLSchemeHandler {
+    nonisolated static let scheme = "wmux-diff-viewer"
+    static let shared = WmuxDiffViewerURLSchemeHandler()
     // Keep this aligned with Native/DiffSidecar's manifest validation limit.
-    nonisolated static let maxRegisteredFiles = CmuxDiffViewerSessionPreparer.defaultMaximumRegisteredFiles
+    nonisolated static let maxRegisteredFiles = WmuxDiffViewerSessionPreparer.defaultMaximumRegisteredFiles
 
-    typealias RegisteredFile = CmuxDiffViewerRegisteredFile
-    private typealias Session = CmuxDiffViewerPreparedSession
+    typealias RegisteredFile = WmuxDiffViewerRegisteredFile
+    private typealias Session = WmuxDiffViewerPreparedSession
     private typealias ActiveSchemeTask = (
         generation: UUID,
         task: WKURLSchemeTask,
@@ -29,20 +29,20 @@ final class CmuxDiffViewerURLSchemeHandler: NSObject, WKURLSchemeHandler {
     private var manifestLoads: [String: ManifestLoad] = [:]
     private let assetReader: DiffViewerAssetReader
     private let pickerCommandRunner: DiffViewerPickerCommandRunner
-    private let sessionPreparer: CmuxDiffViewerSessionPreparer
+    private let sessionPreparer: WmuxDiffViewerSessionPreparer
     private let maxSessionAge: TimeInterval = 24 * 60 * 60
 
     override init() {
         assetReader = DiffViewerAssetReader()
         pickerCommandRunner = DiffViewerPickerCommandRunner()
-        sessionPreparer = CmuxDiffViewerSessionPreparer()
+        sessionPreparer = WmuxDiffViewerSessionPreparer()
         super.init()
     }
 
     init(
         assetReader: DiffViewerAssetReader = DiffViewerAssetReader(),
         pickerCommandRunner: DiffViewerPickerCommandRunner,
-        sessionPreparer: CmuxDiffViewerSessionPreparer = CmuxDiffViewerSessionPreparer()
+        sessionPreparer: WmuxDiffViewerSessionPreparer = WmuxDiffViewerSessionPreparer()
     ) {
         self.assetReader = assetReader
         self.pickerCommandRunner = pickerCommandRunner
@@ -60,7 +60,7 @@ final class CmuxDiffViewerURLSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     /// Installs a session that was already validated on a socket worker.
-    func install(_ preparedSession: CmuxDiffViewerPreparedSession, now: Date = Date()) {
+    func install(_ preparedSession: WmuxDiffViewerPreparedSession, now: Date = Date()) {
         pruneExpiredSessions(now: now)
         sessions[preparedSession.token] = preparedSession
     }
@@ -470,11 +470,11 @@ final class CmuxDiffViewerURLSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 
     nonisolated static func isValidToken(_ token: String) -> Bool {
-        CmuxDiffViewerSessionPreparer.isValidToken(token)
+        WmuxDiffViewerSessionPreparer.isValidToken(token)
     }
 
     nonisolated static func isValidRequestPath(_ path: String) -> Bool {
-        CmuxDiffViewerSessionPreparer.isValidRequestPath(path)
+        WmuxDiffViewerSessionPreparer.isValidRequestPath(path)
     }
 
     static func requestPath(for url: URL) -> String? {

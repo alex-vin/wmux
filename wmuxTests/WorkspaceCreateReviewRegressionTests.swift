@@ -1,10 +1,10 @@
-import CmuxSettings
-import CmuxWorkspaces
+import WmuxSettings
+import WmuxWorkspaces
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -13,7 +13,7 @@ import Testing
 @Suite(.serialized) struct WorkspaceCreateReviewRegressionTests {
     @Test("worktree creation result preserves filesystem identity")
     func worktreeCreationResultPreservesFilesystemIdentity() {
-        let result = CmuxExtensionWorktreeCreationResult(
+        let result = WmuxExtensionWorktreeCreationResult(
             projectRootPath: "/tmp/project",
             worktreePath: "/tmp/project/.cmux/worktrees/created",
             branchName: "cmux-sidebar-created",

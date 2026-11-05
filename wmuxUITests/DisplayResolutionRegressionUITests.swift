@@ -218,7 +218,7 @@ final class DisplayResolutionRegressionUITests: XCTestCase {
     }
 
     private func loadPrebuiltHelperBinaryPath(_ env: [String: String]) -> String? {
-        guard let helperBinaryPath = env["CMUX_UI_TEST_DISPLAY_HELPER_BINARY_PATH"],
+        guard let helperBinaryPath = env["WMUX_UI_TEST_DISPLAY_HELPER_BINARY_PATH"],
               !helperBinaryPath.isEmpty else {
             return nil
         }
@@ -226,24 +226,24 @@ final class DisplayResolutionRegressionUITests: XCTestCase {
     }
 
     private func loadExternalHarnessFromEnvironment(_ env: [String: String]) -> ExternalDisplayHarness? {
-        guard let readyPath = env["CMUX_UI_TEST_DISPLAY_READY_PATH"], !readyPath.isEmpty,
-              let displayIDPath = env["CMUX_UI_TEST_DISPLAY_ID_PATH"], !displayIDPath.isEmpty,
-              let donePath = env["CMUX_UI_TEST_DISPLAY_DONE_PATH"], !donePath.isEmpty else {
+        guard let readyPath = env["WMUX_UI_TEST_DISPLAY_READY_PATH"], !readyPath.isEmpty,
+              let displayIDPath = env["WMUX_UI_TEST_DISPLAY_ID_PATH"], !displayIDPath.isEmpty,
+              let donePath = env["WMUX_UI_TEST_DISPLAY_DONE_PATH"], !donePath.isEmpty else {
             return nil
         }
 
         return ExternalDisplayHarness(
             readyPath: readyPath,
             displayIDPath: displayIDPath,
-            startPath: env["CMUX_UI_TEST_DISPLAY_START_PATH"],
+            startPath: env["WMUX_UI_TEST_DISPLAY_START_PATH"],
             donePath: donePath,
-            logPath: env["CMUX_UI_TEST_DISPLAY_LOG_PATH"],
+            logPath: env["WMUX_UI_TEST_DISPLAY_LOG_PATH"],
             helperBinaryPath: nil
         )
     }
 
     private func loadExternalHarnessFromManifest(_ env: [String: String]) -> ExternalDisplayHarness? {
-        let manifestPath = env["CMUX_UI_TEST_DISPLAY_HARNESS_MANIFEST_PATH"] ?? defaultDisplayHarnessManifestPath
+        let manifestPath = env["WMUX_UI_TEST_DISPLAY_HARNESS_MANIFEST_PATH"] ?? defaultDisplayHarnessManifestPath
         let manifestURL = URL(fileURLWithPath: manifestPath)
         guard let data = try? Data(contentsOf: manifestURL) else {
             return nil
@@ -369,11 +369,11 @@ final class DisplayResolutionRegressionUITests: XCTestCase {
 
     private func launchEnvironment(targetDisplayID: String) -> [String: String] {
         [
-            "CMUX_UI_TEST_MODE": "1",
-            "CMUX_UI_TEST_DIAGNOSTICS_PATH": diagnosticsPath,
-            "CMUX_UI_TEST_DISPLAY_RENDER_STATS": "1",
-            "CMUX_UI_TEST_TARGET_DISPLAY_ID": targetDisplayID,
-            "CMUX_TAG": launchTag,
+            "WMUX_UI_TEST_MODE": "1",
+            "WMUX_UI_TEST_DIAGNOSTICS_PATH": diagnosticsPath,
+            "WMUX_UI_TEST_DISPLAY_RENDER_STATS": "1",
+            "WMUX_UI_TEST_TARGET_DISPLAY_ID": targetDisplayID,
+            "WMUX_TAG": launchTag,
         ]
     }
 

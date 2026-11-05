@@ -1,10 +1,10 @@
 import AppKit
-import CmuxSettingsUI
+import WmuxSettingsUI
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -89,7 +89,7 @@ extension SettingsWindowSharedStateSuites {
             // AppKit owns the Settings window's geometry and chrome. Keeping
             // SwiftUI out of NSHostingController's scene/window bridge avoids
             // the macOS 27 construction-time layout recursion that overflowed
-            // the main-thread stack (CMUXTERM-MACOS-27J7).
+            // the main-thread stack (WMUXTERM-MACOS-27J7).
             #expect(window.contentViewController == nil)
             #expect(window.contentView is NSHostingView<SettingsWindowHostRoot>)
 

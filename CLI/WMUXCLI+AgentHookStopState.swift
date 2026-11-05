@@ -1,5 +1,5 @@
 import Foundation
-import CmuxAgentJournal
+import WmuxAgentJournal
 
 extension WMUXCLI {
     /// Preserves a same-turn needs-input phase when a completion Stop follows

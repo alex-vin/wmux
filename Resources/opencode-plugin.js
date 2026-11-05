@@ -25,7 +25,7 @@ const isNonTerminalSessionError = (event) => {
 
 const createCMUXFeed = async (ctx, options = {}) => {
   const environment = { ...process.env, ...options.environment };
-  const socketPath = environment.CMUX_SOCKET_PATH || DEFAULT_SOCKET;
+  const socketPath = environment.WMUX_SOCKET_PATH || DEFAULT_SOCKET;
   const ownsSession = options.ownsSession || (() => true);
   const locationForSession = options.locationForSession || (() => ctx?.location);
   let disposed = false;
@@ -705,12 +705,12 @@ const createCMUXFeed = async (ctx, options = {}) => {
     const state = sessionState(sessionId);
     const context = extra?.context || contextForSession(sessionId);
     const workspaceId =
-      typeof environment.CMUX_WORKSPACE_ID === "string" && environment.CMUX_WORKSPACE_ID.trim()
-        ? environment.CMUX_WORKSPACE_ID.trim()
+      typeof environment.WMUX_WORKSPACE_ID === "string" && environment.WMUX_WORKSPACE_ID.trim()
+        ? environment.WMUX_WORKSPACE_ID.trim()
         : null;
     const surfaceId =
-      typeof environment.CMUX_SURFACE_ID === "string" && environment.CMUX_SURFACE_ID.trim()
-        ? environment.CMUX_SURFACE_ID.trim()
+      typeof environment.WMUX_SURFACE_ID === "string" && environment.WMUX_SURFACE_ID.trim()
+        ? environment.WMUX_SURFACE_ID.trim()
         : null;
     const event = {
       session_id: `opencode-${sessionId}`,
@@ -1103,9 +1103,9 @@ const createCMUXFeed = async (ctx, options = {}) => {
   };
 };
 
-export const CMUXFeed = createCMUXFeed;
+export const WMUXFeed = createCMUXFeed;
 
-const CMUX_FEED_SERVER_SCOPES_KEY = Symbol.for("cmux.feed.server.scopes");
+const WMUX_FEED_SERVER_SCOPES_KEY = Symbol.for("cmux.feed.server.scopes");
 
 const isTUIProcessServerContext = (ctx) =>
   Boolean(ctx && typeof ctx === "object" && ctx.client && ctx.serverUrl && ctx.directory);
@@ -1117,7 +1117,7 @@ export default {
     // cmux-feed.js and plugins/cmux/index.js both load this source, and every
     // loader in one plugin scope receives the same ctx. OpenCode keeps one
     // scope per directory, and disposes a scope's hooks when it tears it down.
-    const scopes = globalThis[CMUX_FEED_SERVER_SCOPES_KEY] ||= new WeakSet();
+    const scopes = globalThis[WMUX_FEED_SERVER_SCOPES_KEY] ||= new WeakSet();
     if (scopes.has(ctx)) return {};
     scopes.add(ctx);
     return createCMUXFeed(ctx);

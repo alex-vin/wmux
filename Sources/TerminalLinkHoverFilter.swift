@@ -1,6 +1,6 @@
 import AppKit
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxTerminal
+import WmuxTerminalCore
 import Foundation
 import os
 

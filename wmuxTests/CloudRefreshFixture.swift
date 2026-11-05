@@ -1,12 +1,12 @@
-import CmuxCloud
-import CMUXAuthCore
-import CmuxAuthRuntime
+import WmuxCloud
+import WMUXAuthCore
+import WmuxAuthRuntime
 import Foundation
 import Testing
 import os
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -29,19 +29,19 @@ struct CloudRefreshFixture {
         let defaults = try #require(UserDefaults(suiteName: "CloudRefreshFixture.\(UUID())"))
         let auth = AuthCoordinator(
             client: authClient ?? CloudRefreshAuthClient(),
-            sessionCache: CMUXAuthSessionCache(keyValueStore: defaults, key: "session"),
-            userCache: CMUXAuthIdentityStore(keyValueStore: defaults, key: "user"),
-            teamSelection: CMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
+            sessionCache: WMUXAuthSessionCache(keyValueStore: defaults, key: "session"),
+            userCache: WMUXAuthIdentityStore(keyValueStore: defaults, key: "user"),
+            teamSelection: WMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
             anchor: AuthPresentationContextProvider(),
             config: AuthConfig(
-                stack: CMUXAuthConfig(projectId: "fixture", publishableClientKey: "fixture"),
+                stack: WMUXAuthConfig(projectId: "fixture", publishableClientKey: "fixture"),
                 magicLinkCallbackURL: "http://127.0.0.1:1/callback", apiBaseURL: "http://127.0.0.1:1"
             ),
             launch: AuthLaunchOptions(
                 clearAuthRequested: false, mockDataEnabled: false,
                 environment: [
-                    "CMUX_UITEST_AUTH_FIXTURE": "1", "CMUX_UITEST_AUTH_USER_ID": "fixture",
-                ].merging(fixtureTeams ? ["CMUX_UITEST_AUTH_FIXTURE_TEAMS": "1"] : [:]) { current, _ in current },
+                    "WMUX_UITEST_AUTH_FIXTURE": "1", "WMUX_UITEST_AUTH_USER_ID": "fixture",
+                ].merging(fixtureTeams ? ["WMUX_UITEST_AUTH_FIXTURE_TEAMS": "1"] : [:]) { current, _ in current },
                 includesDevAuth: true
             )
         )

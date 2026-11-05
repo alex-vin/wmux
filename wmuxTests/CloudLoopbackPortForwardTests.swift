@@ -1,10 +1,10 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 import Network
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -437,12 +437,12 @@ struct CloudLoopbackPortForwardTests {
             summary.addressIPv4 = address
             return summary
         }
-        let addressed = CmuxTuiSurfaceProvider(summary: summary(address: "10.0.0.7"), links: links, catalog: catalog, portForwards: forwarder)
+        let addressed = WmuxTuiSurfaceProvider(summary: summary(address: "10.0.0.7"), links: links, catalog: catalog, portForwards: forwarder)
         #expect(try await addressed.localPortURL(port: 3000) == nil)
         #expect(try await addressed.portLinkURL(port: 3000) == "http://10.0.0.7:3000")
         #expect(await forwarder.count == 0, "Opening or copying a private link must not create a forward")
 
-        let unaddressed = CmuxTuiSurfaceProvider(summary: summary(address: nil), links: links, catalog: catalog, portForwards: forwarder)
+        let unaddressed = WmuxTuiSurfaceProvider(summary: summary(address: nil), links: links, catalog: catalog, portForwards: forwarder)
         #expect(try await unaddressed.localPortURL(port: 3000) == nil)
         await #expect(throws: (any Error).self) { _ = try await unaddressed.portLinkURL(port: 3000) }
         await forwarder.closeAll()
@@ -455,7 +455,7 @@ struct CloudLoopbackPortForwardTests {
         let links = CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil })
         var summary = VMSummary(id: "vm-unsupported", provider: "unknown", status: "running", image: "cmux-devbox", createdAt: 0, base: nil)
         summary.capabilities.ports = false
-        let provider = CmuxTuiSurfaceProvider(summary: summary, links: links, catalog: catalog)
+        let provider = WmuxTuiSurfaceProvider(summary: summary, links: links, catalog: catalog)
         #expect(!provider.capabilities.ports)
         #expect(try await provider.localPortURL(port: 3000) == nil)
         await #expect(throws: (any Error).self, "no route is an error, never an empty link") {

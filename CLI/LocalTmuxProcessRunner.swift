@@ -38,13 +38,13 @@ struct LocalTmuxProcessRunner {
         self.timedOutMessage = timedOutMessage
         var sanitized = environment
         sanitized.removeValue(forKey: "TMUX")
-        sanitized.removeValue(forKey: "CMUX_SOCKET_PASSWORD")
-        sanitized.removeValue(forKey: "CMUX_SOCKET")
-        sanitized.removeValue(forKey: "CMUX_SOCKET_PATH")
-        sanitized.removeValue(forKey: "CMUX_SOCKET_PASSWORD_FILE")
+        sanitized.removeValue(forKey: "WMUX_SOCKET_PASSWORD")
+        sanitized.removeValue(forKey: "WMUX_SOCKET")
+        sanitized.removeValue(forKey: "WMUX_SOCKET_PATH")
+        sanitized.removeValue(forKey: "WMUX_SOCKET_PASSWORD_FILE")
         // A detached owner must not retain a stale workspace/surface identity
         // or a socket credential from the GUI that launched it.
-        sanitized = sanitized.filter { !$0.key.hasPrefix("CMUX_") && !$0.key.hasPrefix("CMUXD_") }
+        sanitized = sanitized.filter { !$0.key.hasPrefix("WMUX_") && !$0.key.hasPrefix("WMUXD_") }
         self.environment = sanitized
     }
 

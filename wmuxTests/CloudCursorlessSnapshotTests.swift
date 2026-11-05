@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -27,10 +27,10 @@ struct CloudCursorlessSnapshotTests {
         return document
     }
 
-    private func makeProvider() -> (CmuxTuiSurfaceProvider, SurfaceCatalog) {
+    private func makeProvider() -> (WmuxTuiSurfaceProvider, SurfaceCatalog) {
         let summary = VMSummary(id: "cursorless", provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil)
         let catalog = SurfaceCatalog()
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: summary,
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }),
             catalog: catalog
@@ -41,11 +41,11 @@ struct CloudCursorlessSnapshotTests {
     @Test("A changed cursorless snapshot replaces the previous cursorless graph")
     func changedCursorlessSnapshotInstalls() throws {
         let (provider, _) = makeProvider()
-        let first = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Before"), machine: provider.machine))
+        let first = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Before"), machine: provider.machine))
         #expect(first.cursor == nil)
         #expect(provider.installSnapshotIfNewer(first))
 
-        let second = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "After"), machine: provider.machine))
+        let second = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "After"), machine: provider.machine))
         #expect(provider.installSnapshotIfNewer(second), "a missing cursor is not an equal cursor")
         #expect(provider.cloudState?.lookupIndex.workspace(id: "ws_main")?.name == "After")
     }
@@ -54,10 +54,10 @@ struct CloudCursorlessSnapshotTests {
     func staleCursorlessReadIsRefused() throws {
         let (provider, _) = makeProvider()
         // The first install moves the install version from 0 to 1.
-        let first = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Newer"), machine: provider.machine))
+        let first = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Newer"), machine: provider.machine))
         #expect(provider.installSnapshotIfNewer(first))
 
-        let stale = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Older"), machine: provider.machine))
+        let stale = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Older"), machine: provider.machine))
         #expect(!provider.installSnapshotIfNewer(stale, requestVersion: 0))
         #expect(provider.cloudState?.lookupIndex.workspace(id: "ws_main")?.name == "Newer")
         #expect(provider.installSnapshotIfNewer(stale, requestVersion: 1))
@@ -66,13 +66,13 @@ struct CloudCursorlessSnapshotTests {
     @Test("A cursorless snapshot still never replaces a journaled graph")
     func cursorlessSnapshotDoesNotReplaceCursoredGraph() throws {
         let (provider, _) = makeProvider()
-        let journaled = try #require(CmuxTuiSnapshotParser.state(
+        let journaled = try #require(WmuxTuiSnapshotParser.state(
             fromSnapshot: snapshot(workspaceName: "Journaled", cursor: ["generation": "daemon", "revision": "3"]),
             machine: provider.machine
         ))
         #expect(provider.installSnapshotIfNewer(journaled))
 
-        let legacy = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Legacy"), machine: provider.machine))
+        let legacy = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: "Legacy"), machine: provider.machine))
         #expect(!provider.installSnapshotIfNewer(legacy))
         #expect(provider.cloudState?.lookupIndex.workspace(id: "ws_main")?.name == "Journaled")
     }

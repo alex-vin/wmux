@@ -2,7 +2,7 @@ import XCTest
 
 /// Behavioral UI tests for the Settings **Automation** section.
 ///
-/// The Automation section (`AutomationSection` in `CmuxSettingsUI`) exposes:
+/// The Automation section (`AutomationSection` in `WmuxSettingsUI`) exposes:
 /// Socket Control Mode (menu picker), a conditional Socket Password subrow,
 /// Claude Code / Cursor / Gemini integration toggles, Claude binary path,
 /// Ripgrep binary path, Suppress Subagent Notifications, and Port Base /
@@ -10,7 +10,7 @@ import XCTest
 ///
 /// The genuine *runtime* effects of most of these settings (who may connect
 /// to the Unix automation socket, whether `claude`/`cursor`/`gemini` get hook
-/// env injection, which `rg` binary Find resolves, the `CMUX_PORT` range a new
+/// env injection, which `rg` binary Find resolves, the `WMUX_PORT` range a new
 /// terminal inherits, whether subagent completions notify) all live in
 /// backend/CLI/terminal-env code paths that XCUITest cannot observe from the
 /// app surface without adding a runtime seam (see TIER 2/3 notes at the bottom
@@ -446,9 +446,9 @@ final class SettingsAutomationBehaviorUITests: SettingsUITestCase {
     //   without a process-launch seam.
     //
     // TIER 2 (needs runtime seam): Port Base / Port Range Size — set the
-    //   CMUX_PORT / CMUX_PORT_END environment range a new terminal inherits.
+    //   WMUX_PORT / WMUX_PORT_END environment range a new terminal inherits.
     //   The only true verification is reading the env of a freshly spawned
-    //   terminal (e.g. `echo $CMUX_PORT`), which requires driving the Ghostty
+    //   terminal (e.g. `echo $WMUX_PORT`), which requires driving the Ghostty
     //   terminal surface and scraping its text buffer — not reachable through
     //   XCUITest accessibility without a terminal-content seam. The fields
     //   also carry no accessibility identifier.

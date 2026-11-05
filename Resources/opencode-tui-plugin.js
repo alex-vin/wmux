@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { createEffect, createRoot } from "solid-js";
-import { CMUXFeed } from "./index.js";
+import { WMUXFeed } from "./index.js";
 
 const firstString = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || null;
 const properties = (event) => event?.data || event?.properties || {};
@@ -172,25 +172,25 @@ function launchArgv() {
 }
 
 function launchEnvironment(cwdValue, baseEnvironment = process.env) {
-  const env = { ...baseEnvironment, CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" };
+  const env = { ...baseEnvironment, WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" };
   delete env.AMP_API_KEY;
   // Any inherited capture describes a parent process: another agent, or an
   // OpenCode that started this one. Always describe this process's launch.
-  delete env.CMUX_AGENT_LAUNCH_SUBROUTER_CLAUDE_RESUME_COMMAND;
-  delete env.CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND;
-  delete env.CMUX_AGENT_LAUNCH_ROUTED_CLAUDE_ACCOUNT;
+  delete env.WMUX_AGENT_LAUNCH_SUBROUTER_CLAUDE_RESUME_COMMAND;
+  delete env.WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND;
+  delete env.WMUX_AGENT_LAUNCH_ROUTED_CLAUDE_ACCOUNT;
   const argv = launchArgv();
-  env.CMUX_AGENT_LAUNCH_KIND = "opencode";
-  env.CMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("opencode");
-  env.CMUX_AGENT_LAUNCH_ARGV_B64 = Buffer.from(`${argv.join("\0")}\0`, "utf8").toString("base64");
-  env.CMUX_AGENT_LAUNCH_CWD = cwdValue || process.cwd();
+  env.WMUX_AGENT_LAUNCH_KIND = "opencode";
+  env.WMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("opencode");
+  env.WMUX_AGENT_LAUNCH_ARGV_B64 = Buffer.from(`${argv.join("\0")}\0`, "utf8").toString("base64");
+  env.WMUX_AGENT_LAUNCH_CWD = cwdValue || process.cwd();
   return env;
 }
 
 /** Admit session restore without blocking the shared OpenCode service. */
 export function dispatchSessionHook(eventName, payload, spawnImpl = spawn, baseEnvironment = process.env) {
-  if (baseEnvironment.CMUX_OPENCODE_HOOKS_DISABLED === "1" || !baseEnvironment.CMUX_SURFACE_ID) return false;
-  const cmux = baseEnvironment.CMUX_OPENCODE_CMUX_BIN || "cmux";
+  if (baseEnvironment.WMUX_OPENCODE_HOOKS_DISABLED === "1" || !baseEnvironment.WMUX_SURFACE_ID) return false;
+  const cmux = baseEnvironment.WMUX_OPENCODE_CMUX_BIN || "cmux";
   try {
     const child = spawnImpl(cmux, ["hooks", "enqueue", "opencode", eventName], {
       env: launchEnvironment(payload.cwd, baseEnvironment),
@@ -338,7 +338,7 @@ export async function createCMUXTUIBridge(ctx, options = {}) {
     }
   };
   ownership = createOwnership(ctx, flushPending);
-  feed = await CMUXFeed(ctx, {
+  feed = await WMUXFeed(ctx, {
     tui: true,
     ownsSession: ownership.belongs,
     locationForSession: () => ctx?.location,

@@ -2,7 +2,7 @@ import AppKit
 
 /// A modal-alert body that keeps fixed explanatory copy separate from
 /// user-sized details.
-struct CmuxAlertContent: Equatable, Sendable {
+struct WmuxAlertContent: Equatable, Sendable {
     private static let maximumFixedTextHeightFraction: CGFloat = 0.2
 
     let informativeText: String
@@ -48,7 +48,7 @@ struct CmuxAlertContent: Equatable, Sendable {
     @MainActor
     func apply(to alert: NSAlert, visibleFrame: NSRect) {
         if let scrollableDetails, !scrollableDetails.isEmpty {
-            let flattenedMeasurement = CmuxAlertScrollableDetailsView(
+            let flattenedMeasurement = WmuxAlertScrollableDetailsView(
                 text: flattenedText,
                 visibleFrame: visibleFrame
             )
@@ -63,7 +63,7 @@ struct CmuxAlertContent: Equatable, Sendable {
                 return
             }
 
-            let summaryMeasurement = CmuxAlertScrollableDetailsView(
+            let summaryMeasurement = WmuxAlertScrollableDetailsView(
                 text: informativeText,
                 visibleFrame: visibleFrame
             )
@@ -73,14 +73,14 @@ struct CmuxAlertContent: Equatable, Sendable {
                 return
             }
             alert.informativeText = informativeText
-            alert.accessoryView = CmuxAlertScrollableDetailsView(
+            alert.accessoryView = WmuxAlertScrollableDetailsView(
                 text: scrollableDetails,
                 visibleFrame: visibleFrame
             )
             return
         }
 
-        let overflowView = CmuxAlertScrollableDetailsView(
+        let overflowView = WmuxAlertScrollableDetailsView(
             text: informativeText,
             visibleFrame: visibleFrame
         )

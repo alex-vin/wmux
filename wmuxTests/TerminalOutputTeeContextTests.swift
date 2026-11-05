@@ -1,10 +1,10 @@
 import Foundation
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Testing
 import os
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -17,7 +17,7 @@ struct TerminalOutputTeeContextTests {
             workspaceID: UUID(),
             surfaceID: UUID(),
             agentDefinitions: [
-                CmuxTaskManagerCodingAgentDefinition(
+                WmuxTaskManagerCodingAgentDefinition(
                     id: "test-agent",
                     displayName: "Test agent",
                     assetName: nil,

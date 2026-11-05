@@ -1,5 +1,5 @@
-import CmuxAgentJournal
-import CmuxSettings
+import WmuxAgentJournal
+import WmuxSettings
 import Foundation
 import Testing
 

@@ -1,5 +1,5 @@
 import AppKit
-import CmuxCommandPalette
+import WmuxCommandPalette
 
 extension ContentView {
     static func commandPaletteSurfaceNavigationContributions()

@@ -1,10 +1,10 @@
-#if canImport(CmuxComputerUse)
-import CMUXAgentLaunch
+#if canImport(WmuxComputerUse)
+import WMUXAgentLaunch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -16,7 +16,7 @@ struct ComputerUseToolOnboardingTests {
         "cmux-cua.get_app_state",
         "mcp__cmux-cua__get_screen_size",
         "mcp__cmux_cua__click",
-        "cmux_cua.screenshot"
+        "wmux_cua.screenshot"
     ])
     func firstFunctionalToolOpensSetupWithoutAdmittingTools(_ tool: String) async throws {
         let fixture = try ComputerUseToolOnboardingFixture()
@@ -79,7 +79,7 @@ struct ComputerUseToolOnboardingTests {
         await fixture.send("Skill")
         await fixture.send("Bash")
         await fixture.send("cmux-cua.get_app_state", hook: .postToolUseFailure)
-        for prefix in ["mcp__cmux-cua__", "mcp__cmux_cua__", "cmux-cua.", "cmux_cua."] {
+        for prefix in ["mcp__cmux-cua__", "mcp__cmux_cua__", "cmux-cua.", "wmux_cua."] {
             await fixture.send(prefix + "check_permissions")
             await fixture.send(prefix)
         }

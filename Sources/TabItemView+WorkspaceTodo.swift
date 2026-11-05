@@ -1,6 +1,6 @@
 import AppKit
-import CmuxCommandPalette
-import CmuxWorkspaces
+import WmuxCommandPalette
+import WmuxWorkspaces
 import SwiftUI
 
 // MARK: - Context menu section

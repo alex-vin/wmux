@@ -1,10 +1,10 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -147,7 +147,7 @@ import Testing
         // user-controlled and may intentionally match a palette color, so no
         // universal contrast guarantee is possible for arbitrary custom accents.
         for scheme in [ColorScheme.light, .dark] {
-            let selection = Self.srgb(CmuxAccentColor(mode: .cmux).nsColor(isDark: scheme == .dark))
+            let selection = Self.srgb(WmuxAccentColor(mode: .cmux).nsColor(isDark: scheme == .dark))
             for (hex, rgb) in rails {
                 let distance = Self.deltaE(rgb, selection)
                 #expect(distance >= 12, "\(hex) differs from the \(scheme) selection by \(distance)")

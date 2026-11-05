@@ -1,4 +1,4 @@
-import CmuxTerminalCore
+import WmuxTerminalCore
 import GhosttyKit
 
 /// Authoritative terminal geometry tied to one absolute Ghostty row space.

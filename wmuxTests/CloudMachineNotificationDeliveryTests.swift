@@ -1,7 +1,7 @@
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -193,10 +193,10 @@ struct CloudMachineNotificationDeliveryTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let originFile = directory.appendingPathComponent("origin.txt")
         let envelopeFile = directory.appendingPathComponent("envelope.json")
-        let capturingHook = CmuxResolvedNotificationHook(
+        let capturingHook = WmuxResolvedNotificationHook(
             id: "origin-capture",
-            command: "printf '%s' \"$CMUX_NOTIFICATION_ORIGIN\" > '\(originFile.path)'; "
-                + "printf '%s' \"$CMUX_NOTIFICATION_POLICY_JSON\" > '\(envelopeFile.path)'; "
+            command: "printf '%s' \"$WMUX_NOTIFICATION_ORIGIN\" > '\(originFile.path)'; "
+                + "printf '%s' \"$WMUX_NOTIFICATION_POLICY_JSON\" > '\(envelopeFile.path)'; "
                 + "sed 's/\"kind\":\"cloud-vm\"/\"kind\":\"local\"/; s/\"value\":\"cloud-vm:vivid-newt\"/\"value\":\"local\"/'",
             timeoutSeconds: 10,
             sourcePath: nil,
@@ -228,10 +228,10 @@ struct CloudMachineNotificationDeliveryTests {
         #expect(stdinJSON.contains("cloud-vm:vivid-newt"))
 
         // A local notification reads as local and carries no origin block at all.
-        let localHook = CmuxResolvedNotificationHook(
+        let localHook = WmuxResolvedNotificationHook(
             id: "local-capture",
-            command: "printf '%s' \"$CMUX_NOTIFICATION_ORIGIN\" > '\(originFile.path)'; "
-                + "printf '%s' \"$CMUX_NOTIFICATION_POLICY_JSON\" > '\(envelopeFile.path)'; cat",
+            command: "printf '%s' \"$WMUX_NOTIFICATION_ORIGIN\" > '\(originFile.path)'; "
+                + "printf '%s' \"$WMUX_NOTIFICATION_POLICY_JSON\" > '\(envelopeFile.path)'; cat",
             timeoutSeconds: 10,
             sourcePath: nil,
             cwd: directory.path
@@ -264,7 +264,7 @@ struct CloudMachineNotificationDeliveryTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let outputURL = directory.appendingPathComponent("command-origin.txt")
         defaults.set(
-            "printf '%s|%s' \"$CMUX_NOTIFICATION_ORIGIN\" \"$CMUX_NOTIFICATION_TITLE\" > '\(outputURL.path)'",
+            "printf '%s|%s' \"$WMUX_NOTIFICATION_ORIGIN\" \"$WMUX_NOTIFICATION_TITLE\" > '\(outputURL.path)'",
             forKey: NotificationSoundSettings.customCommandKey
         )
 

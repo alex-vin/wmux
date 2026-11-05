@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,8 +14,8 @@ import Testing
 struct CloudStaleInventoryMaterializationTests {
     @Test("a stale graph never materializes an interactive restored terminal")
     func staleGraphIsNotInteractive() {
-        #expect(CmuxTuiSurfaceProvider.shouldShowRecoverableCloudFailure(observation: .stale(reason: "link timeout")))
-        #expect(!CmuxTuiSurfaceProvider.shouldShowRecoverableCloudFailure(observation: .current))
+        #expect(WmuxTuiSurfaceProvider.shouldShowRecoverableCloudFailure(observation: .stale(reason: "link timeout")))
+        #expect(!WmuxTuiSurfaceProvider.shouldShowRecoverableCloudFailure(observation: .current))
     }
 
     @Test("missing and stale observations fail the actual attachment and fresh state retries it", arguments: [false, true])
@@ -30,7 +30,7 @@ struct CloudStaleInventoryMaterializationTests {
             let panelID = try #require(workspace.focusedPanelId)
             let catalog = SurfaceCatalog()
             let summary = VMSummary(id: "stale-\(UUID())", provider: "freestyle", status: "running", image: "fixture", createdAt: 0, base: nil)
-            let provider = CmuxTuiSurfaceProvider(summary: summary,
+            let provider = WmuxTuiSurfaceProvider(summary: summary,
                 links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }), catalog: catalog)
             catalog.register(provider)
             defer { provider.suspendForFeatureFlag(); catalog.unregister(machine: provider.machine) }

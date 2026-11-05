@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 /// Task-grouped `cmux help` output and `cmux help <topic>` topic views.
@@ -156,11 +156,10 @@ extension WMUXCLI {
           Output defaults to refs; pass --id-format uuids or --id-format both to include UUIDs.
 
         Socket Auth:
-          --password takes precedence, then CMUX_SOCKET_PASSWORD, then the password saved in Settings.
+          --password takes precedence, then WMUX_SOCKET_PASSWORD, then the password saved in Settings.
 
         Agent Help:
           wmux guide | wmux --skill
-          wmux cloud guide | wmux cloud --skill
           Change wmux settings with `wmux docs settings` and `wmux settings path`; add Dock controls with `wmux docs dock`.
           Before editing, back up any existing wmux.json file to a timestamped .bak copy.
           Use printed curl commands to fetch the latest docs/schema; prefer Ghostty config for terminal behavior Ghostty already supports.
@@ -175,11 +174,11 @@ extension WMUXCLI {
         \(commandGroups)
 
         Environment:
-          CMUX_WORKSPACE_ID   Auto-set in wmux terminals. Used as default --workspace for
+          WMUX_WORKSPACE_ID   Auto-set in wmux terminals. Used as default --workspace for
                               ALL commands (send, list-panels, new-split, notify, etc.).
-          CMUX_TAB_ID         Optional alias used by `tab-action`/`rename-tab` as default --tab.
-          CMUX_SURFACE_ID     Auto-set in wmux terminals. Used as default --surface.
-          CMUX_SOCKET_PATH    Override the Unix socket path. Without this, the CLI defaults
+          WMUX_TAB_ID         Optional alias used by `tab-action`/`rename-tab` as default --tab.
+          WMUX_SURFACE_ID     Auto-set in wmux terminals. Used as default --surface.
+          WMUX_SOCKET_PATH    Override the Unix socket path. Without this, the CLI defaults
                               to ~/.local/state/wmux/wmux.sock and auto-discovers tagged/debug sockets.
         """
     }
@@ -236,8 +235,8 @@ extension WMUXCLI {
         move-tab-to-new-workspace [--tab <id|ref|index>] [--surface <id|ref|index>] [--workspace <id|ref|index>] [--window <id|ref|index>] [--title <text>] [--focus <true|false>]
         new-split <left|right|up|down> [--workspace <id|ref|index>] [--surface <id|ref|index>] [--panel <id|ref|index>] [--window <id|ref|index>] [--command <text>] [--focus <true|false>]
         focus-pane --pane <id|ref|index> [--workspace <id|ref|index>] [--window <id|ref|index>]
-        new-pane [--type <terminal|browser|simulator>] [--direction <left|right|up|down>] [--workspace <id|ref|index>] [--window <id|ref|index>] [--url <url>] \(String(localized: "cli.browser.profile.option", defaultValue: "[--profile <name|uuid>]")) [--command <text>] [--focus <true|false>]
-        new-surface [--type <terminal|browser|simulator|agent-session>] [--pane <id|ref|index>] [--workspace <id|ref|index>] [--window <id|ref|index>] [--url <url>] [--provider <codex|claude|opencode>] [--renderer <react|solid>] [--command <text>] [--focus <true|false>]
+        new-pane [--type <terminal|browser>] [--direction <left|right|up|down>] [--workspace <id|ref|index>] [--window <id|ref|index>] [--url <url>] \(String(localized: "cli.browser.profile.option", defaultValue: "[--profile <name|uuid>]")) [--command <text>] [--focus <true|false>]
+        new-surface [--type <terminal|browser|agent-session>] [--pane <id|ref|index>] [--workspace <id|ref|index>] [--window <id|ref|index>] [--url <url>] [--provider <codex|claude|opencode>] [--renderer <react|solid>] [--command <text>] [--focus <true|false>]
         close-surface [--surface <id|ref|index>] [--workspace <id|ref|index>] [--window <id|ref|index>]
         move-surface --surface <id|ref|index> [--pane <id|ref|index>] [--workspace <id|ref|index>] [--window <id|ref|index>] [--before <id|ref|index>] [--after <id|ref|index>] [--index <n>] [--focus <true|false>]
         split-off --surface <id|ref|index> <left|right|up|down> [--workspace <id|ref|index>] [--window <id|ref|index>] [--focus <true|false>]
@@ -303,14 +302,14 @@ extension WMUXCLI {
         themes [list|set|clear]
         import [<terminal>] [--dry-run] [--yes] [--path <file>] [--json]
         reload-config
-        right-sidebar <toggle|show|hide|focus|set|mode|files|find|vault|sessions|feed|dock|cloud|devices> [--workspace <id|ref|index>] [--window <id|ref|index>] [--no-focus]
+        right-sidebar <toggle|show|hide|focus|set|mode|files|find|vault|sessions|feed|dock> [--workspace <id|ref|index>] [--window <id|ref|index>] [--no-focus]
         sidebar <templates|try|new|validate|reload|select|open> [name] [options]
         help
         """
     }
 
     private var automationCommandsHelp: String {
-        let executionExchangeHelp = CmuxGlaedaExecutionLocalization().string(
+        let executionExchangeHelp = WmuxGlaedaExecutionLocalization().string(
             "glaeda.cli.taskHelp",
             defaultValue: "glaeda <request|observe> [options]"
         )
@@ -396,12 +395,6 @@ extension WMUXCLI {
 
     private var remoteCommandsHelp: String {
         return """
-        auth <status|login|logout|team>
-        login | logout                                      (aliases for auth login/logout)
-        vm <base|new|ls|domains|tree|self|status|stats|resize|network|agent-updates|rename|pause|resume|restart|snapshot|fork|restore|rm|run|route|agent|dev|prompt|exec|push|pull|wait|shell|tui|desktop|open|workspace|terminal|tab|layout|env|ports|tools|handoff|promote-template|attach|ssh|ssh-info> [args...]    (alias: cloud)
-        remotes <list|add|remove> [--route <host:port>] [--tag <tag>] [--json]    (alias: remote)
-        \(simulatorCommandUsageLine)
-        \(iosCommandUsageLine)
         ssh <destination> [--transport <ssh|mosh>] [--name <title>] [--command <text>] [--port <n>] [--identity <path>] [-A|--forward-agent] [-a|--no-forward-agent] [--ssh-option <opt>] [--window <id|ref|index>] [--no-focus] [-- <remote-command-args>]
         mosh <destination> [--name <title>] [--command <text>] [--port <n>] [--identity <path>] [-A|--forward-agent] [-a|--no-forward-agent] [--ssh-option <opt>] [--window <id|ref|index>] [--no-focus] [-- <remote-command-args>]
         mosh-tmux <destination> [--session <name>] [--name <title>] [--command <text>] [--port <n>] [--identity <path>] [-A|--forward-agent] [-a|--no-forward-agent] [--ssh-option <opt>] [--window <id|ref|index>] [--no-focus]

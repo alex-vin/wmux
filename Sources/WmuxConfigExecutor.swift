@@ -1,20 +1,20 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 @MainActor
-struct CmuxConfigExecutor {
+struct WmuxConfigExecutor {
 
     @discardableResult
     static func execute(
-        command: CmuxCommandDefinition,
+        command: WmuxCommandDefinition,
         tabManager: TabManager,
         baseCwd: String,
         configSourcePath: String?,
         globalConfigPath: String,
         displayTitle: String? = nil,
         actionID: String? = nil,
-        icon: CmuxButtonIcon? = nil,
+        icon: WmuxButtonIcon? = nil,
         iconSourcePath: String? = nil,
         presentingWindow: NSWindow? = nil,
         onExecuted: (() -> Void)? = nil
@@ -68,18 +68,18 @@ struct CmuxConfigExecutor {
 
     @discardableResult
     static func execute(
-        action: CmuxResolvedConfigAction,
-        commands: [CmuxCommandDefinition],
+        action: WmuxResolvedConfigAction,
+        commands: [WmuxCommandDefinition],
         commandSourcePaths: [String: String],
         tabManager: TabManager,
         baseCwd: String,
         globalConfigPath: String,
-        settingPresets: [String: CmuxSettingValue] = [:],
+        settingPresets: [String: WmuxSettingValue] = [:],
         presentingWindow: NSWindow? = nil,
         onExecuted: (() -> Void)? = nil
     ) -> Bool {
         if case .setting(let change) = action.action {
-            let didStart = CmuxSettingActionRunner.run(
+            let didStart = WmuxSettingActionRunner.run(
                 change,
                 actionSourcePath: action.actionSourcePath,
                 globalConfigPath: globalConfigPath,
@@ -163,11 +163,11 @@ struct CmuxConfigExecutor {
         _ rawCommand: String,
         confirm: Bool,
         actionID: String,
-        target: CmuxConfigTerminalCommandTarget,
+        target: WmuxConfigTerminalCommandTarget,
         configSourcePath: String?,
         globalConfigPath: String,
         displayTitle: String? = nil,
-        icon: CmuxButtonIcon? = nil,
+        icon: WmuxButtonIcon? = nil,
         iconSourcePath: String? = nil,
         presentingWindow: NSWindow? = nil,
         onAuthorized: @escaping (String) -> Void
@@ -199,7 +199,7 @@ struct CmuxConfigExecutor {
 
     @discardableResult
     static func authorizeProjectAutomationIfNeeded(
-        descriptor: CmuxActionTrustDescriptor,
+        descriptor: WmuxActionTrustDescriptor,
         confirm: Bool,
         configSourcePath: String?,
         globalConfigPath: String,
@@ -224,7 +224,7 @@ struct CmuxConfigExecutor {
 
     @discardableResult
     private static func authorizeProjectActionIfNeeded(
-        descriptor: CmuxActionTrustDescriptor,
+        descriptor: WmuxActionTrustDescriptor,
         confirm: Bool,
         configSourcePath: String?,
         globalConfigPath: String,
@@ -236,7 +236,7 @@ struct CmuxConfigExecutor {
     ) -> Bool {
         let sourcePath = configSourcePath.map(canonicalPath)
         let canonicalGlobalConfigPath = canonicalPath(globalConfigPath)
-        let isTrusted = CmuxActionTrust.shared.isTrusted(descriptor)
+        let isTrusted = WmuxActionTrust.shared.isTrusted(descriptor)
         let resolvedPresentingWindow = presentingWindow ?? NSApp.keyWindow ?? NSApp.mainWindow
         guard let sourcePath,
               sourcePath != canonicalGlobalConfigPath else {
@@ -280,7 +280,7 @@ struct CmuxConfigExecutor {
     private static func presentConfirmDialog(
         command: String,
         displayTitle: String?,
-        descriptor: CmuxActionTrustDescriptor,
+        descriptor: WmuxActionTrustDescriptor,
         configPath: String,
         presentingWindow: NSWindow,
         completion: @escaping (Bool) -> Void
@@ -290,7 +290,7 @@ struct CmuxConfigExecutor {
             displayTitle: displayTitle,
             configPath: configPath
         )
-        let content = CmuxAlertContent(
+        let content = WmuxAlertContent(
             flattenedText: alert.informativeText,
             separatingScrollableDetails: sanitizeForDisplay(command)
         )
@@ -303,7 +303,7 @@ struct CmuxConfigExecutor {
     private static func runConfirmDialog(
         command: String,
         displayTitle: String?,
-        descriptor: CmuxActionTrustDescriptor,
+        descriptor: WmuxActionTrustDescriptor,
         configPath: String
     ) -> Bool {
         let alert = makeConfirmDialog(
@@ -311,7 +311,7 @@ struct CmuxConfigExecutor {
             displayTitle: displayTitle,
             configPath: configPath
         )
-        let content = CmuxAlertContent(
+        let content = WmuxAlertContent(
             flattenedText: alert.informativeText,
             separatingScrollableDetails: sanitizeForDisplay(command)
         )
@@ -361,13 +361,13 @@ struct CmuxConfigExecutor {
 
     private static func handleConfirmDialogResponse(
         _ response: NSApplication.ModalResponse,
-        descriptor: CmuxActionTrustDescriptor
+        descriptor: WmuxActionTrustDescriptor
     ) -> Bool {
         switch response {
         case .alertFirstButtonReturn:
             return true
         case .alertSecondButtonReturn:
-            CmuxActionTrust.shared.trust(descriptor)
+            WmuxActionTrust.shared.trust(descriptor)
             return true
         default:
             return false
@@ -377,20 +377,20 @@ struct CmuxConfigExecutor {
     private static func terminalTrustDescriptor(
         command: String,
         actionID: String,
-        target: CmuxConfigTerminalCommandTarget,
+        target: WmuxConfigTerminalCommandTarget,
         configSourcePath: String?,
-        icon: CmuxButtonIcon?,
+        icon: WmuxButtonIcon?,
         iconSourcePath: String?,
         globalConfigPath: String
-    ) -> CmuxActionTrustDescriptor {
-        CmuxActionTrustDescriptor(
+    ) -> WmuxActionTrustDescriptor {
+        WmuxActionTrustDescriptor(
             actionID: actionID,
             kind: "terminalCommand",
             command: command,
             target: target.rawValue,
             workspaceCommand: nil,
             configPath: configSourcePath.map(canonicalPath),
-            projectRoot: configSourcePath.map { canonicalPath(CmuxButtonIcon.projectRoot(forConfigPath: $0)) },
+            projectRoot: configSourcePath.map { canonicalPath(WmuxButtonIcon.projectRoot(forConfigPath: $0)) },
             iconFingerprint: icon?.projectLocalImageFingerprint(
                 configSourcePath: iconSourcePath ?? configSourcePath,
                 globalConfigPath: globalConfigPath
@@ -399,21 +399,21 @@ struct CmuxConfigExecutor {
     }
 
     private static func workspaceTrustDescriptor(
-        command: CmuxCommandDefinition,
+        command: WmuxCommandDefinition,
         actionID: String,
         configSourcePath: String?,
-        icon: CmuxButtonIcon?,
+        icon: WmuxButtonIcon?,
         iconSourcePath: String?,
         globalConfigPath: String
-    ) -> CmuxActionTrustDescriptor {
-        CmuxActionTrustDescriptor(
+    ) -> WmuxActionTrustDescriptor {
+        WmuxActionTrustDescriptor(
             actionID: actionID,
             kind: "workspaceCommand",
             command: nil,
             target: nil,
             workspaceCommand: command,
             configPath: configSourcePath.map(canonicalPath),
-            projectRoot: configSourcePath.map { canonicalPath(CmuxButtonIcon.projectRoot(forConfigPath: $0)) },
+            projectRoot: configSourcePath.map { canonicalPath(WmuxButtonIcon.projectRoot(forConfigPath: $0)) },
             iconFingerprint: icon?.projectLocalImageFingerprint(
                 configSourcePath: iconSourcePath ?? configSourcePath,
                 globalConfigPath: globalConfigPath
@@ -422,8 +422,8 @@ struct CmuxConfigExecutor {
     }
 
     static func isTrustedSurfaceButton(
-        _ button: CmuxSurfaceTabBarButton,
-        workspaceCommand: CmuxResolvedCommand?,
+        _ button: WmuxSurfaceTabBarButton,
+        workspaceCommand: WmuxResolvedCommand?,
         terminalCommandSourcePath: String?,
         surfaceTabBarConfigSourcePath: String?,
         globalConfigPath: String
@@ -441,16 +441,16 @@ struct CmuxConfigExecutor {
               configPath != canonicalPath(globalConfigPath) else {
             return true
         }
-        return CmuxActionTrust.shared.isTrusted(descriptor)
+        return WmuxActionTrust.shared.isTrusted(descriptor)
     }
 
     private static func surfaceButtonTrustDescriptor(
-        _ button: CmuxSurfaceTabBarButton,
-        workspaceCommand: CmuxResolvedCommand?,
+        _ button: WmuxSurfaceTabBarButton,
+        workspaceCommand: WmuxResolvedCommand?,
         terminalCommandSourcePath: String?,
         surfaceTabBarConfigSourcePath: String?,
         globalConfigPath: String
-    ) -> CmuxActionTrustDescriptor? {
+    ) -> WmuxActionTrustDescriptor? {
         let configSourcePath = terminalCommandSourcePath
             ?? workspaceCommand?.sourcePath
             ?? button.actionSourcePath

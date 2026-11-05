@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 struct CachedAgentProcessIdentityValidator: Sendable {
@@ -27,11 +27,11 @@ struct CachedAgentProcessIdentityValidator: Sendable {
     }
 
     func currentProcess(
-        _ process: CmuxTopProcessArguments,
+        _ process: WmuxTopProcessArguments,
         matches snapshot: SessionRestorableAgentSnapshot,
         hermesSessionValidation: HermesSessionValidation = .cachedSnapshot
     ) -> Bool {
-        if let liveKind = normalizedProcessValue(process.environment["CMUX_AGENT_LAUNCH_KIND"]),
+        if let liveKind = normalizedProcessValue(process.environment["WMUX_AGENT_LAUNCH_KIND"]),
            !Self.launchKind(liveKind, matches: snapshot.kind, launcher: snapshot.launchCommand?.launcher) {
             return false
         }
@@ -42,11 +42,11 @@ struct CachedAgentProcessIdentityValidator: Sendable {
                 arguments: process.arguments,
                 environment: process.environment
             )
-            guard CmuxVaultAgentRegistration.builtInHermes.detect.matches(observed),
+            guard WmuxVaultAgentRegistration.builtInHermes.detect.matches(observed),
                   observed.isInteractiveHermesAgentInvocation else {
                 return false
             }
-            guard let explicitSessionID = CmuxVaultAgentPersistedSessionStore.hermesStateDB
+            guard let explicitSessionID = WmuxVaultAgentPersistedSessionStore.hermesStateDB
                 .explicitSessionID(arguments: process.arguments) else {
                 // A fresh hook record supplies the missing session identity. A
                 // cached snapshot cannot: Hermes can switch conversations without
@@ -75,7 +75,7 @@ struct CachedAgentProcessIdentityValidator: Sendable {
         matches snapshot: SessionRestorableAgentSnapshot
     ) -> Bool {
         guard let liveExecutable = arguments.first.map(executableBasename) else { return false }
-        if let liveKind = normalizedProcessValue(environment["CMUX_AGENT_LAUNCH_KIND"]),
+        if let liveKind = normalizedProcessValue(environment["WMUX_AGENT_LAUNCH_KIND"]),
            Self.launchKind(liveKind, matches: snapshot.kind, launcher: snapshot.launchCommand?.launcher),
            normalizedProcessValue(snapshot.launchCommand?.launcher)?.compare(liveKind, options: [.caseInsensitive, .literal]) == .orderedSame,
            liveProcessExecutableMatchesRecordedAgent(
@@ -110,13 +110,13 @@ struct CachedAgentProcessIdentityValidator: Sendable {
     }
 
     private func currentProcessSession(
-        _ process: CmuxTopProcessArguments,
+        _ process: WmuxTopProcessArguments,
         matches snapshot: SessionRestorableAgentSnapshot,
         hermesSessionValidation: HermesSessionValidation
     ) -> Bool {
         let arguments = process.arguments
         let authoritativeEnvironmentSessionID = normalizedProcessValue(
-            process.environment["CMUX_AGENT_SESSION_ID"]
+            process.environment["WMUX_AGENT_SESSION_ID"]
         )
         if let registration = snapshot.registration ?? Self.builtInRegistration(for: snapshot.kind) {
             let observedSessionID: String?
@@ -172,7 +172,7 @@ struct CachedAgentProcessIdentityValidator: Sendable {
                     return true
                 }
                 // Pi overwrites its argv with a bare title and nothing exports
-                // CMUX_AGENT_SESSION_ID for it, so a fresh Pi never shows its
+                // WMUX_AGENT_SESSION_ID for it, so a fresh Pi never shows its
                 // session. Its own current hook record vouches instead (#12084).
                 return hermesSessionValidation.vouchesForMissingSessionIdentity
             }
@@ -236,7 +236,7 @@ struct CachedAgentProcessIdentityValidator: Sendable {
     /// owner and the next restore is silently skipped instead of reported (#12158).
     private static func builtInRegistration(
         for kind: RestorableAgentKind
-    ) -> CmuxVaultAgentRegistration? {
+    ) -> WmuxVaultAgentRegistration? {
         switch kind {
         case .amp:
             return .builtInAmp
@@ -344,10 +344,10 @@ struct CachedAgentProcessIdentityValidator: Sendable {
         executableCandidates: [String],
         environment: [String: String]
     ) -> Bool {
-        guard let liveKind = normalizedProcessValue(environment["CMUX_AGENT_LAUNCH_KIND"]),
+        guard let liveKind = normalizedProcessValue(environment["WMUX_AGENT_LAUNCH_KIND"]),
               (liveKind.compare(kind.rawValue, options: [.caseInsensitive, .literal]) == .orderedSame
                   || AgentLaunchCaptureTrust.launcherDescribesKind(liveKind, kind: kind.rawValue)),
-              let launchExecutable = normalizedProcessValue(environment["CMUX_AGENT_LAUNCH_EXECUTABLE"]) else {
+              let launchExecutable = normalizedProcessValue(environment["WMUX_AGENT_LAUNCH_EXECUTABLE"]) else {
             return false
         }
         let launchBasename = executableBasename(launchExecutable)
@@ -357,7 +357,7 @@ struct CachedAgentProcessIdentityValidator: Sendable {
     }
 
     private func registrationDetectRule(
-        _ rule: CmuxVaultAgentDetectRule,
+        _ rule: WmuxVaultAgentDetectRule,
         matchesExecutable liveExecutable: String,
         arguments: [String]
     ) -> Bool {

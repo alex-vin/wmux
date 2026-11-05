@@ -1,8 +1,8 @@
 import SwiftUI
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -10,7 +10,7 @@ import XCTest
 /// Regression coverage for https://github.com/manaflow-ai/cmux/issues/4529.
 ///
 /// PR https://github.com/manaflow-ai/cmux/pull/4437 migrated
-/// `CmuxTaskManagerModel` to `@Observable` and the Task Manager view body
+/// `WmuxTaskManagerModel` to `@Observable` and the Task Manager view body
 /// held `@Bindable var model` while rendering
 /// `ScrollView { LazyVStack { ForEach { ... } } }`. That violates the
 /// snapshot-boundary rule documented in `repo/CLAUDE.md` (referencing
@@ -31,7 +31,7 @@ import XCTest
 final class TaskManagerViewSnapshotBoundaryTests: XCTestCase {
     func testTaskManagerRowViewEqualityIgnoresClosureIdentity() {
         let row = Self.makeRow()
-        let leftView = CmuxTaskManagerRowView(
+        let leftView = WmuxTaskManagerRowView(
             row: row,
             onViewWorkspace: {},
             onViewTerminal: {},
@@ -42,7 +42,7 @@ final class TaskManagerViewSnapshotBoundaryTests: XCTestCase {
         // bundle on every render tick (a side-effect of the snapshot
         // mutation). Closure identity must be excluded from `==` so the
         // lazy list cache does not invalidate.
-        let rightView = CmuxTaskManagerRowView(
+        let rightView = WmuxTaskManagerRowView(
             row: row,
             onViewWorkspace: { _ = 1 },
             onViewTerminal: { _ = 2 },
@@ -61,14 +61,14 @@ final class TaskManagerViewSnapshotBoundaryTests: XCTestCase {
         let baseRow = Self.makeRow()
         let bumpedRow = Self.makeRow(memoryBytes: baseRow.resources.memoryBytes + 1)
 
-        let left = CmuxTaskManagerRowView(
+        let left = WmuxTaskManagerRowView(
             row: baseRow,
             onViewWorkspace: {},
             onViewTerminal: {},
             onKillProcess: {},
             onActivate: {}
         )
-        let right = CmuxTaskManagerRowView(
+        let right = WmuxTaskManagerRowView(
             row: bumpedRow,
             onViewWorkspace: {},
             onViewTerminal: {},
@@ -85,14 +85,14 @@ final class TaskManagerViewSnapshotBoundaryTests: XCTestCase {
 
     // MARK: - Fixtures
 
-    private static func makeRow(memoryBytes: Int64 = 1_024) -> CmuxTaskManagerRow {
-        CmuxTaskManagerRow(
+    private static func makeRow(memoryBytes: Int64 = 1_024) -> WmuxTaskManagerRow {
+        WmuxTaskManagerRow(
             id: "test-row",
             kind: .process,
             level: 0,
             title: "Test Row",
             detail: "PID 42",
-            resources: CmuxTaskManagerResources(
+            resources: WmuxTaskManagerResources(
                 cpuPercent: 1.5,
                 residentBytes: memoryBytes,
                 memoryBytes: memoryBytes,

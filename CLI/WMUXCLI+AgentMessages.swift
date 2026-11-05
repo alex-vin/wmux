@@ -155,8 +155,8 @@ extension WMUXCLI {
         if let from { params["from"] = from }
         if let thread { params["thread_id"] = thread }
         let env = ProcessInfo.processInfo.environment
-        if let surface = env["CMUX_SURFACE_ID"], !surface.isEmpty { params["sender_surface_id"] = surface }
-        if let workspace = env["CMUX_WORKSPACE_ID"], !workspace.isEmpty { params["sender_workspace_id"] = workspace }
+        if let surface = env["WMUX_SURFACE_ID"], !surface.isEmpty { params["sender_surface_id"] = surface }
+        if let workspace = env["WMUX_WORKSPACE_ID"], !workspace.isEmpty { params["sender_workspace_id"] = workspace }
 
         let payload = try client.sendV2(method: "agent.message.send", params: params)
         if jsonOutput {
@@ -242,13 +242,13 @@ extension WMUXCLI {
               subcommand.hasPrefix("inbox-") else { return false }
         let env = ProcessInfo.processInfo.environment
         let input = Self.agentInboxHookInput()
-        let disabledKey = agent == "claude" ? "CMUX_CLAUDE_HOOKS_DISABLED" : "CMUX_CODEX_HOOKS_DISABLED"
+        let disabledKey = agent == "claude" ? "WMUX_CLAUDE_HOOKS_DISABLED" : "WMUX_CODEX_HOOKS_DISABLED"
         // Headless `claude -p` and `codex exec` runs share the pane's surface
         // id with the interactive session there; they must not claim its
         // messages.
-        let headlessKey = agent == "claude" ? "CMUX_CLAUDE_HEADLESS" : "CMUX_CODEX_HEADLESS"
+        let headlessKey = agent == "claude" ? "WMUX_CLAUDE_HEADLESS" : "WMUX_CODEX_HEADLESS"
         let headless = env[headlessKey] == "1"
-        guard let surfaceId = env["CMUX_SURFACE_ID"], !surfaceId.isEmpty, env[disabledKey] != "1", !headless else {
+        guard let surfaceId = env["WMUX_SURFACE_ID"], !surfaceId.isEmpty, env[disabledKey] != "1", !headless else {
             if subcommand != "inbox-wait" { print("{}") }
             return true
         }
@@ -300,7 +300,7 @@ extension WMUXCLI {
     ) -> Never {
         let hookEvent = input["hook_event_name"] as? String
         let isStop = hookEvent == "Stop" || hookEvent == "StopFailure"
-        let agentPID = env["CMUX_CLAUDE_PID"].flatMap { Int32($0) }
+        let agentPID = env["WMUX_CLAUDE_PID"].flatMap { Int32($0) }
         let pollerKey = UUID().uuidString
         var registered = false
         var consecutiveFailures = 0

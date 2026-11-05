@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 import WebKit
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -37,7 +37,7 @@ struct CloudWorkspaceLiveProjectionTests {
             "terminals": terminalIDs.map { ["id": $0, "title": "Process " + $0, "lifecycle": "running"] },
             "browsers": [], "agents": []
         ]
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
     }
 
     private func install(
@@ -52,7 +52,7 @@ struct CloudWorkspaceLiveProjectionTests {
             remoteWorkspaces: state.workspaces.map { SurfaceRemoteWorkspace(id: $0.id, name: $0.name, index: $0.index, focused: $0.focused) })
         catalog.replaceCloudState(
             state,
-            resources: resourceOverride ?? (CmuxTuiSnapshotParser.resources(from: state) + extraResources),
+            resources: resourceOverride ?? (WmuxTuiSnapshotParser.resources(from: state) + extraResources),
             info: info
         )
         catalog.reconcileCloudRemoteState(machine: machine, state: state)
@@ -85,8 +85,8 @@ struct CloudWorkspaceLiveProjectionTests {
         )
         catalog.register(CloudPlacementTestProvider(machine: machine))
         let desktop = isPort
-            ? CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
-            : CmuxTuiSnapshotParser.display(machine: machine)
+            ? WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
+            : WmuxTuiSnapshotParser.display(machine: machine)
         catalog.record(SurfaceProjection(
             resource: SurfaceResourceID(machine: machine, kind: .terminal, key: "term_shared"),
             workspaceID: workspace.id, panelID: terminal, remoteWorkspaceID: "a", remoteTabID: "first"
@@ -132,7 +132,7 @@ struct CloudWorkspaceLiveProjectionTests {
         let catalog = SurfaceCatalog(live: live, cloudPlacementCoordinator: placement, cloudWorkspaceProjectionCoordinator: coordinator)
         let provider = CloudPlacementTestProvider(machine: machine)
         catalog.register(provider)
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
         install(try graph(["first": "a"], revision: 1), catalog: catalog, extraResources: [port])
         await coordinator.waitForIdle()
         let opened = try await catalog.openCloudPort(
@@ -269,13 +269,13 @@ struct CloudWorkspaceLiveProjectionTests {
             ["first": "a", "missing": "a"], revision: 1,
             contentIDs: ["missing": "term_missing"]
         )
-        let resources = CmuxTuiSnapshotParser.resources(from: state).filter { $0.id != missingResource }
+        let resources = WmuxTuiSnapshotParser.resources(from: state).filter { $0.id != missingResource }
         install(state, catalog: catalog, resourceOverride: resources)
         await coordinator.waitForIdle()
         #expect(closed.isEmpty)
         #expect(catalog.projection(forPanel: missingPanel)?.remoteTabID == "missing")
 
-        var missingViewResources = CmuxTuiSnapshotParser.resources(from: state)
+        var missingViewResources = WmuxTuiSnapshotParser.resources(from: state)
         let missingIndex = try #require(missingViewResources.firstIndex { $0.id == missingResource })
         missingViewResources[missingIndex].remoteViews = []
         install(state, catalog: catalog, resourceOverride: missingViewResources)
@@ -317,7 +317,7 @@ struct CloudWorkspaceLiveProjectionTests {
         let sourceProjection = try #require(catalog.projections.first { $0.remoteTabID == "first" })
 
         let moved = try graph(["first": "b"], revision: 2)
-        var incompleteResources = CmuxTuiSnapshotParser.resources(from: moved)
+        var incompleteResources = WmuxTuiSnapshotParser.resources(from: moved)
         let terminalIndex = try #require(incompleteResources.firstIndex { $0.id.kind == .terminal })
         incompleteResources[terminalIndex].remoteViews = []
         install(moved, catalog: catalog, resourceOverride: incompleteResources)
@@ -399,7 +399,7 @@ struct CloudWorkspaceLiveProjectionTests {
         #expect(catalog.projectionVersions[machine] == version)
     }
 
-    /// CMUXTERM-MACOS-41NZ: a pane whose coordinates lag the graph is both obsolete
+    /// WMUXTERM-MACOS-41NZ: a pane whose coordinates lag the graph is both obsolete
     /// (old coordinates) and the pane `project` reuses for the missing placement.
     /// Closing it after the reuse destroyed the pane the pass had just corrected, so
     /// the next pass created it again: a terminal that flickers in and out.
@@ -636,7 +636,7 @@ struct CloudWorkspaceLiveProjectionTests {
         defer { fixture.workspace.teardownAllPanels() }
         let catalog = fixture.catalog
         let provider = CloudPlacementTestProvider(machine: machine)
-        let desktop = CmuxTuiSnapshotParser.display(machine: machine)
+        let desktop = WmuxTuiSnapshotParser.display(machine: machine)
         // Only the browser pane binds its resource while being configured; the
         // coordinator's own terminal materialization keeps its daemon tab.
         provider.registerDuringMaterialization = { projection in
@@ -667,8 +667,8 @@ struct CloudWorkspaceLiveProjectionTests {
         let catalog = fixture.catalog
         catalog.register(CloudPlacementTestProvider(machine: machine))
         let preview = isPort
-            ? CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
-            : CmuxTuiSnapshotParser.display(machine: machine)
+            ? WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
+            : WmuxTuiSnapshotParser.display(machine: machine)
         install(try graph(["first": "a"], revision: 1), catalog: catalog, extraResources: [preview])
         await fixture.coordinator.waitForIdle()
         let panelID = UUID()
@@ -697,8 +697,8 @@ struct CloudWorkspaceLiveProjectionTests {
         let catalog = SurfaceCatalog(live: live, cloudPlacementCoordinator: placement, cloudWorkspaceProjectionCoordinator: coordinator)
         catalog.register(CloudPlacementTestProvider(machine: machine))
         let preview = isPort
-            ? CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
-            : CmuxTuiSnapshotParser.display(machine: machine)
+            ? WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 6969)
+            : WmuxTuiSnapshotParser.display(machine: machine)
 
         install(try graph(["first": "a"], revision: 1), catalog: catalog, extraResources: [preview])
         catalog.record(SurfaceProjection(

@@ -1,4 +1,4 @@
-import CmuxProductAnalytics
+import WmuxProductAnalytics
 
 extension RightSidebarMode {
     /// The feature this right-sidebar tab counts as in product analytics.

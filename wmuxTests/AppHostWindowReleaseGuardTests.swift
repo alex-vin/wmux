@@ -2,7 +2,7 @@ import AppKit
 import Testing
 
 /// Guards the process-wide window-release guard installed by
-/// `CmuxTestWindowReleaseGuard.m`.
+/// `WmuxTestWindowReleaseGuard.m`.
 ///
 /// AppKit defaults code-created windows to `isReleasedWhenClosed == true`,
 /// which under ARC means `close()` over-releases the window and XCTest's

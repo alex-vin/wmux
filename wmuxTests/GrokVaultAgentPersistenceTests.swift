@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -200,7 +200,7 @@ private extension GrokVaultAgentPersistenceTests {
             cwd detectedCWD: URL? = nil
         ) -> RestorableAgentSessionIndex.ProcessDetectedSnapshotEntry? {
             let processID = 9_377
-            let process = CmuxTopProcessInfo(
+            let process = WmuxTopProcessInfo(
                 pid: processID,
                 parentPID: 1,
                 name: "grok",
@@ -216,12 +216,12 @@ private extension GrokVaultAgentPersistenceTests {
                 virtualBytes: 0,
                 threadCount: 1
             )
-            let processSnapshot = CmuxTopProcessSnapshot(
+            let processSnapshot = WmuxTopProcessSnapshot(
                 processes: [process],
                 sampledAt: Date(timeIntervalSince1970: 0),
                 includesProcessDetails: true
             )
-            var registration = CmuxVaultAgentRegistration.builtInGrok
+            var registration = WmuxVaultAgentRegistration.builtInGrok
             registration.sessionDirectory = sessionsRoot.path
             let key = RestorableAgentSessionIndex.PanelKey(
                 workspaceId: workspaceID,
@@ -229,13 +229,13 @@ private extension GrokVaultAgentPersistenceTests {
             )
 
             return RestorableAgentSessionIndex.processDetectedSnapshots(
-                registry: CmuxVaultAgentRegistry(registrations: [registration]),
+                registry: WmuxVaultAgentRegistry(registrations: [registration]),
                 fileManager: fileManager,
                 processSnapshot: processSnapshot,
                 capturedAt: 42,
                 processArgumentsProvider: { requestedProcessID in
                     guard requestedProcessID == processID else { return nil }
-                    return CmuxTopProcessArguments(
+                    return WmuxTopProcessArguments(
                         arguments: arguments,
                         environment: [
                             "HOME": root.path,

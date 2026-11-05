@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -365,7 +365,7 @@ struct PaneFocusFindResponderTests {
             panel.close()
         }
 
-        let webView = try #require(panel.webView as? CmuxWebView)
+        let webView = try #require(panel.webView as? WmuxWebView)
         webView.diffViewerFocusStateDidChange(
             viewer: true,
             editable: true,

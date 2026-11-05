@@ -1,5 +1,5 @@
 import Foundation
-import CmuxMemoryPressure
+import WmuxMemoryPressure
 
 @MainActor
 final class NotificationCacheMemoryPressureResponder: MemoryPressureResponder {

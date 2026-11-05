@@ -1,10 +1,10 @@
 import AppKit
 import Carbon.HIToolbox
-import CmuxBrowser
+import WmuxBrowser
 import Bonsplit
-import CmuxCommandPalette
+import WmuxCommandPalette
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 
 /// Stateless matching policy for configured application shortcuts.
 ///
@@ -760,7 +760,7 @@ func shouldRouteTerminalFontZoomShortcutToGhostty(
 }
 // Main-actor isolated: TerminalSurface.searchState carries the legacy
 // main-thread-only contract as compiler-enforced isolation after the
-// CmuxTerminal lift; both callers (TabManager, overlay tests) are @MainActor.
+// WmuxTerminal lift; both callers (TabManager, overlay tests) are @MainActor.
 @MainActor
 @discardableResult
 func startOrFocusTerminalSearch(
@@ -940,7 +940,7 @@ func shouldRouteBrowserDocumentEditingCommandEquivalentThroughWebContentFirst(
 func shouldRouteBrowserFindCommandEquivalentThroughWebContentFirst(
     _ event: NSEvent,
     responder: NSResponder? = nil,
-    owningWebView: CmuxWebView? = nil
+    owningWebView: WmuxWebView? = nil
 ) -> Bool {
     guard let shortcut = browserFindCommandEquivalent(for: event) else {
         return false

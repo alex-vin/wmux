@@ -1,14 +1,14 @@
-import CmuxFoundation
+import WmuxFoundation
 import AppKit
 import Bonsplit
 import Carbon
-import CmuxSettings
-import CmuxSettingsUI
+import WmuxSettings
+import WmuxSettingsUI
 import SwiftUI
 
 /// Stores customizable keyboard shortcuts (definitions + persistence).
 enum KeyboardShortcutSettings {
-    static let didChangeNotification = Notification.Name("cmux.keyboardShortcutSettingsDidChange")
+    static let didChangeNotification = Notification.Name("wmux.keyboardShortcutSettingsDidChange")
     static let actionUserInfoKey = "action"
     static let settingsFileDisplayPath = "~/.config/cmux/cmux.json"
     static var settingsFileStore: KeyboardShortcutSettingsFileStore = .appLive {
@@ -1283,7 +1283,7 @@ final class SystemWideHotkeyController {
         ) { [weak self] _ in
             self?.refreshRegistration()
         }
-        // The live Settings UI uses the CmuxSettingsUI package recorder, which signals
+        // The live Settings UI uses the WmuxSettingsUI package recorder, which signals
         // arm/disarm through its own notification (it cannot post the app-target
         // `KeyboardShortcutRecorderActivity` one). Without this, recording a system-wide
         // hotkey in Settings would not unregister the existing Carbon hotkey, so the
@@ -1317,7 +1317,7 @@ final class SystemWideHotkeyController {
 
     private func refreshRegistration() {
         let shortcut = SystemWideHotkeySettings.shortcut()
-        // Stand down while either recorder is armed (legacy app-target recorder or the CmuxSettingsUI
+        // Stand down while either recorder is armed (legacy app-target recorder or the WmuxSettingsUI
         // package recorder) so the opt-in hotkey is captured rather than fired while being rebound.
         let isShortcutRecordingActive = KeyboardShortcutRecorderActivity.isAnyRecorderActive
             || RecorderHostButton.isActivelyRecording
@@ -2567,8 +2567,8 @@ extension StoredShortcut {
 }
 
 enum KeyboardShortcutRecorderActivity {
-    static let didChangeNotification = Notification.Name("cmux.keyboardShortcutRecorderActivityDidChange")
-    static let stopAllNotification = Notification.Name("cmux.keyboardShortcutRecorderActivityStopAll")
+    static let didChangeNotification = Notification.Name("wmux.keyboardShortcutRecorderActivityDidChange")
+    static let stopAllNotification = Notification.Name("wmux.keyboardShortcutRecorderActivityStopAll")
     private static var activeRecorderCount = 0
 
     static var isAnyRecorderActive: Bool {

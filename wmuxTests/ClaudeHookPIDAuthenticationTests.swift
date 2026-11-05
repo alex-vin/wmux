@@ -34,8 +34,8 @@ struct ClaudeHookPIDAuthenticationTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
 
         let result = Harness.runHookProcess(
             context: context,
@@ -75,9 +75,9 @@ struct ClaudeHookPIDAuthenticationTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.otherWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.otherSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43300"
+        environment["WMUX_WORKSPACE_ID"] = Self.otherWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.otherSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43300"
 
         let result = Harness.runHookProcess(
             context: context,
@@ -105,9 +105,9 @@ struct ClaudeHookPIDAuthenticationTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43301"
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43301"
 
         let result = Harness.runHookProcess(
             context: context,
@@ -143,9 +143,9 @@ struct ClaudeHookPIDAuthenticationTests {
             surfaceTargets: [Self.otherSurfaceId: Self.otherWorkspaceId]
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.otherWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.otherSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43302"
+        environment["WMUX_WORKSPACE_ID"] = Self.otherWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.otherSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43302"
         let result = Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-end"],

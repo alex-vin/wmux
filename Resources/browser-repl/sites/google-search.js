@@ -4,9 +4,9 @@
 // run one at a time with a short gap, since bursts make Google show a CAPTCHA.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
-  const { URLSearchParams } = root.CmuxBrowserRepl.core;
+  const { URLSearchParams } = root.WmuxBrowserRepl.core;
   const GAP_MS = 1200;
 
   const DATED = /^(\d+ (?:seconds?|minutes?|hours?|days?|weeks?|months?|years?) ago|[A-Z][a-z]{2} \d{1,2}, \d{4})\s+[\u2014-]\s+/;

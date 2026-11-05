@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 struct SessionNotificationSnapshot: Codable, Sendable {

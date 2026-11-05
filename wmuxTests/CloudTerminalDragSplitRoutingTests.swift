@@ -1,12 +1,12 @@
-import CmuxCloud
+import WmuxCloud
 import Bonsplit
-import CmuxCore
-import CmuxSurfaceCatalogModel
+import WmuxCore
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-@testable import CmuxTerminal
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+@testable import WmuxTerminal
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -156,7 +156,7 @@ struct CloudTerminalDragSplitRoutingTests {
     func cloudFailureTextIsSanitized() {
         let failure = CloudPaneCreationFailure(
             machine: .cloud("secret-machine"),
-            error: CmuxTuiSurfaceProvider.ProviderError.remoteWorkspaceNotFound("secret-workspace")
+            error: WmuxTuiSurfaceProvider.ProviderError.remoteWorkspaceNotFound("secret-workspace")
         )
         #expect(!failure.errorText.contains("secret-workspace"))
         #expect(!failure.errorText.contains("cmux-tui"))

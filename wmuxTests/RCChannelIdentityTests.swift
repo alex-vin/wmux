@@ -1,10 +1,9 @@
-import CmuxSettings
-import CmuxUpdater
+import WmuxSettings
 import Foundation
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -35,7 +34,7 @@ final class RCChannelIdentityTests: XCTestCase {
     func testRCReleaseUsesDedicatedDefaultAndIgnoresAmbientSocketOverride() {
         let path = SocketControlSettings.socketPath(
             environment: [
-                "CMUX_SOCKET_PATH": "/tmp/cmux-debug-issue-153-tmux-compat.sock",
+                "WMUX_SOCKET_PATH": "/tmp/cmux-debug-issue-153-tmux-compat.sock",
             ],
             bundleIdentifier: "com.cmuxterm.app.rc",
             isDebugBuild: false,

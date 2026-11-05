@@ -2,8 +2,8 @@ import Bonsplit
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,12 +14,12 @@ import Testing
     func allTerminalSurfacesPreserveDeclaredOrder(focusedIndex: Int) throws {
         let names = ["AAA", "BBB", "CCC", "DDD"]
         let surfaces = names.enumerated().map { index, name in
-            CmuxSurfaceDefinition(type: .terminal, name: name, focus: index == focusedIndex)
+            WmuxSurfaceDefinition(type: .terminal, name: name, focus: index == focusedIndex)
         }
 
         let workspace = Workspace()
         workspace.applyCustomLayout(
-            .pane(CmuxPaneDefinition(surfaces: surfaces)),
+            .pane(WmuxPaneDefinition(surfaces: surfaces)),
             baseCwd: NSTemporaryDirectory()
         )
 
@@ -32,19 +32,19 @@ import Testing
     func mixedTerminalAndBrowserSurfacesPreserveDeclaredOrder(focusedIndex: Int) throws {
         let names = ["Docs", "Shell", "Logs"]
         let surfaces = [
-            CmuxSurfaceDefinition(
+            WmuxSurfaceDefinition(
                 type: .browser,
                 name: names[0],
                 url: nil,
                 focus: focusedIndex == 0
             ),
-            CmuxSurfaceDefinition(type: .terminal, name: names[1], focus: focusedIndex == 1),
-            CmuxSurfaceDefinition(type: .terminal, name: names[2], focus: focusedIndex == 2),
+            WmuxSurfaceDefinition(type: .terminal, name: names[1], focus: focusedIndex == 1),
+            WmuxSurfaceDefinition(type: .terminal, name: names[2], focus: focusedIndex == 2),
         ]
 
         let workspace = Workspace()
         workspace.applyCustomLayout(
-            .pane(CmuxPaneDefinition(surfaces: surfaces)),
+            .pane(WmuxPaneDefinition(surfaces: surfaces)),
             baseCwd: NSTemporaryDirectory()
         )
 
@@ -58,10 +58,10 @@ import Testing
         let workspace = Workspace()
         workspace.bonsplitController.configuration.newTabPosition = initialPlacement
         workspace.applyCustomLayout(
-            .pane(CmuxPaneDefinition(surfaces: [
-                CmuxSurfaceDefinition(type: .terminal, name: "AAA"),
-                CmuxSurfaceDefinition(type: .terminal, name: "BBB", focus: true),
-                CmuxSurfaceDefinition(type: .terminal, name: "CCC"),
+            .pane(WmuxPaneDefinition(surfaces: [
+                WmuxSurfaceDefinition(type: .terminal, name: "AAA"),
+                WmuxSurfaceDefinition(type: .terminal, name: "BBB", focus: true),
+                WmuxSurfaceDefinition(type: .terminal, name: "CCC"),
             ])),
             baseCwd: NSTemporaryDirectory()
         )

@@ -1,5 +1,5 @@
 import AppKit
-import CmuxControlSocket
+import WmuxControlSocket
 import Foundation
 
 enum SurfaceResumeContextMenuState: Equatable, Sendable {

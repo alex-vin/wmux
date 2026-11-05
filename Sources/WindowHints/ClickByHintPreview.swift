@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Click by Hint as a preview: hint mode (``WindowHintController``) stays

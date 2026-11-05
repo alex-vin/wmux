@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PBXPROJ = Path("cmux.xcodeproj/project.pbxproj")
+PBXPROJ = Path("wmux.xcodeproj/project.pbxproj")
 ALLOWLIST = Path("scripts/pbxproj-sources-wiring-allowlist.txt")
 
 FILE_REF = re.compile(

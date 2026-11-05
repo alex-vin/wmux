@@ -1,9 +1,9 @@
 import Foundation
-import CmuxSidebar
+import WmuxSidebar
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -11,7 +11,7 @@ import Testing
 extension SidebarWorkspaceSnapshotRefreshPolicyTests {
     @MainActor
     @Test func workspaceAgentSpinnerFeatureFlagDefaultsOff() throws {
-        let definition = try #require(CmuxFeatureFlags.allFlags.first {
+        let definition = try #require(WmuxFeatureFlags.allFlags.first {
             $0.key == "sidebar-workspace-agent-spinner-experiment"
         })
         let suiteName = "cmux.feature.flags.sidebar-workspace-agent-spinner.\(UUID().uuidString)"
@@ -20,7 +20,7 @@ extension SidebarWorkspaceSnapshotRefreshPolicyTests {
             defaults.removePersistentDomain(forName: suiteName)
         }
 
-        let flags = CmuxFeatureFlags(defaults: defaults, remoteFlagValueProvider: { _ in nil })
+        let flags = WmuxFeatureFlags(defaults: defaults, remoteFlagValueProvider: { _ in nil })
 
         #expect(!flags.effectiveValue(for: definition))
     }

@@ -1,6 +1,6 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
-import CmuxWorkspaces
+import WmuxWorkspaces
 
 /// Owns the durable write side of the application session snapshot.
 ///
@@ -81,12 +81,12 @@ struct SessionSnapshotPersistenceWriter: @unchecked Sendable {
         }
     }
 
-    static let persistedWindowGeometryDefaultsKey = "cmux.session.lastWindowGeometry.v2"
+    static let persistedWindowGeometryDefaultsKey = "wmux.session.lastWindowGeometry.v2"
     private static let legacyPersistedWindowGeometryDefaultsKeys = [
-        "cmux.session.lastWindowGeometry.v1"
+        "wmux.session.lastWindowGeometry.v1"
     ]
     private static let crashOnlyPrimarySnapshotRemovalDefaultsKey =
-        "cmux.session.crashOnlyPrimarySnapshotRemoval.v1"
+        "wmux.session.crashOnlyPrimarySnapshotRemoval.v1"
 
     static func removeLegacyPersistedWindowGeometry(defaults: UserDefaults = .standard) {
         legacyPersistedWindowGeometryDefaultsKeys.forEach { defaults.removeObjectIfPresent(forKey: $0) }

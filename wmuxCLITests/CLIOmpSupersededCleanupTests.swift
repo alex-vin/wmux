@@ -34,12 +34,12 @@ struct CLIOmpSupersededCleanupTests {
             resumeClearSucceeds: false
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "omp"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "omp"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
 
         let result = Harness.runHookProcess(
             context: context,
@@ -87,8 +87,8 @@ struct CLIOmpSupersededCleanupTests {
             pidTarget: (workspaceId: Self.liveWorkspaceId, surfaceId: Self.liveSurfaceId)
         )
         var retryEnvironment = Harness.hookEnvironment(context: retryContext)
-        retryEnvironment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        retryEnvironment["CMUX_OMP_PID"] = String(Self.ompPID)
+        retryEnvironment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        retryEnvironment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let retryResult = Harness.runHookProcess(
             context: retryContext,
@@ -126,8 +126,8 @@ struct CLIOmpSupersededCleanupTests {
             pidTarget: (workspaceId: Self.liveWorkspaceId, surfaceId: Self.liveSurfaceId)
         )
         var stopEnvironment = Harness.hookEnvironment(context: stopContext)
-        stopEnvironment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        stopEnvironment["CMUX_OMP_PID"] = String(Self.ompPID)
+        stopEnvironment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        stopEnvironment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let stopResult = Harness.runHookProcess(
             context: stopContext,
@@ -174,8 +174,8 @@ struct CLIOmpSupersededCleanupTests {
             pidTarget: (workspaceId: Self.liveWorkspaceId, surfaceId: Self.liveSurfaceId)
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -229,8 +229,8 @@ struct CLIOmpSupersededCleanupTests {
             resumeClearOwnsCheckpoint: false
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -284,8 +284,8 @@ struct CLIOmpSupersededCleanupTests {
             resumeClearOwnsCheckpoint: nil
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -339,8 +339,8 @@ struct CLIOmpSupersededCleanupTests {
             resumeClearSucceeds: false
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -387,8 +387,8 @@ struct CLIOmpSupersededCleanupTests {
             pidTarget: (workspaceId: Self.liveWorkspaceId, surfaceId: Self.liveSurfaceId)
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -450,8 +450,8 @@ struct CLIOmpSupersededCleanupTests {
             pidTarget: (workspaceId: Self.liveWorkspaceId, surfaceId: Self.liveSurfaceId)
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,

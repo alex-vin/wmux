@@ -3,8 +3,8 @@ import Bonsplit
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -19,7 +19,7 @@ import Testing
 @Suite(.serialized)
 struct SplitPaneGeometryProjectionRenderParityTests {
     struct Case: Sendable {
-        let direction: CmuxSplitDirection
+        let direction: WmuxSplitDirection
         let split: Double
     }
 
@@ -34,12 +34,12 @@ struct SplitPaneGeometryProjectionRenderParityTests {
         let workspace = Workspace()
         defer { workspace.teardownAllPanels() }
         workspace.applyCustomLayout(
-            .split(CmuxSplitDefinition(
+            .split(WmuxSplitDefinition(
                 direction: testCase.direction,
                 split: testCase.split,
                 children: [
-                    .pane(CmuxPaneDefinition(surfaces: [CmuxSurfaceDefinition(type: .terminal, name: "First")])),
-                    .pane(CmuxPaneDefinition(surfaces: [CmuxSurfaceDefinition(type: .terminal, name: "Second")])),
+                    .pane(WmuxPaneDefinition(surfaces: [WmuxSurfaceDefinition(type: .terminal, name: "First")])),
+                    .pane(WmuxPaneDefinition(surfaces: [WmuxSurfaceDefinition(type: .terminal, name: "Second")])),
                 ]
             )),
             baseCwd: NSTemporaryDirectory()

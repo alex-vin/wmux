@@ -1,5 +1,5 @@
 import Foundation
-import CmuxWorkspaces
+import WmuxWorkspaces
 
 extension AgentHibernationRecord {
     /// Whether the indexed process set is complete enough to terminate safely.

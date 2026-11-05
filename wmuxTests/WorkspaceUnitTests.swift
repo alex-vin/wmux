@@ -1,33 +1,33 @@
-import CmuxCore
+import WmuxCore
 import Darwin
 import AppKit
-import CmuxFoundation
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxTerminalCore
 import SwiftUI
 import UniformTypeIdentifiers
 import WebKit
 import ObjectiveC.runtime
 import Bonsplit
-import CmuxPanes
-import CmuxSettings
-import CmuxWorkspaces
-import CmuxSidebar
+import WmuxPanes
+import WmuxSettings
+import WmuxWorkspaces
+import WmuxSidebar
 import UserNotifications
 import Combine
-import CmuxTerminal
-import CmuxBrowser
-import struct CmuxSettings.IntegrationsCatalogSection
-import enum CmuxSettings.KiroNotificationLevel
+import WmuxTerminal
+import WmuxBrowser
+import struct WmuxSettings.IntegrationsCatalogSection
+import enum WmuxSettings.KiroNotificationLevel
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-// The app target still declares legacy duplicates of these CmuxSettings
-// value types; with CmuxSettings imported unconditionally the names are
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+// The app target still declares legacy duplicates of these WmuxSettings
+// value types; with WmuxSettings imported unconditionally the names are
 // ambiguous. These tests exercise the app-side paths, so pin the app types.
-private typealias StoredShortcut = cmux_DEV.StoredShortcut
-private typealias ShortcutStroke = cmux_DEV.ShortcutStroke
-private typealias AppIconMode = cmux_DEV.AppIconMode
+private typealias StoredShortcut = wmux_DEV.StoredShortcut
+private typealias ShortcutStroke = wmux_DEV.ShortcutStroke
+private typealias AppIconMode = wmux_DEV.AppIconMode
 #elseif canImport(cmux)
 @testable import cmux
 private typealias StoredShortcut = cmux.StoredShortcut
@@ -109,7 +109,7 @@ final class SidebarSelectedWorkspaceColorTests: XCTestCase {
 
     func testSubtleRailSelectionIsAHairlineTintWithLabelColoredText() {
         for (scheme, expectedWhite) in [(ColorScheme.light, CGFloat(0)), (.dark, 1)] {
-            let fill = CmuxSelectionFill.resolve(
+            let fill = WmuxSelectionFill.resolve(
                 colorScheme: scheme,
                 isEmphasized: true,
                 increaseContrast: false
@@ -158,7 +158,7 @@ final class SidebarSelectedWorkspaceColorTests: XCTestCase {
                 colorScheme: scheme,
                 sidebarSelectionColorHex: nil
             )
-            XCTAssertEqual(solid.color?.hexString(), CmuxAccentColor().nsColor(for: scheme).hexString())
+            XCTAssertEqual(solid.color?.hexString(), WmuxAccentColor().nsColor(for: scheme).hexString())
             XCTAssertEqual(solid.opacity, 1.0, accuracy: 0.001)
             XCTAssertNil(solid.edgeColor)
 
@@ -203,10 +203,10 @@ final class SidebarSelectedWorkspaceColorTests: XCTestCase {
 
     func testInactiveWindowSelectionIsNeutralAndIncreaseContrastIsStronger() {
         for scheme in [ColorScheme.light, .dark] {
-            let key = CmuxSelectionFill.resolve(colorScheme: scheme, isEmphasized: true, increaseContrast: false)
-            let inactive = CmuxSelectionFill.resolve(colorScheme: scheme, isEmphasized: false, increaseContrast: false)
-            let keyContrast = CmuxSelectionFill.resolve(colorScheme: scheme, isEmphasized: true, increaseContrast: true)
-            let multi = CmuxSelectionFill.resolve(
+            let key = WmuxSelectionFill.resolve(colorScheme: scheme, isEmphasized: true, increaseContrast: false)
+            let inactive = WmuxSelectionFill.resolve(colorScheme: scheme, isEmphasized: false, increaseContrast: false)
+            let keyContrast = WmuxSelectionFill.resolve(colorScheme: scheme, isEmphasized: true, increaseContrast: true)
+            let multi = WmuxSelectionFill.resolve(
                 colorScheme: scheme,
                 isEmphasized: true,
                 increaseContrast: false,
@@ -317,7 +317,7 @@ final class SidebarSelectedWorkspaceColorTests: XCTestCase {
 
         XCTAssertEqual(
             background.color,
-            CmuxSelectionFill.resolve(colorScheme: .light, isEmphasized: true, increaseContrast: false).color
+            WmuxSelectionFill.resolve(colorScheme: .light, isEmphasized: true, increaseContrast: false).color
         )
         XCTAssertEqual(background.opacity, 1.0, accuracy: 0.001)
         withExtendedLifetime(cancellable) {}
@@ -1935,7 +1935,7 @@ final class KeyboardShortcutSettingsFileStoreTests: XCTestCase {
         )
 
         let tabManager = TabManager()
-        let cmuxConfigStore = CmuxConfigStore(
+        let cmuxConfigStore = WmuxConfigStore(
             globalConfigPath: settingsFileURL.path,
             startFileWatchers: false
         )
@@ -3769,7 +3769,7 @@ final class WorkspaceCreationPlacementTests: XCTestCase {
             title: String,
             workingDirectory: String?,
             portOrdinal: Int,
-            configTemplate: CmuxSurfaceConfigTemplate?,
+            configTemplate: WmuxSurfaceConfigTemplate?,
             initialSurface: NewWorkspaceInitialSurface,
             initialTerminalCommand: String?,
             initialTerminalIsRemote: Bool,
@@ -4065,15 +4065,15 @@ final class WorkspaceCreationPlacementTests: XCTestCase {
 @MainActor
 final class WorkspaceCreationConfigSanitizationTests: XCTestCase {
     private final class UnsafeConfigSnapshotTabManager: TabManager {
-        private var injectedConfig: CmuxSurfaceConfigTemplate?
-        var capturedConfigTemplate: CmuxSurfaceConfigTemplate?
+        private var injectedConfig: WmuxSurfaceConfigTemplate?
+        var capturedConfigTemplate: WmuxSurfaceConfigTemplate?
 
         func installInjectedConfig(fontSize: Float) {
-            var config = CmuxSurfaceConfigTemplate()
+            var config = WmuxSurfaceConfigTemplate()
             config.fontSize = fontSize
             config.workingDirectory = "/tmp/cmux-workspace-snapshot"
             config.command = "echo snapshot"
-            config.environmentVariables = ["CMUX_INHERITED_ENV": "1"]
+            config.environmentVariables = ["WMUX_INHERITED_ENV": "1"]
             injectedConfig = config
         }
 
@@ -4089,7 +4089,7 @@ final class WorkspaceCreationConfigSanitizationTests: XCTestCase {
             title: String,
             workingDirectory: String?,
             portOrdinal: Int,
-            configTemplate: CmuxSurfaceConfigTemplate?,
+            configTemplate: WmuxSurfaceConfigTemplate?,
             initialSurface: NewWorkspaceInitialSurface,
             initialTerminalCommand: String?,
             initialTerminalIsRemote: Bool,
@@ -4751,17 +4751,17 @@ final class WorkspaceReorderTests: XCTestCase {
 
     @MainActor
     func testMoveTabToTopPublishesWorkspaceReorderedEvent() throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         let manager = TabManager()
         let first = manager.tabs[0]
         let second = manager.addWorkspace()
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
 
         manager.moveTabToTop(second.id)
 
-        let event = try XCTUnwrap(CmuxEventBus.shared.retainedSnapshot().last)
+        let event = try XCTUnwrap(WmuxEventBus.shared.retainedSnapshot().last)
         XCTAssertEqual(event["name"] as? String, "workspace.reordered")
         XCTAssertEqual(event["source"] as? String, "workspace.lifecycle")
         XCTAssertEqual(event["workspace_id"] as? String, second.id.uuidString)
@@ -4776,17 +4776,17 @@ final class WorkspaceReorderTests: XCTestCase {
 
     @MainActor
     func testSetPinnedPublishesWorkspaceReorderedEventWithPinnedState() throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         let manager = TabManager()
         let first = manager.tabs[0]
         let second = manager.addWorkspace()
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
 
         manager.setPinned(second, pinned: true)
 
-        let event = try XCTUnwrap(CmuxEventBus.shared.retainedSnapshot().last)
+        let event = try XCTUnwrap(WmuxEventBus.shared.retainedSnapshot().last)
         XCTAssertEqual(event["name"] as? String, "workspace.reordered")
         XCTAssertEqual(event["source"] as? String, "workspace.lifecycle")
         XCTAssertEqual(event["workspace_id"] as? String, second.id.uuidString)
@@ -7030,13 +7030,13 @@ final class WorkspacePanelGitBranchTests: XCTestCase {
         let hookStateRoot = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-session-drop-hook-state-\(UUID().uuidString)", isDirectory: true)
         try fileManager.createDirectory(at: hookStateRoot, withIntermediateDirectories: true)
-        let previousHookStateDir = getenv("CMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
-        setenv("CMUX_AGENT_HOOK_STATE_DIR", hookStateRoot.path, 1)
+        let previousHookStateDir = getenv("WMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
+        setenv("WMUX_AGENT_HOOK_STATE_DIR", hookStateRoot.path, 1)
         defer {
             if let previousHookStateDir {
-                setenv("CMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
+                setenv("WMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
             } else {
-                unsetenv("CMUX_AGENT_HOOK_STATE_DIR")
+                unsetenv("WMUX_AGENT_HOOK_STATE_DIR")
             }
             try? fileManager.removeItem(at: hookStateRoot)
         }
@@ -8364,7 +8364,7 @@ final class SidebarWorkspaceShortcutHintMetricsTests: XCTestCase {
 final class ExtensionWorktreePrototypeTests: XCTestCase {
     func testPipeOutputCollectorDrainsBufferedOutputOnFinish() async throws {
         let pipe = Pipe()
-        let collector = CmuxExtensionPipeOutputCollector(fileHandle: pipe.fileHandleForReading)
+        let collector = WmuxExtensionPipeOutputCollector(fileHandle: pipe.fileHandleForReading)
 
         pipe.fileHandleForWriting.write(Data("exclude-path\n".utf8))
         try pipe.fileHandleForWriting.close()
@@ -8392,7 +8392,7 @@ final class ExtensionWorktreePrototypeTests: XCTestCase {
             "initial"
         ], in: projectRoot)
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(projectRootPath: projectRoot.path)
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(projectRootPath: projectRoot.path)
 
         XCTAssertTrue(FileManager.default.fileExists(atPath: result.worktreePath))
         XCTAssertTrue(result.workspaceTitle.hasPrefix("cmux-sidebar-"))

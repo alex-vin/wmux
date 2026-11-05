@@ -1,7 +1,7 @@
 import AppKit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 #if DEBUG
 @Suite(.serialized)

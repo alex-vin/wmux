@@ -1,4 +1,4 @@
-import CmuxRemoteSession
+import WmuxRemoteSession
 import Foundation
 
 /// A host whose SSH transport answers but whose daemon bootstrap never

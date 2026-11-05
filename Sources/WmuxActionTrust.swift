@@ -1,13 +1,13 @@
 import CryptoKit
 import Foundation
 
-struct CmuxActionTrustDescriptor: Codable, Sendable {
+struct WmuxActionTrustDescriptor: Codable, Sendable {
     var schemaVersion: Int = 1
     var actionID: String
     var kind: String
     var command: String?
     var target: String?
-    var workspaceCommand: CmuxCommandDefinition?
+    var workspaceCommand: WmuxCommandDefinition?
     var configPath: String?
     var projectRoot: String?
     var iconFingerprint: String?
@@ -24,9 +24,9 @@ struct CmuxActionTrustDescriptor: Codable, Sendable {
     }
 }
 
-final class CmuxActionTrust {
-    static let shared = CmuxActionTrust()
-    static let didChangeNotification = Notification.Name("cmux.actionTrustDidChange")
+final class WmuxActionTrust {
+    static let shared = WmuxActionTrust()
+    static let didChangeNotification = Notification.Name("wmux.actionTrustDidChange")
 
     private let storePath: String
     private var trustedFingerprints: Set<String>
@@ -35,7 +35,7 @@ final class CmuxActionTrust {
         let appSupport = FileManager.default.urls(
             for: .applicationSupportDirectory,
             in: .userDomainMask
-        ).first!.appendingPathComponent("cmux")
+        ).first!.appendingPathComponent("wmux")
         storePath = appSupport.appendingPathComponent("trusted-actions.json").path
 
         let fm = FileManager.default
@@ -51,11 +51,11 @@ final class CmuxActionTrust {
         }
     }
 
-    func isTrusted(_ descriptor: CmuxActionTrustDescriptor) -> Bool {
+    func isTrusted(_ descriptor: WmuxActionTrustDescriptor) -> Bool {
         trustedFingerprints.contains(descriptor.fingerprint)
     }
 
-    func trust(_ descriptor: CmuxActionTrustDescriptor) {
+    func trust(_ descriptor: WmuxActionTrustDescriptor) {
         trustedFingerprints.insert(descriptor.fingerprint)
         save()
     }

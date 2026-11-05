@@ -1,5 +1,5 @@
 import Bonsplit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Foundation
 
 /// Workspace surface creation for the CodeRouter guide opened from the Cloud sidebar.

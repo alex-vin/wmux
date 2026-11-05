@@ -1,49 +1,20 @@
 import AppKit
-import CMUXMobileCore
-import CmuxTerminal
+import WmuxFoundation
+import WmuxTerminal
 
-final class MobileHostDiagnostics {
-    nonisolated static let log = DiagnosticLog(
-        buildStamp: DiagnosticReport.buildStamp(infoDictionary: Bundle.main.infoDictionary),
-        role: .macHost
-    )
-    private init() {}
-}
-
-/// App boundary for privacy-safe snapshots; it never reads terminal contents.
+/// App boundary for geometry refresh and diagnostics.
 @MainActor
 struct TerminalGeometryDiagnostics {
-    let log: DiagnosticLog
-
-    init(log: DiagnosticLog = MobileHostDiagnostics.log) { self.log = log }
-
-    func context(
-        workspaceID: UUID?,
-        transition: TerminalWorkContext.Transition
-    ) -> TerminalWorkContext {
-        guard let workspaceID,
-              let workspace = AppDelegate.shared?.tabManagerFor(tabId: workspaceID)?.workspacesById[workspaceID] else {
-            return .init(transition: transition)
-        }
-        // Per-surface layout must not enumerate every workspace in the window.
-        // The existing ownership index and Dictionary.count keep this snapshot
-        // independent of the number of other workspaces and panels.
-        return .init(
-            transition: transition == .unknown ? workspace.terminalGeometryTransition : transition,
-            population: .workspace,
-            workspaceCount: 1,
-            surfaceCount: workspace.panels.count
-        )
+    struct Interval: Sendable {
+        func end() {}
     }
 
     func begin(
-        _ phase: TerminalWorkDiagnostic.Phase,
+        _ phase: TerminalSurfaceWorkDiagnostics.Phase = .layout,
         workspaceID: UUID?,
         transition: TerminalWorkContext.Transition = .unknown
-    ) -> TerminalWorkInterval {
-        log.beginTerminalWork(
-            phase, context: context(workspaceID: workspaceID, transition: transition)
-        )
+    ) -> Interval {
+        Interval()
     }
 
     /// Only an active native window or owned divider drag establishes resize.
@@ -58,13 +29,6 @@ struct TerminalGeometryDiagnostics {
         reason: String,
         transition: TerminalWorkContext.Transition
     ) {
-        let work = begin(
-            .rendererRefresh,
-            workspaceID: view.surfaceView.terminalSurface?.tabId,
-            transition: transition
-        )
-        defer { work.end() }
-        // Retain the existing realization boundary while measuring its cost.
         view.layoutSubtreeIfNeeded()
         view.surfaceView.layoutSubtreeIfNeeded()
         view.displayIfNeeded()

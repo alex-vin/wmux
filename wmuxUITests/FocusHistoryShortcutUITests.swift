@@ -161,8 +161,8 @@ final class FocusHistoryShortcutUITests: XCTestCase {
         app.launchEnvironment["CFFIXED_USER_HOME"] = isolatedHome.path
         app.launchEnvironment["XDG_CONFIG_HOME"] =
             isolatedHome.appendingPathComponent(".config", isDirectory: true).path
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_TAG"] = "ui-tests-focus-history-\(UUID().uuidString.prefix(8))"
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_TAG"] = "ui-tests-focus-history-\(UUID().uuidString.prefix(8))"
         // Backgrounded apps on CI runners get App Nap throttled and this test
         // drives everything through the control socket, which replies after
         // main-thread hops.

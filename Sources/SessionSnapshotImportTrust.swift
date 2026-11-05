@@ -1,5 +1,5 @@
-import CMUXAgentLaunch
-import CmuxControlSocket
+import WMUXAgentLaunch
+import WmuxControlSocket
 import Foundation
 
 /// What `SessionSnapshotImportTrust` removed or held back from an imported
@@ -61,8 +61,8 @@ struct SessionSnapshotImportTrustReport: Equatable, Sendable {
 enum SessionSnapshotImportTrust {
     /// Built-in Vault registrations, keyed by id. File content is never used
     /// for these; the app's own definition replaces it.
-    static var builtInRegistrationsByID: [String: CmuxVaultAgentRegistration] {
-        let builtIns: [CmuxVaultAgentRegistration] = [
+    static var builtInRegistrationsByID: [String: WmuxVaultAgentRegistration] {
+        let builtIns: [WmuxVaultAgentRegistration] = [
             .builtInPi,
             .builtInOmp,
             .builtInCampfire,
@@ -138,7 +138,7 @@ enum SessionSnapshotImportTrust {
 
     private static func sanitizedPanel(
         _ panel: SessionPanelSnapshot,
-        builtIns: [String: CmuxVaultAgentRegistration],
+        builtIns: [String: WmuxVaultAgentRegistration],
         isExistingDirectory: (String) -> Bool,
         report: inout SessionSnapshotImportTrustReport
     ) -> SessionPanelSnapshot {
@@ -232,10 +232,10 @@ enum SessionSnapshotImportTrust {
     /// session id is not a plain token.
     static func rebuiltBuiltInAgent(
         _ agent: SessionRestorableAgentSnapshot,
-        builtIns: [String: CmuxVaultAgentRegistration] = builtInRegistrationsByID
+        builtIns: [String: WmuxVaultAgentRegistration] = builtInRegistrationsByID
     ) -> SessionRestorableAgentSnapshot? {
         guard isSafeSessionID(agent.sessionId) else { return nil }
-        let registration: CmuxVaultAgentRegistration?
+        let registration: WmuxVaultAgentRegistration?
         if let fileRegistration = agent.registration {
             guard let builtIn = builtIns[fileRegistration.id],
                   agent.kind.rawValue == builtIn.id else {

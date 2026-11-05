@@ -1,5 +1,5 @@
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 import Darwin
 import Foundation
 
@@ -12,19 +12,19 @@ import Foundation
 
 enum CLISocketEnvironment {
     static func socketPath(in environment: [String: String]) throws -> String? {
-        let socketPath = normalized(environment["CMUX_SOCKET_PATH"])
-        let legacySocketPath = normalized(environment["CMUX_SOCKET"])
+        let socketPath = normalized(environment["WMUX_SOCKET_PATH"])
+        let legacySocketPath = normalized(environment["WMUX_SOCKET"])
         if let socketPath, let legacySocketPath, socketPath != legacySocketPath {
             throw CLIError(message: String(
                 localized: "cli.socket.error.conflictingEnvironment",
-                defaultValue: "Refusing to choose socket: CMUX_SOCKET_PATH and CMUX_SOCKET differ. Use CMUX_SOCKET_PATH or unset CMUX_SOCKET."
+                defaultValue: "Refusing to choose socket: WMUX_SOCKET_PATH and WMUX_SOCKET differ. Use WMUX_SOCKET_PATH or unset WMUX_SOCKET."
             ))
         }
         return socketPath ?? legacySocketPath
     }
 
     static func socketPathForTelemetry(in environment: [String: String]) -> String? {
-        normalized(environment["CMUX_SOCKET_PATH"]) ?? normalized(environment["CMUX_SOCKET"])
+        normalized(environment["WMUX_SOCKET_PATH"]) ?? normalized(environment["WMUX_SOCKET"])
     }
 
     private static func normalized(_ raw: String?) -> String? {
@@ -84,7 +84,7 @@ final class CLISocketSentryTelemetry {
     private static func currentSentryBundleIdentifier(
         environment: [String: String] = ProcessInfo.processInfo.environment
     ) -> String? {
-        if let bundleIdentifier = environment["CMUX_BUNDLE_ID"]?
+        if let bundleIdentifier = environment["WMUX_BUNDLE_ID"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !bundleIdentifier.isEmpty {
             return bundleIdentifier
@@ -129,11 +129,11 @@ final class CLISocketSentryTelemetry {
         self.socketPath = socketPath
         self.envSocketPath = CLISocketEnvironment.socketPathForTelemetry(in: processEnv)
         self.processEnv = processEnv
-        self.workspaceId = processEnv["CMUX_WORKSPACE_ID"]
-        self.surfaceId = processEnv["CMUX_SURFACE_ID"]
+        self.workspaceId = processEnv["WMUX_WORKSPACE_ID"]
+        self.surfaceId = processEnv["WMUX_SURFACE_ID"]
         self.disabledByEnv =
-            processEnv["CMUX_CLI_SENTRY_DISABLED"] == "1" ||
-            processEnv["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] == "1" ||
+            processEnv["WMUX_CLI_SENTRY_DISABLED"] == "1" ||
+            processEnv["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] == "1" ||
             Self.isFailOpenAgentHookAdmission(
                 command: command.lowercased(),
                 subcommand: commandArgs.first?.lowercased() ?? "help"
@@ -142,7 +142,7 @@ final class CLISocketSentryTelemetry {
         self.sentryPolicy = CLISocketSentryPolicy(environment: processEnv)
         // The cmux repo is public; rebranded forks have shipped with this
         // CLI's hardcoded DSN intact. Only a build that identifies as cmux
-        // may report to it (Sentry issue CMUXTERM-MACOS-1RZF).
+        // may report to it (Sentry issue WMUXTERM-MACOS-1RZF).
         self.buildIdentityPolicy = SentryBuildIdentityPolicy(
             bundleIdentifier: Self.currentSentryBundleIdentifier(environment: processEnv),
             trustedBaseBundleIdentifier: SocketPathMarkerFiles.stableBundleIdentifier
@@ -331,7 +331,7 @@ final class CLISocketSentryTelemetry {
 
 #if DEBUG
     private func recordCaptureProbe(stage: String, error: Error) {
-        guard let path = processEnv["CMUX_CLI_SENTRY_CAPTURE_PROBE_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        guard let path = processEnv["WMUX_CLI_SENTRY_CAPTURE_PROBE_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines),
               !path.isEmpty else {
             return
         }
@@ -341,7 +341,7 @@ final class CLISocketSentryTelemetry {
 
 #if canImport(Sentry)
     private func recordStoreProbe(eventId: String, fingerprint: [String]) {
-        guard let path = processEnv["CMUX_CLI_SENTRY_STORE_PROBE_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        guard let path = processEnv["WMUX_CLI_SENTRY_STORE_PROBE_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines),
               !path.isEmpty else {
             return
         }
@@ -538,7 +538,7 @@ final class CLISocketSentryTelemetry {
         ),
            (envSocketPath?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true),
            !taggedSockets.isEmpty {
-            context["possible_root_cause"] = "CMUX_SOCKET_PATH missing while tagged sockets exist"
+            context["possible_root_cause"] = "WMUX_SOCKET_PATH missing while tagged sockets exist"
         }
 
         return context

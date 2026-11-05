@@ -27,7 +27,7 @@ final class CloseWorkspacesConfirmDialogUITests: XCTestCase {
     func testCommandPaletteCloseOtherWorkspacesKeepsControlsVisibleAndScrollsDetails() {
         let app = XCUIApplication.cmuxTestApplication()
         configureSocketLaunchEnvironment(app)
-        app.launchEnvironment["CMUX_UI_TEST_FORCE_CONFIRM_CLOSE_WORKSPACE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_FORCE_CONFIRM_CLOSE_WORKSPACE"] = "1"
         app.launch()
         XCTAssertTrue(
             ensureForegroundAfterLaunch(app, timeout: 12.0),
@@ -67,7 +67,7 @@ final class CloseWorkspacesConfirmDialogUITests: XCTestCase {
             "Expected a single aggregated close-workspaces alert"
         )
         let dialog = closeWorkspacesDialog(app: app)
-        XCTAssertTrue(dialog.scrollViews["CmuxAlertScrollableDetails"].waitForExistence(timeout: 3.0))
+        XCTAssertTrue(dialog.scrollViews["WmuxAlertScrollableDetails"].waitForExistence(timeout: 3.0))
         XCTAssertTrue(dialog.buttons["Close"].isHittable, "Close must remain visible above the screen edge")
         XCTAssertTrue(dialog.buttons["Cancel"].isHittable, "Cancel must remain visible above the screen edge")
 
@@ -86,8 +86,8 @@ final class CloseWorkspacesConfirmDialogUITests: XCTestCase {
     func testCmdShiftWUsesSidebarMultiSelectionSummaryDialog() {
         let app = XCUIApplication.cmuxTestApplication()
         configureSocketLaunchEnvironment(app)
-        app.launchEnvironment["CMUX_UI_TEST_FORCE_CONFIRM_CLOSE_WORKSPACE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SIDEBAR_SELECTED_WORKSPACE_INDICES"] = "0,1"
+        app.launchEnvironment["WMUX_UI_TEST_FORCE_CONFIRM_CLOSE_WORKSPACE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SIDEBAR_SELECTED_WORKSPACE_INDICES"] = "0,1"
         app.launch()
         XCTAssertTrue(
             ensureForegroundAfterLaunch(app, timeout: 12.0),
@@ -128,9 +128,9 @@ final class CloseWorkspacesConfirmDialogUITests: XCTestCase {
         let recorderPath = "/tmp/cmux-ui-test-close-workspaces-presentation-\(UUID().uuidString).json"
         try? FileManager.default.removeItem(atPath: recorderPath)
         configureSocketLaunchEnvironment(app)
-        app.launchEnvironment["CMUX_UI_TEST_KEYEQUIV_PATH"] = recorderPath
-        app.launchEnvironment["CMUX_UI_TEST_FORCE_CONFIRM_CLOSE_WORKSPACE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SIDEBAR_SELECTED_WORKSPACE_INDICES"] = "0,1"
+        app.launchEnvironment["WMUX_UI_TEST_KEYEQUIV_PATH"] = recorderPath
+        app.launchEnvironment["WMUX_UI_TEST_FORCE_CONFIRM_CLOSE_WORKSPACE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SIDEBAR_SELECTED_WORKSPACE_INDICES"] = "0,1"
         app.launch()
         XCTAssertTrue(
             ensureForegroundAfterLaunch(app, timeout: 12.0),
@@ -187,14 +187,14 @@ final class CloseWorkspacesConfirmDialogUITests: XCTestCase {
     private func configureSocketLaunchEnvironment(_ app: XCUIApplication) {
         app.launchArguments += ["-socketControlMode", "allowAll"]
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_TAG"] = launchTag
     }
 
     private func ensureForegroundAfterLaunch(_ app: XCUIApplication, timeout: TimeInterval) -> Bool {

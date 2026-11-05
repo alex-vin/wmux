@@ -1,10 +1,10 @@
-import CMUXAgentLaunch
-import CmuxAgentChat
+import WMUXAgentLaunch
+import WmuxAgentChat
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -100,15 +100,15 @@ struct VaultQueuedRestoreIdentityTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-vault-liveness-\(UUID().uuidString)", isDirectory: true)
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let previousHookStateDirectory = getenv("CMUX_AGENT_HOOK_STATE_DIR").map {
+        let previousHookStateDirectory = getenv("WMUX_AGENT_HOOK_STATE_DIR").map {
             String(cString: $0)
         }
-        setenv("CMUX_AGENT_HOOK_STATE_DIR", hookStateDirectory.path, 1)
+        setenv("WMUX_AGENT_HOOK_STATE_DIR", hookStateDirectory.path, 1)
         defer {
             if let previousHookStateDirectory {
-                setenv("CMUX_AGENT_HOOK_STATE_DIR", previousHookStateDirectory, 1)
+                setenv("WMUX_AGENT_HOOK_STATE_DIR", previousHookStateDirectory, 1)
             } else {
-                unsetenv("CMUX_AGENT_HOOK_STATE_DIR")
+                unsetenv("WMUX_AGENT_HOOK_STATE_DIR")
             }
             try? fileManager.removeItem(at: root)
         }
@@ -133,7 +133,7 @@ struct VaultQueuedRestoreIdentityTests {
         let staleIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { _ in nil },
             processPresenceProvider: { _ in .absent },
@@ -208,7 +208,7 @@ struct VaultQueuedRestoreIdentityTests {
         rolloutData.append(0x0a)
         try rolloutData.write(to: rollout, options: .atomic)
         let storeURL = RestorableAgentKind.codex.hookStoreFileURL(
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         )
         let record: [String: Any] = [
             "sessionId": sessionID,

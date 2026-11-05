@@ -1,12 +1,12 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-private typealias StoredShortcut = cmux_DEV.StoredShortcut
-private typealias ShortcutStroke = cmux_DEV.ShortcutStroke
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+private typealias StoredShortcut = wmux_DEV.StoredShortcut
+private typealias ShortcutStroke = wmux_DEV.ShortcutStroke
 #elseif canImport(cmux)
 @testable import cmux
 private typealias StoredShortcut = cmux.StoredShortcut
@@ -48,8 +48,8 @@ private final class ShortcutNoopFileSearchController: FileSearchControlling {
         let settingsPrimary = try #require(ShortcutAction(rawValue: primary.rawValue))
         let settingsFinderAlias = try #require(ShortcutAction(rawValue: finderAlias.rawValue))
 
-        #expect(settingsPrimary.defaultStroke == CmuxSettings.ShortcutStroke(key: "\r"))
-        #expect(settingsFinderAlias.defaultStroke == CmuxSettings.ShortcutStroke(key: "↓", command: true))
+        #expect(settingsPrimary.defaultStroke == WmuxSettings.ShortcutStroke(key: "\r"))
+        #expect(settingsFinderAlias.defaultStroke == WmuxSettings.ShortcutStroke(key: "↓", command: true))
         #expect(settingsPrimary.displayName == primary.label)
         #expect(settingsFinderAlias.displayName == finderAlias.label)
     }

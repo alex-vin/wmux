@@ -1,6 +1,6 @@
 import Darwin
 import Foundation
-import CmuxSettings
+import WmuxSettings
 
 extension WMUXCLI {
     /// Reports the effective socket policy without connecting to the socket.
@@ -65,7 +65,7 @@ extension WMUXCLI {
 
     private func socketControlStatusDomain(environment: [String: String]) -> String {
         let candidates = [
-            environment["CMUX_BUNDLE_ID"],
+            environment["WMUX_BUNDLE_ID"],
             CLIExecutableLocator.enclosingAppBundle()?.bundleIdentifier,
             ManagedDevicePolicy.releasePayloadDomain,
         ]

@@ -1,4 +1,4 @@
-import CmuxCore
+import WmuxCore
 import Foundation
 import Darwin
 
@@ -6,23 +6,23 @@ import Darwin
 // probe completed (the scope may legitimately be absent) within this census.
 // `unavailable` means a transient failure (process exited mid-probe, pid reuse,
 // or a failed sysctl); later censuses retry rather than retaining an absent scope.
-enum CmuxTopProcessScopeProbeResult: Equatable {
-    case resolved(CmuxTopProcessScope?)
+enum WmuxTopProcessScopeProbeResult: Equatable {
+    case resolved(WmuxTopProcessScope?)
     case unavailable
 }
 
-extension CmuxTopProcessSnapshot {
-    static func scopeCacheKey(from kinfo: kinfo_proc) -> CmuxTopProcessScopeCacheKey {
+extension WmuxTopProcessSnapshot {
+    static func scopeCacheKey(from kinfo: kinfo_proc) -> WmuxTopProcessScopeCacheKey {
         let startTime = kinfo.kp_proc.p_un.__p_starttime
-        return CmuxTopProcessScopeCacheKey(
+        return WmuxTopProcessScopeCacheKey(
             pid: Int(kinfo.kp_proc.p_pid),
             startSeconds: Int(startTime.tv_sec),
             startMicroseconds: Int(startTime.tv_usec)
         )
     }
 
-    static func scopeCacheKey(from bsdInfo: proc_bsdinfo) -> CmuxTopProcessScopeCacheKey {
-        CmuxTopProcessScopeCacheKey(
+    static func scopeCacheKey(from bsdInfo: proc_bsdinfo) -> WmuxTopProcessScopeCacheKey {
+        WmuxTopProcessScopeCacheKey(
             pid: Int(bsdInfo.pbi_pid),
             startSeconds: Int(bsdInfo.pbi_start_tvsec),
             startMicroseconds: Int(bsdInfo.pbi_start_tvusec)
@@ -36,8 +36,8 @@ extension CmuxTopProcessSnapshot {
     // to the older topology record.
     static func cmuxScopeProbe(
         for pid: Int,
-        expectedCacheKey: CmuxTopProcessScopeCacheKey
-    ) -> CmuxTopProcessScopeProbeResult {
+        expectedCacheKey: WmuxTopProcessScopeCacheKey
+    ) -> WmuxTopProcessScopeProbeResult {
         guard pid > 0, pid <= Int(Int32.max) else { return .unavailable }
 
         var mib: [Int32] = [CTL_KERN, KERN_PROCARGS2, Int32(pid)]
@@ -65,20 +65,20 @@ extension CmuxTopProcessSnapshot {
     // True when `pid` is still the same process (same start time) as the key.
     static func processMatchesKey(
         _ pid: Int,
-        _ expectedCacheKey: CmuxTopProcessScopeCacheKey
+        _ expectedCacheKey: WmuxTopProcessScopeCacheKey
     ) -> Bool {
         guard let process = kinfoProc(for: pid) else { return false }
         return scopeCacheKey(from: process) == expectedCacheKey
     }
 
-    static func cmuxScope(fromKernProcArgs bytes: [UInt8]) -> CmuxTopProcessScope? {
+    static func cmuxScope(fromKernProcArgs bytes: [UInt8]) -> WmuxTopProcessScope? {
         guard let process = processArgumentsAndEnvironment(fromKernProcArgs: bytes) else {
             return nil
         }
         return cmuxScope(arguments: process.arguments, environment: process.environment)
     }
 
-    static func cmuxScope(arguments: [String], environment: [String: String]) -> CmuxTopProcessScope? {
+    static func cmuxScope(arguments: [String], environment: [String: String]) -> WmuxTopProcessScope? {
         if let environmentScope = cmuxScopeFromEnvironment(environment) {
             return environmentScope
         }
@@ -88,28 +88,28 @@ extension CmuxTopProcessSnapshot {
         return nil
     }
 
-    private static func cmuxScopeFromEnvironment(_ environment: [String: String]) -> CmuxTopProcessScope? {
-        let workspaceID = uuidValue(in: environment, keys: ["CMUX_WORKSPACE_ID", "CMUX_TAB_ID"])
-        let surfaceID = uuidValue(in: environment, keys: ["CMUX_SURFACE_ID", "CMUX_PANEL_ID"])
+    private static func cmuxScopeFromEnvironment(_ environment: [String: String]) -> WmuxTopProcessScope? {
+        let workspaceID = uuidValue(in: environment, keys: ["WMUX_WORKSPACE_ID", "WMUX_TAB_ID"])
+        let surfaceID = uuidValue(in: environment, keys: ["WMUX_SURFACE_ID", "WMUX_PANEL_ID"])
         guard workspaceID != nil || surfaceID != nil else { return nil }
-        return CmuxTopProcessScope(
+        return WmuxTopProcessScope(
             workspaceID: workspaceID,
             surfaceID: surfaceID,
-            attributionReason: "cmux-environment"
+            attributionReason: "wmux-environment"
         )
     }
 
-    private static func cmuxHookMonitorScope(arguments: [String]) -> CmuxTopProcessScope? {
+    private static func cmuxHookMonitorScope(arguments: [String]) -> WmuxTopProcessScope? {
         guard containsSubcommandPath(["hooks", "codex", "monitor"], in: arguments) else {
             return nil
         }
         let workspaceID = uuidOptionValue(in: arguments, names: ["--workspace"])
         let surfaceID = uuidOptionValue(in: arguments, names: ["--surface", "--panel"])
         guard workspaceID != nil || surfaceID != nil else { return nil }
-        return CmuxTopProcessScope(
+        return WmuxTopProcessScope(
             workspaceID: workspaceID,
             surfaceID: surfaceID,
-            attributionReason: "cmux-hook-arguments"
+            attributionReason: "wmux-hook-arguments"
         )
     }
 
@@ -119,7 +119,7 @@ extension CmuxTopProcessSnapshot {
         let executableName = URL(fileURLWithPath: arguments[0])
             .lastPathComponent
             .lowercased()
-        guard executableName == "cmux" else { return false }
+        guard executableName == "wmux" else { return false }
         let subcommands = arguments
             .dropFirst()
             .prefix(normalizedPath.count)
@@ -177,9 +177,9 @@ extension CmuxTopProcessSnapshot {
     }
 }
 
-extension CmuxTopProcessArguments {
+extension WmuxTopProcessArguments {
     func matchesCMUXScope(workspaceId: UUID, surfaceId: UUID) -> Bool {
-        guard let scope = CmuxTopProcessSnapshot.cmuxScope(arguments: arguments, environment: environment) else {
+        guard let scope = WmuxTopProcessSnapshot.cmuxScope(arguments: arguments, environment: environment) else {
             return false
         }
         return scope.workspaceID == workspaceId && scope.surfaceID == surfaceId

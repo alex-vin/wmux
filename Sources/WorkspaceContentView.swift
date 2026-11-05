@@ -1,11 +1,11 @@
 import SwiftUI
 import Foundation
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import Bonsplit
-import CmuxWorkspaces
-import CmuxTerminal
+import WmuxWorkspaces
+import WmuxTerminal
 
 private enum WorkspaceTitlebarInteractionMetrics {
     // Keep in sync with the minimal-mode titlebar strip so the monitor only
@@ -821,7 +821,7 @@ struct EmptyPanelView: View {
                     // `.borderedProminent` paints its label in the system's
                     // on-accent text color, so bake that semantic color rather
                     // than a literal white.
-                    CmuxSystemSymbolImage(
+                    WmuxSystemSymbolImage(
                         systemName: systemImage,
                         pointSize: 13,
                         tint: Color(nsColor: .alternateSelectedControlTextColor)
@@ -842,7 +842,7 @@ struct EmptyPanelView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            CmuxSystemSymbolImage(magnified: "terminal.fill", pointSize: 48, tint: Color(nsColor: .tertiaryLabelColor))
+            WmuxSystemSymbolImage(magnified: "terminal.fill", pointSize: 48, tint: Color(nsColor: .tertiaryLabelColor))
 
             Text(String(localized: "emptyPanel.title", defaultValue: "Empty Panel"))
                 .cmuxFont(.headline)

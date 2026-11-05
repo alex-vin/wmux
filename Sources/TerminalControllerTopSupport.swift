@@ -38,7 +38,7 @@ extension TerminalController {
     }
 
     nonisolated func v2TopMemoryDiagnosticPayload(
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         annotatedWindows: [[String: Any]],
         topGroupLimit: Int = 12
     ) -> [String: Any] {
@@ -51,7 +51,7 @@ extension TerminalController {
 
     nonisolated func v2AnnotateTopWindows(
         _ windows: inout [[String: Any]],
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         browserPIDOccurrences: [Int: Int],
         includeProcesses: Bool
     ) -> Set<Int> {
@@ -94,7 +94,7 @@ extension TerminalController {
 
     nonisolated func v2AnnotateTopWorkspace(
         _ workspace: inout [String: Any],
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         browserPIDOccurrences: [Int: Int],
         cmuxOwnedPIDs: Set<Int>,
         includeProcesses: Bool
@@ -141,7 +141,7 @@ extension TerminalController {
 
     nonisolated func v2AnnotateTopPane(
         _ pane: inout [String: Any],
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         browserPIDOccurrences: [Int: Int],
         cmuxOwnedPIDs: Set<Int>,
         includeProcesses: Bool
@@ -172,7 +172,7 @@ extension TerminalController {
 
     nonisolated func v2AnnotateTopSurface(
         _ surface: inout [String: Any],
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         browserPIDOccurrences: [Int: Int],
         cmuxOwnedPIDs: Set<Int>,
         includeProcesses: Bool
@@ -183,11 +183,11 @@ extension TerminalController {
 
         if let surfaceID {
             let cmuxPIDs = processSnapshot.pids(forCMUXSurfaceID: surfaceID)
-            surface["cmux_process_pids"] = cmuxPIDs.sorted()
+            surface["wmux_process_pids"] = cmuxPIDs.sorted()
             rootPIDs.formUnion(cmuxPIDs)
             surfacePIDs.formUnion(processSnapshot.expandedPIDs(rootPIDs: cmuxPIDs))
         } else {
-            surface["cmux_process_pids"] = []
+            surface["wmux_process_pids"] = []
         }
 
         // Sharing the surface's TTY is not ownership. A process reparented to launchd
@@ -250,7 +250,7 @@ extension TerminalController {
 
     nonisolated func v2AnnotateTopWebView(
         _ webview: inout [String: Any],
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         browserPIDOccurrences: [Int: Int],
         includeProcesses: Bool
     ) -> Set<Int> {
@@ -279,7 +279,7 @@ extension TerminalController {
 
     nonisolated func v2AnnotateTopTag(
         _ tag: inout [String: Any],
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         includeProcesses: Bool
     ) -> Set<Int> {
         guard let pid = v2TopInt(tag["pid"]) else {
@@ -338,8 +338,8 @@ extension TerminalController {
         return nil
     }
 
-    private nonisolated func v2TopMemoryAttributionByPID(in windows: [[String: Any]]) -> [Int: CmuxTopProcessAttribution] {
-        var result: [Int: CmuxTopProcessAttribution] = [:]
+    private nonisolated func v2TopMemoryAttributionByPID(in windows: [[String: Any]]) -> [Int: WmuxTopProcessAttribution] {
+        var result: [Int: WmuxTopProcessAttribution] = [:]
         var ambiguousSpecificityByPID: [Int: Int] = [:]
         var commonOwnerSourceSpecificityByPID: [Int: Int] = [:]
         for window in windows {
@@ -350,7 +350,7 @@ extension TerminalController {
 
                 let tags = workspace["tags"] as? [[String: Any]] ?? []
                 for tag in tags {
-                    let attribution = CmuxTopProcessAttribution(
+                    let attribution = WmuxTopProcessAttribution(
                         workspaceID: workspaceID,
                         workspaceRef: workspaceRef,
                         paneID: nil,
@@ -375,7 +375,7 @@ extension TerminalController {
                     let paneRef = v2TopString(pane["ref"])
                     let surfaces = pane["surfaces"] as? [[String: Any]] ?? []
                     for surface in surfaces {
-                        let attribution = CmuxTopProcessAttribution(
+                        let attribution = WmuxTopProcessAttribution(
                             workspaceID: workspaceID,
                             workspaceRef: workspaceRef,
                             paneID: paneID,
@@ -411,9 +411,9 @@ extension TerminalController {
     }
 
     private nonisolated func assignTopMemoryAttribution(
-        _ attribution: CmuxTopProcessAttribution,
+        _ attribution: WmuxTopProcessAttribution,
         from node: [String: Any],
-        to result: inout [Int: CmuxTopProcessAttribution],
+        to result: inout [Int: WmuxTopProcessAttribution],
         ambiguousSpecificityByPID: inout [Int: Int],
         commonOwnerSourceSpecificityByPID: inout [Int: Int]
     ) {
@@ -443,7 +443,7 @@ extension TerminalController {
                 case 2: sharedReason = "shared-pane-process-tree"
                 default: sharedReason = "shared-workspace-process-tree"
                 }
-                result[pid] = CmuxTopProcessAttribution(owner: commonOwner, reason: sharedReason)
+                result[pid] = WmuxTopProcessAttribution(owner: commonOwner, reason: sharedReason)
                 commonOwnerSourceSpecificityByPID[pid] = mergedSourceSpecificity
             } else if newSpecificity > existingSourceSpecificity {
                 result[pid] = attribution
@@ -458,7 +458,7 @@ extension TerminalController {
         }
     }
 
-    private nonisolated func v2TopMemoryAttributionSpecificity(_ attribution: CmuxTopProcessAttribution) -> Int {
+    private nonisolated func v2TopMemoryAttributionSpecificity(_ attribution: WmuxTopProcessAttribution) -> Int {
         attribution.owner.specificity
     }
 

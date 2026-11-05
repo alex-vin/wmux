@@ -1,5 +1,5 @@
-import CMUXAgentLaunch
-import CmuxSettings
+import WMUXAgentLaunch
+import WmuxSettings
 import Foundation
 
 struct AgentExecutableResolver {
@@ -206,7 +206,7 @@ struct AgentExecutableResolver {
     private func isKnownCmuxAgentCommandShim(_ url: URL) -> Bool {
         let candidatePath = url.standardizedFileURL.path
         for (key, rawPath) in environment
-        where key.hasPrefix("CMUX_") && key.hasSuffix("_WRAPPER_SHIM") {
+        where key.hasPrefix("WMUX_") && key.hasSuffix("_WRAPPER_SHIM") {
             let shimPath = rawPath.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !shimPath.isEmpty else { continue }
             if candidatePath == URL(fileURLWithPath: shimPath, isDirectory: false).standardizedFileURL.path {
@@ -215,8 +215,8 @@ struct AgentExecutableResolver {
         }
 
         var shimRoots = environment.compactMap { key, rawPath -> String? in
-            guard key == "CMUX_AGENT_COMMAND_SHIM_ROOT"
-                || (key.hasPrefix("CMUX_") && key.hasSuffix("_WRAPPER_SHIM_ROOT")) else {
+            guard key == "WMUX_AGENT_COMMAND_SHIM_ROOT"
+                || (key.hasPrefix("WMUX_") && key.hasSuffix("_WRAPPER_SHIM_ROOT")) else {
                 return nil
             }
             return rawPath
@@ -230,7 +230,7 @@ struct AgentExecutableResolver {
         }
         shimRoots.append(contentsOf: [
             URL(fileURLWithPath: environment["TMPDIR"] ?? NSTemporaryDirectory(), isDirectory: true)
-                .appendingPathComponent("cmux-cli-shims", isDirectory: true)
+                .appendingPathComponent("wmux-cli-shims", isDirectory: true)
                 .standardizedFileURL
                 .path,
             "/tmp/cmux-cli-shims",
@@ -261,9 +261,9 @@ struct AgentExecutableResolver {
         let marker: String
         switch provider {
         case .claude:
-            marker = "cmux claude wrapper - injects hooks and session tracking"
+            marker = "wmux claude wrapper - injects hooks and session tracking"
         case .codex:
-            marker = "cmux codex wrapper - per-invocation Codex hook injection"
+            marker = "wmux codex wrapper - per-invocation Codex hook injection"
         case .opencode:
             return false
         }
@@ -297,7 +297,7 @@ struct AgentExecutableResolver {
         guard components.count >= 4 else { return nil }
         for index in components.indices {
             guard components[index].hasSuffix(".app"),
-                  components[index].lowercased().contains("cmux"),
+                  components[index].lowercased().contains("wmux"),
                   components.indices.contains(index + 3),
                   components[index + 1] == "Contents",
                   components[index + 2] == "Resources",

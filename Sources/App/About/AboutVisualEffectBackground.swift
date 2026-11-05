@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 struct AboutVisualEffectBackground: NSViewRepresentable {

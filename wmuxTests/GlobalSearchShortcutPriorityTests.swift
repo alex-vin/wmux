@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -179,7 +179,7 @@ extension GlobalSearchShortcutBehaviorTests {
 #if DEBUG
         let appDelegate = try #require(AppDelegate.shared)
         let harness = try makeOmnibarHarness(appDelegate: appDelegate)
-        let webView = try #require(harness.panel.webView as? CmuxWebView)
+        let webView = try #require(harness.panel.webView as? WmuxWebView)
         defer {
             GlobalSearchCoordinator.shared.dismissPalette()
             appDelegate.debugResetShortcutRoutingStateForTesting()

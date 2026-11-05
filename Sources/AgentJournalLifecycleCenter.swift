@@ -1,4 +1,4 @@
-import CmuxAgentJournal
+import WmuxAgentJournal
 import Foundation
 
 /// App-side owner of the agent journal: the single writer for
@@ -79,7 +79,7 @@ final class AgentJournalLifecycleCenter: Sendable {
                     // Fail closed: without alias state, canonicalization
                     // could attach lifecycle to a stale identity. Drop the
                     // operation with a diagnostic and retry on the next one.
-                    CmuxEventBus.shared.publish(
+                    WmuxEventBus.shared.publish(
                         name: "agent.journal.aliases_unavailable",
                         category: "agent",
                         source: "journal"
@@ -182,7 +182,7 @@ final class AgentJournalLifecycleCenter: Sendable {
                             )
                         )
                     } catch {
-                        CmuxEventBus.shared.publish(
+                        WmuxEventBus.shared.publish(
                             name: "agent.journal.append_failed",
                             category: "agent",
                             source: "journal",
@@ -209,7 +209,7 @@ final class AgentJournalLifecycleCenter: Sendable {
                         // In-memory state above keeps the live run correct;
                         // the persistence gap (replay after relaunch) is
                         // recorded in release builds too.
-                        CmuxEventBus.shared.publish(
+                        WmuxEventBus.shared.publish(
                             name: "agent.journal.alias_persist_failed",
                             category: "agent",
                             source: "journal",
@@ -297,7 +297,7 @@ final class AgentJournalLifecycleCenter: Sendable {
 #endif
             return outcome.replayed ? "OK \(outcome.sequence) replayed" : "OK \(outcome.sequence)"
         } catch {
-            CmuxEventBus.shared.publish(
+            WmuxEventBus.shared.publish(
                 name: "agent.journal.append_failed",
                 category: "agent",
                 source: "journal",

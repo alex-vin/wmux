@@ -2,7 +2,7 @@ import AppKit
 import Bonsplit
 import Foundation
 import SwiftUI
-import CmuxTerminal
+import WmuxTerminal
 
 final class PaneDropTargetView: NSView {
     weak var hostedView: GhosttySurfaceScrollView?

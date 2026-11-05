@@ -1,5 +1,5 @@
-import CmuxFoundation
-import CmuxWorkspaces
+import WmuxFoundation
+import WmuxWorkspaces
 import Foundation
 
 /// A restore owner (Workspace or Dock) that holds launches until the live-agent index can decide ownership.

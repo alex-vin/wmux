@@ -117,7 +117,7 @@ extension WMUXCLI {
     /// implementation so machine selection, sync, detached terminals, and
     /// reattach output have one owner.
     private func runCoderouterAgentCommand(commandArgs: [String], client: SocketClient, jsonOutput: Bool) throws {
-        if CmuxTuiRemoteRouting.vmAgentRequestsHelp(commandArgs) {
+        if WmuxTuiRemoteRouting.vmAgentRequestsHelp(commandArgs) {
             print(Self.vmAgentUsage.replacingOccurrences(of: "wmux vm agent", with: "wmux coderouter agent"))
             return
         }

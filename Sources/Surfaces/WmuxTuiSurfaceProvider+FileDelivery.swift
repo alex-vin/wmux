@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Delivers one file to the machine over the link — see `CloudFileDelivery` for the
     /// protocol and why `vm.exec` is not an option for a secret. Returns what the
     /// receiver reported; throws with the receiver's own reason when it refused, and
@@ -43,7 +43,7 @@ extension CmuxTuiSurfaceProvider {
             empty: true
         ))
         guard let object = try JSONSerialization.jsonObject(with: result) as? [String: Any],
-              let workspaceID = CmuxTuiSnapshotParser.createdWorkspace(fromResult: object) else {
+              let workspaceID = WmuxTuiSnapshotParser.createdWorkspace(fromResult: object) else {
             throw ProviderError.noWorkspaceOnMachine(machineID)
         }
         return workspaceID

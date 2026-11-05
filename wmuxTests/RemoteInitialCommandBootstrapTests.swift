@@ -2,8 +2,8 @@ import Foundation
 import Darwin
 import Testing
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -34,14 +34,14 @@ struct RemoteInitialCommandBootstrapTests {
 
         try """
         #!/bin/sh
-        cmux_test_rcfile=''
+        wmux_test_rcfile=''
         while [ "$#" -gt 0 ]; do
           case "$1" in
-            --rcfile) cmux_test_rcfile="$2"; shift 2 ;;
+            --rcfile) wmux_test_rcfile="$2"; shift 2 ;;
             *) shift ;;
           esac
         done
-        [ -n "$cmux_test_rcfile" ] && . "$cmux_test_rcfile"
+        [ -n "$wmux_test_rcfile" ] && . "$wmux_test_rcfile"
         """.write(to: fakeBash, atomically: true, encoding: .utf8)
         try fileManager.setAttributes(
             [.posixPermissions: 0o700],
@@ -49,8 +49,8 @@ struct RemoteInitialCommandBootstrapTests {
         )
         try """
         #!/bin/sh
-        if [ "${CMUX_TEST_DELAY_STAGE:-0}" = 1 ]; then
-          IFS= read -r cmux_test_release < "$HOME/stage-gate"
+        if [ "${WMUX_TEST_DELAY_STAGE:-0}" = 1 ]; then
+          IFS= read -r wmux_test_release < "$HOME/stage-gate"
         fi
         exec /usr/bin/base64 "$@"
         """.write(to: fakeBase64, atomically: true, encoding: .utf8)
@@ -59,7 +59,7 @@ struct RemoteInitialCommandBootstrapTests {
             ofItemAtPath: fakeBase64.path
         )
 
-        let command = #"printf '%s\n' "spaces 'single' \"double\" $CMUX_REMOTE_VALUE $(printf remote-substitution)" >> "$HOME/initial command.txt""#
+        let command = #"printf '%s\n' "spaces 'single' \"double\" $WMUX_REMOTE_VALUE $(printf remote-substitution)" >> "$HOME/initial command.txt""#
         let script = RemoteInteractiveShellBootstrapBuilder.script(
             remoteRelayPort: 0,
             shellFeatures: "ssh-env,ssh-terminfo",
@@ -84,8 +84,8 @@ struct RemoteInitialCommandBootstrapTests {
             "HOME": home.path,
             "PATH": "\(bin.path):/usr/bin:/bin",
             "SHELL": fakeBash.path,
-            "CMUX_REMOTE_VALUE": "remote-only",
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_REMOTE_VALUE": "remote-only",
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
         ]) { _, new in new }
 
         let first = try runShell("umask 022\n" + script, environment: environment)
@@ -116,7 +116,7 @@ struct RemoteInitialCommandBootstrapTests {
         let delayedStderr = Pipe()
         delayed.executableURL = URL(fileURLWithPath: "/bin/sh")
         delayed.arguments = ["-c", "umask 022\n" + concurrentScript]
-        delayed.environment = environment.merging(["CMUX_TEST_DELAY_STAGE": "1"]) { _, new in new }
+        delayed.environment = environment.merging(["WMUX_TEST_DELAY_STAGE": "1"]) { _, new in new }
         delayed.standardOutput = delayedStdout
         delayed.standardError = delayedStderr
         try delayed.run()
@@ -172,12 +172,12 @@ struct RemoteInitialCommandBootstrapTests {
 
         let persistentPTYExecHelper = try writePersistentPTYExecHelper(to: bin)
 
-        try "export CMUX_ZSH_STARTUP_ORDER=zshrc\n".write(
+        try "export WMUX_ZSH_STARTUP_ORDER=zshrc\n".write(
             to: home.appendingPathComponent(".zshrc"),
             atomically: true,
             encoding: .utf8
         )
-        try "export CMUX_ZSH_STARTUP_ORDER=\"$CMUX_ZSH_STARTUP_ORDER,zlogin\"\ncd \"$HOME\"\n".write(
+        try "export WMUX_ZSH_STARTUP_ORDER=\"$WMUX_ZSH_STARTUP_ORDER,zlogin\"\ncd \"$HOME\"\n".write(
             to: home.appendingPathComponent(".zlogin"),
             atomically: true,
             encoding: .utf8
@@ -186,13 +186,13 @@ struct RemoteInitialCommandBootstrapTests {
         let script = RemoteInteractiveShellBootstrapBuilder.script(
             remoteRelayPort: 0,
             shellFeatures: "ssh-env,ssh-terminfo",
-            initialCommand: #"printf '%s|%s\n' "$CMUX_ZSH_STARTUP_ORDER" "$PWD" >> "$HOME/zsh initial command.txt""#
+            initialCommand: #"printf '%s|%s\n' "$WMUX_ZSH_STARTUP_ORDER" "$PWD" >> "$HOME/zsh initial command.txt""#
         )
         let environment = ProcessInfo.processInfo.environment.merging([
             "HOME": home.path,
             "PATH": "\(bin.path):/usr/bin:/bin",
             "SHELL": "/bin/zsh",
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
         ]) { _, new in new }
 
         let first = try runShell(script, environment: environment)
@@ -223,14 +223,14 @@ struct RemoteInitialCommandBootstrapTests {
         #!/bin/sh
         case "${1:-}" in
           -i)
-            [ "${CMUX_TEST_PERSISTENT_PTY_EXEC_USED:-}" = yes ] || exit 69
+            [ "${WMUX_TEST_PERSISTENT_PTY_EXEC_USED:-}" = yes ] || exit 69
             if [ "${2:-}" = -c ]; then
-              cmux_test_command="$3"
+              wmux_test_command="$3"
               shift 3
-              exec /bin/csh -f -c "$cmux_test_command" "$@"
+              exec /bin/csh -f -c "$wmux_test_command" "$@"
             fi
-            if [ -n "${CMUX_FALLBACK_STATE:-}" ]; then
-              printf '%s|%s\n' "$(/bin/pwd)" "$CMUX_FALLBACK_STATE" > "$HOME/fallback state.txt"
+            if [ -n "${WMUX_FALLBACK_STATE:-}" ]; then
+              printf '%s|%s\n' "$(/bin/pwd)" "$WMUX_FALLBACK_STATE" > "$HOME/fallback state.txt"
             fi
             exit 0
             ;;
@@ -244,7 +244,7 @@ struct RemoteInitialCommandBootstrapTests {
             ofItemAtPath: fakeShell.path
         )
 
-        let command = #"cd "$HOME"; setenv CMUX_FALLBACK_STATE preserved; echo "fallback spaces $CMUX_REMOTE_VALUE" >> "$HOME/fallback command.txt""#
+        let command = #"cd "$HOME"; setenv WMUX_FALLBACK_STATE preserved; echo "fallback spaces $WMUX_REMOTE_VALUE" >> "$HOME/fallback command.txt""#
         let script = RemoteInteractiveShellBootstrapBuilder.script(
             remoteRelayPort: 0,
             shellFeatures: "ssh-env,ssh-terminfo",
@@ -255,8 +255,8 @@ struct RemoteInitialCommandBootstrapTests {
             "HOME": home.path,
             "PATH": "/usr/bin:/bin",
             "SHELL": fakeShell.path,
-            "CMUX_REMOTE_VALUE": "remote-only",
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_REMOTE_VALUE": "remote-only",
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
         ]) { _, new in new }
 
         let first = try runShell(script, environment: environment)
@@ -294,9 +294,9 @@ struct RemoteInitialCommandBootstrapTests {
         case "${1:-}" in
           --execute)
             [ "$#" -eq 2 ] || exit 66
-            [ "$2" = "$CMUX_EXPECTED_COMMAND" ] || exit 68
+            [ "$2" = "$WMUX_EXPECTED_COMMAND" ] || exit 68
             printf '%s' "$2" > "$HOME/nushell command.txt"
-            printf 'execute|%s|%s\n' "$HOME" "$CMUX_REMOTE_VALUE" >> "$HOME/nushell invocations.txt"
+            printf 'execute|%s|%s\n' "$HOME" "$WMUX_REMOTE_VALUE" >> "$HOME/nushell invocations.txt"
             printf 'interactive\n' >> "$HOME/nushell invocations.txt"
             exit 0
             ;;
@@ -316,7 +316,7 @@ struct RemoteInitialCommandBootstrapTests {
             ofItemAtPath: fakeShell.path
         )
 
-        let command = #"let quoted = "spaces 'single' \"double\" $env.CMUX_REMOTE_VALUE""#
+        let command = #"let quoted = "spaces 'single' \"double\" $env.WMUX_REMOTE_VALUE""#
         let script = RemoteInteractiveShellBootstrapBuilder.script(
             remoteRelayPort: 0,
             shellFeatures: "ssh-env,ssh-terminfo",
@@ -326,9 +326,9 @@ struct RemoteInitialCommandBootstrapTests {
             "HOME": home.path,
             "PATH": "/usr/bin:/bin",
             "SHELL": fakeShell.path,
-            "CMUX_EXPECTED_COMMAND": command,
-            "CMUX_REMOTE_VALUE": "remote-only",
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_EXPECTED_COMMAND": command,
+            "WMUX_REMOTE_VALUE": "remote-only",
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
         ]) { _, new in new }
 
         let first = try runShell(script, environment: environment)
@@ -365,15 +365,15 @@ struct RemoteInitialCommandBootstrapTests {
         try """
         #!/bin/sh
         if [ "${1:-}" = rpc ] && [ "${2:-}" = surface.report_tty ]; then
-          cmux_wait_count=0
-          while [ "$cmux_wait_count" -lt 100 ] && [ ! -e "$CMUX_TEST_SHELL_STARTED" ]; do
-            cmux_wait_count=$((cmux_wait_count + 1))
+          wmux_wait_count=0
+          while [ "$wmux_wait_count" -lt 100 ] && [ ! -e "$WMUX_TEST_SHELL_STARTED" ]; do
+            wmux_wait_count=$((wmux_wait_count + 1))
             sleep 0.01
           done
-          if [ -e "$CMUX_TEST_SHELL_STARTED" ]; then
-            printf raced > "$CMUX_TEST_REPORT_STATUS"
+          if [ -e "$WMUX_TEST_SHELL_STARTED" ]; then
+            printf raced > "$WMUX_TEST_REPORT_STATUS"
           else
-            printf ready > "$CMUX_TEST_REPORT_STATUS"
+            printf ready > "$WMUX_TEST_REPORT_STATUS"
           fi
         fi
         printf '{"ok":true}\\n'
@@ -381,13 +381,13 @@ struct RemoteInitialCommandBootstrapTests {
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCmux.path)
         try """
         #!/bin/sh
-        : > "$CMUX_TEST_SHELL_STARTED"
-        cmux_wait_count=0
-        while [ "$cmux_wait_count" -lt 100 ] && [ ! -s "$CMUX_TEST_REPORT_STATUS" ]; do
-          cmux_wait_count=$((cmux_wait_count + 1))
+        : > "$WMUX_TEST_SHELL_STARTED"
+        wmux_wait_count=0
+        while [ "$wmux_wait_count" -lt 100 ] && [ ! -s "$WMUX_TEST_REPORT_STATUS" ]; do
+          wmux_wait_count=$((wmux_wait_count + 1))
           sleep 0.01
         done
-        cat "$CMUX_TEST_REPORT_STATUS"
+        cat "$WMUX_TEST_REPORT_STATUS"
         """.write(to: fakeShell, atomically: true, encoding: .utf8)
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeShell.path)
 
@@ -396,13 +396,13 @@ struct RemoteInitialCommandBootstrapTests {
             shellFeatures: "ssh-env,ssh-terminfo"
         )
         let result = try runShell(script, environment: [
-            "CMUX_BOOTSTRAP_TTY": "ttys990",
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
-            "CMUX_SSH_ATTEMPT_ID": "44444444-4444-4444-4444-444444444444",
-            "CMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
-            "CMUX_TEST_REPORT_STATUS": reportStatus.path,
-            "CMUX_TEST_SHELL_STARTED": shellStarted.path,
-            "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_BOOTSTRAP_TTY": "ttys990",
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_SSH_ATTEMPT_ID": "44444444-4444-4444-4444-444444444444",
+            "WMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
+            "WMUX_TEST_REPORT_STATUS": reportStatus.path,
+            "WMUX_TEST_SHELL_STARTED": shellStarted.path,
+            "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
             "HOME": home.path,
             "PATH": "\(bin.path):/usr/bin:/bin",
             "SHELL": fakeShell.path,
@@ -495,7 +495,7 @@ struct RemoteInitialCommandBootstrapTests {
         shift
         [ "${1:-}" = "$executable" ] || exit 2
         shift
-        export CMUX_TEST_PERSISTENT_PTY_EXEC_USED=yes
+        export WMUX_TEST_PERSISTENT_PTY_EXEC_USED=yes
         exec "$executable" "$@"
         """.write(to: url, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: url.path)

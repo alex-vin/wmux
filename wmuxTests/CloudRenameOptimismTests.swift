@@ -1,8 +1,8 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -94,7 +94,7 @@ struct CloudRenameOptimismTests {
             CloudVMPendingMutation(kind: .tabRename, remoteTabID: "tab_main", name: "new tab",
                                    receipt: .init(generation: "fixture", revision: 6)),
         ]
-        catalog.replaceCloudState(stale, resources: CmuxTuiSnapshotParser.resources(from: stale), info: provider.info,
+        catalog.replaceCloudState(stale, resources: WmuxTuiSnapshotParser.resources(from: stale), info: provider.info,
                                   observation: .init(freshness: .current, reason: nil, pendingWrites: receipts))
         #expect(catalog.snapshot.machines.first?.remoteWorkspaces?.map(\.name) == ["Renamed"])
         let views = catalog.snapshot.resources.flatMap { $0.remoteViews ?? [] }
@@ -111,7 +111,7 @@ struct CloudRenameOptimismTests {
         #expect(catalog.snapshot.resources.flatMap { $0.remoteViews ?? [] }.map(\.name) == ["new tab"])
 
         let accepted = try Self.state(machine: provider.machine, workspaceName: "Renamed", tabName: "new tab", revision: 6)
-        catalog.replaceCloudState(accepted, resources: CmuxTuiSnapshotParser.resources(from: accepted), info: provider.info)
+        catalog.replaceCloudState(accepted, resources: WmuxTuiSnapshotParser.resources(from: accepted), info: provider.info)
         #expect(catalog.authoritativeSnapshot.machines.first?.remoteWorkspaces?.map(\.name) == ["Renamed"])
         #expect(catalog.snapshot.resources.flatMap { $0.remoteViews ?? [] }.map(\.name) == ["new tab"])
     }
@@ -130,7 +130,7 @@ struct CloudRenameOptimismTests {
             "terminals": [["id": "term_main", "title": "terminal", "lifecycle": "running"]],
             "browsers": [], "agents": []
         ]
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
     }
 }
 

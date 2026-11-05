@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxPanes
+import WmuxPanes
 import Foundation
 
 private struct DockClosedPanelFallbackPlan {

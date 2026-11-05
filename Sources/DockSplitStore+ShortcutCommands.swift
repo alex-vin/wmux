@@ -1,10 +1,10 @@
 import AppKit
 import Bonsplit
-import CmuxCommandPalette
-import CmuxPanes
-import CmuxSettings
-import CmuxTerminal
-import CmuxWorkspaces
+import WmuxCommandPalette
+import WmuxPanes
+import WmuxSettings
+import WmuxTerminal
+import WmuxWorkspaces
 import Foundation
 
 enum DockShortcutCommand {

@@ -1,7 +1,7 @@
 import XCTest
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import Carbon.HIToolbox
 import Darwin
 import PDFKit
@@ -13,14 +13,14 @@ import ObjectiveC.runtime
 @testable import Bonsplit
 import UserNotifications
 // Selective imports: the app target also defines AppIconMode/StoredShortcut/etc.,
-// so a blanket `import CmuxSettings` here makes those names ambiguous. Import only
+// so a blanket `import WmuxSettings` here makes those names ambiguous. Import only
 // the settings symbols this file needs.
-import struct CmuxSettings.AccountCatalogSection
-import struct CmuxSettings.AppCatalogSection
-import struct CmuxSettings.FileRouteSettingsStore
+import struct WmuxSettings.AccountCatalogSection
+import struct WmuxSettings.AppCatalogSection
+import struct WmuxSettings.FileRouteSettingsStore
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -228,7 +228,7 @@ final class MainWindowFocusRedrawTests: XCTestCase {
         contentView.addSubview(splitView)
         splitView.setPosition(220, ofDividerAt: 0)
 
-        let window = CmuxMainWindow(
+        let window = WmuxMainWindow(
             contentRect: contentView.bounds,
             styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
@@ -2319,12 +2319,12 @@ final class DraggableFolderHitTests: XCTestCase {
     @Test func testStandardFrameKeepsAppKitDefaultFrameWhenLargerThanPolicyMinimum() {
         let defaultFrame = NSRect(x: 20, y: 40, width: 1_000, height: 700)
 
-        #expect(CmuxMainWindow.standardFrame(forDefaultFrame: defaultFrame) == defaultFrame)
+        #expect(WmuxMainWindow.standardFrame(forDefaultFrame: defaultFrame) == defaultFrame)
     }
 
     @Test func testStandardFrameDoesNotShrinkBelowPolicyMinimum() {
         let tinyDefaultFrame = NSRect(x: 20, y: 40, width: 100, height: 80)
-        let standardFrame = CmuxMainWindow.standardFrame(forDefaultFrame: tinyDefaultFrame)
+        let standardFrame = WmuxMainWindow.standardFrame(forDefaultFrame: tinyDefaultFrame)
 
         #expect(standardFrame.origin == tinyDefaultFrame.origin)
         #expect(standardFrame.width == CGFloat(SessionPersistencePolicy.minimumWindowWidth))
@@ -2343,7 +2343,7 @@ final class MainWindowDragBehaviorTests: XCTestCase {
     }
 
     func testMainWindowDragBehaviorRequiresExplicitDragZones() {
-        let window = CmuxMainWindow(
+        let window = WmuxMainWindow(
             contentRect: NSRect(x: 0, y: 0, width: 320, height: 180),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
@@ -4475,8 +4475,8 @@ final class TmuxWorkspacePaneOverlayTests: XCTestCase {
 
     func testFocusFlashUsesNotificationRingColor() {
         XCTAssertEqual(
-            WorkspaceAttentionCoordinator.flashStyle(for: .navigation).accent.strokeColor(accent: CmuxAccentColor()).hexString(),
-            WorkspaceAttentionCoordinator.notificationRingStyle.accent.strokeColor(accent: CmuxAccentColor()).hexString()
+            WorkspaceAttentionCoordinator.flashStyle(for: .navigation).accent.strokeColor(accent: WmuxAccentColor()).hexString(),
+            WorkspaceAttentionCoordinator.notificationRingStyle.accent.strokeColor(accent: WmuxAccentColor()).hexString()
         )
     }
 

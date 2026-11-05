@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 // MARK: - Agents
@@ -14,7 +14,7 @@ struct RegisteredSessionAgent: Hashable, Sendable {
         self.iconAssetName = Self.normalizedOptional(iconAssetName)
     }
 
-    init(registration: CmuxVaultAgentRegistration) {
+    init(registration: WmuxVaultAgentRegistration) {
         self.init(id: registration.id, name: registration.name, iconAssetName: registration.iconAssetName)
     }
 
@@ -57,7 +57,7 @@ enum SessionAgent: Identifiable, Codable, Sendable, Hashable {
         case "rovodev": self = .rovodev
         case "hermes-agent": self = .hermesAgent
         default:
-            guard CmuxVaultAgentRegistration.isValidID(value) else { return nil }
+            guard WmuxVaultAgentRegistration.isValidID(value) else { return nil }
             self = .registered(RegisteredSessionAgent(id: value))
         }
     }
@@ -87,12 +87,12 @@ enum SessionAgent: Identifiable, Codable, Sendable, Hashable {
             let iconAssetName = try container.decodeIfPresent(String.self, forKey: .iconAssetName)
             let hasRegisteredMetadata = name != nil || iconAssetName != nil
             if let builtIn = SessionAgent(rawValue: id),
-               (!CmuxVaultAgentRegistration.isValidID(id) || SessionAgent.builtInCases.contains(builtIn)),
+               (!WmuxVaultAgentRegistration.isValidID(id) || SessionAgent.builtInCases.contains(builtIn)),
                !hasRegisteredMetadata {
                 self = builtIn
                 return
             }
-            guard CmuxVaultAgentRegistration.isValidID(id) else {
+            guard WmuxVaultAgentRegistration.isValidID(id) else {
                 throw DecodingError.dataCorruptedError(
                     forKey: .id,
                     in: container,
@@ -202,7 +202,7 @@ enum AgentSpecifics: Hashable, Sendable {
     case rovodev
     case hermesAgent(source: String?, model: String?, hermesHome: String?)
     case registered(
-        CmuxVaultAgentRegistration,
+        WmuxVaultAgentRegistration,
         launchCommand: AgentLaunchCommandSnapshot? = nil
     )
 }
@@ -364,7 +364,7 @@ struct SessionEntry: Identifiable, Hashable, Sendable {
                 parts.append("--permission-mode \(Self.shellQuote(permissionMode))")
             }
             let environment = configDirectoryForResume.map {
-                ["CLAUDE_CONFIG_DIR": $0, "CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV": "1", "CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS": "CLAUDE_CONFIG_DIR"]
+                ["CLAUDE_CONFIG_DIR": $0, "WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV": "1", "WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS": "CLAUDE_CONFIG_DIR"]
             } ?? [:]
             return AgentResumeArgv.portableClaudeResumeShellCommand(
                 posixCommand: Self.withShellEnvironment(environment, command: parts.joined(separator: " "))

@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxSettings
+import WmuxBrowser
+import WmuxSettings
 import Foundation
 import WebKit
 

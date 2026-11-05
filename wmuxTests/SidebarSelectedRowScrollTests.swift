@@ -1,6 +1,6 @@
 import AppKit
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// The AppKit workspace list scrolls the selected row fully between its
 /// content insets: the top titlebar scrim and the bottom footer overlay.

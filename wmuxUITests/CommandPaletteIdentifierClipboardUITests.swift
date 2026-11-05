@@ -19,7 +19,7 @@ final class CommandPaletteIdentifierClipboardUITests: XCTestCase {
     func testCmdShiftPCopyIdentifierCommandsWriteExpectedClipboardPayloads() {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "-menuBarOnly", "false"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
         launchAndActivate(app)
 
         XCTAssertTrue(
@@ -76,8 +76,8 @@ final class CommandPaletteIdentifierClipboardUITests: XCTestCase {
         }
 
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "-menuBarOnly", "false"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_CAPTURE_OPEN_PATH"] = capturePath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_CAPTURE_OPEN_PATH"] = capturePath
         launchAndActivate(app)
 
         XCTAssertTrue(
@@ -279,13 +279,13 @@ final class CommandPaletteIdentifierClipboardUITests: XCTestCase {
         ]
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_UI_TEST_MODE"] = "1"
-        environment["CMUX_SOCKET_ENABLE"] = "1"
-        environment["CMUX_SOCKET_MODE"] = "allowAll"
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        environment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        environment.removeValue(forKey: "CMUX_TAG")
+        environment["WMUX_UI_TEST_MODE"] = "1"
+        environment["WMUX_SOCKET_ENABLE"] = "1"
+        environment["WMUX_SOCKET_MODE"] = "allowAll"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        environment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        environment.removeValue(forKey: "WMUX_TAG")
         process.environment = environment
 
         _ = FileManager.default.createFile(atPath: logPath, contents: nil)

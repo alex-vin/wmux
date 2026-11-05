@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// On some owned Mac minis an animated `NSPopover` close starts
 /// (`popoverWillClose`) but never finishes (`popoverDidClose`). The presenter

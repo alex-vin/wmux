@@ -119,8 +119,8 @@ struct CLISSHPTYResizeInputTests {
             "--attachment-id", surfaceId,
         ]
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         process.environment = environment
         process.standardInput = stdinHandle
         process.standardOutput = stdoutHandle

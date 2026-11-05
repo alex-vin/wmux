@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     var supportsDisplayCreation: Bool {
         // The stored machine kind predates the desktop capability contract and
         // is stale on some VMs that already have the validated runtime. The
@@ -17,7 +17,7 @@ extension CmuxTuiSurfaceProvider {
         if let snapshot = displayCoordinator.displaySnapshot {
             base = snapshot.displays.map { $0.resource(on: machine, address: info.privateAddress) }
         } else {
-            base = [CmuxTuiSnapshotParser.display(machine: machine,
+            base = [WmuxTuiSnapshotParser.display(machine: machine,
                 directURL: info.privateAddress.map { Self.privateDesktopURL(privateAddress: $0) })]
         }
         // A named display carries its name everywhere it is listed or shown.
@@ -139,7 +139,7 @@ extension CmuxTuiSurfaceProvider {
     }
 
     /// The noVNC URL retains each display's own port across VM reconnects.
-    nonisolated static func privateDesktopURL(privateAddress: String, port: Int = CmuxTuiSnapshotParser.desktopPort) -> String {
+    nonisolated static func privateDesktopURL(privateAddress: String, port: Int = WmuxTuiSnapshotParser.desktopPort) -> String {
         CloudGuestDisplay.privateDesktopURL(privateAddress: privateAddress, port: port)
     }
 }

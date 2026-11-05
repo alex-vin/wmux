@@ -3,8 +3,8 @@ import Dispatch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -19,8 +19,8 @@ import Testing
 /// `initialTerminalInput` so the workspace's main process stays the login shell.
 @Suite("Extension worktree workspace spawn args")
 struct ExtensionWorktreeSpawnArgsTests {
-    private func makeResult(setupCommand: String) -> CmuxExtensionWorktreeCreationResult {
-        CmuxExtensionWorktreeCreationResult(
+    private func makeResult(setupCommand: String) -> WmuxExtensionWorktreeCreationResult {
+        WmuxExtensionWorktreeCreationResult(
             projectRootPath: "/tmp/project",
             worktreePath: "/tmp/project/.cmux/worktrees/cmux-sidebar-123",
             branchName: "cmux-sidebar-123",
@@ -66,7 +66,7 @@ struct ExtensionWorktreeSpawnArgsTests {
 
     @Test("command capture keeps successful stderr out of stdout")
     func commandCaptureSeparatesStandardError() async throws {
-        let output = try await CmuxExtensionWorktreePrototype.runCapturingOutput(
+        let output = try await WmuxExtensionWorktreePrototype.runCapturingOutput(
             "sh",
             ["-c", "printf 'expected'; printf 'warning' >&2"]
         )
@@ -78,7 +78,7 @@ struct ExtensionWorktreeSpawnArgsTests {
     func commandFailurePayloadIsSanitized() async {
         let privateDiagnostic = "/private/worktree/secret"
         do {
-            _ = try await CmuxExtensionWorktreePrototype.runCapturingOutput(
+            _ = try await WmuxExtensionWorktreePrototype.runCapturingOutput(
                 "sh",
                 ["-c", "printf '\(privateDiagnostic)' >&2; exit 7"],
                 failureDescription: "Could not create worktree."
@@ -86,10 +86,10 @@ struct ExtensionWorktreeSpawnArgsTests {
             Issue.record("Expected command failure")
         } catch {
             let error = error as NSError
-            #expect(error.domain == "CmuxExtensionWorktreePrototype")
+            #expect(error.domain == "WmuxExtensionWorktreePrototype")
             #expect(error.localizedDescription == "Could not create worktree.")
             #expect(!String(describing: error.userInfo).contains(privateDiagnostic))
-            #expect(error.userInfo["CmuxExtensionWorktreePrototypeDetails"] == nil)
+            #expect(error.userInfo["WmuxExtensionWorktreePrototypeDetails"] == nil)
         }
     }
 
@@ -99,7 +99,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "unchanged")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         #expect(fileManager.fileExists(atPath: result.worktreePath))
@@ -127,7 +127,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         }
         try fileManager.createSymbolicLink(at: projectRootAlias, withDestinationURL: projectRoot)
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRootAlias.path
         )
         let resolvedWorktreePath = URL(fileURLWithPath: result.worktreePath, isDirectory: true)
@@ -146,7 +146,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "dirty")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         let worktree = URL(fileURLWithPath: result.worktreePath, isDirectory: true)
@@ -186,7 +186,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "replacement")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         try runGit([
@@ -218,7 +218,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "artifact")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         let artifact = URL(fileURLWithPath: result.worktreePath, isDirectory: true)
@@ -239,7 +239,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "locked")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         let artifact = URL(fileURLWithPath: result.worktreePath, isDirectory: true)
@@ -254,7 +254,7 @@ struct ExtensionWorktreeSpawnArgsTests {
             Issue.record("Rollback removed a locked worktree")
         } catch {
             let error = error as NSError
-            #expect(error.domain == "CmuxExtensionWorktreePrototype")
+            #expect(error.domain == "WmuxExtensionWorktreePrototype")
         }
 
         #expect(fileManager.fileExists(atPath: result.worktreePath))
@@ -277,7 +277,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "branch-lock")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         let branchLock = projectRoot
@@ -290,7 +290,7 @@ struct ExtensionWorktreeSpawnArgsTests {
             Issue.record("Rollback deleted a branch whose ref was locked")
         } catch {
             let error = error as NSError
-            #expect(error.domain == "CmuxExtensionWorktreePrototype")
+            #expect(error.domain == "WmuxExtensionWorktreePrototype")
         }
 
         #expect(!fileManager.fileExists(atPath: result.worktreePath))
@@ -313,7 +313,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "open-artifact")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         let artifact = URL(fileURLWithPath: result.worktreePath, isDirectory: true)
@@ -373,7 +373,7 @@ struct ExtensionWorktreeSpawnArgsTests {
             return firstResult
         }
         #expect(mutationStatus == 0)
-        #expect(rollbackError?.domain == "CmuxExtensionWorktreePrototype")
+        #expect(rollbackError?.domain == "WmuxExtensionWorktreePrototype")
         #expect(rollbackError?.code == 3)
         let checkoutPreserved = fileManager.fileExists(atPath: result.worktreePath)
         #expect(try branchExists(result.branchName, projectRoot: projectRoot) == checkoutPreserved)
@@ -403,7 +403,7 @@ struct ExtensionWorktreeSpawnArgsTests {
         let projectRoot = try makeTemporaryRepository(label: "commit")
         defer { try? fileManager.removeItem(at: projectRoot) }
 
-        let result = try await CmuxExtensionWorktreePrototype.createWorktree(
+        let result = try await WmuxExtensionWorktreePrototype.createWorktree(
             projectRootPath: projectRoot.path
         )
         let worktree = URL(fileURLWithPath: result.worktreePath, isDirectory: true)
@@ -453,13 +453,13 @@ struct ExtensionWorktreeSpawnArgsTests {
         return projectRoot
     }
 
-    private func expectRollbackRefused(_ result: CmuxExtensionWorktreeCreationResult) async {
+    private func expectRollbackRefused(_ result: WmuxExtensionWorktreeCreationResult) async {
         do {
             try await result.rollbackUnclaimedWorktree()
             Issue.record("Rollback removed a worktree whose state changed")
         } catch {
             let error = error as NSError
-            #expect(error.domain == "CmuxExtensionWorktreePrototype")
+            #expect(error.domain == "WmuxExtensionWorktreePrototype")
             #expect(error.code == 3)
         }
     }

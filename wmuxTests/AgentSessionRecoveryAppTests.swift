@@ -1,11 +1,11 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
-import CmuxAgentJournal
+import WmuxAgentJournal
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -99,7 +99,7 @@ struct AgentSessionRecoveryAppTests {
         let recovery = AgentSessionRecovery(
             journalURL: journalURL,
             homeDirectory: root.path,
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": root.path]
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": root.path]
         )
         let candidates = recovery.candidates(openSessionIds: ["already-open"], now: now)
         #expect(Set(candidates.map(\.sessionId)) == ["0b7a1e7c-3f0a-4c6e-9d59-8a0d8f7c2b11", "plain", "no-pid", "missing-pid-start"])
@@ -109,7 +109,7 @@ struct AgentSessionRecoveryAppTests {
         // The launcher argv runs inside the portable `/bin/sh -c` wrapper that
         // keeps cmux's Claude shim on PATH for the re-exec'd agent.
         #expect(proxiedCommand.hasPrefix("/bin/sh -c "))
-        #expect(proxiedCommand.contains("CMUX_CLAUDE_WRAPPER_SHIM"))
+        #expect(proxiedCommand.contains("WMUX_CLAUDE_WRAPPER_SHIM"))
         for word in ["sr", "claude", "proxy", "--account", "me@example.com", "--resume", "0b7a1e7c-3f0a-4c6e-9d59-8a0d8f7c2b11"] {
             #expect(proxiedCommand.contains(word))
         }
@@ -233,7 +233,7 @@ struct AgentSessionRecoveryAppTests {
         let recovery = AgentSessionRecovery(
             journalURL: journalURL,
             homeDirectory: root.path,
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": root.path]
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": root.path]
         )
         let recovered = recovery.candidates(openSessionIds: [], activeSince: now.addingTimeInterval(-600), now: now)
         #expect(recovered.map(\.sessionId) == [killedID])

@@ -1,6 +1,6 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
-import CmuxTerminalCore
+import WmuxTerminalCore
 
 /// Title and description ownership: which of the process title, the custom
 /// title, and the custom description a workspace presents, who set them, and

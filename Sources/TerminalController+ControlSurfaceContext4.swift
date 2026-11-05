@@ -1,10 +1,10 @@
 import AppKit
-import CmuxRemoteSession
+import WmuxRemoteSession
 import Bonsplit
-import CmuxControlSocket
-import CmuxTerminal
+import WmuxControlSocket
+import WmuxTerminal
 import Foundation
-import CmuxWorkspaces
+import WmuxWorkspaces
 
 /// The surface-domain reporting (`report_tty` / `report_pwd` /
 /// `report_shell_state` / `ports_kick`) witnesses, plus the token parsers.

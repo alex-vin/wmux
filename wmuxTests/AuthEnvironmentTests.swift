@@ -1,10 +1,10 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,42 +15,42 @@ struct AuthEnvironmentTests {
     func debugFileOverridesWinOverStaleInheritedRoutingValues() {
         let merged = AuthEnvironment.mergedRuntimeEnvironment(
             environment: [
-                "CMUX_API_BASE_URL": "https://stale.example",
-                "CMUX_VM_API_BASE_URL": "https://stale.example",
-                "CMUX_AUTH_ENVIRONMENT": "development",
+                "WMUX_API_BASE_URL": "https://stale.example",
+                "WMUX_VM_API_BASE_URL": "https://stale.example",
+                "WMUX_AUTH_ENVIRONMENT": "development",
                 "UNSAFE_SECRET": "process-secret",
             ],
             fileOverrides: [
-                "CMUX_API_BASE_URL": " https://fresh.example:4626/ ",
-                "CMUX_VM_API_BASE_URL": "https://fresh.example:4626/",
+                "WMUX_API_BASE_URL": " https://fresh.example:4626/ ",
+                "WMUX_VM_API_BASE_URL": "https://fresh.example:4626/",
                 "UNSAFE_SECRET": "file-secret",
             ]
         )
 
-        #expect(merged["CMUX_API_BASE_URL"] == "https://fresh.example:4626/")
-        #expect(merged["CMUX_VM_API_BASE_URL"] == "https://fresh.example:4626/")
+        #expect(merged["WMUX_API_BASE_URL"] == "https://fresh.example:4626/")
+        #expect(merged["WMUX_VM_API_BASE_URL"] == "https://fresh.example:4626/")
         #expect(merged["UNSAFE_SECRET"] == "process-secret")
     }
 
     @Test("debug override parser accepts quoted values and ignores comments")
     func debugOverrideParserAcceptsQuotedValues() {
         let contents = "# comment\nCMUX_VM_API_BASE_URL = \"https://fresh.example:4626/\"\nOTHER=ignored\n"
-        #expect(AuthEnvironment.parseDebugOverride(key: "CMUX_VM_API_BASE_URL", contents: contents) == "https://fresh.example:4626/")
-        #expect(AuthEnvironment.parseDebugOverride(key: "CMUX_API_BASE_URL", contents: contents) == nil)
+        #expect(AuthEnvironment.parseDebugOverride(key: "WMUX_VM_API_BASE_URL", contents: contents) == "https://fresh.example:4626/")
+        #expect(AuthEnvironment.parseDebugOverride(key: "WMUX_API_BASE_URL", contents: contents) == nil)
     }
 
     @Test("macOS production auth override selects the production Stack project")
     func macOSProductionAuthOverrideSelectsProductionStackProject() {
         #expect(AuthEnvironment.resolvedStackAuthEnvironment(
-            environment: ["CMUX_AUTH_ENVIRONMENT": " production "],
+            environment: ["WMUX_AUTH_ENVIRONMENT": " production "],
             isDebugBuild: true
         ) == .production)
         #expect(AuthEnvironment.resolvedStackProjectID(
-            environment: ["CMUX_AUTH_ENVIRONMENT": "production"],
+            environment: ["WMUX_AUTH_ENVIRONMENT": "production"],
             isDebugBuild: true
         ) == "9790718f-14cd-4f7e-824d-eaf527a82b82")
         #expect(AuthEnvironment.resolvedStackPublishableClientKey(
-            environment: ["CMUX_AUTH_ENVIRONMENT": "production"],
+            environment: ["WMUX_AUTH_ENVIRONMENT": "production"],
             isDebugBuild: true
         ) == "pck_kzj80gx4mh2jrzn1cx6y5e8jk0kwa01vkevh2p9zd4twr")
     }
@@ -58,11 +58,11 @@ struct AuthEnvironmentTests {
     @Test("invalid macOS auth override fails toward the build channel")
     func invalidMacOSAuthOverrideFailsTowardBuildChannel() {
         #expect(AuthEnvironment.resolvedStackAuthEnvironment(
-            environment: ["CMUX_AUTH_ENVIRONMENT": "staging"],
+            environment: ["WMUX_AUTH_ENVIRONMENT": "staging"],
             isDebugBuild: true
         ) == .development)
         #expect(AuthEnvironment.resolvedStackAuthEnvironment(
-            environment: ["CMUX_AUTH_ENVIRONMENT": "staging"],
+            environment: ["WMUX_AUTH_ENVIRONMENT": "staging"],
             isDebugBuild: false
         ) == .production)
     }
@@ -70,9 +70,9 @@ struct AuthEnvironmentTests {
     @Test("explicit Stack values override the selected auth channel")
     func explicitStackValuesOverrideSelectedAuthChannel() {
         let environment = [
-            "CMUX_AUTH_ENVIRONMENT": "development",
-            "CMUX_STACK_PROJECT_ID": "test-project",
-            "CMUX_STACK_PUBLISHABLE_CLIENT_KEY": "test-key",
+            "WMUX_AUTH_ENVIRONMENT": "development",
+            "WMUX_STACK_PROJECT_ID": "test-project",
+            "WMUX_STACK_PUBLISHABLE_CLIENT_KEY": "test-key",
         ]
         #expect(AuthEnvironment.resolvedStackProjectID(
             environment: environment,
@@ -87,15 +87,15 @@ struct AuthEnvironmentTests {
     @Test("Iroh broker uses shared staging in debug without moving other APIs")
     func irohBrokerUsesSharedStagingInDebugWithoutMovingOtherAPIs() {
         let defaultURL = AuthEnvironment.resolvedIrohBrokerBaseURL(
-            environment: ["CMUX_VM_API_BASE_URL": "http://localhost:9450"],
+            environment: ["WMUX_VM_API_BASE_URL": "http://localhost:9450"],
             isDebugBuild: true
         )
         #expect(defaultURL?.absoluteString == "https://cmux-staging.vercel.app")
 
         let overrideURL = AuthEnvironment.resolvedIrohBrokerBaseURL(
             environment: [
-                "CMUX_IROH_BROKER_BASE_URL": "https://broker.example.test/root/",
-                "CMUX_VM_API_BASE_URL": "http://localhost:9450",
+                "WMUX_IROH_BROKER_BASE_URL": "https://broker.example.test/root/",
+                "WMUX_VM_API_BASE_URL": "http://localhost:9450",
             ],
             isDebugBuild: true
         )
@@ -108,7 +108,7 @@ struct AuthEnvironmentTests {
         #expect(releaseURL?.absoluteString == "https://cmux.com")
 
         #expect(AuthEnvironment.resolvedIrohBrokerBaseURL(
-            environment: ["CMUX_IROH_BROKER_BASE_URL": ":// malformed"],
+            environment: ["WMUX_IROH_BROKER_BASE_URL": ":// malformed"],
             isDebugBuild: true
         ) == nil)
     }
@@ -117,8 +117,8 @@ struct AuthEnvironmentTests {
     func productionAuthCannotBeRedirectedToStagingIrohBroker() {
         let staging = AuthEnvironment.resolvedIrohBrokerBaseURL(
             environment: [
-                "CMUX_AUTH_ENVIRONMENT": "production",
-                "CMUX_IROH_BROKER_BASE_URL": "https://cmux-staging.vercel.app",
+                "WMUX_AUTH_ENVIRONMENT": "production",
+                "WMUX_IROH_BROKER_BASE_URL": "https://cmux-staging.vercel.app",
             ],
             isDebugBuild: true
         )
@@ -126,7 +126,7 @@ struct AuthEnvironmentTests {
 
         let release = AuthEnvironment.resolvedIrohBrokerBaseURL(
             environment: [
-                "CMUX_IROH_BROKER_BASE_URL": "https://cmux-staging.vercel.app",
+                "WMUX_IROH_BROKER_BASE_URL": "https://cmux-staging.vercel.app",
             ],
             isDebugBuild: false
         )
@@ -137,15 +137,15 @@ struct AuthEnvironmentTests {
     func productionAuthPinsAuthenticatedAPIOrigin() {
         let debugProduction = AuthEnvironment.resolvedAPIBaseURL(
             environment: [
-                "CMUX_AUTH_ENVIRONMENT": "production",
-                "CMUX_API_BASE_URL": "https://cmux-staging.vercel.app",
+                "WMUX_AUTH_ENVIRONMENT": "production",
+                "WMUX_API_BASE_URL": "https://cmux-staging.vercel.app",
             ],
             isDebugBuild: true
         )
         #expect(debugProduction.absoluteString == "https://cmux.com")
 
         let release = AuthEnvironment.resolvedAPIBaseURL(
-            environment: ["CMUX_API_BASE_URL": "https://cmux-staging.vercel.app"],
+            environment: ["WMUX_API_BASE_URL": "https://cmux-staging.vercel.app"],
             isDebugBuild: false
         )
         #expect(release.absoluteString == "https://cmux.com")
@@ -154,9 +154,9 @@ struct AuthEnvironmentTests {
     @Test("production auth pins Stack project and client key")
     func productionAuthPinsStackCredentials() {
         let environment = [
-            "CMUX_AUTH_ENVIRONMENT": "production",
-            "CMUX_STACK_PROJECT_ID": "staging-project",
-            "CMUX_STACK_PUBLISHABLE_CLIENT_KEY": "staging-key",
+            "WMUX_AUTH_ENVIRONMENT": "production",
+            "WMUX_STACK_PROJECT_ID": "staging-project",
+            "WMUX_STACK_PUBLISHABLE_CLIENT_KEY": "staging-key",
         ]
         #expect(AuthEnvironment.resolvedStackProjectID(
             environment: environment,
@@ -183,7 +183,7 @@ struct AuthEnvironmentTests {
     func debugCallbackSchemeUsesSanitizedTag() {
         #expect(
             AuthEnvironment.callbackScheme(
-                environment: ["CMUX_TAG": "Safari Auth!"],
+                environment: ["WMUX_TAG": "Safari Auth!"],
                 bundleIdentifier: "com.cmuxterm.app.debug.safari-auth",
                 isDebugBuild: true
             ) == "cmux-dev-safari-auth"
@@ -194,14 +194,14 @@ struct AuthEnvironmentTests {
     func releaseCallbackSchemeIgnoresAmbientTag() {
         #expect(
             AuthEnvironment.callbackScheme(
-                environment: ["CMUX_TAG": "safari-auth"],
+                environment: ["WMUX_TAG": "safari-auth"],
                 bundleIdentifier: "com.cmuxterm.app",
                 isDebugBuild: false
             ) == "cmux"
         )
         #expect(
             AuthEnvironment.callbackScheme(
-                environment: ["CMUX_TAG": "safari-auth"],
+                environment: ["WMUX_TAG": "safari-auth"],
                 bundleIdentifier: "com.cmuxterm.app.nightly",
                 isDebugBuild: false
             ) == "cmux-nightly"
@@ -218,8 +218,8 @@ struct AuthEnvironmentTests {
                 "AppleLanguages": "(ru)",
                 "LANG": "ru_RU.UTF-8",
                 "LC_ALL": "ru_RU.UTF-8",
-                "CMUX_AUTH_WWW_ORIGIN": "https://cmux.com",
-                "CMUX_AUTH_CALLBACK_SCHEME": "cmux",
+                "WMUX_AUTH_WWW_ORIGIN": "https://cmux.com",
+                "WMUX_AUTH_CALLBACK_SCHEME": "cmux",
             ],
             bundleIdentifier: "com.cmuxterm.app"
         )
@@ -232,8 +232,8 @@ struct AuthEnvironmentTests {
         let url = AuthEnvironment.signInURL(
             callbackState: "state-1",
             environment: [
-                "CMUX_TAG": "pair-auth",
-                "CMUX_PORT": "4123",
+                "WMUX_TAG": "pair-auth",
+                "WMUX_PORT": "4123",
             ],
             bundleIdentifier: "com.cmuxterm.app.debug.pair-auth"
         )
@@ -269,8 +269,8 @@ struct AuthEnvironmentTests {
                 "AppleLanguages": "(en)",
                 "LANG": "en_US.UTF-8",
                 "LC_ALL": "en_US.UTF-8",
-                "CMUX_AUTH_WWW_ORIGIN": "https://cmux.com",
-                "CMUX_AUTH_CALLBACK_SCHEME": "cmux",
+                "WMUX_AUTH_WWW_ORIGIN": "https://cmux.com",
+                "WMUX_AUTH_CALLBACK_SCHEME": "cmux",
             ],
             bundleIdentifier: "com.cmuxterm.app"
         )
@@ -280,8 +280,8 @@ struct AuthEnvironmentTests {
                 "AppleLanguages": "(ru)",
                 "LANG": "ru_RU.UTF-8",
                 "LC_ALL": "ru_RU.UTF-8",
-                "CMUX_AUTH_WWW_ORIGIN": "https://cmux.com",
-                "CMUX_AUTH_CALLBACK_SCHEME": "cmux",
+                "WMUX_AUTH_WWW_ORIGIN": "https://cmux.com",
+                "WMUX_AUTH_CALLBACK_SCHEME": "cmux",
             ],
             bundleIdentifier: "com.cmuxterm.app"
         )
@@ -293,8 +293,8 @@ struct AuthEnvironmentTests {
     func billingCheckoutFollowsAppWebOriginUnlessBillingOriginIsExplicit() {
         let appOriginURL = AuthEnvironment.resolvedBillingCheckoutURL(
             environment: [
-                "CMUX_AUTH_CALLBACK_SCHEME": "cmux-dev",
-                "CMUX_WWW_ORIGIN": "http://127.0.0.1:4278",
+                "WMUX_AUTH_CALLBACK_SCHEME": "cmux-dev",
+                "WMUX_WWW_ORIGIN": "http://127.0.0.1:4278",
             ]
         )
         #expect(appOriginURL.scheme == "http")
@@ -303,16 +303,16 @@ struct AuthEnvironmentTests {
         #expect(appOriginURL.path == "/api/billing/checkout")
         #expect(URLComponents(url: appOriginURL, resolvingAgainstBaseURL: false)?
             .queryItems?
-            .contains(where: { $0.name == "cmux_external_browser" && $0.value == "1" }) == true)
+            .contains(where: { $0.name == "wmux_external_browser" && $0.value == "1" }) == true)
         #expect(URLComponents(url: appOriginURL, resolvingAgainstBaseURL: false)?
             .queryItems?
-            .contains(where: { $0.name == "cmux_scheme" && $0.value == "cmux-dev" }) == true)
+            .contains(where: { $0.name == "wmux_scheme" && $0.value == "cmux-dev" }) == true)
 
         let overrideURL = AuthEnvironment.resolvedBillingCheckoutURL(
             environment: [
-                "CMUX_WWW_ORIGIN": "http://localhost:4278",
-                "CMUX_BILLING_WWW_ORIGIN": "https://billing-preview.example",
-                "CMUX_AUTH_CALLBACK_SCHEME": "cmux-dev-preview",
+                "WMUX_WWW_ORIGIN": "http://localhost:4278",
+                "WMUX_BILLING_WWW_ORIGIN": "https://billing-preview.example",
+                "WMUX_AUTH_CALLBACK_SCHEME": "cmux-dev-preview",
             ]
         )
         #expect(overrideURL.scheme == "https")
@@ -320,14 +320,14 @@ struct AuthEnvironmentTests {
         #expect(overrideURL.path == "/api/billing/checkout")
         #expect(URLComponents(url: overrideURL, resolvingAgainstBaseURL: false)?
             .queryItems?
-            .contains(where: { $0.name == "cmux_scheme" && $0.value == "cmux-dev-preview" }) == true)
+            .contains(where: { $0.name == "wmux_scheme" && $0.value == "cmux-dev-preview" }) == true)
     }
 
     @Test("billing portal follows app web origin unless billing origin is explicit")
     func billingPortalFollowsAppWebOriginUnlessBillingOriginIsExplicit() {
         let appOriginURL = AuthEnvironment.resolvedBillingPortalURL(
             environment: [
-                "CMUX_WWW_ORIGIN": "http://127.0.0.1:4278",
+                "WMUX_WWW_ORIGIN": "http://127.0.0.1:4278",
             ]
         )
         #expect(appOriginURL.scheme == "http")
@@ -337,8 +337,8 @@ struct AuthEnvironmentTests {
 
         let overrideURL = AuthEnvironment.resolvedBillingPortalURL(
             environment: [
-                "CMUX_WWW_ORIGIN": "http://localhost:4278",
-                "CMUX_BILLING_WWW_ORIGIN": "https://billing-preview.example",
+                "WMUX_WWW_ORIGIN": "http://localhost:4278",
+                "WMUX_BILLING_WWW_ORIGIN": "https://billing-preview.example",
             ]
         )
         #expect(overrideURL.scheme == "https")
@@ -350,7 +350,7 @@ struct AuthEnvironmentTests {
     func billingCheckoutDefaultOriginFollowsBuildWebOrigin() {
         let url = AuthEnvironment.resolvedBillingCheckoutURL(
             environment: [
-                "CMUX_PORT": "4278",
+                "WMUX_PORT": "4278",
             ]
         )
 
@@ -377,14 +377,14 @@ struct AuthEnvironmentTests {
         #endif
         #expect(URLComponents(url: url, resolvingAgainstBaseURL: false)?
             .queryItems?
-            .contains(where: { $0.name == "cmux_scheme" && $0.value == expectedScheme }) == true)
+            .contains(where: { $0.name == "wmux_scheme" && $0.value == expectedScheme }) == true)
     }
 
     @Test("tagged debug app pricing uses launch web origin before dotfile fallback")
     func taggedDebugAppPricingUsesLaunchWebOriginBeforeDotfileFallback() {
         let environment = [
-            "CMUX_AUTH_WWW_ORIGIN": "http://127.0.0.1:9210",
-            "CMUX_PORT": "9210",
+            "WMUX_AUTH_WWW_ORIGIN": "http://127.0.0.1:9210",
+            "WMUX_PORT": "9210",
         ]
 
         let pricingURL = AuthEnvironment.resolvedPricingURL(environment: environment)
@@ -430,7 +430,7 @@ struct AuthEnvironmentTests {
         #expect(values["accent"] == "#0091FF")
         #expect(values["accent_on_background"] == theme.accentOnBackground)
         #expect(values["accent_on_foreground"] == theme.accentOnForeground)
-        #expect(values["cmux_app"] == "1")
+        #expect(values["wmux_app"] == "1")
     }
 
     @MainActor
@@ -504,19 +504,19 @@ struct AuthEnvironmentTests {
     @Test("app session handoff pins credentials to production or debug loopback")
     func appSessionHandoffPinsCredentialOrigin() {
         let production = AuthEnvironment.resolvedAppSessionHandoffOrigin(
-            environment: ["CMUX_WWW_ORIGIN": "https://attacker.example"],
+            environment: ["WMUX_WWW_ORIGIN": "https://attacker.example"],
             isDebugBuild: false
         )
         #expect(production.absoluteString == "https://cmux.com")
 
         let rejectedDebugRemote = AuthEnvironment.resolvedAppSessionHandoffOrigin(
-            environment: ["CMUX_AUTH_WWW_ORIGIN": "https://attacker.example"],
+            environment: ["WMUX_AUTH_WWW_ORIGIN": "https://attacker.example"],
             isDebugBuild: true
         )
         #expect(rejectedDebugRemote.absoluteString == "https://cmux.com")
 
         let debugLoopback = AuthEnvironment.resolvedAppSessionHandoffOrigin(
-            environment: ["CMUX_WWW_ORIGIN": "http://127.0.0.1:4347"],
+            environment: ["WMUX_WWW_ORIGIN": "http://127.0.0.1:4347"],
             isDebugBuild: true
         )
         #expect(debugLoopback.absoluteString == "http://localhost:4347")
@@ -525,33 +525,33 @@ struct AuthEnvironmentTests {
     @Test("debug app session handoff accepts the tagged Tailscale Serve origin")
     func debugAppSessionHandoffAcceptsTaggedTailscaleOrigin() {
         let environment = [
-            "CMUX_WWW_ORIGIN": "https://cmux-dev-backend-1.tail137216.ts.net:3916/",
-            "CMUX_DEV_BACKEND_TRANSPORT": "direct",
-            "CMUX_DEV_BACKEND_TAILSCALE_HOST": "cmux-dev-backend-1.tail137216.ts.net",
+            "WMUX_WWW_ORIGIN": "https://cmux-dev-backend-1.tail137216.ts.net:3916/",
+            "WMUX_DEV_BACKEND_TRANSPORT": "direct",
+            "WMUX_DEV_BACKEND_TAILSCALE_HOST": "cmux-dev-backend-1.tail137216.ts.net",
         ]
         let origin = AuthEnvironment.resolvedAppSessionHandoffOrigin(
             environment: environment,
             isDebugBuild: true
         )
-        #expect(origin.absoluteString == environment["CMUX_WWW_ORIGIN"])
+        #expect(origin.absoluteString == environment["WMUX_WWW_ORIGIN"])
     }
 
     @Test("debug app session handoff rejects an untrusted Tailscale host or port")
     func debugAppSessionHandoffRejectsUntrustedTailscaleHostOrPort() {
         let baseEnvironment = [
-            "CMUX_WWW_ORIGIN": "https://cmux-dev-backend-1.tail137216.ts.net:3916/",
-            "CMUX_DEV_BACKEND_TRANSPORT": "direct",
-            "CMUX_DEV_BACKEND_TAILSCALE_HOST": "cmux-dev-backend-1.tail137216.ts.net",
+            "WMUX_WWW_ORIGIN": "https://cmux-dev-backend-1.tail137216.ts.net:3916/",
+            "WMUX_DEV_BACKEND_TRANSPORT": "direct",
+            "WMUX_DEV_BACKEND_TAILSCALE_HOST": "cmux-dev-backend-1.tail137216.ts.net",
         ]
         var wrongHost = baseEnvironment
-        wrongHost["CMUX_WWW_ORIGIN"] = "https://other.tail137216.ts.net:3916/"
+        wrongHost["WMUX_WWW_ORIGIN"] = "https://other.tail137216.ts.net:3916/"
         #expect(AuthEnvironment.resolvedAppSessionHandoffOrigin(
             environment: wrongHost,
             isDebugBuild: true
         ).absoluteString == "https://cmux.com")
 
         var wrongPort = baseEnvironment
-        wrongPort["CMUX_WWW_ORIGIN"] = "https://cmux-dev-backend-1.tail137216.ts.net:8443/"
+        wrongPort["WMUX_WWW_ORIGIN"] = "https://cmux-dev-backend-1.tail137216.ts.net:8443/"
         #expect(AuthEnvironment.resolvedAppSessionHandoffOrigin(
             environment: wrongPort,
             isDebugBuild: true
@@ -591,7 +591,7 @@ private func assertNativeSignInURL(_ url: URL) {
     #expect(nativeCallbackURL.host == "auth-callback")
 
     let nativeCallbackComponents = URLComponents(url: nativeCallbackURL, resolvingAgainstBaseURL: false)
-    #expect(nativeCallbackComponents?.queryItems?.first { $0.name == "cmux_auth_state" }?.value == "state-1")
+    #expect(nativeCallbackComponents?.queryItems?.first { $0.name == "wmux_auth_state" }?.value == "state-1")
 }
 
 private func urlHasLeadingLocaleSegment(_ url: URL) -> Bool {
@@ -625,16 +625,16 @@ struct CheckoutAttributionTests {
         )
         let values = Dictionary(uniqueKeysWithValues: items.compactMap { item in item.value.map { (item.name, $0) } })
 
-        #expect(values["cmux_source"] == "mac_sidebar_badge")
-        #expect(values["cmux_client"] == "mac")
-        #expect(values["cmux_channel"] == "nightly")
-        #expect(values["cmux_app_version"] == "0.65.1")
-        #expect(values["cmux_app_build"] == "2026090101")
+        #expect(values["wmux_source"] == "mac_sidebar_badge")
+        #expect(values["wmux_client"] == "mac")
+        #expect(values["wmux_channel"] == "nightly")
+        #expect(values["wmux_app_version"] == "0.65.1")
+        #expect(values["wmux_app_build"] == "2026090101")
     }
 
     @Test
     func applyingReplacesStaleAttributionAndKeepsOtherQuery() throws {
-        let base = try #require(URL(string: "https://cmux.com/app-pricing?cmux_app=1&cmux_source=mac_help_menu&cmux_channel=stable"))
+        let base = try #require(URL(string: "https://cmux.com/app-pricing?wmux_app=1&wmux_source=mac_help_menu&wmux_channel=stable"))
         let url = CheckoutAttribution.applying(
             to: base,
             source: .commandPalette,
@@ -643,10 +643,10 @@ struct CheckoutAttributionTests {
         )
         let items = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
 
-        #expect(items.filter { $0.name == "cmux_source" }.map(\.value) == ["mac_command_palette"])
-        #expect(items.filter { $0.name == "cmux_channel" }.map(\.value) == ["dev"])
-        #expect(items.contains { $0.name == "cmux_app" && $0.value == "1" })
-        #expect(!items.contains { $0.name == "cmux_app_version" })
+        #expect(items.filter { $0.name == "wmux_source" }.map(\.value) == ["mac_command_palette"])
+        #expect(items.filter { $0.name == "wmux_channel" }.map(\.value) == ["dev"])
+        #expect(items.contains { $0.name == "wmux_app" && $0.value == "1" })
+        #expect(!items.contains { $0.name == "wmux_app_version" })
     }
 
     @Test
@@ -662,8 +662,8 @@ struct CheckoutAttributionTests {
     @Test
     func vmRequiresProErrorTextLinksWithATypedSource() {
         let text = defaultCloudVMAction(status: 402, errorCode: "vm_requires_pro")
-        #expect(text.contains("cmux_source=\(ProUpgradeSource.vmRequiresProError.rawValue)"))
-        #expect(text.contains("cmux_client=mac"))
+        #expect(text.contains("wmux_source=\(ProUpgradeSource.vmRequiresProError.rawValue)"))
+        #expect(text.contains("wmux_client=mac"))
     }
 
     @Test
@@ -671,8 +671,8 @@ struct CheckoutAttributionTests {
         let text = defaultCloudVMAction(status: 402, errorCode: "vm_memory_requires_plan")
         #expect(text.contains("cmux Max"))
         #expect(text.contains(CheckoutAttribution.checkoutURL(source: .vmMemoryRequiresPlanError, plan: .max).absoluteString))
-        #expect(text.contains("cmux_source=\(ProUpgradeSource.vmMemoryRequiresPlanError.rawValue)"))
-        #expect(text.contains("cmux_client=mac"))
+        #expect(text.contains("wmux_source=\(ProUpgradeSource.vmMemoryRequiresPlanError.rawValue)"))
+        #expect(text.contains("wmux_client=mac"))
     }
 
     /// Pro is the server's default plan, so its checkout carries no `plan`;
@@ -680,15 +680,15 @@ struct CheckoutAttributionTests {
     /// `plan` on the base URL is replaced rather than duplicated.
     @Test
     func checkoutURLCarriesThePlanOnlyForMax() throws {
-        let base = try #require(URL(string: "https://cmux.com/api/billing/checkout?cmux_external_browser=1&plan=pro"))
+        let base = try #require(URL(string: "https://cmux.com/api/billing/checkout?wmux_external_browser=1&plan=pro"))
         let pro = CheckoutAttribution.checkoutURL(source: .newMachineSheetMaxUpgrade, plan: .pro, base: base)
         let max = CheckoutAttribution.checkoutURL(source: .newMachineSheetMaxUpgrade, plan: .max, base: base)
         let proItems = try #require(URLComponents(url: pro, resolvingAgainstBaseURL: false)?.queryItems)
         let maxItems = try #require(URLComponents(url: max, resolvingAgainstBaseURL: false)?.queryItems)
         #expect(!proItems.contains { $0.name == "plan" })
         #expect(maxItems.filter { $0.name == "plan" }.map(\.value) == ["max"])
-        #expect(maxItems.filter { $0.name == "cmux_source" }.map(\.value) == ["mac_new_machine_sheet_max_upgrade"])
-        #expect(maxItems.contains { $0.name == "cmux_external_browser" && $0.value == "1" })
+        #expect(maxItems.filter { $0.name == "wmux_source" }.map(\.value) == ["mac_new_machine_sheet_max_upgrade"])
+        #expect(maxItems.contains { $0.name == "wmux_external_browser" && $0.value == "1" })
         #expect(pro.path == "/api/billing/checkout")
         #expect(max.path == "/api/billing/checkout")
     }

@@ -1,6 +1,6 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
-import CmuxBrowser
+import WmuxBrowser
 
 struct SessionBrowserPanelSnapshot: Codable, Sendable {
     var urlString: String?
@@ -17,7 +17,7 @@ struct SessionBrowserPanelSnapshot: Codable, Sendable {
     /// viewer). Restored so the surface comes back transparent, not opaque.
     var transparentBackground: Bool? = nil
     /// Diff viewer token + request path, when this browser surface hosts a diff viewer.
-    /// Restored by re-registering the token with the app-owned `CmuxDiffViewerURLSchemeHandler`
+    /// Restored by re-registering the token with the app-owned `WmuxDiffViewerURLSchemeHandler`
     /// and navigating via the custom scheme, independent of the (possibly-dead) local HTTP server.
     var diffViewerToken: String? = nil
     var diffViewerRequestPath: String? = nil

@@ -6,9 +6,9 @@
 // sites.googleAccounts.list()).
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
-  const { URL, URLSearchParams } = root.CmuxBrowserRepl.core;
+  const { URL, URLSearchParams } = root.WmuxBrowserRepl.core;
   const SIGN_IN = [/^https:\/\/accounts\.google\.com\//, /^https:\/\/workspace\.google\.com\//, /\/gmail\/about/];
 
   function readList(arg) {

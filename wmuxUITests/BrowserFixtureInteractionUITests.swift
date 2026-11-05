@@ -50,16 +50,16 @@ class BrowserFixtureSocketTestCase: XCTestCase {
             "-AppleLanguages", "(en)",
             "-AppleLocale", "en_US",
         ] + additionalLaunchArguments
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
         // Debug launches require a tag outside reload.sh; provide one in UITests so CI
         // does not fail with "Application ... does not have a process ID".
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         if let path = ProcessInfo.processInfo.environment["PATH"], !path.isEmpty {
             app.launchEnvironment["PATH"] = path
         }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Build and package wmux/cmux into DMG locally with step timing and performance profiling
+# Build and package wmux into DMG locally with step timing and performance profiling
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
@@ -56,27 +56,31 @@ fi
 log_step "GhosttyKit preparation"
 
 echo "=== 3. Compiling macOS Application via xcodebuild (Release) ==="
-export GIT_TERMINAL_PROMPT=0
-export CARGO_NET_TIMEOUT=30
-export CARGO_NET_GIT_FETCH_WITH_CLI="true"
-export CMUX_SWIFT_FRONTEND_WORKAROUND=1
-export CMUX_SWIFT_DISABLE_GLOBAL_ISEL=1
-export CMUX_SKIP_ZIG_BUILD=1
+if [ "${SKIP_BUILD:-0}" = "1" ] && [ -d "build/Build/Products/Release/wmux.app" ]; then
+  echo "⚡ Reusing existing build output at build/Build/Products/Release/wmux.app"
+else
+  export GIT_TERMINAL_PROMPT=0
+  export CARGO_NET_TIMEOUT=30
+  export CARGO_NET_GIT_FETCH_WITH_CLI="true"
+  export WMUX_SWIFT_FRONTEND_WORKAROUND=1
+  export WMUX_SWIFT_DISABLE_GLOBAL_ISEL=1
+  export WMUX_SKIP_ZIG_BUILD=1
 
-# Run xcodebuild with timing summary
-xcodebuild -scheme cmux \
-  -configuration Release \
-  -derivedDataPath build \
-  -destination 'generic/platform=macOS' \
-  ARCHS="arm64" \
-  ONLY_ACTIVE_ARCH=NO \
-  CODE_SIGNING_ALLOWED=NO \
-  COMPILER_INDEX_STORE_ENABLE=NO \
-  DEBUG_INFORMATION_FORMAT=dwarf \
-  GCC_GENERATE_DEBUGGING_SYMBOLS=NO \
-  OTHER_SWIFT_FLAGS='$(inherited) -Xllvm -aarch64-enable-global-isel-at-O=-1' \
-  -showBuildTimingSummary \
-  build
+  # Run xcodebuild with timing summary
+  xcodebuild -scheme wmux \
+    -configuration Release \
+    -derivedDataPath build \
+    -destination 'generic/platform=macOS' \
+    ARCHS="arm64" \
+    ONLY_ACTIVE_ARCH=NO \
+    CODE_SIGNING_ALLOWED=NO \
+    COMPILER_INDEX_STORE_ENABLE=NO \
+    DEBUG_INFORMATION_FORMAT=dwarf \
+    GCC_GENERATE_DEBUGGING_SYMBOLS=NO \
+    OTHER_SWIFT_FLAGS='$(inherited) -Xllvm -aarch64-enable-global-isel-at-O=-1' \
+    -showBuildTimingSummary \
+    build
+fi
 
 log_step "xcodebuild Release build"
 
@@ -84,11 +88,8 @@ echo "=== 4. Identifying Produced App Bundle ==="
 if [ -d "build/Build/Products/Release/wmux.app" ]; then
   APP_PATH="build/Build/Products/Release/wmux.app"
   APP_NAME="wmux.app"
-elif [ -d "build/Build/Products/Release/cmux.app" ]; then
-  APP_PATH="build/Build/Products/Release/cmux.app"
-  APP_NAME="cmux.app"
 else
-  echo "❌ Build output not found in build/Build/Products/Release/" >&2
+  echo "❌ Build output not found in build/Build/Products/Release/wmux.app" >&2
   exit 1
 fi
 echo "Found application bundle: $APP_PATH"

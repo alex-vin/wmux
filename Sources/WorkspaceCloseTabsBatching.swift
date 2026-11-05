@@ -1,5 +1,5 @@
 import Bonsplit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 struct CloseOtherTabsConfirmationPrompt: Sendable {

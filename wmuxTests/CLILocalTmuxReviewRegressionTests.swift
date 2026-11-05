@@ -5,9 +5,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
     func testLocalTmuxLifecycleRejectsAttachmentOptions() throws {
         let cliPath = try bundledCLIPath()
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let cases: [[String]] = [
             ["list", "--workspace", "workspace:1"],
@@ -46,9 +46,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
     func testLocalTmuxAliasRejectsNonAttachActions() throws {
         let cliPath = try bundledCLIPath()
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let result = runProcess(
             executablePath: cliPath,
@@ -72,9 +72,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         let fakeTmux = """
         #!/bin/sh
-        printf '%s\\n' "$TMUX" "$CMUX_LOCAL_TMUX" "$@" > "$CMUX_TEST_OUTPUT"
+        printf '%s\\n' "$TMUX" "$WMUX_LOCAL_TMUX" "$@" > "$WMUX_TEST_OUTPUT"
         eval "set -- $6"
-        printf '%s\\n' "$@" > "$CMUX_TEST_ACTION_OUTPUT"
+        printf '%s\\n' "$@" > "$WMUX_TEST_ACTION_OUTPUT"
         """
         try Data(fakeTmux.utf8).write(to: fakeTmuxURL)
         XCTAssertEqual(chmod(fakeTmuxURL.path, 0o755), 0)
@@ -91,8 +91,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         ).attachCommand(binding: binding)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_TEST_OUTPUT"] = outputURL.path
-        environment["CMUX_TEST_ACTION_OUTPUT"] = actionOutputURL.path
+        environment["WMUX_TEST_OUTPUT"] = outputURL.path
+        environment["WMUX_TEST_ACTION_OUTPUT"] = actionOutputURL.path
         environment["TMUX"] = "inherited-tmux-must-be-cleared"
         let result = runProcess(
             executablePath: "/bin/bash",
@@ -109,7 +109,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "", "1", "-S", root.appendingPathComponent("server.sock").path, "if-shell", "-F",
         ])
         XCTAssertEqual(invocation.count, 9)
-        XCTAssertEqual(invocation.dropFirst(6).first, "#{==:#{@cmux_local_server_id},cccccccc-cccc-cccc-cccc-cccccccccccc}")
+        XCTAssertEqual(invocation.dropFirst(6).first, "#{==:#{@wmux_local_server_id},cccccccc-cccc-cccc-cccc-cccccccccccc}")
         XCTAssertEqual(invocation.last, "run-shell false")
         let action = try String(contentsOf: actionOutputURL, encoding: .utf8)
             .split(separator: "\n", omittingEmptySubsequences: false).dropLast().map(String.init)
@@ -157,11 +157,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         defer { try? FileManager.default.removeItem(at: root) }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = root.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = root.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let result = runProcess(
             executablePath: cliPath,
@@ -194,11 +194,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertEqual(chmod(fakeTmuxURL.path, 0o755), 0)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let result = runProcess(
             executablePath: cliPath,
@@ -244,14 +244,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertEqual(chmod(fakeTmuxURL.path, 0o755), 0)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
         environment["FAKE_TMUX_MODE"] = "create"
-        environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let start = runProcess(
             executablePath: cliPath,
@@ -310,7 +310,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         environment["FAKE_TMUX_MODE"] = "live"
-        environment["CMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_SOCKET_PATH"] = socketPath
         let attach = runProcess(
             executablePath: cliPath,
             arguments: ["local-tmux", "attach", sessionName],
@@ -335,11 +335,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         try Data("#!/bin/sh\necho unavailable >&2\nexit 1\n".utf8).write(to: fakeTmuxURL)
         XCTAssertEqual(chmod(fakeTmuxURL.path, 0o755), 0)
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let result = runProcess(
             executablePath: cliPath,
@@ -388,12 +388,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertEqual(chmod(wrapperURL.path, 0o755), 0)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
         environment["EXISTING_TMUX_CWD"] = root.path
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let result = runProcess(
             executablePath: wrapperURL.path,
@@ -455,14 +455,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertEqual(chmod(fakeTmuxURL.path, 0o755), 0)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
         environment["FAKE_TMUX_MODE"] = "create"
-        environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         let start = runProcess(
             executablePath: cliPath,
@@ -477,8 +477,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "'" + $0.replacingOccurrences(of: "'", with: "'\\''") + "'"
         }
         let action = ["attach-session", "-t", "$104"].map(quote).joined(separator: " ")
-        let condition = "#{==:#{@cmux_local_server_id},44444444-4444-4444-4444-444444444444}"
-        let expectedCommand = "/usr/bin/env TMUX= CMUX_LOCAL_TMUX=1 \(quote(fakeTmuxURL.path)) -S \(quote(root.appendingPathComponent("server.sock").path)) if-shell -F \(quote(condition)) \(quote(action)) \(quote("run-shell false"))"
+        let condition = "#{==:#{@wmux_local_server_id},44444444-4444-4444-4444-444444444444}"
+        let expectedCommand = "/usr/bin/env TMUX= WMUX_LOCAL_TMUX=1 \(quote(fakeTmuxURL.path)) -S \(quote(root.appendingPathComponent("server.sock").path)) if-shell -F \(quote(condition)) \(quote(action)) \(quote("run-shell false"))"
         let serverHandled = startMockServer(listenerFD: listenerFD, state: state) { line in
             guard let payload = self.jsonObject(line),
                   let id = payload["id"] as? String,
@@ -515,7 +515,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         environment["FAKE_TMUX_MODE"] = "live"
-        environment["CMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_SOCKET_PATH"] = socketPath
         let attach = runProcess(
             executablePath: cliPath,
             arguments: ["local-tmux", "attach", sessionName, "--workspace", "workspace:2"],
@@ -540,11 +540,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertEqual(chmod(fakeTmuxURL.path, 0o755), 0)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
 
         for invalidName in ["work.name", "work:name"] {
             let result = runProcess(

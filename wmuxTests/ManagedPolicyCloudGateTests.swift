@@ -1,12 +1,12 @@
-import CmuxCloud
-import CMUXAuthCore
-import CmuxAuthRuntime
-import CmuxSettings
+import WmuxCloud
+import WMUXAuthCore
+import WmuxAuthRuntime
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -266,12 +266,12 @@ struct ManagedPolicyCloudGateTests {
     private func makeRestoredSessionCoordinator(defaults: UserDefaults) -> AuthCoordinator {
         AuthCoordinator(
             client: ManagedPolicyCloudGateAuthClient(),
-            sessionCache: CMUXAuthSessionCache(keyValueStore: defaults, key: "auth-session"),
-            userCache: CMUXAuthIdentityStore(keyValueStore: defaults, key: "auth-user"),
-            teamSelection: CMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "auth-team"),
+            sessionCache: WMUXAuthSessionCache(keyValueStore: defaults, key: "auth-session"),
+            userCache: WMUXAuthIdentityStore(keyValueStore: defaults, key: "auth-user"),
+            teamSelection: WMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "auth-team"),
             anchor: AuthPresentationContextProvider(),
             config: AuthConfig(
-                stack: CMUXAuthConfig(projectId: "project-a", publishableClientKey: "publishable-a"),
+                stack: WMUXAuthConfig(projectId: "project-a", publishableClientKey: "publishable-a"),
                 magicLinkCallbackURL: "http://127.0.0.1:1/auth/callback",
                 apiBaseURL: "http://127.0.0.1:1"
             ),
@@ -279,8 +279,8 @@ struct ManagedPolicyCloudGateTests {
                 clearAuthRequested: false,
                 mockDataEnabled: false,
                 environment: [
-                    "CMUX_UITEST_AUTH_FIXTURE": "1",
-                    "CMUX_UITEST_AUTH_USER_ID": "managed-policy-account",
+                    "WMUX_UITEST_AUTH_FIXTURE": "1",
+                    "WMUX_UITEST_AUTH_USER_ID": "managed-policy-account",
                 ],
                 includesDevAuth: true
             )
@@ -381,14 +381,14 @@ private actor ManagedPolicyCloudGateAuthClient: AuthClient {
     func forceRefreshAccessToken() async -> String? { "access-token" }
     func currentUser(
         throwOnMissing: Bool
-    ) async throws -> CMUXAuthCore.CMUXAuthUser? {
-        CMUXAuthCore.CMUXAuthUser(
+    ) async throws -> WMUXAuthCore.WMUXAuthUser? {
+        WMUXAuthCore.WMUXAuthUser(
             id: "managed-policy-account",
             primaryEmail: "managed-policy@cmux.test",
             displayName: "Managed Policy Account"
         )
     }
-    func listTeams() async throws -> [CMUXAuthCore.CMUXAuthTeam] { [] }
+    func listTeams() async throws -> [WMUXAuthCore.WMUXAuthTeam] { [] }
     func sendMagicLinkEmail(email: String, callbackURL: String) async throws -> String {
         "nonce"
     }

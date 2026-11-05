@@ -1,6 +1,6 @@
-import CMUXAgentLaunch
-import CmuxFoundation
-import CmuxControlSocket
+import WMUXAgentLaunch
+import WmuxFoundation
+import WmuxControlSocket
 import Foundation
 
 /// Outcome of the single pre-exec admission boundary for managed agent restores.
@@ -81,7 +81,7 @@ extension TerminalController {
             case .index(let index):
                 liveOwner = index.liveSessionOwner(
                     kind: inputs.kind, sessionID: inputs.sessionID, revalidateProcessEvidence: true,
-                    processArgumentsProvider: { CmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0) },
+                    processArgumentsProvider: { WmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0) },
                     processPresenceProvider: { pid in
                         guard pid > 0, pid <= Int(Int32.max) else { return .absent }
                         return PIDPresence.current(pid: pid_t(pid))
@@ -369,7 +369,7 @@ extension TerminalController {
                 code: "conflict",
                 message: String(
                     localized: "agentRestore.admission.targetChanged",
-                    defaultValue: "The surface restore record changed. Run 'cmux restore --surface' again."
+                    defaultValue: "The surface restore record changed. Run 'wmux restore --surface' again."
                 )
             )
         case .recovering:

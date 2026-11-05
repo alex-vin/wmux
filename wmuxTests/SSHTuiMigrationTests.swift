@@ -1,13 +1,13 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxCore
-import CmuxFoundation
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxCore
+import WmuxFoundation
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -657,7 +657,7 @@ struct SSHTuiMigrationTests {
             agent: nil, remoteWorkspace: nil, port: nil, url: nil
         )
         let url = try #require(URL(string: "http://localhost:3000/project?view=source"))
-        let target = try #require(CmuxTuiSurfaceProvider.cloudTerminalLinkTarget(
+        let target = try #require(WmuxTuiSurfaceProvider.cloudTerminalLinkTarget(
             url: url, resource: resource, privateAddress: "127.0.0.1"
         ))
         #expect(target.url.port == 3000)
@@ -667,10 +667,10 @@ struct SSHTuiMigrationTests {
 
     @Test("SSH port previews admit remote loopback without widening Cloud routes")
     func sshPortPreviewRetainsCarrierOwnership() {
-        let resource = CmuxTuiSnapshotParser.portBrowser(machine: .ssh("fixture"), port: 3000)
+        let resource = WmuxTuiSnapshotParser.portBrowser(machine: .ssh("fixture"), port: 3000)
         #expect(CloudPortRoutePlan.plan(resource: resource, privateAddress: "127.0.0.1")
             == .privateDirect(remoteURL: "http://127.0.0.1:3000"))
-        let cloud = CmuxTuiSnapshotParser.portBrowser(machine: .cloud("fixture"), port: 3000)
+        let cloud = WmuxTuiSnapshotParser.portBrowser(machine: .cloud("fixture"), port: 3000)
         guard case .unsupported = CloudPortRoutePlan.plan(resource: cloud, privateAddress: "127.0.0.1") else {
             Issue.record("Cloud must not acquire an SSH loopback route")
             return

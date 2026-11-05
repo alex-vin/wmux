@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 import Testing
@@ -7,9 +7,9 @@ import Testing
     @Test func bundledClaudeWrapperScrubsSessionIdentityAndPreservesTrustBypassOnResume() throws {
         let fileManager = FileManager.default
         // CI consumers run products compiled under another root; the restore
-        // step aliases this checkout at $CMUX_CI_RUNTIME_SOURCE_ROOT/src.
+        // step aliases this checkout at $WMUX_CI_RUNTIME_SOURCE_ROOT/src.
         let repoRoot: URL
-        if let runtimeRoot = ProcessInfo.processInfo.environment["CMUX_CI_RUNTIME_SOURCE_ROOT"],
+        if let runtimeRoot = ProcessInfo.processInfo.environment["WMUX_CI_RUNTIME_SOURCE_ROOT"],
            !runtimeRoot.isEmpty {
             repoRoot = URL(fileURLWithPath: runtimeRoot, isDirectory: true)
                 .appendingPathComponent("src", isDirectory: true)
@@ -78,9 +78,9 @@ import Testing
             "PATH": "\(binDir.path):/usr/bin:/bin",
             "HOME": homeDir.path,
             "TMPDIR": sandbox.path,
-            "CMUX_SURFACE_ID": UUID().uuidString,
-            "CMUX_SOCKET_PATH": socketURL.path,
-            "CMUX_BUNDLED_CLI_PATH": fakeCmuxURL.path,
+            "WMUX_SURFACE_ID": UUID().uuidString,
+            "WMUX_SOCKET_PATH": socketURL.path,
+            "WMUX_BUNDLED_CLI_PATH": fakeCmuxURL.path,
             "CLAUDE_CODE_USE_VERTEX": "1",
         ]
         for key in observedKeys {

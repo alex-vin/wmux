@@ -1,6 +1,6 @@
-import CMUXDebugLog
-import CmuxTerminal
-import CmuxTerminalCore
+import WMUXDebugLog
+import WmuxTerminal
+import WmuxTerminalCore
 import Foundation
 import GhosttyKit
 

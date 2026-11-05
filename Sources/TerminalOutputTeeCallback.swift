@@ -1,4 +1,4 @@
-import CmuxTerminal
+import WmuxTerminal
 import Foundation
 
 /// One C callback fans raw PTY output out to every opt-in cmux consumer.

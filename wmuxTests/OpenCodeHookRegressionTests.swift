@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import XCTest
 import Darwin
 
@@ -54,7 +54,7 @@ final class OpenCodeHookRegressionTests: XCTestCase {
         environment["HOME"] = root.appendingPathComponent("home", isDirectory: true).path
         environment["XDG_CONFIG_HOME"] = xdgConfigHome.path
         environment["PATH"] = "\(binDir.path):\(environment["PATH"] ?? "/usr/bin")"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -152,7 +152,7 @@ final class OpenCodeHookRegressionTests: XCTestCase {
         var environment = ProcessInfo.processInfo.environment
         environment["OPENCODE_CONFIG_DIR"] = configDir.path
         environment["PATH"] = "\(binDir.path):\(environment["PATH"] ?? "/usr/bin")"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         let result = runProcess(executablePath: cliPath, arguments: ["hooks", "opencode", "install", "--yes"], environment: environment, timeout: 5)
 
         XCTAssertFalse(result.timedOut, result.stderr)
@@ -164,7 +164,7 @@ final class OpenCodeHookRegressionTests: XCTestCase {
         XCTAssertFalse(pluginSource.contains("ctx.event.subscribe({ signal"))
         XCTAssertTrue(pluginSource.contains("event.properties || event.data"))
         XCTAssertTrue(pluginSource.contains("\"hooks\", \"enqueue\", \"opencode\""))
-        XCTAssertTrue(pluginSource.contains("CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: \"1\""))
+        XCTAssertTrue(pluginSource.contains("WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: \"1\""))
 
         let secondResult = runProcess(executablePath: cliPath, arguments: ["setup-hooks", "--agent", "opencode"], environment: environment, timeout: 5)
         XCTAssertFalse(secondResult.timedOut, secondResult.stderr)
@@ -181,7 +181,7 @@ final class OpenCodeHookRegressionTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: tuiDirectory.appendingPathComponent(".cmux-owned").path))
         let serverSource = try String(contentsOf: tuiDirectory.appendingPathComponent("index.js"), encoding: .utf8)
         XCTAssertTrue(serverSource.contains("cmux-opencode-tui-plugin-server-marker"))
-        XCTAssertTrue(serverSource.contains("export const CMUXFeed"))
+        XCTAssertTrue(serverSource.contains("export const WMUXFeed"))
         XCTAssertTrue(serverSource.contains("client.permission.reply"))
         XCTAssertTrue(serverSource.contains("requestID: requestId"))
         XCTAssertTrue(serverSource.contains("reply,"))
@@ -218,7 +218,7 @@ final class OpenCodeHookRegressionTests: XCTestCase {
         var environment = ProcessInfo.processInfo.environment
         environment["OPENCODE_CONFIG_DIR"] = configDir.path
         environment["PATH"] = "\(binDir.path):\(environment["PATH"] ?? "/usr/bin")"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         let result = runProcess(executablePath: cliPath, arguments: ["hooks", "opencode", "install", "--yes"], environment: environment, timeout: 5)
         XCTAssertFalse(result.timedOut, result.stderr)
         XCTAssertEqual(result.status, 0, result.stderr)
@@ -234,7 +234,7 @@ final class OpenCodeHookRegressionTests: XCTestCase {
     func testLegacyHookAliasesAreHiddenFromHelp() throws {
         let cliPath = try bundledCLIPath()
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(executablePath: cliPath, arguments: ["help"], environment: environment, timeout: 5)
 
@@ -314,10 +314,10 @@ const fs = require("node:fs");
     }
   }
 
-  process.env.CMUX_SOCKET_PATH = activeSocketPath;
+  process.env.WMUX_SOCKET_PATH = activeSocketPath;
   const { pathToFileURL } = await import("node:url");
   const plugin = await import(pathToFileURL(pluginPath).href);
-  const hooks = await plugin.CMUXFeed({ directory: "/tmp/opencode-project" });
+  const hooks = await plugin.WMUXFeed({ directory: "/tmp/opencode-project" });
   await hooks.event({ event: {
     type: "session.created",
     properties: { info: { id: "ses-feed-shape", directory: "/tmp/opencode-project" } }

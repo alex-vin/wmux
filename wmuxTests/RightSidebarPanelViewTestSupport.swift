@@ -1,5 +1,5 @@
 import AppKit
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import SwiftUI
 
 extension WindowAppearanceSnapshot {

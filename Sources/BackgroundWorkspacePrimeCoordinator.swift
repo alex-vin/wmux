@@ -1,6 +1,6 @@
 import Foundation
 import Combine
-import CmuxTerminal
+import WmuxTerminal
 
 // Swift 6.0 cannot mark nested type declarations `nonisolated`. File scope
 // keeps these concurrency helpers outside the coordinator's main-actor domain.

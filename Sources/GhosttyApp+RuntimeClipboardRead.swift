@@ -1,7 +1,7 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxTerminal
+import WmuxTerminalCore
 import GhosttyKit
 import os
 
@@ -296,7 +296,7 @@ extension GhosttyApp {
                                 return requestTerminalSurface.owningWorkspace()
                             }
                             guard let workspace else {
-                                finish(.failure(NSError(domain: "cmux.remote.paste", code: 3)))
+                                finish(.failure(NSError(domain: "wmux.remote.paste", code: 3)))
                                 preparationService.cleanupTransferredTemporaryFiles(
                                     .fileURLs(fileURLs)
                                 )
@@ -317,7 +317,7 @@ extension GhosttyApp {
                             guard MainActor.assumeIsolated({
                                 requestSurfaceIdentity.matches(requestTerminalSurface)
                             }) else {
-                                finish(.failure(NSError(domain: "cmux.remote.paste", code: 4)))
+                                finish(.failure(NSError(domain: "wmux.remote.paste", code: 4)))
                                 preparationService.cleanupTransferredTemporaryFiles(
                                     .fileURLs(fileURLs)
                                 )

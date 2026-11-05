@@ -1,11 +1,11 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -26,16 +26,16 @@ extension SSHConfiguredRemoteCommandHostTests {
         ) -> [String: String] {
             var environment = ProcessInfo.processInfo.environment
             environment["PATH"] = "/usr/bin:/bin"
-            environment["CMUX_BUNDLED_CLI_PATH"] = binDirectory.appendingPathComponent("cmux").path
-            environment["CMUX_SOCKET_PATH"] = socketPath
-            environment["CMUX_WORKSPACE_ID"] = workspaceID
-            environment["CMUX_SURFACE_ID"] = surfaceID
-            environment["CMUX_FAKE_SSH_EVENTS"] = eventsFile.path
-            environment["CMUX_FAKE_CLI_LOG"] = fakeCLILog.path
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-            environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
-            environment["CMUX_SSH_RECONNECT_LIMIT"] = "1"
-            environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+            environment["WMUX_BUNDLED_CLI_PATH"] = binDirectory.appendingPathComponent("cmux").path
+            environment["WMUX_SOCKET_PATH"] = socketPath
+            environment["WMUX_WORKSPACE_ID"] = workspaceID
+            environment["WMUX_SURFACE_ID"] = surfaceID
+            environment["WMUX_FAKE_SSH_EVENTS"] = eventsFile.path
+            environment["WMUX_FAKE_CLI_LOG"] = fakeCLILog.path
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+            environment["WMUX_SSH_RECONNECT_LIMIT"] = "1"
+            environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
             return environment
         }
 
@@ -119,7 +119,7 @@ extension SSHConfiguredRemoteCommandHostTests {
         // operations never execute a remote command.
         let fakeSSH = """
         #!/bin/sh
-        events="${CMUX_FAKE_SSH_EVENTS:?}"
+        events="${WMUX_FAKE_SSH_EVENTS:?}"
         override=absent
         remotecommand_value=
         remotecommand_options=0
@@ -193,7 +193,7 @@ extension SSHConfiguredRemoteCommandHostTests {
 
         let fakeCLI = """
         #!/bin/sh
-        printf '%s\\n' "$*" >> "${CMUX_FAKE_CLI_LOG:?}"
+        printf '%s\\n' "$*" >> "${WMUX_FAKE_CLI_LOG:?}"
         exit 0
         """
         let fakeCLIURL = binDirectory.appendingPathComponent("cmux")

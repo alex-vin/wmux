@@ -1,9 +1,9 @@
 import Bonsplit
 import Carbon.HIToolbox
-import CmuxControlSocket
-import CMUXMobileCore
-import CmuxPanes
-import CmuxRemoteSession
+import WmuxControlSocket
+import WMUXMobileCore
+import WmuxPanes
+import WmuxRemoteSession
 import Foundation
 import GhosttyKit
 

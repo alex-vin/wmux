@@ -1,9 +1,9 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -192,7 +192,7 @@ import Testing
         // A user misreading the setting as a list of command strings must fail
         // closed, not crash (JSONSerialization raises an uncatchable exception on a
         // non-collection value unless we guard on the object shape first).
-        #expect(decode(#"["my-upload $CMUX_UPLOAD_LOCAL_PATH"]"#) == nil)
+        #expect(decode(#"["my-upload $WMUX_UPLOAD_LOCAL_PATH"]"#) == nil)
         #expect(decode(#"[42]"#) == nil)
     }
 
@@ -268,12 +268,12 @@ import Testing
             identityFile: "/id",
             sshOptions: ["A=B", "C=D"]
         )
-        #expect(env["CMUX_UPLOAD_LOCAL_PATH"] == "/l")
-        #expect(env["CMUX_UPLOAD_REMOTE_PATH"] == "/r")
-        #expect(env["CMUX_UPLOAD_DESTINATION"] == "me@h")
-        #expect(env["CMUX_UPLOAD_PORT"] == "2222")
-        #expect(env["CMUX_UPLOAD_IDENTITY_FILE"] == "/id")
-        #expect(env["CMUX_UPLOAD_SSH_OPTIONS"] == "A=B\nC=D")
+        #expect(env["WMUX_UPLOAD_LOCAL_PATH"] == "/l")
+        #expect(env["WMUX_UPLOAD_REMOTE_PATH"] == "/r")
+        #expect(env["WMUX_UPLOAD_DESTINATION"] == "me@h")
+        #expect(env["WMUX_UPLOAD_PORT"] == "2222")
+        #expect(env["WMUX_UPLOAD_IDENTITY_FILE"] == "/id")
+        #expect(env["WMUX_UPLOAD_SSH_OPTIONS"] == "A=B\nC=D")
     }
 
     @Test func environmentOmitsAbsentOptionalFields() {
@@ -285,9 +285,9 @@ import Testing
             identityFile: nil,
             sshOptions: []
         )
-        #expect(env["CMUX_UPLOAD_PORT"] == nil)
-        #expect(env["CMUX_UPLOAD_IDENTITY_FILE"] == nil)
-        #expect(env["CMUX_UPLOAD_SSH_OPTIONS"] == nil)
+        #expect(env["WMUX_UPLOAD_PORT"] == nil)
+        #expect(env["WMUX_UPLOAD_IDENTITY_FILE"] == nil)
+        #expect(env["WMUX_UPLOAD_SSH_OPTIONS"] == nil)
     }
 }
 
@@ -321,7 +321,7 @@ import Testing
             compressionEnabled: false, sshOptions: ["HostName=real-host.example.com"]
         )
         let runner = TerminalCustomUploadRunner(
-            runProcess: { _, env, _, _ in (0, "matched:\(env["CMUX_UPLOAD_DESTINATION"] ?? "")", "") },
+            runProcess: { _, env, _, _ in (0, "matched:\(env["WMUX_UPLOAD_DESTINATION"] ?? "")", "") },
             isFileTransferDisabled: { false },
             uploadRules: {
                 [TerminalUploadCommandRule(hostPattern: "real-host.example.com", command: "upload-tool put")]
@@ -351,7 +351,7 @@ import Testing
 
     @Test func perFileStdoutJoinedWithSpaces() {
         let result = runner { _, env, _, _ in
-            (0, "OUT:\(env["CMUX_UPLOAD_LOCAL_PATH"] ?? "")", "")
+            (0, "OUT:\(env["WMUX_UPLOAD_LOCAL_PATH"] ?? "")", "")
         }.runSync(
             fileURLs: [URL(fileURLWithPath: "/tmp/a.png"), URL(fileURLWithPath: "/tmp/b.png")],
             endpoint: endpoint(),
@@ -383,9 +383,9 @@ import Testing
         // supply a usable destination and return it for insertion after copying.
         let runner = runner { command, environment, timeout, operation in
             var environment = environment
-            let path = environment["CMUX_UPLOAD_REMOTE_PATH"] ?? ""
+            let path = environment["WMUX_UPLOAD_REMOTE_PATH"] ?? ""
             let destination = path.hasPrefix("~/") ? directory.path + String(path.dropFirst()) : path
-            environment["CMUX_UPLOAD_REMOTE_PATH"] = destination
+            environment["WMUX_UPLOAD_REMOTE_PATH"] = destination
             destinations.append(destination)
             return try TerminalCustomUploadRunner.spawnCommand(
                 command: command, environment: environment, timeout: timeout, operation: operation
@@ -394,7 +394,7 @@ import Testing
         let result = runner.runSync(
             fileURLs: [source, source],
             endpoint: endpoint(),
-            command: "cp \"$CMUX_UPLOAD_LOCAL_PATH\" \"$CMUX_UPLOAD_REMOTE_PATH\"",
+            command: "cp \"$WMUX_UPLOAD_LOCAL_PATH\" \"$WMUX_UPLOAD_REMOTE_PATH\"",
             operation: TerminalImageTransferOperation()
         )
         let text = try result.get()

@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -142,7 +142,7 @@ extension BrowserDiscardPageStateRestoreTests {
         XCTAssertNil(webView.navigationDelegate, file: file, line: line)
         XCTAssertNil(webView.uiDelegate, file: file, line: line)
         XCTAssertNil(webView.cmuxBrowserViewportHostView, file: file, line: line)
-        if let cmuxWebView = webView as? CmuxWebView {
+        if let cmuxWebView = webView as? WmuxWebView {
             XCTAssertNil(cmuxWebView.cmuxDownloadDelegate, file: file, line: line)
             XCTAssertNil(cmuxWebView.browserViewportModel, file: file, line: line)
             XCTAssertNil(cmuxWebView.onBrowserViewportHierarchyChanged, file: file, line: line)

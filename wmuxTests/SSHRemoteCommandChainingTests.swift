@@ -1,10 +1,10 @@
-import CmuxCore
-import CmuxFoundation
+import WmuxCore
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -62,7 +62,7 @@ struct SSHRemoteCommandChainingTests {
         try fileManager.setAttributes([.posixPermissions: 0o755], ofItemAtPath: helper.path)
 
         let configuredRemoteCommand = """
-        cd "$HOME/project dir" && printf '%s\\n' "command 'ran'" "$CMUX_SOCKET_PATH" "$PWD" > "$HOME/remote-command-result"
+        cd "$HOME/project dir" && printf '%s\\n' "command 'ran'" "$WMUX_SOCKET_PATH" "$PWD" > "$HOME/remote-command-result"
         """
         let script = RemoteInteractiveShellBootstrapBuilder.script(
             remoteRelayPort: 64_123,
@@ -78,7 +78,7 @@ struct SSHRemoteCommandChainingTests {
                 "SHELL=/bin/sh",
                 "PATH=/usr/bin:/bin",
                 "USER=\(NSUserName())",
-                "CMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
+                "WMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
                 "/bin/sh",
                 "-c",
                 script,
@@ -139,7 +139,7 @@ struct SSHRemoteCommandChainingTests {
                 "SHELL=/bin/zsh",
                 "PATH=/usr/bin:/bin",
                 "USER=\(NSUserName())",
-                "CMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
+                "WMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
                 "/bin/sh",
                 "-c",
                 script,

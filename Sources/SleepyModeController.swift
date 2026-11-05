@@ -1,6 +1,6 @@
 import AppKit
-import CmuxSettingsUI
-import CmuxSettings
+import WmuxSettingsUI
+import WmuxSettings
 import IOKit.pwr_mgt
 import SwiftUI
 
@@ -30,7 +30,7 @@ final class SleepyModeController {
     /// The single Sleepy Mode settings store, owned here (the app composition
     /// root) and injected into the overlay scene and the Preferences section.
     let store = SleepyModeSettingsStore(
-        configStore: JSONConfigStore(fileURL: CmuxConfigLocation().userConfigFile)
+        configStore: JSONConfigStore(fileURL: WmuxConfigLocation().userConfigFile)
     )
 
     /// Power-action service (display sleep / real Mac lock / Low Power), owned
@@ -119,7 +119,7 @@ final class SleepyModeController {
             backing: .buffered,
             defer: false
         )
-        window.identifier = NSUserInterfaceItemIdentifier("cmux.sleepyMode")
+        window.identifier = NSUserInterfaceItemIdentifier("wmux.sleepyMode")
         window.isReleasedWhenClosed = false
         window.isOpaque = true
         window.backgroundColor = .black
@@ -170,7 +170,7 @@ final class SleepyModeController {
     /// In-process equivalent of `caffeinate -d -i`: keep the display awake so the
     /// screensaver stays visible, and stop the system from idle-sleeping.
     private func beginPowerAssertions() {
-        let reason = "cmux Sleepy Mode" as CFString
+        let reason = "wmux Sleepy Mode" as CFString
         if !hasSystemAssertion {
             var id = IOPMAssertionID(0)
             if IOPMAssertionCreateWithName(kIOPMAssertionTypePreventUserIdleSystemSleep as CFString, IOPMAssertionLevel(kIOPMAssertionLevelOn), reason, &id) == kIOReturnSuccess {

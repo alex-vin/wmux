@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 /// Value-only SwiftUI environment forwarded into each independently hosted Vault row.

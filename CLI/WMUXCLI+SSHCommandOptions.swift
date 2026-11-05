@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 extension WMUXCLI {
@@ -33,7 +33,7 @@ extension WMUXCLI {
         let remoteRelayPort: Int
         let pinWorkspaceToTop: Bool
         let daemonWebSocketEndpoint: VMDaemonWebSocketEndpoint?
-        /// True when the remote is a cloud VM with cmuxd-remote pre-baked in the image.
+        /// True when the remote is a cloud VM with wmuxd-remote pre-baked in the image.
         /// Set by `cmux vm new/shell/attach`; false for plain `cmux ssh`.
         let skipDaemonBootstrap: Bool
 

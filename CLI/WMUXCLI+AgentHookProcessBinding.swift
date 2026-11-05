@@ -1,4 +1,4 @@
-import CmuxControlSocket
+import WmuxControlSocket
 import Darwin
 import Foundation
 
@@ -130,7 +130,7 @@ extension WMUXCLI {
     }
 
     /// Resolves the hook process through the same live PID probe used by
-    /// Claude hooks. A sanitized agent hook has no ambient CMUX identity; the
+    /// Claude hooks. A sanitized agent hook has no ambient WMUX identity; the
     /// CLI process itself still carries the live controlling TTY, so it is a
     /// safe second candidate when an agent's parent is hidden behind a runner.
     private func liveAgentHookProcessBinding(

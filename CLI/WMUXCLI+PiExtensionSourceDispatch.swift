@@ -269,11 +269,11 @@ class PiCmuxCommandDispatcher {
   private compactedTerminalCommand(existing: PiFeedCommand, incoming: PiFeedCommand): PiFeedCommand {
     const existingPayload = { ...existing.payload };
     const incomingPayload = incoming.payload;
-    const existingSummaries = Array.isArray(existingPayload.cmux_compacted_terminal_events)
-      ? existingPayload.cmux_compacted_terminal_events
+    const existingSummaries = Array.isArray(existingPayload.wmux_compacted_terminal_events)
+      ? existingPayload.wmux_compacted_terminal_events
       : [piTerminalFeedSummary(existingPayload)];
-    const incomingSummaries = Array.isArray(incomingPayload.cmux_compacted_terminal_events)
-      ? incomingPayload.cmux_compacted_terminal_events
+    const incomingSummaries = Array.isArray(incomingPayload.wmux_compacted_terminal_events)
+      ? incomingPayload.wmux_compacted_terminal_events
       : [piTerminalFeedSummary(incomingPayload)];
     const existingCount = this.compactedTerminalCount(existingPayload, existingSummaries.length);
     const incomingCount = this.compactedTerminalCount(incomingPayload, incomingSummaries.length);
@@ -285,14 +285,14 @@ class PiCmuxCommandDispatcher {
     const totalCount = existingCount + incomingCount;
     delete existingPayload.tool_input;
     delete existingPayload.tool_result;
-    existingPayload.cmux_compacted_terminal_count = totalCount;
-    existingPayload.cmux_compacted_terminal_omitted_count = Math.max(0, totalCount - summaries.length);
-    existingPayload.cmux_compacted_terminal_events = summaries;
+    existingPayload.wmux_compacted_terminal_count = totalCount;
+    existingPayload.wmux_compacted_terminal_omitted_count = Math.max(0, totalCount - summaries.length);
+    existingPayload.wmux_compacted_terminal_events = summaries;
     return { ...existing, payload: existingPayload };
   }
 
   private compactedTerminalCount(payload: Record<string, unknown>, fallback: number): number {
-    const count = payload.cmux_compacted_terminal_count;
+    const count = payload.wmux_compacted_terminal_count;
     return typeof count === "number" && Number.isFinite(count) && count >= fallback ? count : fallback;
   }
   private discardFeedForSession(sessionId: string): void {

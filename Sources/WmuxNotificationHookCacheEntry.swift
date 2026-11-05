@@ -1,6 +1,6 @@
 /// Stores resolved hooks and their content-sensitive fingerprints for one cache key.
-struct CmuxNotificationHookCacheEntry {
-    let fingerprints: [CmuxNotificationHookFileFingerprint]
-    let hooks: [CmuxResolvedNotificationHook]
+struct WmuxNotificationHookCacheEntry {
+    let fingerprints: [WmuxNotificationHookFileFingerprint]
+    let hooks: [WmuxResolvedNotificationHook]
     var lastAccessSequence: UInt64
 }

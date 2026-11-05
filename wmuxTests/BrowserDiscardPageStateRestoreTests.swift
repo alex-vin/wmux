@@ -1,11 +1,11 @@
 import AppKit
-import CmuxBrowser
-import CmuxCore
+import WmuxBrowser
+import WmuxCore
 import WebKit
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

@@ -1,14 +1,14 @@
 import AppKit
-import CMUXMobileCore
-import CmuxIrohTransport
-import CmuxMobileRPC
-import CmuxTerminal
+import WMUXMobileCore
+import WmuxIrohTransport
+import WmuxMobileRPC
+import WmuxTerminal
 import Foundation
 @preconcurrency import Network
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -421,8 +421,8 @@ extension MobileHostAuthorizationTests {
     }
 
     @Test func testMobileHostPublishesUsableSessionOnlyAfterWorkspaceAndEventReadiness() async throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
         let transport = ScriptedMobileHostByteTransport()
         let session = MobileHostConnection(
             id: UUID(),
@@ -478,8 +478,8 @@ extension MobileHostAuthorizationTests {
     }
 
     @Test func testMobileHostDoesNotPublishUsableSessionWithoutARealWorkspace() async throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
         let transport = ScriptedMobileHostByteTransport()
         let session = MobileHostConnection(
             id: UUID(),
@@ -506,8 +506,8 @@ extension MobileHostAuthorizationTests {
     }
 
     @Test func testMobileHostDoesNotPublishReadinessForUnsubscribedStream() async throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
         let transport = ScriptedMobileHostByteTransport()
         let session = MobileHostConnection(
             id: UUID(),
@@ -536,8 +536,8 @@ extension MobileHostAuthorizationTests {
     }
 
     @Test func testMobileHostPublishesReadinessOnlyAfterSubscriptionAckWrites() async throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
         let transport = ScriptedMobileHostByteTransport()
         await transport.failSend(number: 2)
         let session = MobileHostConnection(
@@ -600,7 +600,7 @@ extension MobileHostAuthorizationTests {
     }
 
     private static func retainedUsableSessionEvents() -> [[String: Any]] {
-        CmuxEventBus.shared.retainedSnapshot().filter {
+        WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "mobile.rpc.ready"
         }
     }
@@ -895,7 +895,7 @@ extension MobileHostAuthorizationTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         var remoteValue: Any?
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in remoteValue }
         )
@@ -919,10 +919,10 @@ extension MobileHostAuthorizationTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         var remoteValue: Any?
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { key in
-                key == CmuxFeatureFlags.mobileTaskComposerFlag.key ? remoteValue : nil
+                key == WmuxFeatureFlags.mobileTaskComposerFlag.key ? remoteValue : nil
             }
         )
 

@@ -2,7 +2,7 @@ import Foundation
 
 /// Persists saved workspace layout results into the global cmux.json,
 /// preserving JSONC comments and formatting via `JSONCObjectEditor`.
-enum CmuxConfigActionSaver {
+enum WmuxConfigActionSaver {
 
     struct SaveResult: Equatable {
         var actionID: String
@@ -47,7 +47,7 @@ enum CmuxConfigActionSaver {
     @discardableResult
     static func saveWorkspaceAction(
         title: String,
-        definition: CmuxWorkspaceDefinition,
+        definition: WmuxWorkspaceDefinition,
         globalConfigPath: String,
         reservedActionIDs: Set<String> = [],
         fileManager: FileManager = .default
@@ -72,7 +72,7 @@ enum CmuxConfigActionSaver {
             existingIDs: existingActionIDs(inConfigSource: source)
                 .union(reservedActionIDs)
         )
-        let actionDefinition = CmuxConfigActionDefinition(
+        let actionDefinition = WmuxConfigActionDefinition(
             action: .workspace(definition, restart: nil),
             title: title
         )
@@ -253,7 +253,7 @@ enum CmuxConfigActionSaver {
         try fileManager.setAttributes([.posixPermissions: 0o600], ofItemAtPath: configURL.path)
     }
 
-    static func encodeActionValueJSON(_ definition: CmuxConfigActionDefinition) throws -> String {
+    static func encodeActionValueJSON(_ definition: WmuxConfigActionDefinition) throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         let data = try encoder.encode(definition)
@@ -310,7 +310,7 @@ struct NewWorkspaceDefaultLayoutMenuModel: Equatable {
     let hasDefault: Bool
 
     static func build(
-        loadedActions: [CmuxResolvedConfigAction],
+        loadedActions: [WmuxResolvedConfigAction],
         newWorkspaceActionID: String?
     ) -> NewWorkspaceDefaultLayoutMenuModel {
         // Only workspace layouts (an inline workspace definition or a

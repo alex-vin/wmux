@@ -1,15 +1,15 @@
-@testable import CmuxFoundation
+@testable import WmuxFoundation
 import Darwin
 import Foundation
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 /// A census in which one listed process exits before enrichment reads it.
-struct ExitingProcessCensusReader: CmuxTopProcessReading {
+struct ExitingProcessCensusReader: WmuxTopProcessReading {
     struct ListedProcess {
         let pid: Int
         let parentPID: Int
@@ -44,11 +44,11 @@ struct ExitingProcessCensusReader: CmuxTopProcessReading {
     func processName(pid: Int, fallback: String) -> String { fallback }
     func processPath(pid: Int) -> String? { nil }
 
-    func scope(for pid: Int, key: CmuxTopProcessScopeCacheKey) -> CmuxTopProcessScope? {
+    func scope(for pid: Int, key: WmuxTopProcessScopeCacheKey) -> WmuxTopProcessScope? {
         guard pid != exitedPID, processes.first(where: { $0.pid == pid })?.scoped == true else { return nil }
-        return CmuxTopProcessScope(workspaceID: workspaceId, surfaceID: panelId, attributionReason: "cmux-test")
+        return WmuxTopProcessScope(workspaceID: workspaceId, surfaceID: panelId, attributionReason: "cmux-test")
     }
 
-    func matches(pid: Int, key: CmuxTopProcessScopeCacheKey) -> Bool { pid != exitedPID }
+    func matches(pid: Int, key: WmuxTopProcessScopeCacheKey) -> Bool { pid != exitedPID }
     func processHasExited(pid: Int) -> Bool { pid == exitedPID }
 }

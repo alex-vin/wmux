@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import CryptoKit
 import Testing
-import CMUXAgentLaunch
-import CmuxFoundation
+import WMUXAgentLaunch
+import WmuxFoundation
 @Suite(.serialized)
 struct CLIClaudeHookTimeoutRegressionTests {
     @Test("Queued lifecycle routes trust an admitted surface snapshot")
@@ -89,13 +89,13 @@ struct CLIClaudeHookTimeoutRegressionTests {
         try expectDirectHook(
             hooks,
             event: "PreToolUse",
-            command: #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude cron-create-guard"#,
+            command: #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude cron-create-guard"#,
             timeout: 5
         )
         try expectDirectHook(
             hooks,
             event: "PermissionRequest",
-            command: #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks feed --source claude"#,
+            command: #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks feed --source claude"#,
             timeout: 125
         )
     }
@@ -125,7 +125,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
         try makeCodexHookExecutableShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
             "if [ \"${1:-}\" = \"--socket\" ] && [ \"${3:-}\" = \"ping\" ]; then exit 0; fi",
-            "if [ \"${1:-}\" = \"hooks\" ] && [ \"${2:-}\" = \"claude\" ] && [ \"${3:-}\" = \"inject-settings\" ]; then exec \"$CMUX_TEST_REAL_CLI\" \"$@\"; fi",
+            "if [ \"${1:-}\" = \"hooks\" ] && [ \"${2:-}\" = \"claude\" ] && [ \"${3:-}\" = \"inject-settings\" ]; then exec \"$WMUX_TEST_REAL_CLI\" \"$@\"; fi",
             "exit 1",
         ])
         try makeSettingsCapturingClaude(at: fakeClaude)
@@ -137,7 +137,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
             settings: capturedSettings,
             socketPath: socketPath
         )
-        environment["CMUX_TEST_REAL_CLI"] = cliPath
+        environment["WMUX_TEST_REAL_CLI"] = cliPath
 
         let result = runCodexHookProcess(
             executablePath: wrapper.path,
@@ -168,19 +168,19 @@ struct CLIClaudeHookTimeoutRegressionTests {
         try expectDirectHook(
             hooks,
             event: "PreToolUse",
-            command: #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude cron-create-guard"#,
+            command: #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude cron-create-guard"#,
             timeout: 5
         )
         try expectDirectHook(
             hooks,
             event: "PermissionRequest",
-            command: #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks feed --source claude"#,
+            command: #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks feed --source claude"#,
             timeout: 125
         )
         try expectDirectHook(
             hooks,
             event: "Stop",
-            command: #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude auto-name"#,
+            command: #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude auto-name"#,
             timeout: 120,
             isAsync: true
         )
@@ -190,7 +190,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
             try expectDirectHook(
                 hooks,
                 event: event,
-                command: #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude inbox-wait"#,
+                command: #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude inbox-wait"#,
                 timeout: 86_400,
                 isAsync: true,
                 isAsyncRewake: true
@@ -199,7 +199,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
         try expectDirectHook(
             hooks,
             event: "UserPromptSubmit",
-            command: #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude inbox-drain 2>/dev/null || echo '{}'"#,
+            command: #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}" hooks claude inbox-drain 2>/dev/null || echo '{}'"#,
             timeout: 5
         )
 
@@ -223,11 +223,11 @@ struct CLIClaudeHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SURFACE_ID": "surface-8535",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_BUNDLED_CLI_PATH": cliPath,
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SURFACE_ID": "surface-8535",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_BUNDLED_CLI_PATH": cliPath,
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
                 "ANTHROPIC_BASE_URL": "https://proxy.example.test",
                 "ANTHROPIC_API_KEY": "must-not-cross-admission",
             ],
@@ -247,8 +247,8 @@ struct CLIClaudeHookTimeoutRegressionTests {
         #expect(params["socket_path"] as? String == socketPath)
         #expect(params["relay_backed"] as? Bool == false)
         let admittedEnvironment = try #require(params["environment"] as? [String: Any])
-        #expect(admittedEnvironment["CMUX_SURFACE_ID"] as? String == "surface-8535")
-        #expect(admittedEnvironment["CMUX_CLAUDE_PID"] as? String == "8535")
+        #expect(admittedEnvironment["WMUX_SURFACE_ID"] as? String == "surface-8535")
+        #expect(admittedEnvironment["WMUX_CLAUDE_PID"] as? String == "8535")
         #expect(admittedEnvironment["ANTHROPIC_BASE_URL"] as? String == "https://proxy.example.test")
         #expect(admittedEnvironment["ANTHROPIC_API_KEY"] == nil)
     }
@@ -286,10 +286,10 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_WORKSPACE_ID": "workspace-stale",
-                "CMUX_SURFACE_ID": "surface-stale",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_WORKSPACE_ID": "workspace-stale",
+                "WMUX_SURFACE_ID": "surface-stale",
             ],
             standardInput: #"{"session_id":"local-route"}"#,
             timeout: 5
@@ -308,15 +308,15 @@ struct CLIClaudeHookTimeoutRegressionTests {
         let params = try #require(enqueue["params"] as? [String: Any])
         let environment = try #require(params["environment"] as? [String: Any])
         #expect(
-            environment["CMUX_WORKSPACE_ID"] as? String
+            environment["WMUX_WORKSPACE_ID"] as? String
                 == "33333333-3333-3333-3333-333333333333"
         )
         #expect(
-            environment["CMUX_SURFACE_ID"] as? String
+            environment["WMUX_SURFACE_ID"] as? String
                 == "44444444-4444-4444-4444-444444444444"
         )
-        #expect(environment["CMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] as? String == "1")
-        #expect(environment["CMUX_CLAUDE_PID"] as? String == "8535")
+        #expect(environment["WMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] as? String == "1")
+        #expect(environment["WMUX_CLAUDE_PID"] as? String == "8535")
     }
 
     @Test("Local queue admission retains its lane when route probing fails")
@@ -347,10 +347,10 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_WORKSPACE_ID": "workspace-stale",
-                "CMUX_SURFACE_ID": "surface-stale",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_WORKSPACE_ID": "workspace-stale",
+                "WMUX_SURFACE_ID": "surface-stale",
             ],
             standardInput: #"{"session_id":"local-route-fallback"}"#,
             timeout: 5
@@ -366,10 +366,10 @@ struct CLIClaudeHookTimeoutRegressionTests {
         let enqueue = try #require(requests.last)
         let params = try #require(enqueue["params"] as? [String: Any])
         let environment = try #require(params["environment"] as? [String: Any])
-        #expect(environment["CMUX_WORKSPACE_ID"] as? String == "workspace-stale")
-        #expect(environment["CMUX_SURFACE_ID"] as? String == "surface-stale")
-        #expect(environment["CMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] == nil)
-        #expect(environment["CMUX_CLAUDE_PID"] as? String == "8535")
+        #expect(environment["WMUX_WORKSPACE_ID"] as? String == "workspace-stale")
+        #expect(environment["WMUX_SURFACE_ID"] as? String == "surface-stale")
+        #expect(environment["WMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] == nil)
+        #expect(environment["WMUX_CLAUDE_PID"] as? String == "8535")
     }
 
     @Test("Local queue admission preserves an existing route snapshot when reprobe fails")
@@ -400,11 +400,11 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_WORKSPACE_ID": "33333333-3333-3333-3333-333333333333",
-                "CMUX_SURFACE_ID": "44444444-4444-4444-4444-444444444444",
-                "CMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_WORKSPACE_ID": "33333333-3333-3333-3333-333333333333",
+                "WMUX_SURFACE_ID": "44444444-4444-4444-4444-444444444444",
+                "WMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
             ],
             standardInput: #"{"session_id":"local-route-snapshot-fallback"}"#,
             timeout: 5
@@ -420,19 +420,19 @@ struct CLIClaudeHookTimeoutRegressionTests {
         let enqueue = try #require(requests.last)
         let params = try #require(enqueue["params"] as? [String: Any])
         let environment = try #require(params["environment"] as? [String: Any])
-        #expect(environment["CMUX_WORKSPACE_ID"] as? String == "33333333-3333-3333-3333-333333333333")
-        #expect(environment["CMUX_SURFACE_ID"] as? String == "44444444-4444-4444-4444-444444444444")
-        #expect(environment["CMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] as? String == "1")
-        #expect(environment["CMUX_CLAUDE_PID"] as? String == "8535")
+        #expect(environment["WMUX_WORKSPACE_ID"] as? String == "33333333-3333-3333-3333-333333333333")
+        #expect(environment["WMUX_SURFACE_ID"] as? String == "44444444-4444-4444-4444-444444444444")
+        #expect(environment["WMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] as? String == "1")
+        #expect(environment["WMUX_CLAUDE_PID"] as? String == "8535")
     }
 
     @Test(
         "Queued replay rehomes its route without probing and preserves the admitted PID",
         arguments: [
-            ("claude", "CMUX_CLAUDE_PID", "prompt-submit"),
-            ("cursor", "CMUX_CURSOR_PID", "prompt-submit"),
-            ("claude", "CMUX_CLAUDE_PID", "session-start"),
-            ("cursor", "CMUX_CURSOR_PID", "session-start"),
+            ("claude", "WMUX_CLAUDE_PID", "prompt-submit"),
+            ("cursor", "WMUX_CURSOR_PID", "prompt-submit"),
+            ("claude", "WMUX_CLAUDE_PID", "session-start"),
+            ("cursor", "WMUX_CURSOR_PID", "session-start"),
         ]
     )
     func queuedReplayRehomesRouteWithoutReusingPID(
@@ -485,12 +485,12 @@ struct CLIClaudeHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
                 pidKey: "8535",
-                "CMUX_WORKSPACE_ID": "77777777-7777-7777-7777-777777777777",
-                "CMUX_SURFACE_ID": surfaceID,
+                "WMUX_WORKSPACE_ID": "77777777-7777-7777-7777-777777777777",
+                "WMUX_SURFACE_ID": surfaceID,
             ],
             standardInput: #"{"session_id":"\#(sessionID)"}"#,
             timeout: 5
@@ -550,7 +550,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 2
         )
@@ -577,11 +577,11 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SURFACE_ID": "surface-8535-stalled",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_BUNDLED_CLI_PATH": cliPath,
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SURFACE_ID": "surface-8535-stalled",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_BUNDLED_CLI_PATH": cliPath,
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"session_id":"stalled"}"#,
             timeout: 2.5
@@ -623,9 +623,9 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_SURFACE_ID": "surface-8535",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_SURFACE_ID": "surface-8535",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: rawPayload,
             timeout: 5
@@ -680,9 +680,9 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_SURFACE_ID": "surface-ingress-budget",
-                "CMUX_CLAUDE_PID": "8535",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SURFACE_ID": "surface-ingress-budget",
+                "WMUX_CLAUDE_PID": "8535",
             ],
             standardInput: rawPayload,
             fileBackedStandardInput: true,
@@ -765,9 +765,9 @@ struct CLIClaudeHookTimeoutRegressionTests {
                 environment: [
                     "HOME": FileManager.default.temporaryDirectory.path,
                     "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                    "CMUX_CLAUDE_PID": "8535",
-                    "CMUX_SURFACE_ID": "surface-8535",
-                    "CMUX_CLI_SENTRY_DISABLED": "1",
+                    "WMUX_CLAUDE_PID": "8535",
+                    "WMUX_SURFACE_ID": "surface-8535",
+                    "WMUX_CLI_SENTRY_DISABLED": "1",
                 ],
                 standardInput: rawPayload,
                 timeout: 5
@@ -796,7 +796,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
         "Queue compaction preserves Boolean lifecycle flags",
         arguments: [
             ("antigravity", "fullyIdle", false),
-            ("pi", "cmux_notification_routed", true),
+            ("pi", "wmux_notification_routed", true),
         ]
     )
     func queueCompactionPreservesBooleanLifecycleFlags(
@@ -836,9 +836,9 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_SURFACE_ID": "surface-\(agent)-lifecycle-flags",
-                "CMUX_\(agent.uppercased())_PID": "8535",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SURFACE_ID": "surface-\(agent)-lifecycle-flags",
+                "WMUX_\(agent.uppercased())_PID": "8535",
             ],
             standardInput: rawPayload,
             fileBackedStandardInput: true,
@@ -910,9 +910,9 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_SURFACE_ID": "surface-claude-background-work",
-                "CMUX_CLAUDE_PID": "8535",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SURFACE_ID": "surface-claude-background-work",
+                "WMUX_CLAUDE_PID": "8535",
             ],
             standardInput: rawPayload,
             fileBackedStandardInput: true,
@@ -963,7 +963,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": FileManager.default.temporaryDirectory.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: payload,
             timeout: 5
@@ -981,9 +981,9 @@ struct CLIClaudeHookTimeoutRegressionTests {
         #expect(params["payload"] as? String == payload)
         #expect(params["socket_path"] as? String == socketPath)
         let admittedEnvironment = try #require(params["environment"] as? [String: Any])
-        #expect(admittedEnvironment["CMUX_SURFACE_ID"] == nil)
-        #expect(admittedEnvironment["CMUX_WORKSPACE_ID"] == nil)
-        let pidKey = "CMUX_\(agent.uppercased())_PID"
+        #expect(admittedEnvironment["WMUX_SURFACE_ID"] == nil)
+        #expect(admittedEnvironment["WMUX_WORKSPACE_ID"] == nil)
+        let pidKey = "WMUX_\(agent.uppercased())_PID"
         #expect(
             admittedEnvironment[pidKey] as? String ==
                 String(ProcessInfo.processInfo.processIdentifier)
@@ -992,7 +992,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
 
     @Test(
         "Relay-origin delivery skips local PID and TTY routing",
-        arguments: [("claude", "CMUX_CLAUDE_PID"), ("codex", "CMUX_CODEX_PID")]
+        arguments: [("claude", "WMUX_CLAUDE_PID"), ("codex", "WMUX_CODEX_PID")]
     )
     func relayOriginSkipsLocalProcessRouting(agent: String, pidKey: String) throws {
         let cliPath = try BundledCLITestSupport.bundledCLIPath(for: CLITestBundleAnchor.self)
@@ -1025,15 +1025,15 @@ struct CLIClaudeHookTimeoutRegressionTests {
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": root.path,
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
-            "CMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
-            "CMUX_CLI_TTY_NAME": "ttys-local-collision",
-            "CMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
-            "CMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
-            "CMUX_AGENT_HOOK_STATE_DIR": root.path,
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
+            "WMUX_CLI_TTY_NAME": "ttys-local-collision",
+            "WMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
+            "WMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
+            "WMUX_AGENT_HOOK_STATE_DIR": root.path,
             pidKey: "8535",
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         let result = runCodexHookProcess(
             executablePath: cliPath,
@@ -1102,12 +1102,12 @@ struct CLIClaudeHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
-                "CMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
-                "CMUX_GEMINI_PID": "8535",
-                "CMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+                "WMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_GEMINI_PID": "8535",
+                "WMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"true"}}"#,
             timeout: 10
@@ -1173,11 +1173,11 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
-                "CMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
-                "CMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+                "WMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: payload,
             timeout: 10
@@ -1233,10 +1233,10 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_WORKSPACE_ID": staleWorkspaceID,
-                "CMUX_SURFACE_ID": staleSurfaceID,
-                "CMUX_GEMINI_PID": "8535",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_WORKSPACE_ID": staleWorkspaceID,
+                "WMUX_SURFACE_ID": staleSurfaceID,
+                "WMUX_GEMINI_PID": "8535",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: """
             {"session_id":"decision-session","hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"true"}}
@@ -1257,9 +1257,9 @@ struct CLIClaudeHookTimeoutRegressionTests {
         let params = try #require(barrier["params"] as? [String: Any])
         #expect(params["agent"] as? String == "gemini")
         let environment = try #require(params["environment"] as? [String: Any])
-        #expect(environment["CMUX_WORKSPACE_ID"] as? String == workspaceID)
-        #expect(environment["CMUX_SURFACE_ID"] as? String == surfaceID)
-        #expect(environment["CMUX_GEMINI_PID"] as? String == "8535")
+        #expect(environment["WMUX_WORKSPACE_ID"] as? String == workspaceID)
+        #expect(environment["WMUX_SURFACE_ID"] as? String == surfaceID)
+        #expect(environment["WMUX_GEMINI_PID"] as? String == "8535")
         let feedPush = try #require(requests.first {
             $0["method"] as? String == "feed.push"
         })
@@ -1311,11 +1311,11 @@ struct CLIClaudeHookTimeoutRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_WORKSPACE_ID": workspaceID,
-                "CMUX_SURFACE_ID": surfaceID,
-                "CMUX_CODEX_PID": "8535",
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_WORKSPACE_ID": workspaceID,
+                "WMUX_SURFACE_ID": surfaceID,
+                "WMUX_CODEX_PID": "8535",
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: """
             {"session_id":"codex-decision-session","hook_event_name":"PermissionRequest","tool_name":"Write"}
@@ -1332,8 +1332,8 @@ struct CLIClaudeHookTimeoutRegressionTests {
         let params = try #require(barrier["params"] as? [String: Any])
         #expect(params["agent"] as? String == "codex")
         let environment = try #require(params["environment"] as? [String: Any])
-        #expect(environment["CMUX_SURFACE_ID"] as? String == surfaceID)
-        #expect(environment["CMUX_CODEX_PID"] as? String == "8535")
+        #expect(environment["WMUX_SURFACE_ID"] as? String == surfaceID)
+        #expect(environment["WMUX_CODEX_PID"] as? String == "8535")
     }
 
     @Test("Custom agent installers emit bounded lifecycle delivery")
@@ -1389,7 +1389,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
             var environment = [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
             environment.merge(producer.environment, uniquingKeysWith: { _, value in value })
             let result = runCodexHookProcess(
@@ -1405,7 +1405,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
                 // Pi consumes the synchronous response to keep its resolved
                 // pane target across relaunch; its dispatcher owns ordering.
                 #expect(source.contains("[\"hooks\", \"pi\", subcommand, ...target]"))
-                #expect(source.contains("CMUX_PI_HOOK_TIMEOUT_MS"))
+                #expect(source.contains("WMUX_PI_HOOK_TIMEOUT_MS"))
                 #expect(source.contains("maximumPiHookTimeoutMilliseconds"))
                 continue
             }
@@ -1414,7 +1414,7 @@ struct CLIClaudeHookTimeoutRegressionTests {
                 "\(producer.agent) lifecycle hooks must use the shared app queue"
             )
             #expect(
-                source.contains("CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"),
+                source.contains("WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"),
                 "\(producer.agent) queue admission must have an internal socket deadline"
             )
             #expect(
@@ -1430,8 +1430,8 @@ struct CLIClaudeHookTimeoutRegressionTests {
 
     private var repositoryRoot: URL {
         // CI consumers run products compiled under another root; the restore
-        // step aliases this checkout at $CMUX_CI_RUNTIME_SOURCE_ROOT/src.
-        if let runtimeRoot = ProcessInfo.processInfo.environment["CMUX_CI_RUNTIME_SOURCE_ROOT"],
+        // step aliases this checkout at $WMUX_CI_RUNTIME_SOURCE_ROOT/src.
+        if let runtimeRoot = ProcessInfo.processInfo.environment["WMUX_CI_RUNTIME_SOURCE_ROOT"],
            !runtimeRoot.isEmpty {
             return URL(fileURLWithPath: runtimeRoot, isDirectory: true)
                 .appendingPathComponent("src", isDirectory: true)
@@ -1463,11 +1463,11 @@ struct CLIClaudeHookTimeoutRegressionTests {
             "HOME": root.path,
             "PATH": "\(binDirectory.path):/usr/bin:/bin:/usr/sbin:/sbin",
             "TMPDIR": root.path,
-            "CMUX_SURFACE_ID": "surface-8535",
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_BUNDLED_CLI_PATH": cli.path,
-            "CMUX_CUSTOM_CLAUDE_PATH": claude.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SURFACE_ID": "surface-8535",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_BUNDLED_CLI_PATH": cli.path,
+            "WMUX_CUSTOM_CLAUDE_PATH": claude.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
             "FAKE_CLAUDE_SETTINGS_OUTPUT": settings.path,
         ]
     }
@@ -1505,8 +1505,8 @@ struct CLIClaudeHookTimeoutRegressionTests {
         }.first)
         #expect(hook["timeout"] as? Int == 5)
         #expect(hook["async"] == nil)
-        #expect(command.contains(#"--socket "$CMUX_SOCKET_PATH""#))
-        #expect(command.contains("CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5"))
+        #expect(command.contains(#"--socket "$WMUX_SOCKET_PATH""#))
+        #expect(command.contains("WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5"))
         #expect(command.contains("cat >/dev/null"))
         #expect(!command.contains("nohup"))
         #expect(!command.contains("sleep "))

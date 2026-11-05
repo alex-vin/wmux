@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxSettings
+import WmuxSettings
 
 struct DockPaneCloseConfirmationPrompt: Sendable {
     let title: String
@@ -269,8 +269,8 @@ extension DockSplitStore {
         alert.addButton(withTitle: String(localized: "dialog.closeTab.close", defaultValue: "Close"))
         alert.addButton(withTitle: String(localized: "dialog.closeTab.cancel", defaultValue: "Cancel"))
         let content = scrollableDetails.map {
-            CmuxAlertContent(flattenedText: message, separatingScrollableDetails: $0)
-        } ?? CmuxAlertContent(informativeText: message)
+            WmuxAlertContent(flattenedText: message, separatingScrollableDetails: $0)
+        } ?? WmuxAlertContent(informativeText: message)
         return alert.runCmuxModal(content: content) == .alertFirstButtonReturn
     }
 }

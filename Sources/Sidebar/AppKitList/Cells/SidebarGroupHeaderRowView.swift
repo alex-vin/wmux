@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 /// Pure-AppKit group header cell for the sidebar workspace table.
@@ -287,7 +287,7 @@ final class SidebarGroupHeaderTableCellView: NSTableCellView {
     func paintControllerDropIndicator(top: Bool, bottom: Bool) {
         let colorScheme: ColorScheme = model.map { $0.colorSchemeIsDark ? .dark : .light }
             ?? SidebarAppearanceColorResolver().currentColorScheme()
-        let accent = (model?.accentColor ?? CmuxAccentColor()).nsColor(for: colorScheme)
+        let accent = (model?.accentColor ?? WmuxAccentColor()).nsColor(for: colorScheme)
         topDropIndicator.layer?.backgroundColor = accent.cgColor
         bottomDropIndicator.layer?.backgroundColor = accent.cgColor
         topDropIndicator.isHidden = !top

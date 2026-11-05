@@ -1,7 +1,7 @@
 import AppKit
 import Bonsplit
-import CmuxControlSocket
-import CmuxWorkspaces
+import WmuxControlSocket
+import WmuxWorkspaces
 import Foundation
 
 /// The system-domain witnesses: the byte-faithful bodies of the former
@@ -351,7 +351,7 @@ extension TerminalController: ControlSystemContext {
                 code: "not_found",
                 message: String(
                     localized: "session.export.error.noSnapshot",
-                    defaultValue: "cmux has not saved a session yet. Try again in a few seconds."
+                    defaultValue: "wmux has not saved a session yet. Try again in a few seconds."
                 ),
                 path: nil
             )
@@ -510,7 +510,7 @@ extension TerminalController: ControlSystemContext {
         }
 
         // Int64 → Int is lossless on 64-bit macOS.
-        let sequence = Int(max(0, CmuxEventBus.shared.latestSequence))
+        let sequence = Int(max(0, WmuxEventBus.shared.latestSequence))
         let selectedWorkspaceId = tabManager.selectedTabId
         let workspaces = tabManager.tabs.enumerated().map { index, workspace in
             extensionSidebarWorkspaceRow(
@@ -560,7 +560,7 @@ extension TerminalController: ControlSystemContext {
             latestNotificationText: latestNotificationText,
             latestConversationMessage: workspace.latestConversationMessage,
             latestSubmittedMessage: workspace.latestSubmittedMessage,
-            latestSubmittedAtISO: workspace.latestSubmittedAt.map(CmuxEventBus.isoTimestamp),
+            latestSubmittedAtISO: workspace.latestSubmittedAt.map(WmuxEventBus.isoTimestamp),
             listeningPorts: workspace.listeningPorts,
             pullRequestURLs: workspace.sidebarPullRequestsInDisplayOrder().map { $0.url.absoluteString },
             panelDirectories: workspace.sidebarFilesystemDirectoriesInDisplayOrder(),

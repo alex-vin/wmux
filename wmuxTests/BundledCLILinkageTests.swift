@@ -56,12 +56,12 @@ enum BundledCLITestSupport {
     /// Environment key that confines a Debug CLI's implicit socket discovery to its
     /// state directory, skipping the machine-wide `/tmp` marker files and legacy `/tmp`
     /// socket aliases a real cmux running as the same user publishes.
-    static let isolatedSocketDiscoveryEnvironmentKey = "CMUX_TEST_ISOLATED_SOCKET_DISCOVERY"
+    static let isolatedSocketDiscoveryEnvironmentKey = "WMUX_TEST_ISOLATED_SOCKET_DISCOVERY"
 
     /// Environment for a spawned bundled CLI that cannot see the real user's cmux.
     ///
     /// Every home-derived location (`HOME`, `CFFIXED_USER_HOME`, the XDG base
-    /// directories, `TMPDIR`) points inside `home`; inherited `CMUX*`
+    /// directories, `TMPDIR`) points inside `home`; inherited `WMUX*`
     /// variables (socket pins, surface/workspace ids, tags) are dropped; and implicit
     /// socket discovery is confined to `home`'s state directory. On a machine where
     /// the user (or a CI runner account) has a live cmux, the CLI would otherwise
@@ -72,7 +72,7 @@ enum BundledCLITestSupport {
     ) -> [String: String] {
         var environment = base
         for key in Array(environment.keys)
-        where key.hasPrefix("CMUX") || key.hasPrefix("XDG_") {
+        where key.hasPrefix("WMUX") || key.hasPrefix("XDG_") {
             environment.removeValue(forKey: key)
         }
         let fileManager = FileManager.default
@@ -92,7 +92,7 @@ enum BundledCLITestSupport {
         environment["XDG_CACHE_HOME"] = home.appendingPathComponent(".cache", isDirectory: true).path
         environment["XDG_RUNTIME_DIR"] = runtimeURL.path
         environment["TMPDIR"] = tmpURL.path + "/"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment[isolatedSocketDiscoveryEnvironmentKey] = "1"
         return environment
     }

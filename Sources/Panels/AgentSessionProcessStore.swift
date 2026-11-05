@@ -1,6 +1,6 @@
 import Foundation
 import Darwin
-import CmuxSettings
+import WmuxSettings
 
 @MainActor
 final class AgentSessionProcessStore {
@@ -30,7 +30,7 @@ final class AgentSessionProcessStore {
                 provider: plan.provider
             )
             launchEnvironment["TMPDIR"] = scratchDirectory.path
-            launchEnvironment["CMUX_AGENT_ARTIFACT_ROOT"] = scratchDirectory.path
+            launchEnvironment["WMUX_AGENT_ARTIFACT_ROOT"] = scratchDirectory.path
         }
         let process = try AgentSessionOwnedProcessLauncher().prepare(
             plan: plan, workingDirectory: workingDirectory, environment: launchEnvironment

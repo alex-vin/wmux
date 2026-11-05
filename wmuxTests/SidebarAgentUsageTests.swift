@@ -1,10 +1,10 @@
-import CMUXAgentLaunch
-import CmuxAgentChat
-import CmuxSettings
-import CmuxSidebar
+import WMUXAgentLaunch
+import WmuxAgentChat
+import WmuxSettings
+import WmuxSidebar
 import Foundation
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 private struct UnlimitedSidebarLog: SidebarLogEntryLimitProviding {
     let configuredMaxSidebarLogEntries: Int? = nil

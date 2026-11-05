@@ -1,9 +1,9 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -128,7 +128,7 @@ struct SurfaceMachineIDDeviceEncodingTests {
         #expect(payload["link_error"] as? String == "cloud_api_unavailable")
         #expect(payload["link_error_message"] as? String == "cmux cannot reach the Cloud service for this machine right now.")
 
-        let lines = CmuxTuiRemoteRouting.vmTreeLines(
+        let lines = WmuxTuiRemoteRouting.vmTreeLines(
             machine: [
                 "id": "brave-otter",
                 "status": "running",
@@ -141,7 +141,7 @@ struct SurfaceMachineIDDeviceEncodingTests {
         #expect(lines.contains { $0.contains("cmux cannot reach the Cloud service") })
         #expect(!lines.contains { $0.contains("cloud_api_unavailable") })
 
-        let fallbackLines = CmuxTuiRemoteRouting.vmTreeLines(
+        let fallbackLines = WmuxTuiRemoteRouting.vmTreeLines(
             machine: [
                 "id": "brave-otter",
                 "status": "running",

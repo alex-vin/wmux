@@ -5,7 +5,7 @@
 // out). Cookie-only, no tab.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
   S.register(
     "googleAccounts",

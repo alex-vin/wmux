@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 extension WMUXCLI {
@@ -8,7 +8,7 @@ extension WMUXCLI {
         AgentHookDef(
             name: "codex", displayName: "Codex", statusKey: "codex",
             configDir: ".codex", configFile: "hooks.json", configDirEnvOverride: "CODEX_HOME",
-            sessionStoreSuffix: "codex", disableEnvVar: "CMUX_CODEX_HOOKS_DISABLED",
+            sessionStoreSuffix: "codex", disableEnvVar: "WMUX_CODEX_HOOKS_DISABLED",
             hookMarker: "wmux hooks codex", format: .nested(timeoutMs: agentHookDeclaredTimeoutMilliseconds),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -31,7 +31,7 @@ extension WMUXCLI {
             configDir: ".grok/hooks", configFile: "wmux-session.json",
             configDirEnvOverride: "GROK_HOME", configDirEnvOverrideSubpath: "hooks",
             createConfigDirIfMissing: true,
-            sessionStoreSuffix: "grok", disableEnvVar: "CMUX_GROK_HOOKS_DISABLED",
+            sessionStoreSuffix: "grok", disableEnvVar: "WMUX_GROK_HOOKS_DISABLED",
             hookMarker: "wmux hooks grok", format: .nested(timeoutMs: 5000),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -49,14 +49,14 @@ extension WMUXCLI {
             name: "opencode", displayName: "OpenCode", statusKey: "opencode",
             configDir: ".config/opencode", configFile: "plugins/wmux-session.js", configDirEnvOverride: "OPENCODE_CONFIG_DIR",
             configDirResolver: { OpenCodePaths(environment: ProcessInfo.processInfo.environment).configDirectory.path },
-            sessionStoreSuffix: "opencode", disableEnvVar: "CMUX_OPENCODE_HOOKS_DISABLED",
+            sessionStoreSuffix: "opencode", disableEnvVar: "WMUX_OPENCODE_HOOKS_DISABLED",
             hookMarker: "wmux hooks opencode", format: .flat,
             events: []
         ),
         AgentHookDef(
             name: "pi", displayName: "Pi", statusKey: "pi",
             configDir: ".pi/agent", configFile: "extensions/wmux-session.ts", configDirEnvOverride: "PI_CODING_AGENT_DIR",
-            sessionStoreSuffix: "pi", disableEnvVar: "CMUX_PI_HOOKS_DISABLED",
+            sessionStoreSuffix: "pi", disableEnvVar: "WMUX_PI_HOOKS_DISABLED",
             hookMarker: "wmux hooks pi", format: .flat,
             events: []
         ),
@@ -65,7 +65,7 @@ extension WMUXCLI {
             configDir: ".omp/agent", configFile: "extensions/wmux-omp-session.ts",
             createConfigDirIfMissing: true,
             configDirResolver: { WMUXCLI.resolvedOmpAgentDirectory().path },
-            sessionStoreSuffix: "omp", disableEnvVar: "CMUX_OMP_HOOKS_DISABLED",
+            sessionStoreSuffix: "omp", disableEnvVar: "WMUX_OMP_HOOKS_DISABLED",
             hookMarker: "wmux hooks omp", format: .flat,
             events: []
         ),
@@ -74,21 +74,21 @@ extension WMUXCLI {
             configDir: ".campfire/agent", configFile: "extensions/wmux-campfire-session.ts",
             createConfigDirIfMissing: true,
             configDirResolver: { WMUXCLI.resolvedCampfireAgentDirectory().path },
-            sessionStoreSuffix: "campfire", disableEnvVar: "CMUX_CAMPFIRE_HOOKS_DISABLED",
+            sessionStoreSuffix: "campfire", disableEnvVar: "WMUX_CAMPFIRE_HOOKS_DISABLED",
             hookMarker: "wmux hooks campfire", format: .flat,
             events: []
         ),
         AgentHookDef(
             name: "amp", displayName: "Amp", statusKey: "amp",
             configDir: ".config/amp", configFile: "plugins/wmux-session.ts",
-            sessionStoreSuffix: "amp", disableEnvVar: "CMUX_AMP_HOOKS_DISABLED",
+            sessionStoreSuffix: "amp", disableEnvVar: "WMUX_AMP_HOOKS_DISABLED",
             hookMarker: "wmux hooks amp", format: .flat,
             events: []
         ),
         AgentHookDef(
             name: "cursor", displayName: "Cursor", statusKey: "cursor",
             configDir: ".cursor", configFile: "hooks.json", binaryName: "cursor-agent",
-            sessionStoreSuffix: "cursor", disableEnvVar: "CMUX_CURSOR_HOOKS_DISABLED",
+            sessionStoreSuffix: "cursor", disableEnvVar: "WMUX_CURSOR_HOOKS_DISABLED",
             hookMarker: "wmux hooks cursor", format: .flat,
             events: [
                 .init(agentEvent: "beforeSubmitPrompt", cmuxSubcommand: "prompt-submit"),
@@ -110,7 +110,7 @@ extension WMUXCLI {
         AgentHookDef(
             name: "gemini", displayName: "Gemini", statusKey: "gemini",
             configDir: ".gemini", configFile: "settings.json",
-            sessionStoreSuffix: "gemini", disableEnvVar: "CMUX_GEMINI_HOOKS_DISABLED",
+            sessionStoreSuffix: "gemini", disableEnvVar: "WMUX_GEMINI_HOOKS_DISABLED",
             hookMarker: "wmux hooks gemini", format: .nested(timeoutMs: 10000),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -125,7 +125,7 @@ extension WMUXCLI {
             configDir: ".kiro/agents", configFile: "wmux.json",
             configDirEnvOverride: "KIRO_HOME", configDirEnvOverrideSubpath: "agents",
             createConfigDirIfMissing: true, binaryName: "kiro-cli",
-            sessionStoreSuffix: "kiro", disableEnvVar: "CMUX_KIRO_HOOKS_DISABLED",
+            sessionStoreSuffix: "kiro", disableEnvVar: "WMUX_KIRO_HOOKS_DISABLED",
             hookMarker: "wmux hooks kiro", format: .kiroAgentJSON(timeoutMs: 5000),
             events: [
                 .init(agentEvent: "agentSpawn", cmuxSubcommand: "session-start"),
@@ -142,7 +142,7 @@ extension WMUXCLI {
             name: "antigravity", displayName: "Antigravity", statusKey: "antigravity",
             configDir: ".gemini/config", configFile: "hooks.json",
             createConfigDirIfMissing: true, binaryName: "agy",
-            sessionStoreSuffix: "antigravity", disableEnvVar: "CMUX_ANTIGRAVITY_HOOKS_DISABLED",
+            sessionStoreSuffix: "antigravity", disableEnvVar: "WMUX_ANTIGRAVITY_HOOKS_DISABLED",
             hookMarker: "wmux hooks antigravity", format: .antigravityJSON(timeoutSeconds: 10),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -159,7 +159,7 @@ extension WMUXCLI {
         AgentHookDef(
             name: "rovodev", displayName: "Rovo Dev", statusKey: "rovodev",
             configDir: ".rovodev", configFile: "config.yml", binaryName: "acli",
-            sessionStoreSuffix: "rovodev", disableEnvVar: "CMUX_ROVODEV_HOOKS_DISABLED",
+            sessionStoreSuffix: "rovodev", disableEnvVar: "WMUX_ROVODEV_HOOKS_DISABLED",
             hookMarker: "wmux hooks rovodev", format: .rovoDevYAML,
             events: [
                 .init(agentEvent: "on_complete", cmuxSubcommand: "stop"),
@@ -173,7 +173,7 @@ extension WMUXCLI {
             configDir: ".hermes", configFile: "config.yaml", configDirEnvOverride: "HERMES_HOME",
             createConfigDirIfMissing: true,
             binaryName: "hermes",
-            sessionStoreSuffix: "hermes-agent", disableEnvVar: "CMUX_HERMES_AGENT_HOOKS_DISABLED",
+            sessionStoreSuffix: "hermes-agent", disableEnvVar: "WMUX_HERMES_AGENT_HOOKS_DISABLED",
             hookMarker: "wmux hooks hermes-agent", format: .hermesAgentYAML,
             events: [
                 .init(agentEvent: "on_session_start", cmuxSubcommand: "session-start"),
@@ -191,7 +191,7 @@ extension WMUXCLI {
         AgentHookDef(
             name: "copilot", displayName: "Copilot", statusKey: "copilot",
             configDir: ".copilot", configFile: "config.json", configDirEnvOverride: "COPILOT_HOME",
-            sessionStoreSuffix: "copilot", disableEnvVar: "CMUX_COPILOT_HOOKS_DISABLED",
+            sessionStoreSuffix: "copilot", disableEnvVar: "WMUX_COPILOT_HOOKS_DISABLED",
             hookMarker: "wmux hooks copilot", format: .nested(timeoutMs: 5000),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -204,7 +204,7 @@ extension WMUXCLI {
         AgentHookDef(
             name: "codebuddy", displayName: "CodeBuddy", statusKey: "codebuddy",
             configDir: ".codebuddy", configFile: "settings.json", configDirEnvOverride: "CODEBUDDY_CONFIG_DIR",
-            sessionStoreSuffix: "codebuddy", disableEnvVar: "CMUX_CODEBUDDY_HOOKS_DISABLED",
+            sessionStoreSuffix: "codebuddy", disableEnvVar: "WMUX_CODEBUDDY_HOOKS_DISABLED",
             hookMarker: "wmux hooks codebuddy", format: .nested(timeoutMs: 5000),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -217,7 +217,7 @@ extension WMUXCLI {
         AgentHookDef(
             name: "factory", displayName: "Factory", statusKey: "factory",
             configDir: ".factory", configFile: "settings.json", binaryName: "droid",
-            sessionStoreSuffix: "factory", disableEnvVar: "CMUX_FACTORY_HOOKS_DISABLED",
+            sessionStoreSuffix: "factory", disableEnvVar: "WMUX_FACTORY_HOOKS_DISABLED",
             hookMarker: "wmux hooks factory", format: .nested(timeoutMs: 5000),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -230,7 +230,7 @@ extension WMUXCLI {
         AgentHookDef(
             name: "qoder", displayName: "Qoder", statusKey: "qoder",
             configDir: ".qoder", configFile: "settings.json", configDirEnvOverride: "QODER_CONFIG_DIR", binaryName: "qodercli",
-            sessionStoreSuffix: "qoder", disableEnvVar: "CMUX_QODER_HOOKS_DISABLED",
+            sessionStoreSuffix: "qoder", disableEnvVar: "WMUX_QODER_HOOKS_DISABLED",
             hookMarker: "wmux hooks qoder", format: .nested(timeoutMs: 5000),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -246,7 +246,7 @@ extension WMUXCLI {
             createConfigDirIfMissing: true,
             configDirResolver: { WMUXCLI.resolvedKimiConfigDirectory().path },
             binaryName: "kimi",
-            sessionStoreSuffix: "kimi", disableEnvVar: "CMUX_KIMI_HOOKS_DISABLED",
+            sessionStoreSuffix: "kimi", disableEnvVar: "WMUX_KIMI_HOOKS_DISABLED",
             hookMarker: "wmux hooks kimi", format: .tomlArrayTable,
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),
@@ -263,7 +263,7 @@ extension WMUXCLI {
             configDir: ".config/muse", configFile: "settings.json",
             configDirEnvOverride: "XDG_CONFIG_HOME", configDirEnvOverrideSubpath: "muse",
             createConfigDirIfMissing: true,
-            sessionStoreSuffix: "muse", disableEnvVar: "CMUX_MUSE_HOOKS_DISABLED",
+            sessionStoreSuffix: "muse", disableEnvVar: "WMUX_MUSE_HOOKS_DISABLED",
             hookMarker: "wmux hooks muse", format: .nested(timeoutMs: 10_000),
             events: [
                 .init(agentEvent: "SessionStart", cmuxSubcommand: "session-start"),

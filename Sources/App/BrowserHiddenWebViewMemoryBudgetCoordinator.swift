@@ -1,4 +1,4 @@
-import CmuxBrowser
+import WmuxBrowser
 import Darwin
 import Foundation
 import WebKit
@@ -16,8 +16,8 @@ final class BrowserHiddenWebViewMemoryBudgetCoordinator {
 
     init(
         policyDefaults: UserDefaults = .standard,
-        processIdentifier: @escaping @MainActor (WKWebView) -> Int? = { CmuxWebContentProcessIdentifier.pid(for: $0) },
-        footprintBytes: @escaping (Int) -> UInt64? = { CmuxTopProcessSnapshot.resourceUsage(for: $0)?.ri_phys_footprint },
+        processIdentifier: @escaping @MainActor (WKWebView) -> Int? = { WmuxWebContentProcessIdentifier.pid(for: $0) },
+        footprintBytes: @escaping (Int) -> UInt64? = { WmuxTopProcessSnapshot.resourceUsage(for: $0)?.ri_phys_footprint },
         browserPanels: @escaping @MainActor () -> [BrowserPanel]
     ) {
         self.policyDefaults = policyDefaults

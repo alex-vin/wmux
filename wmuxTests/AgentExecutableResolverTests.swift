@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -428,8 +428,8 @@ struct AgentExecutableResolverTests {
             environment: [
                 "PATH": "\(shimBin.path):\(realBin.path)",
                 "HOME": root.path,
-                "CMUX_CLAUDE_WRAPPER_SHIM": durableInheritedRoot ? "" : shimClaude.path,
-                "CMUX_CLAUDE_WRAPPER_SHIM_ROOT": durableInheritedRoot ? "" : shimBin.path,
+                "WMUX_CLAUDE_WRAPPER_SHIM": durableInheritedRoot ? "" : shimClaude.path,
+                "WMUX_CLAUDE_WRAPPER_SHIM_ROOT": durableInheritedRoot ? "" : shimBin.path,
             ],
             bundleResourceURL: root.appendingPathComponent("Resources", isDirectory: true)
         )

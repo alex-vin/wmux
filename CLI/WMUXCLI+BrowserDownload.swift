@@ -1,4 +1,4 @@
-import CmuxControlSocket
+import WmuxControlSocket
 import Foundation
 
 extension WMUXCLI {
@@ -14,7 +14,7 @@ extension WMUXCLI {
     ) throws {
         guard let surfaceRaw,
               let surfaceID = try normalizeSurfaceHandle(surfaceRaw, client: client) else {
-            throw CLIError(message: CMUXDiffViewerLocalization.string(
+            throw CLIError(message: WMUXDiffViewerLocalization.string(
                 "cli.browser.download.error.surfaceRequired",
                 defaultValue: "browser download requires a surface handle"
             ))
@@ -193,7 +193,7 @@ extension WMUXCLI {
 
     private func browserDownloadListText(_ payload: [String: Any]) -> String {
         guard let downloads = payload["downloads"] as? [[String: Any]], !downloads.isEmpty else {
-            return CMUXDiffViewerLocalization.string(
+            return WMUXDiffViewerLocalization.string(
                 "cli.browser.download.list.empty",
                 defaultValue: "No recent downloads."
             )
@@ -205,7 +205,7 @@ extension WMUXCLI {
             let path = browserDownloadTextValue(download["path"])
             let bytes = browserDownloadTextValue(download["bytes"])
             let pathExists = browserDownloadTextValue(download["path_exists"])
-            let template = CMUXDiffViewerLocalization.string(
+            let template = WMUXDiffViewerLocalization.string(
                 "cli.browser.download.list.entry",
                 defaultValue: "%1$lld. %2$@ %3$@\n   id: %4$@\n   path: %5$@\n   bytes: %6$@\n   path_exists: %7$@"
             )
@@ -223,7 +223,7 @@ extension WMUXCLI {
     }
 
     private func browserDownloadArgumentError(_ detail: String) -> CLIError {
-        let template = CMUXDiffViewerLocalization.string(
+        let template = WMUXDiffViewerLocalization.string(
             "cli.browser.download.error.invalidArguments",
             defaultValue: "Invalid browser download arguments: %@"
         )

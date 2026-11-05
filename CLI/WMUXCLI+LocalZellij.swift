@@ -108,7 +108,7 @@ extension WMUXCLI {
     private func localZellijRuntime() throws -> LocalZellijRuntime {
         let registry = LocalTmuxSessionRegistry.live(
             directoryName: "local-zellij",
-            overrideVariable: "CMUX_LOCAL_ZELLIJ_STATE_DIR"
+            overrideVariable: "WMUX_LOCAL_ZELLIJ_STATE_DIR"
         )
         try registry.ensureSecureStorage()
         let socketDirectory = registry.rootURL.appendingPathComponent("sock", isDirectory: true).path
@@ -116,7 +116,7 @@ extension WMUXCLI {
 
         let environment = ProcessInfo.processInfo.environment
         let path: String?
-        if let override = environment["CMUX_LOCAL_ZELLIJ_BIN"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        if let override = environment["WMUX_LOCAL_ZELLIJ_BIN"]?.trimmingCharacters(in: .whitespacesAndNewlines),
            !override.isEmpty {
             path = URL(fileURLWithPath: resolvePath(override)).standardizedFileURL.path
         } else {
@@ -126,7 +126,7 @@ extension WMUXCLI {
         guard let path,
               !FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) || !isDirectory.boolValue,
               FileManager.default.isExecutableFile(atPath: path) else {
-            throw CLIError(message: String(localized: "cli.localZellij.error.zellijMissing", defaultValue: "local-zellij requires zellij. Install zellij or set CMUX_LOCAL_ZELLIJ_BIN to its path"), exitCode: 127)
+            throw CLIError(message: String(localized: "cli.localZellij.error.zellijMissing", defaultValue: "local-zellij requires zellij. Install zellij or set WMUX_LOCAL_ZELLIJ_BIN to its path"), exitCode: 127)
         }
         let builder = LocalZellijCommandBuilder(zellijPath: path, socketDirectory: socketDirectory)
         guard builder.maxSessionNameBytes > 0 else {

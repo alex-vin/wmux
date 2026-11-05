@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -135,16 +135,16 @@ struct SavedLayoutStoreTests {
         #expect(decoded.layouts.first?.name == "Demo")
     }
 
-    private static func layout(named name: String, description: String? = "Example") -> CmuxSavedLayout {
-        CmuxSavedLayout(
+    private static func layout(named name: String, description: String? = "Example") -> WmuxSavedLayout {
+        WmuxSavedLayout(
             name: name,
             description: description,
-            workspace: CmuxWorkspaceDefinition(
+            workspace: WmuxWorkspaceDefinition(
                 name: nil,
                 cwd: "/tmp",
                 color: nil,
                 env: nil,
-                layout: .pane(CmuxPaneDefinition(surfaces: [CmuxSurfaceDefinition(type: .terminal)]))
+                layout: .pane(WmuxPaneDefinition(surfaces: [WmuxSurfaceDefinition(type: .terminal)]))
             )
         )
     }

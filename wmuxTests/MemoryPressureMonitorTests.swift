@@ -1,10 +1,10 @@
 import Foundation
 import Testing
-import CmuxFoundation
-import CmuxMemoryPressure
+import WmuxFoundation
+import WmuxMemoryPressure
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -74,10 +74,10 @@ private struct MemoryPressureAggregateProcessFixture {
         name: String,
         path: String?,
         memoryBytes: Int64,
-        memorySource: CmuxTopProcessMemorySource = .physicalFootprint,
+        memorySource: WmuxTopProcessMemorySource = .physicalFootprint,
         startSeconds: Int64 = 1
-    ) -> CmuxTopProcessInfo {
-        CmuxTopProcessInfo(
+    ) -> WmuxTopProcessInfo {
+        WmuxTopProcessInfo(
             pid: pid,
             processIdentity: AgentPIDProcessIdentity(
                 pid: pid_t(pid),
@@ -108,7 +108,7 @@ private struct MemoryPressureAggregateProcessFixture {
         includeUnreadableChild: Bool = false,
         enumerationMissingProcessCount: Int = 0,
         reusedPIDBelongsToUnrelatedParent: Bool = false
-    ) -> CmuxTopProcessSnapshot {
+    ) -> WmuxTopProcessSnapshot {
         let login = process(
             pid: loginPID,
             parentPID: appPID,
@@ -133,7 +133,7 @@ private struct MemoryPressureAggregateProcessFixture {
             memorySource: includeUnreadableChild ? .unavailable : .physicalFootprint,
             startSeconds: reusedPIDBelongsToUnrelatedParent ? 9 : 1
         )
-        return CmuxTopProcessSnapshot(
+        return WmuxTopProcessSnapshot(
             processes: [
                 process(
                     pid: appPID,
@@ -425,7 +425,7 @@ struct MemoryPressureStateTrackerTests {
     }
 
     @Test func zeroCoalitionFootprintFallsBackToCompleteTree() async {
-        let process = CmuxTopProcessInfo(
+        let process = WmuxTopProcessInfo(
             pid: 42,
             parentPID: 1,
             name: "cmux",
@@ -444,7 +444,7 @@ struct MemoryPressureStateTrackerTests {
             virtualBytes: 0,
             threadCount: 1
         )
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [process],
             sampledAt: Date(timeIntervalSince1970: 0),
             includesProcessDetails: false,

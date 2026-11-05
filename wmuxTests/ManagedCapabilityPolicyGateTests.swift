@@ -1,12 +1,12 @@
-import CmuxCloud
-import CmuxBrowser
-import CmuxCore
-import CmuxRemoteWorkspace
-import CmuxSettings
+import WmuxCloud
+import WmuxBrowser
+import WmuxCore
+import WmuxRemoteWorkspace
+import WmuxSettings
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -296,7 +296,7 @@ struct ManagedCapabilityPolicyGateTests {
                 )]
             )
         ]))
-        let bus = CmuxEventBus(retainedEventLimit: 32)
+        let bus = WmuxEventBus(retainedEventLimit: 32)
         let calls = SpawnRecorder()
         let engine = AutomationEngine(
             configStore: store,

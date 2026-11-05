@@ -2,8 +2,8 @@ import AppKit
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -20,12 +20,12 @@ struct WorkspaceActionSaveDialogAccessoryTests {
         // dialog exists to show rendered blank inside its scroll view.
         let accessory = WorkspaceActionSaveDialogAccessory(
             snapshot: WorkspaceConfigActionSnapshot(
-                definition: CmuxWorkspaceDefinition(
+                definition: WmuxWorkspaceDefinition(
                     name: "W",
                     env: ["API_TOKEN": "secret"],
-                    layout: .pane(CmuxPaneDefinition(surfaces: [
-                        CmuxSurfaceDefinition(type: .terminal, command: "claude --model claude-fable-5"),
-                        CmuxSurfaceDefinition(type: .browser, url: "https://example.com/callback?code=abc"),
+                    layout: .pane(WmuxPaneDefinition(surfaces: [
+                        WmuxSurfaceDefinition(type: .terminal, command: "claude --model claude-fable-5"),
+                        WmuxSurfaceDefinition(type: .browser, url: "https://example.com/callback?code=abc"),
                     ]))
                 ),
                 skippedPanelCount: 0
@@ -45,7 +45,7 @@ struct WorkspaceActionSaveDialogAccessoryTests {
         #expect(disclosureScrollViews.count == 3)
         #expect(
             disclosureScrollViews.reduce(0) { $0 + $1.frame.height }
-                <= CmuxAlertScrollableDetailsView.maximumHeight(
+                <= WmuxAlertScrollableDetailsView.maximumHeight(
                     for: NSRect(x: 0, y: 0, width: 1024, height: 500)
                 )
         )

@@ -34,13 +34,13 @@ extension WMUXCLI {
     }
 
     /// CodeRouter and its installer are independent executables. They never
-    /// receive cmux's ambient terminal or control-plane context: CMUX_* and
-    /// CMUXD_* may carry socket paths, capabilities, passwords, auth state, or
+    /// receive cmux's ambient terminal or control-plane context: WMUX_* and
+    /// WMUXD_* may carry socket paths, capabilities, passwords, auth state, or
     /// internal paths. This environment is used for installation; the native
     /// handoff applies its own narrower execution policy.
     static func coderouterChildEnvironment(from environment: [String: String]) -> [String: String] {
         environment.filter { key, _ in
-            !key.hasPrefix("CMUX_") && !key.hasPrefix("CMUXD_")
+            !key.hasPrefix("WMUX_") && !key.hasPrefix("WMUXD_")
         }
     }
 
@@ -178,7 +178,7 @@ extension WMUXCLI {
         // Tests run the bootstrap against a local stand-in for install.sh so
         // the offer, the install, the re-resolve, and the exec are exercised
         // without the network. Not compiled into release builds.
-        if let override = environment["CMUX_CODEROUTER_INSTALLER_SCRIPT"]?
+        if let override = environment["WMUX_CODEROUTER_INSTALLER_SCRIPT"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !override.isEmpty {
             return CoderouterInstallerScript(
@@ -258,6 +258,6 @@ extension WMUXCLI {
     /// An explicit `AppleLanguages` override wins, then the app bundle's
     /// catalog in the user's language, then the English default.
     private static func localizedPassthroughString(_ key: String, defaultValue: String) -> String {
-        CMUXDiffViewerLocalization.string(key, defaultValue: defaultValue)
+        WMUXDiffViewerLocalization.string(key, defaultValue: defaultValue)
     }
 }

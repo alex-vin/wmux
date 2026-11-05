@@ -1,5 +1,5 @@
-import CmuxControlSocket
-import CmuxCore
+import WmuxControlSocket
+import WmuxCore
 import Foundation
 
 /// A socket command's hop onto the main actor exceeded its deadline.
@@ -234,13 +234,13 @@ extension TerminalController {
         _ body: @escaping @Sendable () -> T
     ) async -> T {
         let policyStack = SocketCommandTaskPolicy.focusAllowanceStack
-        let focusAllowed = CmuxAutomationInvocationContext.focusAllowed
-        let eventOrigin = CmuxAutomationInvocationContext.eventOrigin
+        let focusAllowed = WmuxAutomationInvocationContext.focusAllowed
+        let eventOrigin = WmuxAutomationInvocationContext.eventOrigin
         return await withCheckedContinuation { continuation in
             Self.socketBlockingWorkerQueue.async {
                 let value = Self.withSocketCommandPolicyStack(policyStack) {
-                    CmuxAutomationInvocationContext.$focusAllowed.withValue(focusAllowed) {
-                        CmuxAutomationInvocationContext.$eventOrigin.withValue(eventOrigin) {
+                    WmuxAutomationInvocationContext.$focusAllowed.withValue(focusAllowed) {
+                        WmuxAutomationInvocationContext.$eventOrigin.withValue(eventOrigin) {
                             body()
                         }
                     }
@@ -279,14 +279,14 @@ extension TerminalController {
     private nonisolated static var socketMainHopTimeoutNotRunMessage: String {
         String(
             localized: "socket.mainActorHop.timeout.notRun",
-            defaultValue: "cmux did not respond within 10 seconds, so the command was not run. Retry in a moment."
+            defaultValue: "wmux did not respond within 10 seconds, so the command was not run. Retry in a moment."
         )
     }
 
     private nonisolated static var socketMainHopTimeoutMayHaveRunMessage: String {
         String(
             localized: "socket.mainActorHop.timeout.mayHaveRun",
-            defaultValue: "cmux did not respond within 10 seconds after the command started, so its result is unknown. Check the effect before retrying."
+            defaultValue: "wmux did not respond within 10 seconds after the command started, so its result is unknown. Check the effect before retrying."
         )
     }
 

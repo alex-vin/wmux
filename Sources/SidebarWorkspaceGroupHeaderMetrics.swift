@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import CoreGraphics
 
 /// Font sizes, icon/control frames, and badge padding for

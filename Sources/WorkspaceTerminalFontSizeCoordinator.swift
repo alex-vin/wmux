@@ -1,7 +1,7 @@
 import Foundation
-import CmuxFoundation
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxTerminal
+import WmuxTerminalCore
 import OSLog
 
 @MainActor

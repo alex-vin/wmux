@@ -145,11 +145,11 @@ extension CLITmuxCompatRemoteSplitTests {
             executablePath: cliPath,
             arguments: ["__tmux-compat", "resize-pane", "-t", "pane:1"] + arguments,
             environment: [
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceID,
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceID,
                 "HOME": NSTemporaryDirectory(),
                 "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 30
         )

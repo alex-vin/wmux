@@ -1,12 +1,12 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxCore
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxCore
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -24,7 +24,7 @@ struct CloudMultiTeamSurfaceTests {
         defer { live.tearDown() }
         let catalog = SurfaceCatalog(live: live)
         var activeTeam = "team-a"
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             allowsBackgroundWork: { false },
             listPage: {
@@ -83,7 +83,7 @@ struct CloudMultiTeamSurfaceTests {
         let catalog = SurfaceCatalog(live: live)
         var activeTeam = "team-a"
         var statusTeams: [String] = []
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             allowsBackgroundWork: { false },
             listPage: { VMListPage(vms: activeTeam == "team-a" ? [Self.machine("vm-a")] : [Self.machine("vm-b")], limits: nil) },
@@ -120,7 +120,7 @@ struct CloudMultiTeamSurfaceTests {
         defer { live.tearDown() }
         let catalog = SurfaceCatalog(live: live)
         var statusTeams: [String: String] = [:]
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             allowsBackgroundWork: { false },
             listPage: { VMListPage(vms: [Self.machine("vm-b")], limits: nil) },
@@ -156,7 +156,7 @@ struct CloudMultiTeamSurfaceTests {
         defer { live.tearDown() }
         let catalog = SurfaceCatalog(live: live)
         var statusReads = 0
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             allowsBackgroundWork: { false },
             listPage: { VMListPage(vms: [], limits: nil) },
@@ -188,7 +188,7 @@ struct CloudMultiTeamSurfaceTests {
         let links = AccessDeniedLinks()
         // The link path is shared by every remote machine; an SSH summary
         // reaches it without a signed-in control-plane client in the test host.
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: .ssh(Self.sshConnection()), ownerTeamID: "team-a", links: links, catalog: catalog
         )
         catalog.register(provider)
@@ -215,7 +215,7 @@ struct CloudMultiTeamSurfaceTests {
         defer { live.tearDown() }
         let catalog = SurfaceCatalog(live: live)
         let links = AccessDeniedLinks(answer: .httpStatus(403, #"{"error":"forbidden"}"#))
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: .ssh(Self.sshConnection()), ownerTeamID: "team-a", links: links, catalog: catalog
         )
         catalog.register(provider)
@@ -247,7 +247,7 @@ struct CloudMultiTeamSurfaceTests {
         let links = AccessDeniedLinks(answer: .httpStatus(
             403, #"{"error":"vm_access_revoked","phase":"network"}"#
         ))
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: .ssh(Self.sshConnection()), ownerTeamID: "team-a", links: links, catalog: catalog
         )
         catalog.register(provider)
@@ -278,7 +278,7 @@ struct CloudMultiTeamSurfaceTests {
         let links = AccessDeniedLinks(answer: .httpStatus(
             403, #"{"error":"vm_billing_team_not_found"}"#
         ))
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: .ssh(Self.sshConnection()), ownerTeamID: "team-a", links: links, catalog: catalog
         )
         catalog.register(provider)

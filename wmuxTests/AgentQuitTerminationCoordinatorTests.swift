@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -150,8 +150,8 @@ private struct AgentLockHolderFixture {
                 pass
         """
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_WORKSPACE_ID"] = workspaceID.uuidString
-        environment["CMUX_SURFACE_ID"] = panelID.uuidString
+        environment["WMUX_WORKSPACE_ID"] = workspaceID.uuidString
+        environment["WMUX_SURFACE_ID"] = panelID.uuidString
         let launcherPID = try spawnProcess(
             executablePath: "/usr/bin/python3",
             arguments: ["/usr/bin/python3", "-c", script, lockPath, String(descriptors[1]), ignoresSIGTERM ? "1" : "0"],

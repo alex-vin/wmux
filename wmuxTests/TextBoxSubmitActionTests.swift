@@ -23,8 +23,8 @@ struct ComposedPromptSubmitKeyTests {
     }
 }
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -404,7 +404,7 @@ struct TextBoxSubmitActionTests {
 
     @Test
     func testDefaultConfigTemplateIncludesTextBoxLaunchPromptFlag() {
-        let template = CmuxSettingsFileStore.defaultTemplate()
+        let template = WmuxSettingsFileStore.defaultTemplate()
 
         XCTAssertTrue(template.contains(#""commandTemplate" : "codex --yolo -- {{prompt}}""#))
         XCTAssertTrue(template.contains(#""commandTemplate" : "opencode --prompt {{prompt}}""#))
@@ -1244,7 +1244,7 @@ struct TextBoxSubmitActionTests {
 
     @Test
     func testTerminalPanelKeepsStartupSurfacesUnknownUntilShellIntegrationReports() {
-        var template = CmuxSurfaceConfigTemplate()
+        var template = WmuxSurfaceConfigTemplate()
         template.initialInput = "echo from template\n"
 
         XCTAssertEqual(

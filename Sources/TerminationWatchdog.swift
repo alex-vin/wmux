@@ -59,7 +59,7 @@ final class TerminationWatchdog: Sendable {
     // delegate methods and must not depend on Swift concurrency while guarding a
     // wedged termination path. This is a one-shot 0 -> 1 latch; the deadline
     // callback itself remains lock-free.
-    nonisolated(unsafe) private var latch = CMUXTerminationWatchdogLatchMake()
+    nonisolated(unsafe) private var latch = WMUXTerminationWatchdogLatchMake()
     private let onFire: @Sendable () -> Void
     private let scheduleDeadline: DeadlineScheduler
 
@@ -84,7 +84,7 @@ final class TerminationWatchdog: Sendable {
     /// attempts, or several commit sites arming for one request — schedule the
     /// deadline only once, so `onFire` runs at most once.
     func arm(deadline: TimeInterval = TerminationWatchdog.defaultDeadline) {
-        guard CMUXTerminationWatchdogLatchClaim(&latch) else {
+        guard WMUXTerminationWatchdogLatchClaim(&latch) else {
             return
         }
 

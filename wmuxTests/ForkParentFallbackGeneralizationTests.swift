@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -103,7 +103,7 @@ struct ForkParentFallbackGeneralizationTests {
             fixture.parentPiPath: hookRecord(kind: "pi", sessionId: fixture.parentPiPath, fixture: fixture, panelId: fixture.parentPanelId),
         ])
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInPi])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInPi])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -123,7 +123,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInPi])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInPi])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -143,7 +143,7 @@ struct ForkParentFallbackGeneralizationTests {
         let parentPath = sessionDirectory.appendingPathComponent("parent-pi.jsonl").path
         try writeSessionFile(URL(fileURLWithPath: parentPath), modifiedAt: 20)
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInPi])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInPi])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -165,7 +165,7 @@ struct ForkParentFallbackGeneralizationTests {
         try writeSessionFile(URL(fileURLWithPath: parentPath), modifiedAt: 20)
         try writeSessionFile(URL(fileURLWithPath: childPath), modifiedAt: 30, parentSessionId: parentPath)
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInPi])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInPi])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -189,7 +189,7 @@ struct ForkParentFallbackGeneralizationTests {
         try writeSessionFile(URL(fileURLWithPath: firstChildPath), modifiedAt: 30, parentSessionId: parentPath)
         try writeSessionFile(URL(fileURLWithPath: secondChildPath), modifiedAt: 40, parentSessionId: parentPath)
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInPi])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInPi])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -206,7 +206,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInPi])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInPi])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -223,7 +223,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInOmp])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInOmp])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -245,7 +245,7 @@ struct ForkParentFallbackGeneralizationTests {
         try writeSessionFile(URL(fileURLWithPath: parentPath), modifiedAt: 20)
         try writeSessionFile(URL(fileURLWithPath: childPath), modifiedAt: 30, parentSessionId: parentPath)
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInOmp])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInOmp])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -262,7 +262,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInOmp])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInOmp])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -283,7 +283,7 @@ struct ForkParentFallbackGeneralizationTests {
             fixture.childPiPath: hookRecord(kind: "pi", sessionId: fixture.childPiPath, fixture: fixture, panelId: fixture.forkPanelId, updatedAt: 20),
         ])
 
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInPi])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInPi])
         let detected = detectedSnapshots(
             fixture: fixture,
             registry: registry,
@@ -301,7 +301,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
         let registration = customForkerRegistration()
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
 
         let detected = detectedSnapshots(
             fixture: fixture,
@@ -322,7 +322,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
         let registration = customBranchFromRegistration()
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
 
         let detected = detectedSnapshots(
             fixture: fixture,
@@ -340,7 +340,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
         let registration = customForkerRegistration()
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
 
         let detected = detectedSnapshots(
             fixture: fixture,
@@ -357,15 +357,15 @@ struct ForkParentFallbackGeneralizationTests {
     @Test func customRegistryForkTemplateWithoutConstantMarkerStaysExplicit() throws {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "brancher",
             name: "Brancher",
-            detect: CmuxVaultAgentDetectRule(processName: "brancher"),
+            detect: WmuxVaultAgentDetectRule(processName: "brancher"),
             sessionIdSource: .argvOption("--thread"),
             resumeCommand: "{{executable}} --thread {{sessionId}}",
             forkCommand: "{{executable}} --thread {{sessionId}}"
         )
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
 
         let detected = detectedSnapshots(
             fixture: fixture,
@@ -383,7 +383,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
         let registration = customForkerRegistration()
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
         try writeStore(root: fixture.root, filename: "custom-forker-hook-sessions.json", sessions: [
             fixture.parentCodexId: hookRecord(kind: "custom-forker", sessionId: fixture.parentCodexId, fixture: fixture, panelId: fixture.parentPanelId, updatedAt: 10),
             fixture.childCodexId: hookRecord(kind: "custom-forker", sessionId: fixture.childCodexId, fixture: fixture, panelId: fixture.forkPanelId, updatedAt: 20),
@@ -419,7 +419,7 @@ struct ForkParentFallbackGeneralizationTests {
         let fixture = try Fixture.make()
         defer { fixture.cleanup() }
         let key = fixture.forkKey
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
                 processInfo(pid: 5_150, fixture: fixture, processName: "opencode", processPath: "/usr/local/bin/opencode"),
                 processInfo(pid: fixture.forkProcessID, fixture: fixture, processName: "codex", processPath: "/usr/local/bin/codex"),
@@ -428,7 +428,7 @@ struct ForkParentFallbackGeneralizationTests {
             includesProcessDetails: true
         )
         let detected = RestorableAgentSessionIndex.processDetectedSnapshots(
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             fileManager: fixture.fileManager,
             processSnapshot: processSnapshot,
             capturedAt: 42,
@@ -489,7 +489,7 @@ struct ForkParentFallbackGeneralizationTests {
 
     private func detectedSnapshots(
         fixture: Fixture,
-        registry: CmuxVaultAgentRegistry = CmuxVaultAgentRegistry(registrations: []),
+        registry: WmuxVaultAgentRegistry = WmuxVaultAgentRegistry(registrations: []),
         argv: [String],
         launchKind: String,
         processName: String,
@@ -507,7 +507,7 @@ struct ForkParentFallbackGeneralizationTests {
 
     private func loadIndex(
         fixture: Fixture,
-        registry: CmuxVaultAgentRegistry = CmuxVaultAgentRegistry(registrations: []),
+        registry: WmuxVaultAgentRegistry = WmuxVaultAgentRegistry(registrations: []),
         detectedSnapshots: [RestorableAgentSessionIndex.PanelKey: RestorableAgentSessionIndex.ProcessDetectedSnapshotEntry],
         processIdentityProvider: @escaping (Int) -> AgentPIDProcessIdentity? = { _ in nil }
     ) -> RestorableAgentSessionIndex {
@@ -521,8 +521,8 @@ struct ForkParentFallbackGeneralizationTests {
         )
     }
 
-    private func processSnapshot(fixture: Fixture, processName: String, processPath: String?) -> CmuxTopProcessSnapshot {
-        CmuxTopProcessSnapshot(
+    private func processSnapshot(fixture: Fixture, processName: String, processPath: String?) -> WmuxTopProcessSnapshot {
+        WmuxTopProcessSnapshot(
             processes: [
                 processInfo(pid: fixture.forkProcessID, fixture: fixture, processName: processName, processPath: processPath),
             ],
@@ -531,8 +531,8 @@ struct ForkParentFallbackGeneralizationTests {
         )
     }
 
-    private func processInfo(pid: Int, fixture: Fixture, processName: String, processPath: String?) -> CmuxTopProcessInfo {
-        CmuxTopProcessInfo(
+    private func processInfo(pid: Int, fixture: Fixture, processName: String, processPath: String?) -> WmuxTopProcessInfo {
+        WmuxTopProcessInfo(
             pid: pid,
             parentPID: 1,
             name: processName,
@@ -550,12 +550,12 @@ struct ForkParentFallbackGeneralizationTests {
         )
     }
 
-    private func processArguments(fixture: Fixture, argv: [String], launchKind: String) -> CmuxTopProcessArguments {
-        CmuxTopProcessArguments(arguments: argv, environment: [
-            "CMUX_AGENT_LAUNCH_KIND": launchKind,
-            "CMUX_AGENT_LAUNCH_CWD": fixture.cwd.path,
-            "CMUX_WORKSPACE_ID": fixture.workspaceId.uuidString,
-            "CMUX_SURFACE_ID": fixture.forkPanelId.uuidString,
+    private func processArguments(fixture: Fixture, argv: [String], launchKind: String) -> WmuxTopProcessArguments {
+        WmuxTopProcessArguments(arguments: argv, environment: [
+            "WMUX_AGENT_LAUNCH_KIND": launchKind,
+            "WMUX_AGENT_LAUNCH_CWD": fixture.cwd.path,
+            "WMUX_WORKSPACE_ID": fixture.workspaceId.uuidString,
+            "WMUX_SURFACE_ID": fixture.forkPanelId.uuidString,
             "CODEX_HOME": fixture.root.appendingPathComponent(".codex", isDirectory: true).path,
             "PWD": fixture.cwd.path,
         ])
@@ -620,22 +620,22 @@ struct ForkParentFallbackGeneralizationTests {
         )
     }
 
-    private func customForkerRegistration() -> CmuxVaultAgentRegistration {
-        CmuxVaultAgentRegistration(
+    private func customForkerRegistration() -> WmuxVaultAgentRegistration {
+        WmuxVaultAgentRegistration(
             id: "custom-forker",
             name: "Custom Forker",
-            detect: CmuxVaultAgentDetectRule(processName: "custom-forker"),
+            detect: WmuxVaultAgentDetectRule(processName: "custom-forker"),
             sessionIdSource: .argvOption("--thread"),
             resumeCommand: "{{executable}} --thread {{sessionId}}",
             forkCommand: "{{executable}} --thread {{sessionId}} --fork"
         )
     }
 
-    private func customBranchFromRegistration() -> CmuxVaultAgentRegistration {
-        CmuxVaultAgentRegistration(
+    private func customBranchFromRegistration() -> WmuxVaultAgentRegistration {
+        WmuxVaultAgentRegistration(
             id: "brancher",
             name: "Brancher",
-            detect: CmuxVaultAgentDetectRule(processName: "brancher"),
+            detect: WmuxVaultAgentDetectRule(processName: "brancher"),
             sessionIdSource: .argvOption("--thread"),
             resumeCommand: "{{executable}} --thread {{sessionId}}",
             forkCommand: "{{executable}} --thread {{sessionId}} --branch-from"

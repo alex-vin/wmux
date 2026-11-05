@@ -1,4 +1,4 @@
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 
 /// Evaluates find-in-page scripts against the live `WKWebView` of a

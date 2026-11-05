@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxFoundation
+import WmuxBrowser
+import WmuxFoundation
 import WebKit
 
 /// Owns synchronized, DOM-attested capture of one browser viewport.

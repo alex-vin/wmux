@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 import Observation
 
@@ -119,8 +119,8 @@ final class PaneMemoryGuardrail {
         // guardrail is the sole sampler it still captures fresh each tick, which
         // is the cheap no-details tier and the intended freshness floor.
         let snapshot = includeCMUXScope
-            ? await CmuxTopProcessSnapshot.captureCached(includeCMUXScope: true, maximumAge: 5)
-            : await CmuxTopProcessSnapshot.captureCached(includeCMUXScope: false, maximumAge: 3)
+            ? await WmuxTopProcessSnapshot.captureCached(includeCMUXScope: true, maximumAge: 5)
+            : await WmuxTopProcessSnapshot.captureCached(includeCMUXScope: false, maximumAge: 3)
         let samples = computeSamples(
             descriptors: descriptors,
             thresholdBytes: thresholdBytes,
@@ -146,7 +146,7 @@ final class PaneMemoryGuardrail {
     nonisolated static func computeSamples(
         descriptors: [PaneMemoryDescriptor],
         thresholdBytes: Int64,
-        snapshot: CmuxTopProcessSnapshot
+        snapshot: WmuxTopProcessSnapshot
     ) -> [PaneMemorySample] {
         let clearBytes = Int64(Double(thresholdBytes) * PaneMemoryGuardrailEngine.clearFraction)
         return descriptors.map { descriptor in
@@ -179,7 +179,7 @@ final class PaneMemoryGuardrail {
     nonisolated static func computeScopedOnlySamples(
         descriptors: [PaneMemoryDescriptor],
         thresholdBytes: Int64,
-        snapshot: CmuxTopProcessSnapshot
+        snapshot: WmuxTopProcessSnapshot
     ) -> [PaneMemorySample] {
         let clearBytes = Int64(Double(thresholdBytes) * PaneMemoryGuardrailEngine.clearFraction)
         return descriptors.map { descriptor in
@@ -206,7 +206,7 @@ final class PaneMemoryGuardrail {
 
     nonisolated static func cheapRootPIDs(
         for descriptor: PaneMemoryDescriptor,
-        in snapshot: CmuxTopProcessSnapshot
+        in snapshot: WmuxTopProcessSnapshot
     ) -> Set<Int> {
         var rootPIDs: Set<Int> = []
         if let foregroundPID = descriptor.foregroundPID {
@@ -279,7 +279,7 @@ final class PaneMemoryGuardrail {
     }
 
     nonisolated static func memoryPressureProcessGroupIDs(
-        in snapshot: CmuxTopProcessSnapshot,
+        in snapshot: WmuxTopProcessSnapshot,
         pids: Set<Int>,
         clearBytes: Int64
     ) -> [Int] {

@@ -9,7 +9,7 @@ set -euo pipefail
 own_release_app_path() {
   local settings
   # Keep going on failure so the caller reports it instead of set -e exiting silently.
-  settings="$(xcodebuild -project cmux.xcodeproj -scheme cmux -configuration Release -destination 'platform=macOS' \
+  settings="$(xcodebuild -project wmux.xcodeproj -scheme wmux -configuration Release -destination 'platform=macOS' \
     -skipPackageUpdates -showBuildSettings 2>&1)" || {
     echo "$settings" | tail -5 >&2
     return 0
@@ -59,7 +59,7 @@ if [[ "${CMUX_ALLOW_REPLACING_RUNNING_CMUX:-}" == "1" ]]; then
   OPEN_ENV_ARGS=(--env CMUX_ALLOW_REPLACING_RUNNING_CMUX=1)
 fi
 
-xcodebuild -project cmux.xcodeproj -scheme cmux -configuration Release -destination 'platform=macOS' build
+xcodebuild -project wmux.xcodeproj -scheme wmux -configuration Release -destination 'platform=macOS' build
 APP_PATH="$OWN_APP_PATH"
 if [[ ! -d "${APP_PATH}" ]]; then
   echo "cmux.app not found at ${APP_PATH}" >&2

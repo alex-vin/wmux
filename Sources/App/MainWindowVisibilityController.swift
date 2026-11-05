@@ -63,7 +63,7 @@ final class MainWindowVisibilityController {
             orderFrontRegardless: { $0.orderFrontRegardless() },
             orderOut: { $0.orderOut(nil) },
             softHide: {
-                if let window = $0 as? CmuxMainWindow {
+                if let window = $0 as? WmuxMainWindow {
                     window.setSoftHiddenForVisibilityController(true)
                 } else {
                     $0.makeFirstResponder(nil)
@@ -72,7 +72,7 @@ final class MainWindowVisibilityController {
                 }
             },
             softShow: {
-                if let window = $0 as? CmuxMainWindow {
+                if let window = $0 as? WmuxMainWindow {
                     window.setSoftHiddenForVisibilityController(false)
                 } else {
                     $0.alphaValue = 1

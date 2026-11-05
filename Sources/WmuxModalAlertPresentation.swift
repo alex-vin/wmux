@@ -6,7 +6,7 @@ import AppKit
 /// Reported to the `willPresent` hook from inside the presenter so callers
 /// observe the *actual* path taken rather than re-deriving it (which can
 /// drift from the presenter's own decision).
-enum CmuxModalAlertPresentation {
+enum WmuxModalAlertPresentation {
     /// Presented as a sheet attached to the associated host window.
     case sheet(NSWindow)
     /// Presented application-modal because no eligible host window was found.
@@ -21,7 +21,7 @@ private extension NSWindow {
     /// Whether this window is one of cmux's main windows.
     var isCmuxMainWindow: Bool {
         guard let raw = identifier?.rawValue else { return false }
-        return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+        return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
     }
 }
 
@@ -69,8 +69,8 @@ extension NSAlert {
     @MainActor
     func runCmuxModal(
         presentingWindow: NSWindow? = nil,
-        content: CmuxAlertContent? = nil,
-        willPresent: ((CmuxModalAlertPresentation) -> Void)? = nil
+        content: WmuxAlertContent? = nil,
+        willPresent: ((WmuxModalAlertPresentation) -> Void)? = nil
     ) -> NSApplication.ModalResponse {
         if NSApp.activationPolicy() == .regular {
             NSApp.activate(ignoringOtherApps: true)
@@ -80,7 +80,7 @@ extension NSAlert {
         if let content {
             content.apply(to: self, presentingWindow: hostWindow)
         } else if accessoryView == nil, !informativeText.isEmpty {
-            CmuxAlertContent(informativeText: informativeText)
+            WmuxAlertContent(informativeText: informativeText)
                 .apply(to: self, presentingWindow: hostWindow)
         }
         guard let hostWindow, hostWindow.attachedSheet == nil else {

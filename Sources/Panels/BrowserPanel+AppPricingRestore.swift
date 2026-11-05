@@ -1,5 +1,5 @@
-import CmuxCloud
-import CmuxAuthRuntime
+import WmuxCloud
+import WmuxAuthRuntime
 import Foundation
 
 extension BrowserPanel {
@@ -13,10 +13,10 @@ extension BrowserPanel {
             components.fragment = restoredComponents.fragment
         }
         var queryItems = components.queryItems ?? []
-        queryItems.removeAll { $0.name == "cmux_app" }
-        queryItems.removeAll { $0.name == "cmux_scheme" }
-        queryItems.append(URLQueryItem(name: "cmux_app", value: "1"))
-        queryItems.append(URLQueryItem(name: "cmux_scheme", value: AuthEnvironment.callbackScheme))
+        queryItems.removeAll { $0.name == "wmux_app" }
+        queryItems.removeAll { $0.name == "wmux_scheme" }
+        queryItems.append(URLQueryItem(name: "wmux_app", value: "1"))
+        queryItems.append(URLQueryItem(name: "wmux_scheme", value: AuthEnvironment.callbackScheme))
         components.queryItems = queryItems
         return components.url ?? AuthEnvironment.appPricingURL
     }

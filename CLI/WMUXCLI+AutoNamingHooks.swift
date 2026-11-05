@@ -125,7 +125,7 @@ extension WMUXCLI {
                FileManager.default.isExecutableFile(atPath: first) {
                 return first
             }
-            if let bundled = normalizedHookValue(env["CMUX_BUNDLED_CLI_PATH"]),
+            if let bundled = normalizedHookValue(env["WMUX_BUNDLED_CLI_PATH"]),
                FileManager.default.isExecutableFile(atPath: bundled) {
                 return bundled
             }
@@ -145,7 +145,7 @@ extension WMUXCLI {
             cwd ?? ""
         ]
         var spawnEnv = env
-        spawnEnv["CMUX_CLAUDE_HOOK_STATE_PATH"] = agentHookStatePath(sessionStoreSuffix: def.sessionStoreSuffix, env: env)
+        spawnEnv["WMUX_CLAUDE_HOOK_STATE_PATH"] = agentHookStatePath(sessionStoreSuffix: def.sessionStoreSuffix, env: env)
         process.environment = spawnEnv
         process.standardInput = FileHandle.nullDevice
         process.standardOutput = FileHandle.nullDevice

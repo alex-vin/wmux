@@ -1,12 +1,12 @@
 import AppKit
-import CmuxControlSocket
-import CmuxCore
+import WmuxControlSocket
+import WmuxCore
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -927,15 +927,15 @@ struct RemoteResumeBindingTests {
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": workingDirectory.path,
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceID.uuidString,
-            "CMUX_SURFACE_ID": surfaceID.uuidString,
-            "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-            "CMUX_AGENT_LAUNCH_KIND": "kiro",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": executable,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(launchArguments),
-            "CMUX_AGENT_LAUNCH_CWD": workingDirectory.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceID.uuidString,
+            "WMUX_SURFACE_ID": surfaceID.uuidString,
+            "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+            "WMUX_AGENT_LAUNCH_KIND": "kiro",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": executable,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(launchArguments),
+            "WMUX_AGENT_LAUNCH_CWD": workingDirectory.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         let inputObject: [String: Any] = [
             "session_id": "kiro-remote-session",

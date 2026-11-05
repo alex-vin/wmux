@@ -1,5 +1,5 @@
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 
 extension AppDelegate {
     /// Focused and visible terminal lifecycle tokens that should observe a

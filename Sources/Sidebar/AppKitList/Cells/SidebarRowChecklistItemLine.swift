@@ -1,5 +1,5 @@
 import AppKit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import SwiftUI
 
 // MARK: - Item line

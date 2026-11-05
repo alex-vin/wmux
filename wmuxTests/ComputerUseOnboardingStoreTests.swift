@@ -1,10 +1,10 @@
-#if canImport(CmuxComputerUse)
+#if canImport(WmuxComputerUse)
 import Foundation
-@testable import CmuxComputerUse
+@testable import WmuxComputerUse
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

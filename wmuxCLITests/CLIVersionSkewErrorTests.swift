@@ -165,15 +165,15 @@ struct CLIVersionSkewErrorTests {
         let served = fixture.start()
 
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         // The assertions read English copy.
         environment["AppleLanguages"] = "(en)"
         environment["AppleLocale"] = "en_US"
-        environment["CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = "2"
+        environment["WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = "2"
         let result = CLIHookProcessRunner.run(
             executablePath: cliPath,
             arguments: arguments,

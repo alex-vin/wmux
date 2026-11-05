@@ -1,11 +1,11 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CMUXMobileCore
-import CmuxWorkspaces
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxSwiftRenderUI
-import CmuxFoundation
+import WMUXMobileCore
+import WmuxWorkspaces
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxSwiftRenderUI
+import WmuxFoundation
 import Foundation
 import OSLog
 import SwiftUI
@@ -29,7 +29,7 @@ final class HostSettingsActions: SettingsHostActions {
     /// Matches the value `ConfigSettingsView.configureWindow` assigns so the
     /// host reuses a config window opened from any entrypoint (the legacy
     /// in-app button's SwiftUI scene or this host-presented window).
-    private let configWindowIdentifier = "cmux.configEditor"
+    private let configWindowIdentifier = "wmux.configEditor"
 
     /// Observes the `appIconMode` defaults key the settings package writes
     /// so the host can re-apply the dock/app-switcher icon when the user
@@ -194,7 +194,7 @@ final class HostSettingsActions: SettingsHostActions {
         ).first else {
             return nil
         }
-        let configURL = CmuxGhosttyConfigPathResolver().editableConfigURL(
+        let configURL = WmuxGhosttyConfigPathResolver().editableConfigURL(
             currentBundleIdentifier: Bundle.main.bundleIdentifier,
             appSupportDirectory: appSupport
         )
@@ -204,7 +204,7 @@ final class HostSettingsActions: SettingsHostActions {
                 .compactMap { $0 }
         ).urls
         return TerminalThemeGalleryContext(
-            configFile: CmuxManagedThemeConfigFile(url: configURL),
+            configFile: WmuxManagedThemeConfigFile(url: configURL),
             themeDirectories: themeDirectories,
             readCurrentThemeValue: { GhosttyApp.userAppearanceConfigSummary().lastThemeDirective },
             prefersDarkAppearance: NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
@@ -237,7 +237,7 @@ final class HostSettingsActions: SettingsHostActions {
     }
 
     func canRegisterSystemWideHotkey(
-        _ shortcut: CmuxSettings.StoredShortcut
+        _ shortcut: WmuxSettings.StoredShortcut
     ) -> Bool {
         SystemWideHotkeySettings.registrationCandidate(
             for: StoredShortcut(cmuxSettingsStoredShortcut: shortcut)
@@ -308,13 +308,13 @@ final class HostSettingsActions: SettingsHostActions {
     }
 
     func customSidebarNames() -> [String] {
-        CmuxExtensionSidebarSelection.discoveredCustomSidebarNames(
-            sidebarsDirectory: CmuxExtensionSidebarSelection.customSidebarsDirectory
+        WmuxExtensionSidebarSelection.discoveredCustomSidebarNames(
+            sidebarsDirectory: WmuxExtensionSidebarSelection.customSidebarsDirectory
         )
     }
 
     func customSidebarNamesUpdates() async -> AsyncStream<[String]> {
-        await CustomSidebarDiscovery(directory: CmuxExtensionSidebarSelection.customSidebarsDirectory).updates()
+        await CustomSidebarDiscovery(directory: WmuxExtensionSidebarSelection.customSidebarsDirectory).updates()
     }
 
     func createCustomSidebar() -> CustomSidebarOnboardingResult {
@@ -337,7 +337,7 @@ final class HostSettingsActions: SettingsHostActions {
     }
 
     private func installCustomSidebarTemplate(id: String, openEditor: Bool) -> CustomSidebarOnboardingResult {
-        guard CmuxExtensionSidebarSelection.customSidebarsEnabled else { return .writeFailed }
+        guard WmuxExtensionSidebarSelection.customSidebarsEnabled else { return .writeFailed }
         guard let template = CustomSidebarOnboardingAssets().exampleTemplate(id: id) else {
             return .templateUnavailable
         }
@@ -348,7 +348,7 @@ final class HostSettingsActions: SettingsHostActions {
             openEditor: openEditor
         )
         if case let .created(name) = result {
-            CmuxExtensionSidebarSelection.clearInMemoryTemplatePreview()
+            WmuxExtensionSidebarSelection.clearInMemoryTemplatePreview()
             customSidebarPreview = nil
             UserDefaults.standard.set(true, forKey: SettingCatalog().betaFeatures.customSidebars.userDefaultsKey)
             if template.descriptor.kind == .right {
@@ -356,13 +356,13 @@ final class HostSettingsActions: SettingsHostActions {
                     // A settings window can outlive the main window. Keep the
                     // new file usable through the left-sidebar picker if the
                     // right-panel host is unavailable.
-                    CmuxExtensionSidebarSelection.setProviderId(
-                        CmuxExtensionSidebarSelection.customSidebarProviderPrefix + name
+                    WmuxExtensionSidebarSelection.setProviderId(
+                        WmuxExtensionSidebarSelection.customSidebarProviderPrefix + name
                     )
                 }
             } else {
-                CmuxExtensionSidebarSelection.setProviderId(
-                    CmuxExtensionSidebarSelection.customSidebarProviderPrefix + name
+                WmuxExtensionSidebarSelection.setProviderId(
+                    WmuxExtensionSidebarSelection.customSidebarProviderPrefix + name
                 )
             }
             NotificationCenter.default.post(
@@ -376,17 +376,17 @@ final class HostSettingsActions: SettingsHostActions {
 
     func previewCustomSidebarTemplate(id: String) -> CustomSidebarOnboardingResult {
         revertCustomSidebarPreview()
-        guard CmuxExtensionSidebarSelection.customSidebarsEnabled else { return .writeFailed }
+        guard WmuxExtensionSidebarSelection.customSidebarsEnabled else { return .writeFailed }
         guard let template = CustomSidebarOnboardingAssets().exampleTemplate(id: id) else {
             return .templateUnavailable
         }
-        let previous = UserDefaults.standard.string(forKey: CmuxExtensionSidebarSelection.defaultsKey)
-            ?? CmuxExtensionSidebarSelection.defaultProviderId
+        let previous = UserDefaults.standard.string(forKey: WmuxExtensionSidebarSelection.defaultsKey)
+            ?? WmuxExtensionSidebarSelection.defaultProviderId
         let providerName = ".cmux-preview-\(id)-\(UUID().uuidString.prefix(8).lowercased())"
-        let providerId = CmuxExtensionSidebarSelection.customSidebarProviderPrefix + providerName
+        let providerId = WmuxExtensionSidebarSelection.customSidebarProviderPrefix + providerName
         customSidebarPreview = (id: id, providerId: providerId, previousProviderId: previous)
-        CmuxExtensionSidebarSelection.setInMemoryTemplatePreview(providerId: providerId, source: template.source)
-        CmuxExtensionSidebarSelection.setProviderId(providerId)
+        WmuxExtensionSidebarSelection.setInMemoryTemplatePreview(providerId: providerId, source: template.source)
+        WmuxExtensionSidebarSelection.setProviderId(providerId)
         NotificationCenter.default.post(name: .customSidebarReloadRequested, object: nil)
         return .created(name: providerName)
     }
@@ -395,7 +395,7 @@ final class HostSettingsActions: SettingsHostActions {
         guard let preview = customSidebarPreview else { return .templateUnavailable }
         let result = useCustomSidebarTemplate(id: preview.id)
         if case .created = result {
-            CmuxExtensionSidebarSelection.clearInMemoryTemplatePreview()
+            WmuxExtensionSidebarSelection.clearInMemoryTemplatePreview()
             customSidebarPreview = nil
         }
         return result
@@ -403,8 +403,8 @@ final class HostSettingsActions: SettingsHostActions {
 
     func revertCustomSidebarPreview() {
         guard let preview = customSidebarPreview else { return }
-        CmuxExtensionSidebarSelection.clearInMemoryTemplatePreview()
-        CmuxExtensionSidebarSelection.setProviderId(preview.previousProviderId)
+        WmuxExtensionSidebarSelection.clearInMemoryTemplatePreview()
+        WmuxExtensionSidebarSelection.setProviderId(preview.previousProviderId)
         NotificationCenter.default.post(name: .customSidebarReloadRequested, object: nil)
         customSidebarPreview = nil
     }
@@ -414,7 +414,7 @@ final class HostSettingsActions: SettingsHostActions {
     }
 
     func openCustomSidebarInExternalEditor(named name: String) {
-        guard let fileURL = CmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) else {
+        guard let fileURL = WmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) else {
             return
         }
         PreferredEditorService(defaults: .standard).open(fileURL)
@@ -422,8 +422,8 @@ final class HostSettingsActions: SettingsHostActions {
 
     func openCustomSidebarsFolder() {
         do {
-            let directory = try CmuxExtensionSidebarSelection.ensureCustomSidebarsDirectory(
-                CmuxExtensionSidebarSelection.customSidebarsDirectory
+            let directory = try WmuxExtensionSidebarSelection.ensureCustomSidebarsDirectory(
+                WmuxExtensionSidebarSelection.customSidebarsDirectory
             )
             NSWorkspace.shared.open(directory)
         } catch {
@@ -437,12 +437,12 @@ final class HostSettingsActions: SettingsHostActions {
         uniquingIfNeeded: Bool,
         openEditor: Bool = true
     ) -> CustomSidebarOnboardingResult {
-        switch CmuxExtensionSidebarSelection.writeCustomSidebar(
+        switch WmuxExtensionSidebarSelection.writeCustomSidebar(
             named: name,
             fileExtension: template.fileExtension,
             source: template.source,
             uniquingIfNeeded: uniquingIfNeeded,
-            sidebarsDirectory: CmuxExtensionSidebarSelection.customSidebarsDirectory
+            sidebarsDirectory: WmuxExtensionSidebarSelection.customSidebarsDirectory
         ) {
         case let .created(createdName, fileURL):
             if openEditor {
@@ -860,16 +860,16 @@ final class HostSettingsActions: SettingsHostActions {
         // forcing a synchronous disk read on the main actor when Settings opens.
         SettingsFontSize(
             points: Double(GhosttyConfig.loadForCmux().sidebarFontSize),
-            minimum: CmuxGhosttyConfigSettingEditor.minSidebarFontSize,
-            maximum: CmuxGhosttyConfigSettingEditor.maxSidebarFontSize,
-            defaultValue: CmuxGhosttyConfigSettingEditor.defaultSidebarFontSize
+            minimum: WmuxGhosttyConfigSettingEditor.minSidebarFontSize,
+            maximum: WmuxGhosttyConfigSettingEditor.maxSidebarFontSize,
+            defaultValue: WmuxGhosttyConfigSettingEditor.defaultSidebarFontSize
         )
     }
 
     func setSidebarFontSize(_ points: Double) async -> Bool {
         await persistFontSize(
-            key: CmuxGhosttyConfigSettingEditor.sidebarFontSizeKey,
-            points: CmuxGhosttyConfigSettingEditor().clampedSidebarFontSize(points),
+            key: WmuxGhosttyConfigSettingEditor.sidebarFontSizeKey,
+            points: WmuxGhosttyConfigSettingEditor().clampedSidebarFontSize(points),
             reloadSource: "settings.sidebar.fontSize"
         )
     }
@@ -878,22 +878,22 @@ final class HostSettingsActions: SettingsHostActions {
         // See ``sidebarFontSize()`` — uses the cached config to avoid main-actor disk I/O.
         SettingsFontSize(
             points: Double(GhosttyConfig.loadForCmux().surfaceTabBarFontSize),
-            minimum: CmuxGhosttyConfigSettingEditor.minSurfaceTabBarFontSize,
-            maximum: CmuxGhosttyConfigSettingEditor.maxSurfaceTabBarFontSize,
-            defaultValue: CmuxGhosttyConfigSettingEditor.defaultSurfaceTabBarFontSize
+            minimum: WmuxGhosttyConfigSettingEditor.minSurfaceTabBarFontSize,
+            maximum: WmuxGhosttyConfigSettingEditor.maxSurfaceTabBarFontSize,
+            defaultValue: WmuxGhosttyConfigSettingEditor.defaultSurfaceTabBarFontSize
         )
     }
 
     func setSurfaceTabBarFontSize(_ points: Double) async -> Bool {
         await persistFontSize(
-            key: CmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey,
-            points: CmuxGhosttyConfigSettingEditor().clampedSurfaceTabBarFontSize(points),
+            key: WmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey,
+            points: WmuxGhosttyConfigSettingEditor().clampedSurfaceTabBarFontSize(points),
             reloadSource: "settings.terminal.tabBarFontSize"
         )
     }
 
     func formattedFontSize(_ points: Double) -> String {
-        CmuxGhosttyConfigSettingEditor().formattedFontSize(points)
+        WmuxGhosttyConfigSettingEditor().formattedFontSize(points)
     }
 
     func terminalGhosttyOptions() async -> GhosttyTerminalOptionsSnapshot {
@@ -1028,7 +1028,7 @@ final class HostSettingsActions: SettingsHostActions {
     /// - Returns: `true` on success, `false` if the write failed (a generic
     ///   warning is logged here; the Settings UI surfaces a save-failed message).
     private func persistFontSize(key: String, points: Double, reloadSource: String) async -> Bool {
-        let formatted = CmuxGhosttyConfigSettingEditor().formattedFontSize(points)
+        let formatted = WmuxGhosttyConfigSettingEditor().formattedFontSize(points)
         guard await fontConfigWriter.write(key: key, value: formatted) else {
             hostSettingsLogger.warning("failed to persist \(key, privacy: .public)")
             return false
@@ -1042,7 +1042,7 @@ final class HostSettingsActions: SettingsHostActions {
 /// Wraps the opaque observer returned by `NotificationCenter.addObserver` so the
 /// `@Sendable` stream-termination closure can hold it for removal. Objective-C
 /// doesn't model `Sendable`; the token is immutable and only hands the opaque
-/// observer back to NotificationCenter's thread-safe removal API. CmuxSettings
+/// observer back to NotificationCenter's thread-safe removal API. WmuxSettings
 /// has an identical internal token, which isn't `public`, so it's duplicated.
 final class MobileHostStatusObserverToken: @unchecked Sendable {
     private let token: NSObjectProtocol

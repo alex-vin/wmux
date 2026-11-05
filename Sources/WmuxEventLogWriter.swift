@@ -5,7 +5,7 @@ nonisolated private let cmuxEventLogLogger = Logger(subsystem: "com.cmuxterm.app
 
 // Sendable safety: pending state is protected by `lock`; file IO and
 // `openLogHandle` are confined to `queue`.
-final class CmuxEventLogWriter: @unchecked Sendable {
+final class WmuxEventLogWriter: @unchecked Sendable {
     static let defaultMaxPendingLines = 1_024
 
     private static let queue = DispatchQueue(label: "com.cmuxterm.event-log", qos: .utility)

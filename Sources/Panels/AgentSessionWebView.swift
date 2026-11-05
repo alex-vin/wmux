@@ -1,9 +1,9 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 
 @MainActor
-final class AgentSessionWebView: CmuxUndoableWebView {
+final class AgentSessionWebView: WmuxUndoableWebView {
     var onPointerDown: (() -> Void)?
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool {

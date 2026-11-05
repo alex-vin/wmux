@@ -3,14 +3,14 @@ import Foundation
 
 // MARK: - Workspace command launch (named and inline `type: "workspace"` actions)
 
-extension CmuxConfigExecutor {
+extension WmuxConfigExecutor {
 
     /// The trust dialog must disclose everything a workspace action does to
     /// the shells it spawns — the `setup` bootstrap, each surface `command`,
     /// env assignments (ZDOTDIR/BASH_ENV/PATH-style keys change what
     /// executes), and the cwd values commands run in — not just the action's
     /// (arbitrary, benign-looking) name.
-    static func workspaceShellDisclosure(_ command: CmuxCommandDefinition) -> String {
+    static func workspaceShellDisclosure(_ command: WmuxCommandDefinition) -> String {
         guard let workspace = command.workspace else { return command.name }
         var shellLines: [String] = []
         if let cwd = workspace.cwd {
@@ -53,11 +53,11 @@ extension CmuxConfigExecutor {
 
     /// The cwd of the first terminal surface in leaf order — the surface that
     /// receives the `setup` command in `applyCustomLayout`.
-    private static func firstTerminalSurfaceCwd(_ node: CmuxLayoutNode) -> String? {
+    private static func firstTerminalSurfaceCwd(_ node: WmuxLayoutNode) -> String? {
         firstTerminalSurface(node)?.cwd
     }
 
-    private static func firstTerminalSurface(_ node: CmuxLayoutNode) -> CmuxSurfaceDefinition? {
+    private static func firstTerminalSurface(_ node: WmuxLayoutNode) -> WmuxSurfaceDefinition? {
         switch node {
         case .pane(let pane):
             return pane.surfaces.first { $0.type == .terminal }
@@ -71,7 +71,7 @@ extension CmuxConfigExecutor {
         }
     }
 
-    private static func collectSurfaceDisclosures(_ node: CmuxLayoutNode, into lines: inout [String]) {
+    private static func collectSurfaceDisclosures(_ node: WmuxLayoutNode, into lines: inout [String]) {
         switch node {
         case .pane(let pane):
             for surface in pane.surfaces {
@@ -102,8 +102,8 @@ extension CmuxConfigExecutor {
 
 
     static func executeWorkspaceCommand(
-        command: CmuxCommandDefinition,
-        workspace wsDef: CmuxWorkspaceDefinition,
+        command: WmuxCommandDefinition,
+        workspace wsDef: WmuxWorkspaceDefinition,
         tabManager: TabManager,
         baseCwd: String
     ) -> Bool {
@@ -147,7 +147,7 @@ extension CmuxConfigExecutor {
             }
         }
 
-        let resolvedCwd = CmuxConfigStore.resolveCwd(wsDef.cwd, relativeTo: baseCwd)
+        let resolvedCwd = WmuxConfigStore.resolveCwd(wsDef.cwd, relativeTo: baseCwd)
         guard let newWorkspace = tabManager.addWorkspaceIfActive(
             title: workspaceName,
             titleSource: .auto,

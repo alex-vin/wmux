@@ -1,7 +1,7 @@
 import Foundation
 
 /// One tab (panel) inside a workspace, described by both of its identities.
-struct CmuxNavigationSurfaceDescriptor: Equatable {
+struct WmuxNavigationSurfaceDescriptor: Equatable {
     /// Session-scoped panel identifier (`Panel.id`).
     let panelId: UUID
     /// Current session-owned surface identifiers that route to this panel.

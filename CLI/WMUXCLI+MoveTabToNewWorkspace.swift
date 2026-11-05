@@ -74,9 +74,9 @@ extension WMUXCLI {
     Move a tab into a newly created workspace in the same window.
 
     Flags:
-      --tab <id|ref|index>         Target tab (accepts tab:<n> or surface:<n>; default: $CMUX_TAB_ID, then $CMUX_SURFACE_ID, then focused tab)
+      --tab <id|ref|index>         Target tab (accepts tab:<n> or surface:<n>; default: $WMUX_TAB_ID, then $WMUX_SURFACE_ID, then focused tab)
       --surface <id|ref|index>     Alias for --tab
-      --workspace <id|ref|index>   Workspace context (default: current/$CMUX_WORKSPACE_ID)
+      --workspace <id|ref|index>   Workspace context (default: current/$WMUX_WORKSPACE_ID)
       --window <id|ref|index>      Window context for workspace/tab refs and indexes
       --title <text>               Optional title for the new workspace
       --focus <true|false>         Focus the new workspace when supported (default: false)

@@ -1,7 +1,7 @@
-import CmuxTerminalCore
-import CmuxNotifications
-import CmuxSidebar
-import CmuxWorkspaces
+import WmuxTerminalCore
+import WmuxNotifications
+import WmuxSidebar
+import WmuxWorkspaces
 import Darwin
 import AppKit
 import Foundation

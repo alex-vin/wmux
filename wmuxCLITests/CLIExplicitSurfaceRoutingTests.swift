@@ -105,12 +105,12 @@ struct CLIExplicitSurfaceRoutingTests {
         defer { try? FileManager.default.removeItem(at: temporaryHome) }
 
         var environment = ProcessInfo.processInfo.environment
-        environment.removeValue(forKey: "CMUX_SOCKET_PATH")
-        environment.removeValue(forKey: "CMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PATH")
+        environment.removeValue(forKey: "WMUX_SOCKET")
         environment["CFFIXED_USER_HOME"] = temporaryHome.path
         environment["HOME"] = temporaryHome.path
-        environment["CMUX_TEST_ISOLATED_SOCKET_DISCOVERY"] = "1"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_TEST_ISOLATED_SOCKET_DISCOVERY"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = Self.runProcess(
             executablePath: try Self.bundledCLIPath(),
@@ -489,8 +489,8 @@ struct CLIExplicitSurfaceRoutingTests {
         }
 
         var environment = cliEnvironment(socketPath: socketPath)
-        environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
+        environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
 
         let state = ServerState()
         let handled = Self.startMockServer(listenerFD: listenerFD, state: state) { line in
@@ -538,8 +538,8 @@ struct CLIExplicitSurfaceRoutingTests {
         }
 
         var environment = cliEnvironment(socketPath: socketPath)
-        environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
+        environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
 
         let state = ServerState()
         let handled = Self.startMockServer(listenerFD: listenerFD, state: state) { line in
@@ -811,11 +811,11 @@ struct CLIExplicitSurfaceRoutingTests {
 
     private func cliEnvironment(socketPath: String) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = Self.callerWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.callerSurfaceId
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = Self.callerWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.callerSurfaceId
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         return environment
     }
 

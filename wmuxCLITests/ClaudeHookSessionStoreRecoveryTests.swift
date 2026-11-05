@@ -123,12 +123,12 @@ struct ClaudeHookSessionStoreRecoveryTests {
                 "HOME": root.path,
                 "CFFIXED_USER_HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceID,
-                "CMUX_SURFACE_ID": surfaceID,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLAUDE_HOOK_STATE_PATH": stateURL(root).path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceID,
+                "WMUX_SURFACE_ID": surfaceID,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLAUDE_HOOK_STATE_PATH": stateURL(root).path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: """
             {"session_id":"\(sessionID)","source":"startup","hook_event_name":"SessionStart"}

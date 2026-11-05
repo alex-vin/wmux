@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 /// Owns the complete Git subprocess boundary used by TextBox file mentions.

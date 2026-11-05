@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 import WebKit
 
@@ -89,7 +89,7 @@ extension BrowserPanel {
         )
         terminatedWebView.navigationDelegate = nil
         terminatedWebView.uiDelegate = nil
-        if let terminatedCmuxWebView = terminatedWebView as? CmuxWebView {
+        if let terminatedCmuxWebView = terminatedWebView as? WmuxWebView {
             terminatedCmuxWebView.cmuxDownloadDelegate = nil
             terminatedCmuxWebView.clearBrowserDownloadCallbacks()
         }

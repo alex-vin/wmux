@@ -1,5 +1,5 @@
 import AppKit
-import CmuxTestSupport
+import WmuxTestSupport
 import os
 
 /// Outcome of a Settings show request. Every request ends in exactly one of
@@ -37,9 +37,9 @@ enum SettingsWindowShowResult: Equatable {
 /// removes it by design.
 @MainActor
 final class SettingsWindowPresenter: NSObject {
-    static let windowIdentifier = "cmux.settings"
+    static let windowIdentifier = "wmux.settings"
     static let minimumSize = NSSize(width: 820, height: 540)
-    private static let frameAutosaveName = "cmux.settings"
+    private static let frameAutosaveName = "wmux.settings"
     /// One reuse-or-create pass plus one recreate-from-scratch pass. Creation
     /// is synchronous, so more attempts cannot help: if two consecutive fresh
     /// windows refuse to order in, AppKit itself is wedged and we fail loudly.
@@ -146,7 +146,7 @@ final class SettingsWindowPresenter: NSObject {
             presented = true
         }
         _ = UITestCaptureSink().mutateJSONObjectIfConfigured(
-            envKey: "CMUX_UI_TEST_SETTINGS_OPEN_CAPTURE_PATH"
+            envKey: "WMUX_UI_TEST_SETTINGS_OPEN_CAPTURE_PATH"
         ) { payload in
             payload["opened"] = presented
             payload["target"] = navigationTarget?.rawValue ?? ""

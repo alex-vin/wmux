@@ -1,8 +1,8 @@
 import Foundation
 
-actor CmuxRuntimeDebugCaptureSender {
+actor WmuxRuntimeDebugCaptureSender {
     private let maxInFlightRequests: Int
-    private let sequence = CmuxRuntimeDebugCaptureSequence()
+    private let sequence = WmuxRuntimeDebugCaptureSequence()
     private var inFlightRequests = 0
 
     init(maxInFlightRequests: Int) {
@@ -10,7 +10,7 @@ actor CmuxRuntimeDebugCaptureSender {
     }
 
     func sendIfCapacityAvailable(
-        configuration: CmuxRuntimeDebugCaptureConfiguration,
+        configuration: WmuxRuntimeDebugCaptureConfiguration,
         hypothesisID: String,
         source: String,
         name: String,
@@ -40,7 +40,7 @@ actor CmuxRuntimeDebugCaptureSender {
     }
 
     private static func sendLog(
-        configuration: CmuxRuntimeDebugCaptureConfiguration,
+        configuration: WmuxRuntimeDebugCaptureConfiguration,
         sequenceNumber: Int,
         hypothesisID: String,
         source: String,
@@ -52,7 +52,7 @@ actor CmuxRuntimeDebugCaptureSender {
         var payload: [String: Any] = [
             "session_id": configuration.sessionID,
             "hypothesis_id": hypothesisID,
-            "service": "cmux-macos",
+            "service": "wmux-macos",
             "source": source,
             "name": name,
             "ts": ISO8601DateFormatter().string(from: Date()),

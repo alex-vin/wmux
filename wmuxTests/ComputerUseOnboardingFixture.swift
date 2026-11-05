@@ -1,11 +1,11 @@
-#if canImport(CmuxComputerUse)
+#if canImport(WmuxComputerUse)
 import Darwin
-@testable import CmuxComputerUse
+@testable import WmuxComputerUse
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -26,7 +26,7 @@ struct ComputerUseOnboardingFixture {
             homeDirectoryURL: root.appendingPathComponent("home"),
             socketRootDirectoryURL: root,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "fixture"],
+            environment: ["WMUX_TAG": "fixture"],
             authenticationToken: "synthetic-agent-capability",
             hostAuthenticationToken: "synthetic-host-capability"
         )

@@ -1,21 +1,21 @@
 import AppKit
 import Bonsplit
-import CmuxFoundation
+import WmuxFoundation
 
-struct CmuxConfigUIDefinition: Codable, Sendable, Hashable {
-    var newWorkspace: CmuxConfigButtonPlacement?
-    var surfaceTabBar: CmuxSurfaceTabBarUIDefinition?
+struct WmuxConfigUIDefinition: Codable, Sendable, Hashable {
+    var newWorkspace: WmuxConfigButtonPlacement?
+    var surfaceTabBar: WmuxSurfaceTabBarUIDefinition?
 }
 
-struct CmuxSurfaceTabBarUIDefinition: Codable, Sendable, Hashable {
-    var buttons: [CmuxSurfaceTabBarButton]?
+struct WmuxSurfaceTabBarUIDefinition: Codable, Sendable, Hashable {
+    var buttons: [WmuxSurfaceTabBarButton]?
 }
 
-struct CmuxConfigButtonPlacement: Codable, Sendable, Hashable {
+struct WmuxConfigButtonPlacement: Codable, Sendable, Hashable {
     var action: String?
-    var icon: CmuxButtonIcon?
+    var icon: WmuxButtonIcon?
     var tooltip: String?
-    var contextMenu: [CmuxConfigContextMenuItem]?
+    var contextMenu: [WmuxConfigContextMenuItem]?
 
     private enum CodingKeys: String, CodingKey {
         case action
@@ -27,9 +27,9 @@ struct CmuxConfigButtonPlacement: Codable, Sendable, Hashable {
 
     init(
         action: String? = nil,
-        icon: CmuxButtonIcon? = nil,
+        icon: WmuxButtonIcon? = nil,
         tooltip: String? = nil,
-        contextMenu: [CmuxConfigContextMenuItem]? = nil
+        contextMenu: [WmuxConfigContextMenuItem]? = nil
     ) {
         self.action = action
         self.icon = icon
@@ -40,10 +40,10 @@ struct CmuxConfigButtonPlacement: Codable, Sendable, Hashable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         action = try Self.trimmedString(forKey: .action, in: container)
-        icon = try container.decodeIfPresent(CmuxButtonIcon.self, forKey: .icon)
+        icon = try container.decodeIfPresent(WmuxButtonIcon.self, forKey: .icon)
         tooltip = try Self.trimmedString(forKey: .tooltip, in: container, allowBlankAsNil: true)
-        contextMenu = try container.decodeIfPresent([CmuxConfigContextMenuItem].self, forKey: .contextMenu)
-            ?? container.decodeIfPresent([CmuxConfigContextMenuItem].self, forKey: .rightClick)
+        contextMenu = try container.decodeIfPresent([WmuxConfigContextMenuItem].self, forKey: .contextMenu)
+            ?? container.decodeIfPresent([WmuxConfigContextMenuItem].self, forKey: .rightClick)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -74,10 +74,10 @@ struct CmuxConfigButtonPlacement: Codable, Sendable, Hashable {
     }
 }
 
-struct CmuxConfigContextMenuActionItem: Codable, Sendable, Hashable {
+struct WmuxConfigContextMenuActionItem: Codable, Sendable, Hashable {
     var action: String
     var title: String?
-    var icon: CmuxButtonIcon?
+    var icon: WmuxButtonIcon?
     var tooltip: String?
 
     private enum CodingKeys: String, CodingKey {
@@ -87,7 +87,7 @@ struct CmuxConfigContextMenuActionItem: Codable, Sendable, Hashable {
         case tooltip
     }
 
-    init(action: String, title: String? = nil, icon: CmuxButtonIcon? = nil, tooltip: String? = nil) {
+    init(action: String, title: String? = nil, icon: WmuxButtonIcon? = nil, tooltip: String? = nil) {
         self.action = action
         self.title = title
         self.icon = icon
@@ -98,7 +98,7 @@ struct CmuxConfigContextMenuActionItem: Codable, Sendable, Hashable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         action = try Self.requiredTrimmedString(forKey: .action, in: container)
         title = try Self.trimmedString(forKey: .title, in: container, allowBlankAsNil: true)
-        icon = try container.decodeIfPresent(CmuxButtonIcon.self, forKey: .icon)
+        icon = try container.decodeIfPresent(WmuxButtonIcon.self, forKey: .icon)
         tooltip = try Self.trimmedString(forKey: .tooltip, in: container, allowBlankAsNil: true)
     }
 
@@ -138,8 +138,8 @@ struct CmuxConfigContextMenuActionItem: Codable, Sendable, Hashable {
     }
 }
 
-enum CmuxConfigContextMenuItem: Codable, Sendable, Hashable {
-    case action(CmuxConfigContextMenuActionItem)
+enum WmuxConfigContextMenuItem: Codable, Sendable, Hashable {
+    case action(WmuxConfigContextMenuActionItem)
     case separator
 
     private enum CodingKeys: String, CodingKey {
@@ -163,7 +163,7 @@ enum CmuxConfigContextMenuItem: Codable, Sendable, Hashable {
                     )
                 )
             }
-            self = .action(CmuxConfigContextMenuActionItem(action: trimmed))
+            self = .action(WmuxConfigContextMenuActionItem(action: trimmed))
             return
         }
 
@@ -173,7 +173,7 @@ enum CmuxConfigContextMenuItem: Codable, Sendable, Hashable {
             self = .separator
             return
         }
-        self = .action(try CmuxConfigContextMenuActionItem(from: decoder))
+        self = .action(try WmuxConfigContextMenuActionItem(from: decoder))
     }
 
     func encode(to encoder: Encoder) throws {
@@ -204,17 +204,17 @@ enum CmuxConfigContextMenuItem: Codable, Sendable, Hashable {
     }
 }
 
-struct CmuxResolvedConfigMenuAction: Identifiable, Sendable, Hashable {
+struct WmuxResolvedConfigMenuAction: Identifiable, Sendable, Hashable {
     var id: String
     var title: String
-    var icon: CmuxButtonIcon?
+    var icon: WmuxButtonIcon?
     var iconSourcePath: String?
     var tooltip: String?
-    var action: CmuxResolvedConfigAction
+    var action: WmuxResolvedConfigAction
 }
 
-enum CmuxResolvedConfigContextMenuItem: Identifiable, Sendable, Hashable {
-    case action(CmuxResolvedConfigMenuAction)
+enum WmuxResolvedConfigContextMenuItem: Identifiable, Sendable, Hashable {
+    case action(WmuxResolvedConfigMenuAction)
     case separator(id: String)
 
     var id: String {
@@ -227,14 +227,14 @@ enum CmuxResolvedConfigContextMenuItem: Identifiable, Sendable, Hashable {
     }
 }
 
-enum CmuxRestartBehavior: String, Codable, Sendable {
+enum WmuxRestartBehavior: String, Codable, Sendable {
     case new
     case recreate
     case ignore
     case confirm
 }
 
-extension CmuxButtonIcon {
+extension WmuxButtonIcon {
     func contextMenuImage(configSourcePath: String?, globalConfigPath: String) -> NSImage? {
         switch bonsplitIcon(configSourcePath: configSourcePath, globalConfigPath: globalConfigPath) {
         case .systemImage(let symbolName):

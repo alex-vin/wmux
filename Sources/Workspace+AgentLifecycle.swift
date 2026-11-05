@@ -1,5 +1,5 @@
-import CMUXAgentLaunch
-import CmuxWorkspaces
+import WMUXAgentLaunch
+import WmuxWorkspaces
 import Foundation
 
 extension Workspace {
@@ -102,7 +102,7 @@ extension Workspace {
                 ?? existingAgent?.launchCommand
                 ?? sourceBinding.launchCommand
             recoveredAgent.registration = existingAgent?.registration
-                ?? CmuxVaultAgentRegistration.builtInHermes
+                ?? WmuxVaultAgentRegistration.builtInHermes
             recoveredAgent.permissionMode = existingAgent?.permissionMode
 
             var repairedBinding = sourceBinding
@@ -215,7 +215,7 @@ extension Workspace {
                 sessionId: recovered.sessionID,
                 workingDirectory: nil,
                 launchCommand: recovered.launchCommand,
-                registration: CmuxVaultAgentRegistration.builtInHermes
+                registration: WmuxVaultAgentRegistration.builtInHermes
             ))
         case .missing:
             return .missing
@@ -227,7 +227,7 @@ extension Workspace {
                 sessionId: recovered.sessionID,
                 workingDirectory: nil,
                 launchCommand: recovered.launchCommand,
-                registration: CmuxVaultAgentRegistration.builtInHermes
+                registration: WmuxVaultAgentRegistration.builtInHermes
             ))
         }
     }

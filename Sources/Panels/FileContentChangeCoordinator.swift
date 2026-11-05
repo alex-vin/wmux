@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 /// Multiplexes file-content invalidations for file-backed panels.

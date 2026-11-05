@@ -1,5 +1,5 @@
 import AppKit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import SwiftUI
 /// Attaches the checklist popover to the section container (not just the
 /// summary line — see the call site comment in ``SidebarWorkspaceChecklistSection/body``)

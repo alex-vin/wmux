@@ -386,7 +386,7 @@
     var doc = options.document || global.document;
     var profile = options.profile;
     if (!doc || !profile) {
-      throw new Error('CmuxMarkdownSanitizer requires a document and a profile');
+      throw new Error('WmuxMarkdownSanitizer requires a document and a profile');
     }
     var source = parseInert(html, doc);
     var output = doc.createDocumentFragment();
@@ -482,7 +482,7 @@
     });
   }
 
-  global.CmuxMarkdownSanitizer = {
+  global.WmuxMarkdownSanitizer = {
     createProfile: createProfile,
     markdownProfile: markdownProfile,
     diagramProfile: diagramProfile,

@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -139,7 +139,7 @@ extension CampfireSupportTests {
     }
 
     @Test func taskManagerClassifiesCampfireCompiledBinaryAndDevInvocation() throws {
-        let compiled = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let compiled = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "campfire",
             processPath: "/Users/example/.local/bin/campfire",
             arguments: ["/Users/example/.local/bin/campfire", "--relay", "wss://relay.example/ws"],
@@ -147,7 +147,7 @@ extension CampfireSupportTests {
         ))
         #expect(compiled.id == "campfire")
 
-        let dev = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let dev = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "bun",
             processPath: "/opt/homebrew/bin/bun",
             arguments: [
@@ -160,7 +160,7 @@ extension CampfireSupportTests {
     }
 
     @Test func builtInCampfireRegistrationResumesWithBareSessionId() throws {
-        let registration = CmuxVaultAgentRegistration.builtInCampfire
+        let registration = WmuxVaultAgentRegistration.builtInCampfire
         #expect(registration.id == "campfire")
         #expect(registration.resumeCommand == "{{executable}} --session {{sessionId}}")
         #expect(registration.sessionIdSource == .argvOption("--session"))
@@ -172,8 +172,8 @@ extension CampfireSupportTests {
         // process names and no `argvContains`) must not classify an unrelated
         // process. Otherwise the empty primary criteria make the primary match
         // succeed for every process before the alternate criteria are checked.
-        var registration = CmuxVaultAgentRegistration.builtInCampfire
-        registration.detect = CmuxVaultAgentDetectRule(
+        var registration = WmuxVaultAgentRegistration.builtInCampfire
+        registration.detect = WmuxVaultAgentDetectRule(
             alternateArgvContainsAny: ["packages/session/bin/campfire.ts"]
         )
 
@@ -189,8 +189,8 @@ extension CampfireSupportTests {
     }
 
     @Test func alternateOnlyDetectRuleUsesDefaultExecutableForRestore() throws {
-        var registration = CmuxVaultAgentRegistration.builtInCampfire
-        registration.detect = CmuxVaultAgentDetectRule(
+        var registration = WmuxVaultAgentRegistration.builtInCampfire
+        registration.detect = WmuxVaultAgentDetectRule(
             alternateArgvContainsAny: ["packages/session/bin/campfire.ts"]
         )
 
@@ -225,8 +225,8 @@ extension CampfireSupportTests {
     }
 
     @Test func cachedValidatorUsesSameAlternateDetectRuleSemanticsAsProcessScanner() throws {
-        var registration = CmuxVaultAgentRegistration.builtInCampfire
-        registration.detect = CmuxVaultAgentDetectRule(
+        var registration = WmuxVaultAgentRegistration.builtInCampfire
+        registration.detect = WmuxVaultAgentDetectRule(
             processName: "campfire",
             alternateProcessNames: ["bun"],
             alternateArgvContainsAny: [
@@ -249,7 +249,7 @@ extension CampfireSupportTests {
             ),
             registration: registration
         )
-        let matchingAlternate = CmuxTopProcessArguments(
+        let matchingAlternate = WmuxTopProcessArguments(
             arguments: [
                 "/opt/homebrew/bin/bun",
                 "/Users/example/campfire/packages/session/dist/campfire",
@@ -258,7 +258,7 @@ extension CampfireSupportTests {
             ],
             environment: [:]
         )
-        let wrongAlternateHost = CmuxTopProcessArguments(
+        let wrongAlternateHost = WmuxTopProcessArguments(
             arguments: [
                 "/opt/homebrew/bin/node",
                 "/Users/example/campfire/packages/session/dist/campfire",

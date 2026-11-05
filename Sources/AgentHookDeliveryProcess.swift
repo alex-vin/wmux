@@ -187,7 +187,7 @@ struct AgentHookDeliveryProcess: Sendable {
         let ambientEnvironment = ProcessInfo.processInfo.environment
         let ambientKeys = [
             "HOME", "LANG", "LC_ALL", "LC_CTYPE", "LOGNAME", "PATH", "SHELL", "TMPDIR", "USER",
-            "CMUX_BUNDLE_ID", "CMUX_CLI_SENTRY_DISABLED", "CMUX_SOCKET_PASSWORD", "CMUX_TAG",
+            "WMUX_BUNDLE_ID", "WMUX_CLI_SENTRY_DISABLED", "WMUX_SOCKET_PASSWORD", "WMUX_TAG",
         ]
         var environment: [String: String] = [:]
         for key in ambientKeys {
@@ -202,31 +202,31 @@ struct AgentHookDeliveryProcess: Sendable {
             // routing that the relay has alias-rewritten plus explicit
             // notification/subagent policy bits.
             let relayDeliveryKeys: Set<String> = [
-                "CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
-                "CMUX_AGENT_MANAGED_SUBAGENT",
-                "CMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
-                "CMUX_SURFACE_ID",
-                "CMUX_WORKSPACE_ID",
+                "WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
+                "WMUX_AGENT_MANAGED_SUBAGENT",
+                "WMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
+                "WMUX_SURFACE_ID",
+                "WMUX_WORKSPACE_ID",
             ]
             deliveredEventEnvironment = event.environment.filter { relayDeliveryKeys.contains($0.key) }
         } else {
             deliveredEventEnvironment = event.environment
         }
         environment.merge(deliveredEventEnvironment, uniquingKeysWith: { _, eventValue in eventValue })
-        environment["CMUX_SOCKET_PATH"] = event.socketPath
-        environment["CMUX_BUNDLED_CLI_PATH"] = executableURL.path
-        environment["CMUX_AGENT_HOOK_DELIVERY_PROCESS_GROUP"] = "1"
+        environment["WMUX_SOCKET_PATH"] = event.socketPath
+        environment["WMUX_BUNDLED_CLI_PATH"] = executableURL.path
+        environment["WMUX_AGENT_HOOK_DELIVERY_PROCESS_GROUP"] = "1"
         if event.relayBacked {
-            environment["CMUX_AGENT_HOOK_RELAY_ORIGIN"] = "1"
-            environment["CMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] = "1"
-            environment["CMUX_AGENT_HOOK_STATE_DIR"] = relayStateDirectory(
+            environment["WMUX_AGENT_HOOK_RELAY_ORIGIN"] = "1"
+            environment["WMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] = "1"
+            environment["WMUX_AGENT_HOOK_STATE_DIR"] = relayStateDirectory(
                 event: event,
                 ambientEnvironment: ambientEnvironment
             )
         } else {
-            environment.removeValue(forKey: "CMUX_AGENT_HOOK_RELAY_ORIGIN")
+            environment.removeValue(forKey: "WMUX_AGENT_HOOK_RELAY_ORIGIN")
         }
-        environment["CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = "12"
+        environment["WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = "12"
         return environment
     }
 
@@ -241,13 +241,13 @@ struct AgentHookDeliveryProcess: Sendable {
         let homePath = ambientEnvironment["HOME"]
             ?? FileManager.default.homeDirectoryForCurrentUser.path
         let appScope = Self.safePathComponent(
-            ambientEnvironment["CMUX_BUNDLE_ID"]
+            ambientEnvironment["WMUX_BUNDLE_ID"]
                 ?? Bundle.main.bundleIdentifier
                 ?? "com.cmuxterm.app"
         )
         let routeScope = Self.safePathComponent(
-            event.environment["CMUX_WORKSPACE_ID"]
-                ?? event.environment["CMUX_SURFACE_ID"]
+            event.environment["WMUX_WORKSPACE_ID"]
+                ?? event.environment["WMUX_SURFACE_ID"]
                 ?? "unrouted"
         )
         return URL(fileURLWithPath: homePath, isDirectory: true)

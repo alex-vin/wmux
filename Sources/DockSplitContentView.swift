@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import Foundation
 import SwiftUI
 

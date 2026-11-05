@@ -1,6 +1,6 @@
 import Foundation
 
-actor CmuxRuntimeDebugCaptureSequence {
+actor WmuxRuntimeDebugCaptureSequence {
     private var sequence = 0
 
     func next() -> Int {

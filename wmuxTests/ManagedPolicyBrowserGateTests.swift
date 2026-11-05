@@ -1,10 +1,10 @@
 import Foundation
 import Testing
-import struct CMUXMobileCore.MobileBrowserStreamCapability
-import CmuxIrxTransport
+import struct WMUXMobileCore.MobileBrowserStreamCapability
+import WmuxIrxTransport
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

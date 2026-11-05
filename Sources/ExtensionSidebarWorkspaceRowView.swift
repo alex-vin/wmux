@@ -1,20 +1,20 @@
-import CmuxFoundation
-import CmuxBrowser
+import WmuxFoundation
+import WmuxBrowser
 import AppKit
-import CmuxSidebarProviderKit
+import WmuxSidebarProviderKit
 import SwiftUI
 import WebKit
 
-struct CmuxExtensionSidebarWorkspaceRowView: View, Equatable {
-    let row: CmuxSidebarProviderRow
-    let workspace: CmuxSidebarProviderWorkspace?
+struct WmuxExtensionSidebarWorkspaceRowView: View, Equatable {
+    let row: WmuxSidebarProviderRow
+    let workspace: WmuxSidebarProviderWorkspace?
     let providerId: String
     let relativeNow: Date
     let isSelected: Bool
     let onSelect: (UUID) -> Void
-    let onOpenWindow: (CmuxSidebarProviderWorkspace) -> Void
+    let onOpenWindow: (WmuxSidebarProviderWorkspace) -> Void
     @State private var showsInspector = false
-    @State private var inspectorDraft: CmuxExtensionWorkspaceInspectorDraft?
+    @State private var inspectorDraft: WmuxExtensionWorkspaceInspectorDraft?
 
     nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.row == rhs.row &&
@@ -63,7 +63,7 @@ struct CmuxExtensionSidebarWorkspaceRowView: View, Equatable {
             if let accessory = row.accessory, let workspace {
                 Button {
                     if inspectorDraft == nil {
-                        inspectorDraft = CmuxExtensionWorkspaceInspectorDraft.initial(
+                        inspectorDraft = WmuxExtensionWorkspaceInspectorDraft.initial(
                             workspace: workspace,
                             selectedTab: accessory.defaultTab
                         )
@@ -77,11 +77,11 @@ struct CmuxExtensionSidebarWorkspaceRowView: View, Equatable {
                 .buttonStyle(.plain)
                 .safeHelp(String(localized: "sidebar.extension.inspectWorkspace", defaultValue: "Workspace tools"))
                 .popover(isPresented: $showsInspector, arrowEdge: .trailing) {
-                    CmuxExtensionWorkspaceInspectorView(
+                    WmuxExtensionWorkspaceInspectorView(
                         workspace: workspace,
                         draft: Binding(
                             get: {
-                                inspectorDraft ?? CmuxExtensionWorkspaceInspectorDraft.initial(
+                                inspectorDraft ?? WmuxExtensionWorkspaceInspectorDraft.initial(
                                     workspace: workspace,
                                     selectedTab: accessory.defaultTab
                                 )
@@ -110,31 +110,31 @@ struct CmuxExtensionSidebarWorkspaceRowView: View, Equatable {
         }
     }
 
-    private func rendered(_ text: CmuxSidebarProviderText?) -> String? {
+    private func rendered(_ text: WmuxSidebarProviderText?) -> String? {
         guard let text else { return nil }
         switch text {
         case .plain(let value):
             return value
         case .localized(let localized):
-            return CmuxExtensionSidebarSelection.localizedText(localized)
+            return WmuxExtensionSidebarSelection.localizedText(localized)
         case .relativeDate(let date, _):
-            return CmuxExtensionRelativeTimeFormatter.string(from: date, to: relativeNow)
+            return WmuxExtensionRelativeTimeFormatter.string(from: date, to: relativeNow)
         }
     }
 }
 
-struct CmuxExtensionWorkspaceInspectorDraft: Equatable {
-    var selectedTab: CmuxSidebarProviderWorkspacePopoverTab
+struct WmuxExtensionWorkspaceInspectorDraft: Equatable {
+    var selectedTab: WmuxSidebarProviderWorkspacePopoverTab
     var notes: String
     var address: String
     var committedAddress: String
 
     static func initial(
-        workspace: CmuxSidebarProviderWorkspace,
-        selectedTab: CmuxSidebarProviderWorkspacePopoverTab = .notes
-    ) -> CmuxExtensionWorkspaceInspectorDraft {
+        workspace: WmuxSidebarProviderWorkspace,
+        selectedTab: WmuxSidebarProviderWorkspacePopoverTab = .notes
+    ) -> WmuxExtensionWorkspaceInspectorDraft {
         let initialAddress = workspace.pullRequestURLs.first ?? "https://github.com/"
-        return CmuxExtensionWorkspaceInspectorDraft(
+        return WmuxExtensionWorkspaceInspectorDraft(
             selectedTab: selectedTab,
             notes: "",
             address: initialAddress,
@@ -143,7 +143,7 @@ struct CmuxExtensionWorkspaceInspectorDraft: Equatable {
     }
 }
 
-enum CmuxExtensionRelativeTimeFormatter {
+enum WmuxExtensionRelativeTimeFormatter {
     static func string(from date: Date, to now: Date) -> String {
         let seconds = max(0, Int(now.timeIntervalSince(date)))
         if seconds < 60 { return String(localized: "relativeTime.now", defaultValue: "now") }
@@ -169,14 +169,14 @@ enum CmuxExtensionRelativeTimeFormatter {
     }
 }
 
-struct CmuxExtensionWorkspaceInspectorView: View {
-    let workspace: CmuxSidebarProviderWorkspace
+struct WmuxExtensionWorkspaceInspectorView: View {
+    let workspace: WmuxSidebarProviderWorkspace
     let onOpenWindow: () -> Void
-    @Binding private var draft: CmuxExtensionWorkspaceInspectorDraft
+    @Binding private var draft: WmuxExtensionWorkspaceInspectorDraft
 
     init(
-        workspace: CmuxSidebarProviderWorkspace,
-        draft: Binding<CmuxExtensionWorkspaceInspectorDraft>,
+        workspace: WmuxSidebarProviderWorkspace,
+        draft: Binding<WmuxExtensionWorkspaceInspectorDraft>,
         onOpenWindow: @escaping () -> Void
     ) {
         self.workspace = workspace
@@ -188,8 +188,8 @@ struct CmuxExtensionWorkspaceInspectorView: View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
                 Picker("", selection: $draft.selectedTab) {
-                    Text(String(localized: "sidebar.extension.notesTab", defaultValue: "Notes")).tag(CmuxSidebarProviderWorkspacePopoverTab.notes)
-                    Text(String(localized: "sidebar.extension.browserTab", defaultValue: "Browser")).tag(CmuxSidebarProviderWorkspacePopoverTab.browser)
+                    Text(String(localized: "sidebar.extension.notesTab", defaultValue: "Notes")).tag(WmuxSidebarProviderWorkspacePopoverTab.notes)
+                    Text(String(localized: "sidebar.extension.browserTab", defaultValue: "Browser")).tag(WmuxSidebarProviderWorkspacePopoverTab.browser)
                 }
                 .pickerStyle(.segmented)
 
@@ -222,7 +222,7 @@ struct CmuxExtensionWorkspaceInspectorView: View {
                         )
                         .textFieldStyle(.plain)
                         .onSubmit {
-                            let normalized = CmuxExtensionWorkspaceInspectorBrowserView.normalizedAddress(draft.address)
+                            let normalized = WmuxExtensionWorkspaceInspectorBrowserView.normalizedAddress(draft.address)
                             draft.address = normalized
                             draft.committedAddress = normalized
                         }
@@ -232,29 +232,29 @@ struct CmuxExtensionWorkspaceInspectorView: View {
                     .padding(.vertical, 7)
                     .background(Color(nsColor: .controlBackgroundColor))
 
-                    CmuxExtensionWorkspaceInspectorBrowserView(address: draft.committedAddress)
+                    WmuxExtensionWorkspaceInspectorBrowserView(address: draft.committedAddress)
                 }
             }
         }
     }
 }
 
-struct CmuxExtensionWorkspaceInspectorWindowContentView: View {
-    let workspace: CmuxSidebarProviderWorkspace
+struct WmuxExtensionWorkspaceInspectorWindowContentView: View {
+    let workspace: WmuxSidebarProviderWorkspace
     let onOpenWindow: () -> Void
-    @State private var draft: CmuxExtensionWorkspaceInspectorDraft
+    @State private var draft: WmuxExtensionWorkspaceInspectorDraft
 
     init(
-        workspace: CmuxSidebarProviderWorkspace,
+        workspace: WmuxSidebarProviderWorkspace,
         onOpenWindow: @escaping () -> Void
     ) {
         self.workspace = workspace
         self.onOpenWindow = onOpenWindow
-        _draft = State(initialValue: CmuxExtensionWorkspaceInspectorDraft.initial(workspace: workspace))
+        _draft = State(initialValue: WmuxExtensionWorkspaceInspectorDraft.initial(workspace: workspace))
     }
 
     var body: some View {
-        CmuxExtensionWorkspaceInspectorView(
+        WmuxExtensionWorkspaceInspectorView(
             workspace: workspace,
             draft: $draft,
             onOpenWindow: onOpenWindow
@@ -262,7 +262,7 @@ struct CmuxExtensionWorkspaceInspectorWindowContentView: View {
     }
 }
 
-struct CmuxExtensionWorkspaceInspectorBrowserView: NSViewRepresentable {
+struct WmuxExtensionWorkspaceInspectorBrowserView: NSViewRepresentable {
     let address: String
 
     final class Coordinator {
@@ -301,11 +301,11 @@ struct CmuxExtensionWorkspaceInspectorBrowserView: NSViewRepresentable {
 }
 
 @MainActor
-final class CmuxExtensionSidebarInspectorWindowController {
+final class WmuxExtensionSidebarInspectorWindowController {
     private static var controllers: [UUID: NSWindowController] = [:]
     private static var closeObservers: [UUID: NSObjectProtocol] = [:]
 
-    static func show(workspace: CmuxSidebarProviderWorkspace) {
+    static func show(workspace: WmuxSidebarProviderWorkspace) {
         if let controller = controllers[workspace.id] {
             controller.window?.title = workspace.title
             controller.window?.setContentSize(NSSize(width: 620, height: 440))
@@ -314,13 +314,13 @@ final class CmuxExtensionSidebarInspectorWindowController {
             return
         }
 
-        let view = CmuxExtensionWorkspaceInspectorWindowContentView(workspace: workspace) {
+        let view = WmuxExtensionWorkspaceInspectorWindowContentView(workspace: workspace) {
             show(workspace: workspace)
         }
         let hostingController = NSHostingController(rootView: view.frame(width: 620, height: 440))
         let window = NSWindow(contentViewController: hostingController)
         window.title = workspace.title
-        window.identifier = NSUserInterfaceItemIdentifier("cmux.extensionSidebarInspector")
+        window.identifier = NSUserInterfaceItemIdentifier("wmux.extensionSidebarInspector")
         window.setContentSize(NSSize(width: 620, height: 440))
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         let controller = NSWindowController(window: window)
@@ -344,7 +344,7 @@ final class CmuxExtensionSidebarInspectorWindowController {
 
 /// Extension sidebar row web view: completes routed undo/redo chords with the
 /// app's keyboard-layout-aware check.
-private final class ExtensionSidebarWebView: CmuxUndoableWebView {
+private final class ExtensionSidebarWebView: WmuxUndoableWebView {
     override func isWebContentUndoRedoCommandEquivalent(_ event: NSEvent) -> Bool {
         event.cmuxIsUndoRedoCommandEquivalent
     }

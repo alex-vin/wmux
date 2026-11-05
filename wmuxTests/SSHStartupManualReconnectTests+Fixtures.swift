@@ -1,11 +1,11 @@
-import CmuxCore
-import CmuxFoundation
+import WmuxCore
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -46,7 +46,7 @@ extension SSHStartupManualReconnectTests {
     }
 
     /// Set only while priming, so a primed fixture exits before doing any work.
-    static let primeExecEnvironmentKey = "CMUX_TEST_PRIME_EXEC"
+    static let primeExecEnvironmentKey = "WMUX_TEST_PRIME_EXEC"
 
     /// The line a primeable fixture carries right after its shebang.
     static let primeExecGuard = "if [ -n \"${\(primeExecEnvironmentKey):-}\" ]; then exit 0; fi"
@@ -174,9 +174,9 @@ extension SSHStartupManualReconnectTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -263,13 +263,13 @@ extension SSHStartupManualReconnectTests {
             )
             var environment = ProcessInfo.processInfo.environment
             environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-            environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-            environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-            environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-            environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-            environment["CMUX_SSH_RECONNECT_LIMIT"] = "0"
-            environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
-            environment["CMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
+            environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+            environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+            environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+            environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+            environment["WMUX_SSH_RECONNECT_LIMIT"] = "0"
+            environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
+            environment["WMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
             return TerminalExitPromptFixture(
                 startupCommand: startupCommand,
                 environment: environment,
@@ -294,10 +294,10 @@ extension SSHStartupManualReconnectTests {
         process.executableURL = URL(fileURLWithPath: "/usr/bin/script")
         process.arguments = [
             "-q", "-F", "/dev/null", "/bin/sh", "-c",
-            "/usr/bin/tty > \"$CMUX_TEST_PROMPT_TTY_PATH\"\n" + fixture.startupCommand,
+            "/usr/bin/tty > \"$WMUX_TEST_PROMPT_TTY_PATH\"\n" + fixture.startupCommand,
         ]
         var environment = fixture.environment
-        environment["CMUX_TEST_PROMPT_TTY_PATH"] = terminalPathURL.path
+        environment["WMUX_TEST_PROMPT_TTY_PATH"] = terminalPathURL.path
         process.environment = environment
         process.standardInput = standardInput
         process.standardOutput = transcriptHandle

@@ -1,5 +1,5 @@
-import CmuxFoundation
-import CmuxWorkspaces
+import WmuxFoundation
+import WmuxWorkspaces
 
 extension RestorableAgentProcessLiveness {
     /// Revalidates recorded process generations before applying workspace restore policy.

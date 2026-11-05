@@ -2,14 +2,14 @@ import XCTest
 import AppKit
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
-// Find-in-page script generation and escaping moved into the CmuxBrowser package
-// (BrowserFindScript). Its behavior is covered by CmuxBrowserTests/Find/BrowserFindServiceTests.
+// Find-in-page script generation and escaping moved into the WmuxBrowser package
+// (BrowserFindScript). Its behavior is covered by WmuxBrowserTests/Find/BrowserFindServiceTests.
 
 final class BrowserPopupDecisionTests: XCTestCase {
     func testLinkActivatedPlainLeftClickDoesNotCreatePopup() {

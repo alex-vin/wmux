@@ -1,20 +1,20 @@
 import Foundation
 
-enum CmuxRuntimeDebugCapture {
-    private static let configuration: CmuxRuntimeDebugCaptureConfiguration? = {
+enum WmuxRuntimeDebugCapture {
+    private static let configuration: WmuxRuntimeDebugCaptureConfiguration? = {
         let env = ProcessInfo.processInfo.environment
-        guard let baseURLString = env["CMUX_RUNTIME_DEBUG_BASE_URL"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        guard let baseURLString = env["WMUX_RUNTIME_DEBUG_BASE_URL"]?.trimmingCharacters(in: .whitespacesAndNewlines),
               let baseURL = URL(string: baseURLString),
-              let token = env["CMUX_RUNTIME_DEBUG_TOKEN"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+              let token = env["WMUX_RUNTIME_DEBUG_TOKEN"]?.trimmingCharacters(in: .whitespacesAndNewlines),
               !token.isEmpty,
-              let sessionID = env["CMUX_RUNTIME_DEBUG_SESSION_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+              let sessionID = env["WMUX_RUNTIME_DEBUG_SESSION_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines),
               !sessionID.isEmpty else {
             return nil
         }
-        return CmuxRuntimeDebugCaptureConfiguration(baseURL: baseURL, token: token, sessionID: sessionID)
+        return WmuxRuntimeDebugCaptureConfiguration(baseURL: baseURL, token: token, sessionID: sessionID)
     }()
 
-    private static let sender = CmuxRuntimeDebugCaptureSender(maxInFlightRequests: 16)
+    private static let sender = WmuxRuntimeDebugCaptureSender(maxInFlightRequests: 16)
 
     static func logIfConfigured(
         hypothesisID: String,

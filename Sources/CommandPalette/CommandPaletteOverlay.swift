@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Observation
 import SwiftUI
 
@@ -45,7 +45,7 @@ enum CommandPaletteRowHighlight: Equatable {
         }
     }
 
-    func backgroundColor(accent: CmuxAccentColor) -> Color {
+    func backgroundColor(accent: WmuxAccentColor) -> Color {
         switch self {
         case .selected: return accent.color.opacity(backgroundOpacity)
         case .hovered: return Color.primary.opacity(backgroundOpacity)

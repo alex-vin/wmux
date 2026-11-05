@@ -2,8 +2,8 @@
 import AppKit
 import SwiftUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -35,7 +35,7 @@ final class MainWindowHitTestMutationMonitorTests: XCTestCase {
 
     /// AppKit's `-[NSView hitTest:]` walks the root's subviews by index; a
     /// child whose hitTest removes a sibling is the re-entrant mutation behind
-    /// CMUXTERM-MACOS-41RH. The main window host must report it.
+    /// WMUXTERM-MACOS-41RH. The main window host must report it.
     func testMainWindowHostReportsSiblingRemovedFromChildHitTest() {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 200, height: 200),

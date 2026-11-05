@@ -1,5 +1,5 @@
-import CmuxFoundation
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxTerminalCore
 import Foundation
 
 /// Synchronous callback ingress: duplicate titles are rejected before an
@@ -26,7 +26,7 @@ final class GhosttyTitleUpdateIngress {
             schedule: schedule
         ) { updates in
 #if DEBUG
-            let timingStart = CmuxTypingTiming.start()
+            let timingStart = WmuxTypingTiming.start()
 #endif
             for update in updates {
                 let change = GhosttyTitleChange(
@@ -40,7 +40,7 @@ final class GhosttyTitleUpdateIngress {
                 center.post(name: .ghosttyDidSetTitle, object: nil, userInfo: change.userInfo)
             }
 #if DEBUG
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "title.publish",
                 startedAt: timingStart,
                 extra: "published=\(updates.count)"

@@ -1,8 +1,8 @@
-import CmuxWorkspaces
+import WmuxWorkspaces
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -63,7 +63,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
     }
 
     func testBuiltInPiRegistrationUsesBrandedIconAsset() {
-        let agent = RegisteredSessionAgent(registration: CmuxVaultAgentRegistration.builtInPi)
+        let agent = RegisteredSessionAgent(registration: WmuxVaultAgentRegistration.builtInPi)
 
         XCTAssertEqual(agent.iconAssetName, "AgentIcons/Pi")
         XCTAssertEqual(SessionAgent.registered(agent).assetName, "AgentIcons/Pi")
@@ -71,11 +71,11 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
 
 
     func testBuiltInAntigravityRegistrationUsesBrandedIconAsset() {
-        let agent = RegisteredSessionAgent(registration: CmuxVaultAgentRegistration.builtInAntigravity)
+        let agent = RegisteredSessionAgent(registration: WmuxVaultAgentRegistration.builtInAntigravity)
 
         XCTAssertEqual(agent.iconAssetName, "AgentIcons/Antigravity")
         XCTAssertEqual(SessionAgent.registered(agent).assetName, "AgentIcons/Antigravity")
-        XCTAssertEqual(CmuxVaultAgentRegistration.builtInAntigravity.detect.processNames, ["agy", "antigravity"])
+        XCTAssertEqual(WmuxVaultAgentRegistration.builtInAntigravity.detect.processNames, ["agy", "antigravity"])
     }
 
     func testBuiltInAntigravityRegistrationLoadsHistoryDisplayAndWorkspace() async throws {
@@ -89,7 +89,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"conversationId":"antigravity-conversation-123","display":"Implement Antigravity notifications","timestamp":1779231774516,"workspace":"/tmp/antigravity repo"}
         """.write(to: historyURL, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInAntigravity
+        var registration = WmuxVaultAgentRegistration.builtInAntigravity
         registration.sessionDirectory = tempDir.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -124,7 +124,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"display":"latest prompt","timestamp":1779263000000,"workspace":"/tmp/antigravity repo","conversationId":"conversation-a"}
         """.write(to: historyURL, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInAntigravity
+        var registration = WmuxVaultAgentRegistration.builtInAntigravity
         registration.sessionDirectory = tempDir.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -163,10 +163,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"sessionId":"native-session-123","workspace":"/tmp/acme-workspace","title":"Resume Acme"}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --session {{sessionId}}",
             cwd: .preserve,
@@ -198,10 +198,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"sessionId":"native-session-123","cwd":"/tmp/acme","display":"Antigravity-only prompt"}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --session {{sessionId}}",
             cwd: .preserve,
@@ -236,10 +236,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"conversationId":"foreign-conversation","sessionId":"native-session-123","cwd":"/tmp/acme","title":"Resume Acme"}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --session {{sessionId}}",
             cwd: .preserve,
@@ -260,7 +260,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
     }
 
     func testBuiltInGrokRegistrationUsesNativeSessionDirectory() {
-        let registration = CmuxVaultAgentRegistration.builtInGrok
+        let registration = WmuxVaultAgentRegistration.builtInGrok
 
         XCTAssertEqual(registration.id, "grok")
         XCTAssertEqual(registration.sessionIdSource, .grokSessionDirectory)
@@ -271,10 +271,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
     }
 
     func testRegisteredAgentTemplateFailsClosedWhenPlaceholderIsUnavailable() {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --cwd {{cwd}} --session {{sessionId}}",
             cwd: .preserve
@@ -300,10 +300,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
     }
 
     func testRegisteredAgentTemplateUsesExplicitWorkingDirectoryForCWDPlaceholder() {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --cwd {{cwd}} --session {{sessionId}}",
             cwd: .preserve
@@ -330,10 +330,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
     }
 
     func testRegisteredAgentTemplatePreservesCWDArgumentWithWorkingDirectoryPrefix() {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --cwd {{cwd}} --session {{sessionId}}",
             cwd: .preserve
@@ -362,10 +362,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
     }
 
     func testRegisteredAgentTemplateDoesNotExpandPlaceholdersInsideReplacementValues() {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --session {{sessionId}} --cwd {{cwd}}",
             cwd: .preserve
@@ -392,10 +392,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
     }
 
     func testRegisteredAgentCWDIgnoreSuppressesResumeWorkingDirectory() {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --session {{sessionId}}",
             cwd: .ignore
@@ -429,10 +429,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"gitBranch":"issue-3575-vault-pi-agent-support"}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --session {{sessionId}}",
             cwd: .preserve,
@@ -465,10 +465,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"sessionId":"native-session-123","cwd":"/tmp/other","title":"Resume Acme"}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "acme-agent",
             name: "Acme Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "acme-agent --session {{sessionId}}",
             cwd: .preserve,
@@ -502,7 +502,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"git":{"branch":"issue-3575-vault-pi-agent-support"}}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = tempDir.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -534,7 +534,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"type":"message","message":{"role":"user","content":[{"type":"text","text":"ping"}]}}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = tempDir.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -565,7 +565,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"role":"user","content":[{"type":"text","text":"implement the vault view"}]}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = tempDir.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -595,7 +595,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"messages":[{"content":[{"type":"text","text":"restore without role"}]},{"role":"assistant","content":[{"type":"text","text":"assistant reply"}]}]}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = tempDir.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -625,7 +625,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"message":{"role":"user","content":[{"text":"untyped object"},{"type":"image","text":"image fallback"},{"type":"text","text":"typed text title"}]}}
         """.write(to: sessionFile, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = tempDir.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -664,7 +664,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"type":"assistant","content":"done"}
         """.write(to: historyURL, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInGrok
+        var registration = WmuxVaultAgentRegistration.builtInGrok
         registration.sessionDirectory = sessionsRoot.path
         let entries = await SessionIndexStore.loadGrokEntries(
             registration: registration,
@@ -726,7 +726,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         }.joined(separator: "\n")
         try (jsonLines + "\n").write(to: historyURL, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInGrok
+        var registration = WmuxVaultAgentRegistration.builtInGrok
         registration.sessionDirectory = sessionsRoot.path
         let entries = await SessionIndexStore.loadGrokEntries(
             registration: registration,
@@ -762,7 +762,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"type":"assistant","content":"Working","git":{"branch":"late-branch"}}
         """.write(to: historyURL, atomically: true, encoding: .utf8)
 
-        var registration = CmuxVaultAgentRegistration.builtInGrok
+        var registration = WmuxVaultAgentRegistration.builtInGrok
         registration.sessionDirectory = sessionsRoot.path
         let entries = await SessionIndexStore.loadGrokEntries(
             registration: registration,
@@ -887,7 +887,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
             cwdFilter: nil,
             offset: 0,
             limit: 10,
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDir.path],
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDir.path],
             homeDirectory: homeDirectory.path
         )
 
@@ -921,10 +921,10 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         {"type":"user","content":"Resume a custom Grok-compatible agent","git":{"branch":"issue-4394-grok-vault-resume"}}
         """.write(to: historyURL, atomically: true, encoding: .utf8)
 
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "custom-grok",
             name: "Custom Grok",
-            detect: CmuxVaultAgentDetectRule(processName: "custom-grok"),
+            detect: WmuxVaultAgentDetectRule(processName: "custom-grok"),
             sessionIdSource: .grokSessionDirectory,
             resumeCommand: "custom-grok -r {{sessionId}}",
             cwd: .preserve,
@@ -975,7 +975,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
         try writeHistory(cwd: "/tmp/current grok repo/../current grok repo", sessionId: "current-session", prompt: "duplicate")
         try writeHistory(cwd: "/tmp/other grok repo", sessionId: "other-session", prompt: "other")
 
-        var registration = CmuxVaultAgentRegistration.builtInGrok
+        var registration = WmuxVaultAgentRegistration.builtInGrok
         registration.sessionDirectory = sessionsRoot.path
         let entries = await SessionIndexStore.loadGrokEntries(
             registration: registration,
@@ -1083,7 +1083,7 @@ final class PiVaultAgentPersistenceTests: XCTestCase {
                             capturedAt: 1_777_777_777,
                             source: "process"
                         ),
-                        registration: CmuxVaultAgentRegistration.builtInPi
+                        registration: WmuxVaultAgentRegistration.builtInPi
                     ),
                     tmuxStartCommand: nil
                 ),

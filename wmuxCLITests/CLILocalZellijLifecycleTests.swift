@@ -13,7 +13,7 @@ struct CLILocalZellijLifecycleTests {
     private struct Fixture {
         /// Temporary directory holding the fake zellij and its files.
         let base: URL
-        /// `CMUX_LOCAL_ZELLIJ_STATE_DIR`.
+        /// `WMUX_LOCAL_ZELLIJ_STATE_DIR`.
         let root: URL
         let environment: [String: String]
         let logURL: URL
@@ -43,7 +43,7 @@ struct CLILocalZellijLifecycleTests {
         #expect(zellijName.range(of: "^work-[0-9a-f]{8}$", options: .regularExpression) != nil, "the zellij name carries the record's token")
         // Serialization stays off: a dead session must leave nothing that a
         // surface's `zellij attach` could resurrect into a new server that
-        // inherits the surface's CMUX_* credentials and identity.
+        // inherits the surface's WMUX_* credentials and identity.
         let created = try #require(fixture.invocations().first { $0.contains("--create-background") })
         let expectedPrefix = "\(fixture.socketDirectory)|attach --create-background \(zellijName) options --default-cwd \(fixture.base.path) --on-force-close detach --session-serialization false --default-layout "
         #expect(created.hasPrefix(expectedPrefix), Comment(rawValue: created))
@@ -352,9 +352,9 @@ struct CLILocalZellijLifecycleTests {
         let sessionsURL = root.appendingPathComponent("sessions.txt", isDirectory: false)
         let layoutCopyURL = root.appendingPathComponent("layout-copy.kdl", isDirectory: false)
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_ZELLIJ_BIN"] = fakeZellij.path
-        environment["CMUX_LOCAL_ZELLIJ_STATE_DIR"] = root.appendingPathComponent("state", isDirectory: true).path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_ZELLIJ_BIN"] = fakeZellij.path
+        environment["WMUX_LOCAL_ZELLIJ_STATE_DIR"] = root.appendingPathComponent("state", isDirectory: true).path
         environment["FAKE_ZELLIJ_LOG"] = logURL.path
         environment["FAKE_ZELLIJ_SESSIONS"] = sessionsURL.path
         environment["FAKE_ZELLIJ_LAYOUT_COPY"] = layoutCopyURL.path
@@ -362,7 +362,7 @@ struct CLILocalZellijLifecycleTests {
         if failListAfterFirstCreate { environment["FAKE_ZELLIJ_FAIL_LIST_AFTER_FIRST_CREATE"] = "1" }
         if createdSessionsExit { environment["FAKE_ZELLIJ_CREATED_SESSIONS_EXIT"] = "1" }
         if deleteFails { environment["FAKE_ZELLIJ_DELETE_FAILS"] = "1" }
-        for key in ["CMUX_SOCKET", "CMUX_SOCKET_PATH", "CMUX_WORKSPACE_ID", "ZELLIJ", "ZELLIJ_SESSION_NAME"] {
+        for key in ["WMUX_SOCKET", "WMUX_SOCKET_PATH", "WMUX_WORKSPACE_ID", "ZELLIJ", "ZELLIJ_SESSION_NAME"] {
             environment.removeValue(forKey: key)
         }
         return Fixture(
@@ -415,8 +415,8 @@ struct CLILocalZellijLifecycleTests {
             "--surface", AttachHoldingCmuxSocket.surfaceID,
         ]
         var environment = fixture.environment
-        environment["CMUX_SOCKET_PATH"] = app.socketPath
-        environment["CMUX_SOCKET_PASSWORD"] = ""
+        environment["WMUX_SOCKET_PATH"] = app.socketPath
+        environment["WMUX_SOCKET_PASSWORD"] = ""
         attach.environment = environment
         attach.standardOutput = FileHandle.nullDevice
         attach.standardError = FileHandle.nullDevice

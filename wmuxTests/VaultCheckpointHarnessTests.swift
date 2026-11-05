@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -20,10 +20,10 @@ private func makeEntry(agent: SessionAgent, fileURL: URL?, registeredID: String?
     case .rovodev: specifics = .rovodev
     case .hermesAgent: specifics = .hermesAgent(source: nil, model: nil, hermesHome: nil)
     case .registered:
-        specifics = .registered(CmuxVaultAgentRegistration(
+        specifics = .registered(WmuxVaultAgentRegistration(
             id: registeredID ?? "pi",
             name: (registeredID ?? "pi").capitalized,
-            detect: CmuxVaultAgentDetectRule(processNames: [registeredID ?? "pi"]),
+            detect: WmuxVaultAgentDetectRule(processNames: [registeredID ?? "pi"]),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "\(registeredID ?? "pi") --session {{sessionId}}",
             cwd: .preserve

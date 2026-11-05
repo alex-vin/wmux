@@ -4,11 +4,11 @@ import Foundation
 /// Resolves per-directory notification hooks on a background actor. Cache
 /// entries are invalidated by hierarchy or content changes, so notification
 /// delivery never parses cmux.json on the Ghostty callback thread or main actor.
-actor CmuxNotificationHookCache {
+actor WmuxNotificationHookCache {
     private let fileManager: FileManager
     private let maximumEntryCount: Int
-    private var entries: [CmuxNotificationHookCacheKey: CmuxNotificationHookCacheEntry] = [:]
-    private var parsedConfigs: [String: CmuxNotificationHookParsedConfig] = [:]
+    private var entries: [WmuxNotificationHookCacheKey: WmuxNotificationHookCacheEntry] = [:]
+    private var parsedConfigs: [String: WmuxNotificationHookParsedConfig] = [:]
     private var accessSequence: UInt64 = 0
     private(set) var parseCount = 0
     private(set) var hitCount = 0
@@ -21,11 +21,11 @@ actor CmuxNotificationHookCache {
     func hooks(
         startingFrom directory: String?,
         globalConfigPath: String?
-    ) -> [CmuxResolvedNotificationHook] {
+    ) -> [WmuxResolvedNotificationHook] {
         guard let globalConfigPath, !globalConfigPath.isEmpty else { return [] }
         let normalizedDirectory = normalizedDirectory(directory)
         let normalizedGlobalPath = (globalConfigPath as NSString).standardizingPath
-        let key = CmuxNotificationHookCacheKey(directory: normalizedDirectory, globalConfigPath: normalizedGlobalPath)
+        let key = WmuxNotificationHookCacheKey(directory: normalizedDirectory, globalConfigPath: normalizedGlobalPath)
         let localPaths = normalizedDirectory.map { findConfigHierarchy(startingFrom: $0) } ?? []
         let paths = [normalizedGlobalPath] + localPaths
         let snapshots = paths.map(snapshot(for:))
@@ -47,7 +47,7 @@ actor CmuxNotificationHookCache {
             globalConfigPath: normalizedGlobalPath,
             localConfigs: localConfigs
         )
-        entries[key] = CmuxNotificationHookCacheEntry(
+        entries[key] = WmuxNotificationHookCacheEntry(
             fingerprints: fingerprints,
             hooks: hooks,
             lastAccessSequence: sequence
@@ -86,8 +86,8 @@ actor CmuxNotificationHookCache {
         while true {
             let candidates = [
                 ((current as NSString).appendingPathComponent(".cmux") as NSString)
-                    .appendingPathComponent("cmux.json"),
-                (current as NSString).appendingPathComponent("cmux.json"),
+                    .appendingPathComponent("wmux.json"),
+                (current as NSString).appendingPathComponent("wmux.json"),
             ]
             if let candidate = candidates.first(where: { fileManager.fileExists(atPath: $0) }) {
                 paths.append(candidate)
@@ -99,11 +99,11 @@ actor CmuxNotificationHookCache {
         return paths.reversed()
     }
 
-    private func snapshot(for path: String) -> CmuxNotificationHookFileSnapshot {
+    private func snapshot(for path: String) -> WmuxNotificationHookFileSnapshot {
         let attributes = try? fileManager.attributesOfItem(atPath: path)
         let contents = fileManager.contents(atPath: path)
         let exists = attributes != nil || contents != nil
-        let fingerprint = CmuxNotificationHookFileFingerprint(
+        let fingerprint = WmuxNotificationHookFileFingerprint(
             path: path,
             exists: exists,
             fileSize: (attributes?[.size] as? NSNumber)?.uint64Value
@@ -112,10 +112,10 @@ actor CmuxNotificationHookCache {
             fileIdentifier: (attributes?[.systemFileNumber] as? NSNumber)?.uint64Value,
             contentDigest: contents.map { Data(SHA256.hash(data: $0)) }
         )
-        return CmuxNotificationHookFileSnapshot(fingerprint: fingerprint, contents: contents)
+        return WmuxNotificationHookFileSnapshot(fingerprint: fingerprint, contents: contents)
     }
 
-    private func parsedConfig(for snapshot: CmuxNotificationHookFileSnapshot) -> CmuxConfigFile? {
+    private func parsedConfig(for snapshot: WmuxNotificationHookFileSnapshot) -> WmuxConfigFile? {
         let fingerprint = snapshot.fingerprint
         guard fingerprint.exists else {
             parsedConfigs.removeValue(forKey: fingerprint.path)
@@ -125,23 +125,23 @@ actor CmuxNotificationHookCache {
             return cached.config
         }
         parseCount += 1
-        let config: CmuxConfigFile?
+        let config: WmuxConfigFile?
         if let contents = snapshot.contents,
            let sanitized = try? JSONCParser.preprocess(data: contents) {
-            config = try? JSONDecoder().decode(CmuxConfigFile.self, from: sanitized)
+            config = try? JSONDecoder().decode(WmuxConfigFile.self, from: sanitized)
         } else {
             config = nil
         }
-        parsedConfigs[fingerprint.path] = CmuxNotificationHookParsedConfig(fingerprint: fingerprint, config: config)
+        parsedConfigs[fingerprint.path] = WmuxNotificationHookParsedConfig(fingerprint: fingerprint, config: config)
         return config
     }
 
     private func resolveHooks(
-        globalConfig: CmuxConfigFile?,
+        globalConfig: WmuxConfigFile?,
         globalConfigPath: String,
-        localConfigs: [(path: String, config: CmuxConfigFile)]
-    ) -> [CmuxResolvedNotificationHook] {
-        var hooks: [CmuxResolvedNotificationHook] = []
+        localConfigs: [(path: String, config: WmuxConfigFile)]
+    ) -> [WmuxResolvedNotificationHook] {
+        var hooks: [WmuxResolvedNotificationHook] = []
         if let definitions = globalConfig?.notifications?.hooks {
             hooks = definitions.compactMap {
                 resolvedHook($0, sourcePath: globalConfigPath, globalConfigPath: globalConfigPath)
@@ -160,16 +160,16 @@ actor CmuxNotificationHookCache {
     }
 
     private func resolvedHook(
-        _ definition: CmuxNotificationHookDefinition,
+        _ definition: WmuxNotificationHookDefinition,
         sourcePath: String,
         globalConfigPath: String
-    ) -> CmuxResolvedNotificationHook? {
+    ) -> WmuxResolvedNotificationHook? {
         guard definition.enabled else { return nil }
-        let cwd = CmuxButtonIcon.projectRoot(forConfigPath: sourcePath)
+        let cwd = WmuxButtonIcon.projectRoot(forConfigPath: sourcePath)
         let canonicalSourcePath = canonicalPath(sourcePath)
         let canonicalGlobalPath = canonicalPath(globalConfigPath)
-        let trustDescriptor: CmuxActionTrustDescriptor? = canonicalSourcePath == canonicalGlobalPath ? nil :
-            CmuxActionTrustDescriptor(
+        let trustDescriptor: WmuxActionTrustDescriptor? = canonicalSourcePath == canonicalGlobalPath ? nil :
+            WmuxActionTrustDescriptor(
                 actionID: definition.id,
                 kind: "notificationHook",
                 command: definition.command,
@@ -179,7 +179,7 @@ actor CmuxNotificationHookCache {
                 projectRoot: canonicalPath(cwd),
                 iconFingerprint: nil
             )
-        return CmuxResolvedNotificationHook(
+        return WmuxResolvedNotificationHook(
             id: definition.id,
             command: definition.command,
             timeoutSeconds: definition.resolvedTimeoutSeconds,

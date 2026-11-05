@@ -34,9 +34,9 @@ struct ClaudeHookHibernationGenerationHistoryTests {
             hibernationSessionEndPreserved: true
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.workspaceID
-        environment["CMUX_SURFACE_ID"] = Self.surfaceID
-        environment["CMUX_CLAUDE_PID"] = "43219"
+        environment["WMUX_WORKSPACE_ID"] = Self.workspaceID
+        environment["WMUX_SURFACE_ID"] = Self.surfaceID
+        environment["WMUX_CLAUDE_PID"] = "43219"
         let result = Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-end"],
@@ -87,9 +87,9 @@ struct ClaudeHookHibernationGenerationHistoryTests {
             hibernationSessionEndPreserved: true
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.workspaceID
-        environment["CMUX_SURFACE_ID"] = Self.surfaceID
-        environment["CMUX_CLAUDE_PID"] = "43219"
+        environment["WMUX_WORKSPACE_ID"] = Self.workspaceID
+        environment["WMUX_SURFACE_ID"] = Self.surfaceID
+        environment["WMUX_CLAUDE_PID"] = "43219"
         let result = Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-end"],

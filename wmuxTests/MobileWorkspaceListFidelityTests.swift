@@ -1,13 +1,13 @@
-@testable import CmuxMobileHost
+@testable import WmuxMobileHost
 import Testing
 import AppKit
 import Bonsplit
-import CMUXMobileCore
-import CmuxCore
-import CmuxNotifications
+import WMUXMobileCore
+import WmuxCore
+import WmuxNotifications
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -321,7 +321,7 @@ struct MobileWorkspaceListFidelityTests {
         }
         """.write(to: configURL, atomically: true, encoding: .utf8)
 
-        let configStore = CmuxConfigStore(
+        let configStore = WmuxConfigStore(
             globalConfigPath: configURL.path,
             startFileWatchers: false
         )

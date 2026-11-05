@@ -1,11 +1,11 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
-import CmuxControlSocket
-import CmuxWorkspaces
+import WmuxControlSocket
+import WmuxWorkspaces
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -284,7 +284,7 @@ struct DockSessionPersistenceTests {
         defer { defaults.removePersistentDomain(forName: defaultsName) }
 
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let testEnvironment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let testEnvironment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
 
         let workingDirectory = root.appendingPathComponent("repo", isDirectory: true)
         try fileManager.createDirectory(at: workingDirectory, withIntermediateDirectories: true)
@@ -319,7 +319,7 @@ struct DockSessionPersistenceTests {
         let agentIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: testEnvironment,
             processArgumentsProvider: { _ in nil }
@@ -336,7 +336,7 @@ struct DockSessionPersistenceTests {
         let liveAgentIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 RestorableAgentSessionIndex.PanelKey(workspaceId: previousOwnerID, panelId: panelID): (
                     snapshot: SessionRestorableAgentSnapshot(
@@ -465,7 +465,7 @@ struct DockSessionPersistenceTests {
         defer { try? fileManager.removeItem(at: root) }
 
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let testEnvironment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let testEnvironment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         let staleOwnerID = UUID()
         let liveOwnerID = UUID()
         let panelID = UUID()
@@ -500,7 +500,7 @@ struct DockSessionPersistenceTests {
         let agentIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 liveKey: (
                     snapshot: SessionRestorableAgentSnapshot(
@@ -577,7 +577,7 @@ struct DockSessionPersistenceTests {
         defer { try? fileManager.removeItem(at: root) }
 
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let testEnvironment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let testEnvironment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
 
         let firstOwnerID = UUID()
         let secondOwnerID = UUID()
@@ -609,7 +609,7 @@ struct DockSessionPersistenceTests {
         let agentIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: testEnvironment,
             processArgumentsProvider: { _ in nil }
@@ -665,7 +665,7 @@ struct DockSessionPersistenceTests {
         let newestAgentIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: testEnvironment,
             processArgumentsProvider: { _ in nil }
@@ -713,7 +713,7 @@ struct DockSessionPersistenceTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: FileManager.default.homeDirectoryForCurrentUser.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 .init(workspaceId: expectedOwnerID, panelId: panelID): (
                     snapshot: SessionRestorableAgentSnapshot(
@@ -800,7 +800,7 @@ struct DockSessionPersistenceTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: FileManager.default.homeDirectoryForCurrentUser.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: detectedSnapshots,
             processArgumentsProvider: { _ in nil },
             processPresenceProvider: { _ in .absent },
@@ -869,16 +869,16 @@ struct DockSessionPersistenceTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path],
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path],
             processArgumentsProvider: { pid in
                 pid == stalePID
-                    ? CmuxTopProcessArguments(
+                    ? WmuxTopProcessArguments(
                         arguments: ["/usr/local/bin/codex"],
                         environment: [
-                            "CMUX_WORKSPACE_ID": staleOwnerID.uuidString,
-                            "CMUX_SURFACE_ID": panelID.uuidString,
+                            "WMUX_WORKSPACE_ID": staleOwnerID.uuidString,
+                            "WMUX_SURFACE_ID": panelID.uuidString,
                         ]
                     )
                     : nil

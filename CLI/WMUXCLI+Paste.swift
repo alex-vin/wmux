@@ -132,7 +132,7 @@ extension WMUXCLI {
             ?? Self.callerWorkspaceForSurfaceHandle(surface, windowRaw: windowRaw)
         let surfaceArg = surface
             ?? (workspace == nil && windowRaw == nil
-                ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"]
+                ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"]
                 : nil)
 
         var params: [String: Any] = [
@@ -424,8 +424,8 @@ extension WMUXCLI {
         If an agent prompt in the target holds text someone is typing, or a question or permission dialog is open, nothing is sent and the command fails. --force sends anyway.
 
         Flags:
-          --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
-          --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+          --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
+          --surface <id|ref|index>     Target surface (default: $WMUX_SURFACE_ID)
           --window <id|ref|index>      Window context for workspace/surface refs and indexes
           --paste                      Paste the text instead of typing it
           --force                      Send even over a draft or into an open dialog
@@ -446,8 +446,8 @@ extension WMUXCLI {
         If an agent prompt in the target holds text someone is typing, or a question or permission dialog is open, nothing is sent and the command fails. --force sends anyway.
 
         Flags:
-          --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
-          --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+          --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
+          --surface <id|ref|index>     Target surface (default: $WMUX_SURFACE_ID)
           --window <id|ref|index>      Window context for workspace/surface refs and indexes
           --submit                     Press the agent's submit key after the paste
           --force                      Send even over a draft or into an open dialog

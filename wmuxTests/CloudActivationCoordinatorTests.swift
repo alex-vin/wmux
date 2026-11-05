@@ -1,11 +1,11 @@
-import CmuxAuthRuntime
-import CmuxCloud
-import CmuxSettings
+import WmuxAuthRuntime
+import WmuxCloud
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -20,11 +20,11 @@ struct CloudActivationCoordinatorTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         defaults.set(true, forKey: CloudActivationCoordinator.activationKey)
-        let capability = CmuxFeatureFlagOverrideCapability(
+        let capability = WmuxFeatureFlagOverrideCapability(
             bundleIdentifier: "com.cmuxterm.app.debug",
             isDebugBuild: true
         )
-        _ = CmuxFeatureFlags(
+        _ = WmuxFeatureFlags(
             defaults: defaults,
             overrideCapability: capability,
             remoteFlagValueProvider: { _ in false }
@@ -117,7 +117,7 @@ struct CloudActivationCoordinatorTests {
         let suite = "cmux.cloud.activation.absentHub.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             wireGuardHub: nil,
             allowsBackgroundWork: { true },

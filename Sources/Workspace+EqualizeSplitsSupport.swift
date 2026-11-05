@@ -1,6 +1,6 @@
 import Bonsplit
-import CmuxPanes
-import CmuxSettings
+import WmuxPanes
+import WmuxSettings
 import Foundation
 
 extension Workspace {

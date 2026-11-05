@@ -1,8 +1,8 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -55,11 +55,11 @@ final class CloudSidebarRenameFixture {
                           ["id": "term_other", "title": "terminal", "lifecycle": "running"]],
             "browsers": [], "agents": []
         ]
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
     }
 
     func install(_ graph: CloudVMState, observation: CloudVMStateObservation = .current) {
-        catalog.replaceCloudState(graph, resources: CmuxTuiSnapshotParser.resources(from: graph), info: provider.info, observation: observation)
+        catalog.replaceCloudState(graph, resources: WmuxTuiSnapshotParser.resources(from: graph), info: provider.info, observation: observation)
     }
 
     func reconcile() {

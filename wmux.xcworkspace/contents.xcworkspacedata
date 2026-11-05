@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:wmux.xcodeproj">
+   </FileRef>
+   <Group
+      location = "container:Packages/Shared"
+      name = "Packages (Shared)">
+      <FileRef
+         location = "group:WmuxAgentChat">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxAPIClient">
+      </FileRef>
+      <FileRef
+         location = "group:WMUXAuthCore">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxAuthRuntime">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxClientConfig">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxGhosttyKit">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSentryTelemetry">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSyntaxHighlighting">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTerminalClient">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTerminalPrediction">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTerminalSizing">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:Packages/macOS"
+      name = "Packages (macOS)">
+      <FileRef
+         location = "group:WmuxAgentDeliveryCore">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxAgentJournal">
+      </FileRef>
+      <FileRef
+         location = "group:WMUXAgentLaunch">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxAgentSessionStore">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxAppKitSupportUI">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxBrowser">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxCanvas">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxCanvasUI">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxCommandPalette">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxComputerUse">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxControlSocket">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxCore">
+      </FileRef>
+      <FileRef
+         location = "group:WMUXDebugLog">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxDiffComments">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxExtensionKit">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxFeedback">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxFilePreviewCore">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxFoundation">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxGeminiQuota">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxGit">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxLiveEval">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxMemoryPressure">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxNotifications">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxPanes">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxProductAnalytics">
+      </FileRef>
+      <FileRef
+         location = "group:WMUXProjectModel">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSettings">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSettingsUI">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSidebar">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSidebarGit">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSidebarInterpreterService">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSidebarProviderKit">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSudoBroker">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSudoBrokerUI">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSurfaceCatalogModel">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSwiftRender">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxSwiftRenderUI">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTerminal">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTerminalCore">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTerminalImport">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTerminalSharing">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxTestSupport">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxWindowing">
+      </FileRef>
+      <FileRef
+         location = "group:WmuxWorkspaces">
+      </FileRef>
+   </Group>
+</Workspace>

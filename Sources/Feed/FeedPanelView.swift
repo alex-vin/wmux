@@ -1,7 +1,7 @@
-import CmuxFoundation
+import WmuxFoundation
 import AppKit
 import Bonsplit
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import SwiftUI
 #if DEBUG
 private func feedDebugResponderSummary(_ responder: NSResponder?) -> String {

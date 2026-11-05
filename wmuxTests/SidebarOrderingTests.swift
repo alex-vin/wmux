@@ -5,16 +5,16 @@ import UniformTypeIdentifiers
 import WebKit
 import ObjectiveC.runtime
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxSettings
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxSettings
 import UserNotifications
 import Testing
 
-import CmuxSidebar
+import WmuxSidebar
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

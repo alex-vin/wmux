@@ -28,8 +28,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         let environment = [
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         let result = runProcess(
             executablePath: cliPath,
@@ -70,7 +70,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             XCTAssertTrue(script.contains("hooks enqueue muse \(subcommand)"), "\(event): \(script)")
             XCTAssertTrue(script.contains("cmux-muse-hook-v1"), "\(event): \(script)")
             XCTAssertTrue(script.contains("--socket '\(socketPath)'"), "\(event): \(script)")
-            XCTAssertFalse(script.contains("[ -n \"$CMUX_SURFACE_ID\" ]"), "Muse clears CMUX_* from hooks: \(script)")
+            XCTAssertFalse(script.contains("[ -n \"$WMUX_SURFACE_ID\" ]"), "Muse clears WMUX_* from hooks: \(script)")
             XCTAssertEqual(commands.first?["type"] as? String, "command")
             // Muse follows the Claude Code hook contract, which counts timeouts in seconds.
             XCTAssertEqual(commands.first?["timeout"] as? Int, 10, event)
@@ -118,8 +118,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
                 "HOME": root.path,
                 "XDG_CONFIG_HOME": xdgConfig.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": makeSocketPath("muse-xdg"),
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": makeSocketPath("muse-xdg"),
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 5
         )

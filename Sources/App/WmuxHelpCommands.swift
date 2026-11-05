@@ -45,7 +45,7 @@ extension wmuxApp {
         }
     }
 
-    private func helpResourceButton(_ resource: CmuxHelpResource) -> some View {
+    private func helpResourceButton(_ resource: WmuxHelpResource) -> some View {
         Button(resource.title) {
             NSWorkspace.shared.open(resource.url)
         }

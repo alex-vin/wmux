@@ -1,7 +1,7 @@
-import CMUXAgentLaunch
-import CmuxFoundation
+import WMUXAgentLaunch
+import WmuxFoundation
 import Bonsplit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Darwin
 import Foundation
 

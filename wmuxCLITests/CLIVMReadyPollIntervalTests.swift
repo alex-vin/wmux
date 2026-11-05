@@ -3,7 +3,7 @@ import Testing
 
 /// The poll-interval policy is compiled into this target from
 /// `CLI/VMReadyPollInterval.swift`: the CLI is a tool target that tests cannot
-/// import, and in the app-hosted `CLIVMTransferTests` `CMUXCLI` names the
+/// import, and in the app-hosted `CLIVMTransferTests` `WMUXCLI` names the
 /// app's routing type instead.
 @Suite("cmux vm: ready poll interval")
 struct CLIVMReadyPollIntervalTests {
@@ -14,7 +14,7 @@ struct CLIVMReadyPollIntervalTests {
               ("nan", 3.0), ("fast", 3.0),
           ] as [(String?, TimeInterval)])
     func pollInterval(override: String?, expected: TimeInterval) {
-        let environment = override.map { ["CMUX_VM_WAIT_POLL_SECONDS": $0] } ?? [:]
+        let environment = override.map { ["WMUX_VM_WAIT_POLL_SECONDS": $0] } ?? [:]
         #expect(VMReadyPollInterval.resolve(environment: environment) == expected)
     }
 }

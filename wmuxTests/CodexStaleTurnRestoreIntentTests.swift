@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -16,7 +16,7 @@ struct CodexStaleTurnRestoreIntentTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-codex-stale-turn-intent-\(UUID().uuidString)", isDirectory: true)
         let hookDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let environment = ["CMUX_AGENT_HOOK_STATE_DIR": hookDirectory.path]
+        let environment = ["WMUX_AGENT_HOOK_STATE_DIR": hookDirectory.path]
         let defaultsName = "cmux-codex-stale-turn-intent-\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: defaultsName))
         defer {
@@ -43,7 +43,7 @@ struct CodexStaleTurnRestoreIntentTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: environment,
             processArgumentsProvider: { _ in nil },
@@ -86,7 +86,7 @@ struct CodexStaleTurnRestoreIntentTests {
     ) throws {
         let storeURL = RestorableAgentKind.codex.hookStoreFileURL(
             homeDirectory: root.path,
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": hookDirectory.path]
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": hookDirectory.path]
         )
         try fileManager.createDirectory(at: storeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         let transcriptURL = root.appendingPathComponent(".codex/sessions/rollout-\(sessionID).jsonl")

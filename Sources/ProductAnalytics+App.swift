@@ -1,13 +1,13 @@
-import CmuxCloud
-import CmuxProductAnalytics
-import CmuxSettings
+import WmuxCloud
+import WmuxProductAnalytics
+import WmuxSettings
 import Foundation
 
 extension ProductAnalytics {
     /// The app's product analytics, sending through ``PostHogAnalytics``.
     /// Disabled whenever PostHog capture is (telemetry opt-out in Settings,
     /// managed `DisableTelemetry`, XCTest, debug builds without
-    /// `CMUX_POSTHOG_ENABLE=1`), so it enqueues nothing in those launches.
+    /// `WMUX_POSTHOG_ENABLE=1`), so it enqueues nothing in those launches.
     static let app: ProductAnalytics = {
         let posthog = PostHogAnalytics.shared
         let defaults = UserDefaults.standard
@@ -32,6 +32,6 @@ extension ProductAnalytics {
     /// analytics or campaign markers; its first launch is not reported now.
     static func isPreexistingInstall(defaults: UserDefaults) -> Bool {
         defaults.string(forKey: "posthog.lastActiveDayUTC") != nil
-            || defaults.string(forKey: "cmux.cloud.welcome.seenVersion") != nil
+            || defaults.string(forKey: "wmux.cloud.welcome.seenVersion") != nil
     }
 }

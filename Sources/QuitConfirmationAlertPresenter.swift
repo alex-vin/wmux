@@ -1,5 +1,5 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 
 @MainActor
 final class QuitConfirmationAlertPresenter: NSObject, NSWindowDelegate {

@@ -8,7 +8,7 @@ import Testing
 /// Every test isolates HOME and PATH so the developer's own CodeRouter install,
 /// `~/.coderouter`, and `~/.cmux` never take part, and none of them reaches the
 /// network: the interactive bootstrap runs a local stand-in for install.sh
-/// through the Debug-only `CMUX_CODEROUTER_INSTALLER_SCRIPT` seam. The stand-in
+/// through the Debug-only `WMUX_CODEROUTER_INSTALLER_SCRIPT` seam. The stand-in
 /// honors the real installer's contract (a `coderouter` executable in
 /// `$HOME/.coderouter/bin`) so the re-resolve and exec after installing are the
 /// production code path.
@@ -37,8 +37,8 @@ struct CLICoderouterBootstrapTests {
         let result = fixture.runCLI(
             arguments: ["cr", "--version"],
             extraEnvironment: [
-                "CMUX_SOCKET_CAPABILITY": "missing-capability",
-                "CMUX_SOCKET_PASSWORD": "missing-password",
+                "WMUX_SOCKET_CAPABILITY": "missing-capability",
+                "WMUX_SOCKET_PASSWORD": "missing-password",
             ]
         )
 
@@ -100,7 +100,7 @@ struct CLICoderouterBootstrapTests {
         let result = try fixture.runCLIUnderPTY(
             arguments: ["cr", "--version"],
             input: "y\n",
-            extraEnvironment: ["CMUX_CODEROUTER_INSTALLER_SCRIPT": installerScript.path]
+            extraEnvironment: ["WMUX_CODEROUTER_INSTALLER_SCRIPT": installerScript.path]
         )
 
         #expect(!result.timedOut, Comment(rawValue: result.transcript))
@@ -124,7 +124,7 @@ struct CLICoderouterBootstrapTests {
         let result = try fixture.runCLIUnderPTY(
             arguments: ["cr", "--version"],
             input: "n\n",
-            extraEnvironment: ["CMUX_CODEROUTER_INSTALLER_SCRIPT": installerScript.path]
+            extraEnvironment: ["WMUX_CODEROUTER_INSTALLER_SCRIPT": installerScript.path]
         )
 
         #expect(!result.timedOut, Comment(rawValue: result.transcript))
@@ -157,7 +157,7 @@ struct CLICoderouterBootstrapTests {
             input: "y\n",
             extraEnvironment: [
                 "PATH": pathDirectory.path,
-                "CMUX_CODEROUTER_INSTALLER_SCRIPT": installerScript.path,
+                "WMUX_CODEROUTER_INSTALLER_SCRIPT": installerScript.path,
             ]
         )
 
@@ -245,7 +245,7 @@ struct CLICoderouterBootstrapTests {
         /// does not exist, so nothing here can reach a running cmux.
         func environment(merging extra: [String: String]) -> [String: String] {
             var environment = ProcessInfo.processInfo.environment
-            for key in environment.keys where key.hasPrefix("CMUX_") || key.hasPrefix("CMUXD_") {
+            for key in environment.keys where key.hasPrefix("WMUX_") || key.hasPrefix("WMUXD_") {
                 environment.removeValue(forKey: key)
             }
             environment.removeValue(forKey: "CODEROUTER_INSTALL")
@@ -254,8 +254,8 @@ struct CLICoderouterBootstrapTests {
             environment["PATH"] = emptyPathDirectory.path
             environment["AppleLanguages"] = "(en)"
             environment["AppleLocale"] = "en_US"
-            environment["CMUX_SOCKET_PATH"] = socketPath
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment["WMUX_SOCKET_PATH"] = socketPath
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
             environment.merge(extra) { _, newValue in newValue }
             return environment
         }

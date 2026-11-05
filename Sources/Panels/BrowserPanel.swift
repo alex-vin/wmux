@@ -1,25 +1,25 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
-import CmuxMobileHost
+import WmuxCloud
+import WmuxSurfaceCatalogModel
+import WmuxMobileHost
 import Foundation
-import CMUXMobileCore
-import CmuxCore
-import CmuxBrowser
-import CmuxFoundation
-import CmuxSettings
+import WMUXMobileCore
+import WmuxCore
+import WmuxBrowser
+import WmuxFoundation
+import WmuxSettings
 import Combine
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import WebKit
 import AppKit
 import Bonsplit
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Network
 import CFNetwork
 import SQLite3
 import CryptoKit
 import Darwin
 import os
-import CmuxTerminal
+import WmuxTerminal
 #if canImport(CommonCrypto)
 import CommonCrypto
 #endif
@@ -308,10 +308,10 @@ enum BrowserImportHintSettings {
 }
 
 // `BrowserProfileDefinition` and `BrowserProfileClearOutcome` now live in the
-// `CmuxBrowser` package (imported above); the call sites reference them
+// `WmuxBrowser` package (imported above); the call sites reference them
 // unqualified through that import.
 
-// Adapts `BrowserHistoryStore` to the `CmuxBrowser` history seams so the
+// Adapts `BrowserHistoryStore` to the `WmuxBrowser` history seams so the
 // profile repository can manage per-profile history stores without depending on
 // the app-target `BrowserHistoryStore` type.
 extension BrowserHistoryStore: BrowserProfileHistoryStore {}
@@ -337,7 +337,7 @@ private final class BrowserProfileHistoryAdapter: BrowserProfileHistoryProviding
     }
 }
 
-// Adapts WebKit's `WKWebsiteDataStore` to the `CmuxBrowser` data-store
+// Adapts WebKit's `WKWebsiteDataStore` to the `WmuxBrowser` data-store
 // seam, mapping the built-in default profile to the default store and bridging
 // the legacy completion-handler wipe to `async`/`await` at this one boundary.
 @MainActor
@@ -386,7 +386,7 @@ final class BrowserProfileStore: ObservableObject {
             historyProvider: BrowserProfileHistoryAdapter(),
             websiteDataStoreProvider: BrowserProfileWebsiteDataStoreAdapter(),
             fileRemover: BrowserProfileFileRemover(),
-            bundleIdentifier: Bundle.main.bundleIdentifier ?? "cmux",
+            bundleIdentifier: Bundle.main.bundleIdentifier ?? "wmux",
             defaultProfileDisplayName: String(localized: "browser.profile.default", defaultValue: "Default")
         )
         mirrorPublishedState()
@@ -579,7 +579,7 @@ enum BrowserLinkOpenSettings {
 
 enum BrowserAvailabilitySettings {
     static let disabledKey = "browserDisabledOverride"
-    static let didChangeNotification = Notification.Name("cmux.browserAvailabilityDidChange")
+    static let didChangeNotification = Notification.Name("wmux.browserAvailabilityDidChange")
     static let defaultDisabled = false
 
     static func isDisabled(defaults: UserDefaults = .standard) -> Bool {
@@ -643,7 +643,7 @@ final class BrowserAvailabilityMonitor {
 
     /// Posted only when the resolved availability differs from the last value.
     static let didChangeNotification = Notification.Name(
-        "cmux.browserAvailabilityMonitorDidChange"
+        "wmux.browserAvailabilityMonitorDidChange"
     )
 
     private(set) var isEnabled: Bool
@@ -770,7 +770,7 @@ enum BrowserInsecureHTTPSettings {
         defaults.set(patterns.joined(separator: "\n"), forKey: allowlistKey)
     }
 
-    // Single source of truth: the host normalizer moved to CmuxCore with the
+    // Single source of truth: the host normalizer moved to WmuxCore with the
     // loopback alias lift; this forwards so allowlist semantics stay identical.
     static func normalizeHost(_ rawHost: String) -> String? {
         RemoteLoopbackProxyAlias.normalizeHost(rawHost)
@@ -1091,7 +1091,7 @@ func browserLoadRequest(
         guard policy.allowsTrustedInternalURL(url) else {
             return nil
         }
-        if let cmuxWebView = webView as? CmuxWebView,
+        if let cmuxWebView = webView as? WmuxWebView,
            BrowserURLAllowlistPolicy.trustedInternalSchemes.contains(url.scheme?.lowercased() ?? "") {
             cmuxWebView.markTrustedInternalNavigation(url)
         }
@@ -1111,7 +1111,7 @@ private let browserEmbeddedNavigationSchemes: Set<String> = [
     "about",
     "applewebdata",
     "blob",
-    "cmux-diff-viewer",
+    "wmux-diff-viewer",
     "data",
     "file",
     "http",
@@ -1247,7 +1247,7 @@ func browserPresentExternalNavigationFailure(
     )
     alert.informativeText = String(
         localized: "browser.externalOpenFailure.message",
-        defaultValue: "cmux could not open this link. You can copy it and open it in another app."
+        defaultValue: "wmux could not open this link. You can copy it and open it in another app."
     )
     alert.addButton(withTitle: String(localized: "common.ok", defaultValue: "OK"))
     alert.addButton(withTitle: String(
@@ -1341,10 +1341,10 @@ func normalizedBrowserHistoryNamespace(bundleIdentifier: String) -> String {
 
 func browserIsTemporaryHistoryURL(_ url: URL?) -> Bool {
     guard let url else { return false }
-    if url.scheme?.lowercased() == CmuxDiffViewerURLSchemeHandler.scheme {
+    if url.scheme?.lowercased() == WmuxDiffViewerURLSchemeHandler.scheme {
         return true
     }
-    guard url.fragment == "cmux-diff-viewer",
+    guard url.fragment == "wmux-diff-viewer",
           url.scheme?.lowercased() == "http",
           let host = url.host else {
         return false
@@ -1360,7 +1360,7 @@ func browserIsTemporaryHistoryURL(_ url: URL?) -> Bool {
 final class BrowserHistoryStore: ObservableObject {
     static let shared = BrowserHistoryStore()
 
-    /// Persisted history record. Owned by `CmuxBrowser`; this alias keeps
+    /// Persisted history record. Owned by `WmuxBrowser`; this alias keeps
     /// existing `BrowserHistoryStore.Entry` call sites byte-identical after the
     /// value type moved into the package.
     typealias Entry = BrowserHistoryEntry
@@ -1384,7 +1384,7 @@ final class BrowserHistoryStore: ObservableObject {
     private let saveDebounceNanoseconds: UInt64 = 120_000_000
 
     // Pure suggestion matching/scoring and persistence I/O live in
-    // `CmuxBrowser`; the store owns only the @Published entry list, the
+    // `WmuxBrowser`; the store owns only the @Published entry list, the
     // first-load lifecycle, and the debounced-save scheduling.
     private let suggestionEngine = BrowserHistorySuggestionEngine()
     private let fileRepository = BrowserHistoryFileRepository()
@@ -1827,7 +1827,7 @@ final class BrowserHistoryStore: ObservableObject {
         guard let appSupport = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             return nil
         }
-        let bundleId = Bundle.main.bundleIdentifier ?? "cmux"
+        let bundleId = Bundle.main.bundleIdentifier ?? "wmux"
         return BrowserHistoryLocation(applicationSupportDirectory: appSupport, bundleIdentifier: bundleId)
     }
 
@@ -1853,8 +1853,8 @@ actor BrowserSearchSuggestionService {
 
         // Deterministic UI-test hook for validating remote suggestion rendering
         // without relying on external network behavior.
-        let forced = ProcessInfo.processInfo.environment["CMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON"]
-            ?? UserDefaults.standard.string(forKey: "CMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON")
+        let forced = ProcessInfo.processInfo.environment["WMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON"]
+            ?? UserDefaults.standard.string(forKey: "WMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON")
         if let forced,
            let data = forced.data(using: .utf8),
            let parsed = try? JSONSerialization.jsonObject(with: data) as? [Any] {
@@ -2026,7 +2026,7 @@ final class BrowserSearchState: ObservableObject {
 @MainActor
 final class BrowserPanel: Panel, ObservableObject {
     /// Identifier of the offscreen window that preloads hidden tabs.
-    static let backgroundPreloadWindowIdentifier = "cmux.browserBackgroundPreload"
+    static let backgroundPreloadWindowIdentifier = "wmux.browserBackgroundPreload"
 
     /// Popup windows owned by this panel (for lifecycle cleanup)
     private var popupControllers: [BrowserPopupWindowController] = []
@@ -2232,7 +2232,7 @@ final class BrowserPanel: Panel, ObservableObject {
 
     /// Owns the address-bar page-focus capture/restore subsystem.
     ///
-    /// The repository (in `CmuxBrowser`) runs the capture/restore scripts
+    /// The repository (in `WmuxBrowser`) runs the capture/restore scripts
     /// through ``BrowserOmnibarPageFocusAdapter``, which reaches back to this
     /// panel's current `webView` weakly so the panel and repository do not retain
     /// each other.
@@ -2370,7 +2370,7 @@ final class BrowserPanel: Panel, ObservableObject {
     var nativeCanGoForward: Bool = false
 
     /// The replayable back/forward session history this surface restores from a
-    /// prior launch. The pure stack state machine lives in `CmuxBrowser`;
+    /// prior launch. The pure stack state machine lives in `WmuxBrowser`;
     /// this surface owns the instance, feeds it the resolved live current URL,
     /// and performs the `WKWebView` calls its decisions return. The temporary-URL
     /// classification (diff viewer + remote loopback proxy alias) is inverted into
@@ -2549,7 +2549,7 @@ final class BrowserPanel: Panel, ObservableObject {
         promptFormatter: BrowserDesignModePromptFormatter(),
         artifactStore: BrowserDesignModeArtifactStore(
             directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent("cmux-browser-design-mode", isDirectory: true)
+                .appendingPathComponent("wmux-browser-design-mode", isDirectory: true)
         ),
         javaScriptEvaluator: BrowserDesignModeJavaScriptEvaluator(),
         screenshotEvaluator: BrowserDesignModeScreenshotEvaluator(),
@@ -3135,7 +3135,7 @@ final class BrowserPanel: Panel, ObservableObject {
     static func makeWebView(
         profileID: UUID,
         websiteDataStore: WKWebsiteDataStore? = nil
-    ) -> CmuxWebView {
+    ) -> WmuxWebView {
         let config = WKWebViewConfiguration()
         configureWebViewConfiguration(
             config,
@@ -3143,7 +3143,7 @@ final class BrowserPanel: Panel, ObservableObject {
         )
         installFormStateUserScript(into: config)
 
-        let webView = CmuxWebView(frame: .zero, configuration: config, host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: config, host: WmuxWebViewAppHost())
         webView.allowsBackForwardNavigationGestures = true
         if #available(macOS 13.3, *) {
             webView.isInspectable = true
@@ -3168,10 +3168,10 @@ final class BrowserPanel: Panel, ObservableObject {
         // Ensure browser cookies/storage persist across navigations and launches.
         // This reduces repeated consent/bot-challenge flows on sites like Google.
         configuration.websiteDataStore = websiteDataStore
-        if configuration.urlSchemeHandler(forURLScheme: CmuxDiffViewerURLSchemeHandler.scheme) == nil {
+        if configuration.urlSchemeHandler(forURLScheme: WmuxDiffViewerURLSchemeHandler.scheme) == nil {
             configuration.setURLSchemeHandler(
-                CmuxDiffViewerURLSchemeHandler.shared,
-                forURLScheme: CmuxDiffViewerURLSchemeHandler.scheme
+                WmuxDiffViewerURLSchemeHandler.shared,
+                forURLScheme: WmuxDiffViewerURLSchemeHandler.scheme
             )
         }
         // Review-comment persistence + TextBox attach for diff viewer pages.
@@ -3248,7 +3248,7 @@ final class BrowserPanel: Panel, ObservableObject {
         // plain-text paste so Cmd+Shift+V is only consumed when the browser can use it.
         configuration.userContentController.addUserScript(
             WKUserScript(
-                source: CmuxWebView.pasteAsPlainTextFocusTrackingBootstrapScriptSource,
+                source: WmuxWebView.pasteAsPlainTextFocusTrackingBootstrapScriptSource,
                 injectionTime: .atDocumentStart,
                 forMainFrameOnly: true
             )
@@ -3256,7 +3256,7 @@ final class BrowserPanel: Panel, ObservableObject {
         Self.installMediaPlaybackUserScript(into: configuration)
     }
 
-    func bindWebView(_ webView: CmuxWebView) {
+    func bindWebView(_ webView: WmuxWebView) {
         localFileEncodingPolicy = BrowserLocalFileEncodingPolicy(
             preferences: webView.configuration.preferences
         )
@@ -3360,7 +3360,7 @@ final class BrowserPanel: Panel, ObservableObject {
         guard let navigationDelegate else { return }
         let boundWebViewInstanceID = webViewInstanceID
         let boundHistoryStore = historyStore
-        (webView as? CmuxWebView)?.onSubframeDownloadIntent = { [weak navigationDelegate] in
+        (webView as? WmuxWebView)?.onSubframeDownloadIntent = { [weak navigationDelegate] in
             navigationDelegate?.recordSubframeDownloadIntent($0)
         }
         navigationDelegate.didRenderPDFDocument = { [weak self] url, isMainFrame in
@@ -3373,7 +3373,7 @@ final class BrowserPanel: Panel, ObservableObject {
         }
         navigationDelegate.didStartProvisionalNavigation = { [weak self] webView, navigation in
             guard let self, self.isCurrentWebView(webView, instanceID: boundWebViewInstanceID) else { return }
-            (webView as? CmuxWebView)?.diffViewerNavigationDidStart(navigation)
+            (webView as? WmuxWebView)?.diffViewerNavigationDidStart(navigation)
             self.automationNavigationCoordinator.didStart(
                 instanceID: boundWebViewInstanceID,
                 navigationID: navigation.map { ObjectIdentifier($0) },
@@ -3389,7 +3389,7 @@ final class BrowserPanel: Panel, ObservableObject {
             guard let self, self.isCurrentWebView(webView, instanceID: boundWebViewInstanceID) else { return }
             self.cancelPendingJavaScriptDialogs()
             self.designModeController.webViewWillNavigate()
-            (webView as? CmuxWebView)?.diffViewerNavigationDidCommit(navigation)
+            (webView as? WmuxWebView)?.diffViewerNavigationDidCommit(navigation)
             WindowBrowserSlotView.hosting(webView)?.clearLinkHoverURLs()
             self.isMainFrameProvisionalNavigationActive = false
             self.automationDocumentReadiness.didCommit(instanceID: boundWebViewInstanceID)
@@ -3503,7 +3503,7 @@ final class BrowserPanel: Panel, ObservableObject {
         }
         navigationDelegate.didCancelProvisionalNavigation = { [weak self] webView, cancelledNavigation in
             guard let self, self.isCurrentWebView(webView, instanceID: boundWebViewInstanceID) else { return }
-            (webView as? CmuxWebView)?.diffViewerNavigationDidCancel(cancelledNavigation)
+            (webView as? WmuxWebView)?.diffViewerNavigationDidCancel(cancelledNavigation)
             self.cloudAccess.didCancel(navigationID: cancelledNavigation.map(ObjectIdentifier.init))
             self.automationNavigationCoordinator.didCancel(
                 instanceID: boundWebViewInstanceID,
@@ -3522,7 +3522,7 @@ final class BrowserPanel: Panel, ObservableObject {
         navigationDelegate.didChooseMainFrameDownloadPolicy = { [weak self] webView, navigation in
             guard let self, self.isCurrentWebView(webView, instanceID: boundWebViewInstanceID) else { return }
             self.failTrustedLocalFileNavigation()
-            (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+            (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
             self.automationNavigationCoordinator.didChooseDownloadPolicy(
                 instanceID: boundWebViewInstanceID,
                 navigationID: navigation.map { ObjectIdentifier($0) }
@@ -3548,7 +3548,7 @@ final class BrowserPanel: Panel, ObservableObject {
                 return
             }
             self.failTrustedLocalFileNavigation()
-            (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+            (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
             guard let restoreAttemptID,
                   restoreAttemptID == self.currentDiscardRestoreAttemptID else {
                 return
@@ -3741,7 +3741,7 @@ final class BrowserPanel: Panel, ObservableObject {
         self.websiteDataStore = websiteDataStore
         self.preservesExplicitEphemeralWebsiteDataStore =
             preservesExplicitEphemeralWebsiteDataStore
-        let webView: CmuxWebView
+        let webView: WmuxWebView
         var adoptedPrewarmedWebView = false
         if let popup = Self.takePendingPopupWebView(for: initialURL) {
             // WebKit loads the popup's document into this web view itself.
@@ -4693,9 +4693,9 @@ final class BrowserPanel: Panel, ObservableObject {
         // awaits the same deduplicated loader if it reaches the handler first.
         if let token = snapshot.diffViewerToken,
            let requestPath = snapshot.diffViewerRequestPath,
-           let diffURL = CmuxDiffViewerURLSchemeHandler.diffViewerURL(token: token, requestPath: requestPath) {
+           let diffURL = WmuxDiffViewerURLSchemeHandler.diffViewerURL(token: token, requestPath: requestPath) {
             Task { @MainActor in
-                _ = await CmuxDiffViewerURLSchemeHandler.shared.registerFromManifest(token: token)
+                _ = await WmuxDiffViewerURLSchemeHandler.shared.registerFromManifest(token: token)
             }
             hiddenWebViewDiscardManager.updateRestoredSessionRenderIntent(snapshot.shouldRenderWebView)
             setMuted(snapshot.isMuted)
@@ -4733,8 +4733,8 @@ final class BrowserPanel: Panel, ObservableObject {
         if let resource = snapshot.cloudResource {
             restoredCloudTeamID = snapshot.cloudTeamID
             if let machineID = resource.machine.cloudMachineID {
-                CmuxTuiSurfaceProviderRegistry.shared.adoptOwnerTeam(snapshot.cloudTeamID, forMachineID: machineID)
-                CmuxTuiSurfaceProviderRegistry.shared.adoptPrivateAddress(restoredURL?.host, forMachineID: machineID)
+                WmuxTuiSurfaceProviderRegistry.shared.adoptOwnerTeam(snapshot.cloudTeamID, forMachineID: machineID)
+                WmuxTuiSurfaceProviderRegistry.shared.adoptPrivateAddress(restoredURL?.host, forMachineID: machineID)
             }
             restoreCloudResource(resource, preferredURL: restoredURL, activate: shouldRenderRestoredWebView)
             if !shouldRenderRestoredWebView { shouldRenderWebView = false; refreshNavigationAvailability() }
@@ -4782,7 +4782,7 @@ final class BrowserPanel: Panel, ObservableObject {
         // path as local and non-pending. This cache-only query keeps session
         // snapshotting free of filesystem reads and JSON parsing.
         if let components = diffViewerSessionComponents() {
-            return CmuxDiffViewerURLSchemeHandler.shared.diffViewerRestorable(
+            return WmuxDiffViewerURLSchemeHandler.shared.diffViewerRestorable(
                 token: components.token,
                 requestPath: components.requestPath
             )
@@ -4804,8 +4804,8 @@ final class BrowserPanel: Panel, ObservableObject {
     /// The diff viewer `(token, requestPath)` for the live URL, if this surface
     /// is currently showing a diff viewer; used to persist + restore it.
     func diffViewerSessionComponents() -> (token: String, requestPath: String)? {
-        CmuxDiffViewerURLSchemeHandler.diffViewerComponents(from: webView.url)
-            ?? CmuxDiffViewerURLSchemeHandler.diffViewerComponents(from: currentURL)
+        WmuxDiffViewerURLSchemeHandler.diffViewerComponents(from: webView.url)
+            ?? WmuxDiffViewerURLSchemeHandler.diffViewerComponents(from: currentURL)
     }
 
     /// Tears down every live web-view observer and clears the derived
@@ -5160,7 +5160,7 @@ final class BrowserPanel: Panel, ObservableObject {
         }
 
         let didBecomeFirstResponder: Bool
-        if let cmuxWebView = webView as? CmuxWebView {
+        if let cmuxWebView = webView as? WmuxWebView {
             // Toolbar/menu activation is an explicit user gesture. Temporarily
             // bypass the background-pane acquisition guard while handing focus
             // back from the menu window to this browser surface.
@@ -5185,7 +5185,7 @@ final class BrowserPanel: Panel, ObservableObject {
             guard webView.window === window else { return }
             let didBecomeFirstResponder: Bool
             if !Self.responderChainContains(window.firstResponder, target: webView) {
-                if let cmuxWebView = webView as? CmuxWebView {
+                if let cmuxWebView = webView as? WmuxWebView {
                     didBecomeFirstResponder = cmuxWebView.withPointerFocusAllowance {
                         window.makeFirstResponder(webView)
                     }
@@ -5678,7 +5678,7 @@ final class BrowserPanel: Panel, ObservableObject {
         }
         let request = URLRequest(url: url)
         let policy = BrowserURLAllowlistPolicy(defaults: .standard)
-        (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+        (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
         if !policy.allowsTrustedInternalURL(url) {
             navigationDelegate?.blockURLAllowlistNavigation(url, in: webView)
             onNavigationStarted?(nil)
@@ -5712,7 +5712,7 @@ final class BrowserPanel: Panel, ObservableObject {
         cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
         onNavigationStarted: ((WKNavigation?) -> Void)? = nil
     ) -> WKNavigation? {
-        (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+        (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
         let request = URLRequest(url: url, cachePolicy: cachePolicy)
         return navigateWithoutInsecureHTTPPrompt(
             request: request,
@@ -5898,7 +5898,7 @@ final class BrowserPanel: Panel, ObservableObject {
         }
         noteDiscardedWebViewRestoreNavigationStarted()
         userStoppedLoadSinceWebViewReplacement = false
-        (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+        (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
         let trustedInternalNavigation = BrowserURLAllowlistPolicy
             .trustedInternalSchemes
             .contains(originalURL.scheme?.lowercased() ?? "")
@@ -6611,7 +6611,7 @@ extension BrowserPanel {
     }
 
     func markTrustedInternalNavigationIfNeeded(for url: URL?) {
-        (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+        (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
         guard let url,
               let scheme = url.scheme?.lowercased(),
               BrowserURLAllowlistPolicy.trustedInternalSchemes.contains(scheme),
@@ -6619,7 +6619,7 @@ extension BrowserPanel {
             return
         }
         beginTrustedLocalFileNavigation(url)
-        (webView as? CmuxWebView)?.markTrustedInternalNavigation(url)
+        (webView as? WmuxWebView)?.markTrustedInternalNavigation(url)
     }
 
     @discardableResult
@@ -7663,14 +7663,14 @@ extension BrowserPanel {
     /// virtualizes rows, so the generic in-page find script cannot see most
     /// of the diff; find-family shortcuts are forwarded to the app instead.
     var isDiffViewerFindOwner: Bool {
-        (webView as? CmuxWebView)?.isDiffViewerFindOwner == true
+        (webView as? WmuxWebView)?.isDiffViewerFindOwner == true
     }
 
     private func performDiffViewerFindActionOrFallback(
-        _ action: CmuxWebView.DiffViewerFindAction,
+        _ action: WmuxWebView.DiffViewerFindAction,
         fallback: @escaping @MainActor @Sendable () -> Void
     ) {
-        guard let cmuxWebView = webView as? CmuxWebView else {
+        guard let cmuxWebView = webView as? WmuxWebView else {
             fallback()
             return
         }
@@ -8721,7 +8721,7 @@ class BrowserDownloadDelegate: NSObject, WKDownloadDelegate, BrowserSuggestedFil
     private var activeDownloads: [ObjectIdentifier: DownloadState] = [:]
     private var suggestedFilenameOverrides: [ObjectIdentifier: String] = [:]
     private let activeDownloadsLock = NSLock()
-    // CmuxWebView reads this flag synchronously from a WebKit callback. Keep
+    // WmuxWebView reads this flag synchronously from a WebKit callback. Keep
     // the callback independent of Swift's MainActor executor while publishing
     // the actor-owned REPL decision as one atomic snapshot.
     private let scriptedDownloadRoutingState = OSAllocatedUnfairLock(initialState: false)
@@ -8749,7 +8749,7 @@ class BrowserDownloadDelegate: NSObject, WKDownloadDelegate, BrowserSuggestedFil
     }
 
     static let tempDir: URL = {
-        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("cmux-downloads", isDirectory: true)
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("wmux-downloads", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }()
@@ -9229,7 +9229,7 @@ final class BrowserUIDelegate: BrowserPDFPreviewActionUIDelegate {
             return nil
         }
 
-        let hasRecentMiddleClickIntent = CmuxWebView.hasRecentMiddleClickIntent(for: webView)
+        let hasRecentMiddleClickIntent = WmuxWebView.hasRecentMiddleClickIntent(for: webView)
         let popupFeaturesWereSpecified = browserNavigationPopupFeaturesWereSpecified(windowFeatures: windowFeatures)
         let shouldOpenSimpleUserGesturePopupInCurrentTab = browserNavigationShouldOpenSimpleUserGesturePopupInCurrentTab(
             navigationType: navigationAction.navigationType,
@@ -9590,7 +9590,7 @@ enum BrowserImportPlanRealizationError: LocalizedError {
             return String(
                 format: String(
                     localized: "browser.import.error.destinationCreateFailed",
-                    defaultValue: "cmux could not create the destination profile \"%@\"."
+                    defaultValue: "wmux could not create the destination profile \"%@\"."
                 ),
                 name
             )
@@ -10729,7 +10729,7 @@ enum BrowserDataImporter {
     ) throws {
         let fileManager = FileManager.default
         let tempRoot = fileManager.temporaryDirectory.appendingPathComponent(
-            "cmux-browser-import-\(UUID().uuidString)",
+            "wmux-browser-import-\(UUID().uuidString)",
             isDirectory: true
         )
         try fileManager.createDirectory(at: tempRoot, withIntermediateDirectories: true)
@@ -10826,7 +10826,7 @@ enum BrowserImportUITestFixtureLoader {
     }
 
     static func browsers(from environment: [String: String]) -> [InstalledBrowserCandidate]? {
-        guard let rawFixture = environment["CMUX_UI_TEST_BROWSER_IMPORT_FIXTURE"],
+        guard let rawFixture = environment["WMUX_UI_TEST_BROWSER_IMPORT_FIXTURE"],
               let data = rawFixture.data(using: .utf8),
               let fixture = try? JSONDecoder().decode(BrowserFixture.self, from: data) else {
             return nil
@@ -10836,7 +10836,7 @@ enum BrowserImportUITestFixtureLoader {
             InstalledBrowserProfile(
                 displayName: name,
                 rootURL: FileManager.default.temporaryDirectory
-                    .appendingPathComponent("cmux-ui-test-browser-import")
+                    .appendingPathComponent("wmux-ui-test-browser-import")
                     .appendingPathComponent(
                         fixture.browserName
                             .lowercased()
@@ -10880,7 +10880,7 @@ enum BrowserImportUITestFixtureLoader {
     }
 
     static func destinationProfiles(from environment: [String: String]) -> [BrowserProfileDefinition]? {
-        guard let rawDestinations = environment["CMUX_UI_TEST_BROWSER_IMPORT_DESTINATIONS"],
+        guard let rawDestinations = environment["WMUX_UI_TEST_BROWSER_IMPORT_DESTINATIONS"],
               let data = rawDestinations.data(using: .utf8),
               let names = try? JSONDecoder().decode([String].self, from: data),
               !names.isEmpty else {
@@ -11492,7 +11492,7 @@ extension BrowserDataImportCoordinator {
             let destinationTitleLabel = NSTextField(
                 labelWithString: String(
                     localized: "browser.import.destination.cmux",
-                    defaultValue: "cmux destination"
+                    defaultValue: "wmux destination"
                 )
             )
             registerStaticFont(destinationTitleLabel, size: 12, weight: .semibold)

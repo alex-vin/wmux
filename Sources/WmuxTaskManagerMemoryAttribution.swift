@@ -1,7 +1,7 @@
 import Foundation
 
 /// Identifies a Task Manager process owner decoded from a diagnostic payload.
-struct CmuxTaskManagerMemoryAttribution: Sendable {
+struct WmuxTaskManagerMemoryAttribution: Sendable {
     let workspaceId: UUID?
     let workspaceRef: String?
     let paneId: UUID?
@@ -13,12 +13,12 @@ struct CmuxTaskManagerMemoryAttribution: Sendable {
     init?(_ payload: [String: Any]?) {
         guard let payload else { return nil }
         self.workspaceId = Self.uuid(payload["workspace_id"])
-        self.workspaceRef = CmuxTaskManagerMemoryDiagnostic.string(payload["workspace_ref"])
+        self.workspaceRef = WmuxTaskManagerMemoryDiagnostic.string(payload["workspace_ref"])
         self.paneId = Self.uuid(payload["pane_id"])
-        self.paneRef = CmuxTaskManagerMemoryDiagnostic.string(payload["pane_ref"])
+        self.paneRef = WmuxTaskManagerMemoryDiagnostic.string(payload["pane_ref"])
         self.surfaceId = Self.uuid(payload["surface_id"])
-        self.surfaceRef = CmuxTaskManagerMemoryDiagnostic.string(payload["surface_ref"])
-        self.surfaceType = CmuxTaskManagerMemoryDiagnostic.string(payload["surface_type"])
+        self.surfaceRef = WmuxTaskManagerMemoryDiagnostic.string(payload["surface_ref"])
+        self.surfaceType = WmuxTaskManagerMemoryDiagnostic.string(payload["surface_type"])
         if workspaceId == nil,
            workspaceRef == nil,
            paneId == nil,
@@ -59,7 +59,7 @@ struct CmuxTaskManagerMemoryAttribution: Sendable {
         if let value = raw as? UUID {
             return value
         }
-        guard let value = CmuxTaskManagerMemoryDiagnostic.string(raw) else {
+        guard let value = WmuxTaskManagerMemoryDiagnostic.string(raw) else {
             return nil
         }
         return UUID(uuidString: value)

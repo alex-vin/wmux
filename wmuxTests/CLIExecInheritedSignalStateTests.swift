@@ -9,7 +9,7 @@ import Testing
 struct CLIExecInheritedSignalStateTests {
     @Test(arguments: ["restore", "fork"], [false, true])
     func restoredAgentReceivesResizeSignals(verb: String, legacy: Bool) throws {
-        let runner = CMUXCLIErrorOutputRegressionTests()
+        let runner = WMUXCLIErrorOutputRegressionTests()
         let cliPath = try runner.bundledCLIPath()
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("cmux-signal-\(UUID().uuidString)", isDirectory: true)
@@ -58,8 +58,8 @@ struct CLIExecInheritedSignalStateTests {
             "HOME": root.path,
             "CFFIXED_USER_HOME": root.path,
             "SHELL": "/bin/sh",
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_CLI_SENTRY_DISABLED": "1"
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_CLI_SENTRY_DISABLED": "1"
         ]
         let result = runner.runProcess(
             executablePath: cliPath,

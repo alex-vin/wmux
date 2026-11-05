@@ -1,9 +1,9 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -13,9 +13,9 @@ import Testing
 struct CloudTerminalStartupLatencyTests {
     @Test
     func terminalCreationFailuresKeepTheirKnownCause() {
-        #expect(CloudDiagnosticFailure.classify(CmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab_source")) == .notFound)
-        #expect(CloudDiagnosticFailure.classify(CmuxTuiSurfaceProvider.ProviderError.invalidSnapshot("machine")) == .response)
-        #expect(CloudDiagnosticFailure.classify(CmuxTuiSurfaceProvider.ProviderError.terminalAttachTimedOut(
+        #expect(CloudDiagnosticFailure.classify(WmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab_source")) == .notFound)
+        #expect(CloudDiagnosticFailure.classify(WmuxTuiSurfaceProvider.ProviderError.invalidSnapshot("machine")) == .response)
+        #expect(CloudDiagnosticFailure.classify(WmuxTuiSurfaceProvider.ProviderError.terminalAttachTimedOut(
             terminalID: "term_created", failure: .transportUnavailable
         )) == .timeout)
     }

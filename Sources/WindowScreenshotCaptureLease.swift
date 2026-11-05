@@ -1,5 +1,5 @@
 #if DEBUG
-import CmuxFoundation
+import WmuxFoundation
 
 /// Keeps screenshot admission claimed until its asynchronous operation retires.
 final class WindowScreenshotCaptureLease: Sendable {

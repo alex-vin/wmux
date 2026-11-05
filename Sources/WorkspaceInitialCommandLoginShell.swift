@@ -47,7 +47,7 @@ enum WorkspaceInitialCommandLoginShell {
         case "fish":
             payload = """
             set -l _cmux_previous_shim ""
-            for _cmux_candidate_shim in "$CMUX_CLAUDE_WRAPPER_SHIM_ROOT" "$CMUX_AGENT_COMMAND_SHIM_ROOT"
+            for _cmux_candidate_shim in "$WMUX_CLAUDE_WRAPPER_SHIM_ROOT" "$WMUX_AGENT_COMMAND_SHIM_ROOT"
                 if test -n "$_cmux_candidate_shim"; and test "$_cmux_candidate_shim" != "$_cmux_previous_shim"; and /bin/sh -c \(check) cmux "$_cmux_candidate_shim"
                     set -gx PATH "$_cmux_candidate_shim" $PATH
                     set _cmux_previous_shim "$_cmux_candidate_shim"
@@ -75,7 +75,7 @@ enum WorkspaceInitialCommandLoginShell {
     private static var posixShimRootPrepend: String {
         """
         _cmux_previous_shim=''
-        for _cmux_candidate_shim in "${CMUX_CLAUDE_WRAPPER_SHIM_ROOT:-}" "${CMUX_AGENT_COMMAND_SHIM_ROOT:-}"; do
+        for _cmux_candidate_shim in "${WMUX_CLAUDE_WRAPPER_SHIM_ROOT:-}" "${WMUX_AGENT_COMMAND_SHIM_ROOT:-}"; do
             if [ -n "$_cmux_candidate_shim" ] && [ "$_cmux_candidate_shim" != "$_cmux_previous_shim" ] && /bin/sh -c \(shellSingleQuoted(shimRootCheck)) cmux "$_cmux_candidate_shim"; then
                 PATH="$_cmux_candidate_shim${PATH:+:$PATH}"; export PATH
                 _cmux_previous_shim=$_cmux_candidate_shim

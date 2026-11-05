@@ -94,18 +94,18 @@ function base64NulSeparated(values: string[]): string {
 
 function hookEnvironment(cwd: string): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env };
-  const launchKind = String(env.CMUX_AGENT_LAUNCH_KIND || "").toLowerCase();
+  const launchKind = String(env.WMUX_AGENT_LAUNCH_KIND || "").toLowerCase();
   const shouldCaptureLaunch =
     launchKind !== "campfire" ||
-    !env.CMUX_AGENT_LAUNCH_EXECUTABLE ||
-    !env.CMUX_AGENT_LAUNCH_ARGV_B64 ||
-    !env.CMUX_AGENT_LAUNCH_CWD;
+    !env.WMUX_AGENT_LAUNCH_EXECUTABLE ||
+    !env.WMUX_AGENT_LAUNCH_ARGV_B64 ||
+    !env.WMUX_AGENT_LAUNCH_CWD;
   if (shouldCaptureLaunch) {
     const argv = normalizedLaunchArgv();
-    env.CMUX_AGENT_LAUNCH_KIND = "campfire";
-    env.CMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("campfire");
-    env.CMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
-    env.CMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
+    env.WMUX_AGENT_LAUNCH_KIND = "campfire";
+    env.WMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("campfire");
+    env.WMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
+    env.WMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
   }
   return env;
 }
@@ -162,8 +162,8 @@ function lastAssistantMessage(event: AgentEndEvent): string | undefined {
 }
 
 function hookInvocation(subcommand: string, ctx: ExtensionContext, extra: Record<string, unknown> = {}): HookInvocation | null {
-  if (process.env.CMUX_CAMPFIRE_HOOKS_DISABLED === "1") return null;
-  if (!process.env.CMUX_SURFACE_ID) return null;
+  if (process.env.WMUX_CAMPFIRE_HOOKS_DISABLED === "1") return null;
+  if (!process.env.WMUX_SURFACE_ID) return null;
   // Newer campfire ships this integration natively (its built-in wmux bridge
   // publishes the flag below). Defer to it so nothing double-fires; this
   // installed file then only serves campfire versions without the native
@@ -186,7 +186,7 @@ function hookInvocation(subcommand: string, ctx: ExtensionContext, extra: Record
     event: eventName(subcommand),
     ...extra,
   };
-  const wmux = process.env.CMUX_CAMPFIRE_CMUX_BIN || "wmux";
+  const wmux = process.env.WMUX_CAMPFIRE_CMUX_BIN || "wmux";
   return {
     wmux,
     cwd,
@@ -215,7 +215,7 @@ async function sendHook(
     };
     try {
       const child = spawn(invocation.wmux, ["hooks", "enqueue", "campfire", subcommand], {
-        env: { ...invocation.env, CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
+        env: { ...invocation.env, WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
         stdio: ["pipe", "ignore", "ignore"],
         detached: !waitForExit,
       });

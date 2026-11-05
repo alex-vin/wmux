@@ -1,16 +1,16 @@
 import AppKit
-import CmuxWindowing
-import CmuxFoundation
-import CmuxAppKitSupportUI
+import WmuxWindowing
+import WmuxFoundation
+import WmuxAppKitSupportUI
 
 // MARK: - Window display placement (`window.display` / `window.displays`)
 
 extension AppDelegate {
     /// A connected display, surfaced by the `window.displays` control command and
     /// the `cmux window display --list` CLI so callers can discover screen names.
-    /// Lifted to ``CmuxWindowing/DisplayInfo``; aliased so existing
+    /// Lifted to ``WmuxWindowing/DisplayInfo``; aliased so existing
     /// `AppDelegate.DisplayInfo` references stay source-identical.
-    typealias DisplayInfo = CmuxWindowing.DisplayInfo
+    typealias DisplayInfo = WmuxWindowing.DisplayInfo
 
     /// All currently-connected displays, in `NSScreen.screens` order.
     func availableDisplays() -> [DisplayInfo] {

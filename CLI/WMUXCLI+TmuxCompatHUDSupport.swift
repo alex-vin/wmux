@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 extension WMUXCLI {
@@ -86,9 +86,9 @@ extension WMUXCLI {
     func tmuxOMXHudConfigDisablesHud(cwd: String?) -> Bool {
         let environment = ProcessInfo.processInfo.environment
         if tmuxBooleanValue(environment["OMX_HUD_ENABLED"]) == false
-            || tmuxBooleanValue(environment["CMUX_OMX_HUD_ENABLED"]) == false
+            || tmuxBooleanValue(environment["WMUX_OMX_HUD_ENABLED"]) == false
             || tmuxBooleanValue(environment["OMX_HUD_DISABLED"]) == true
-            || tmuxBooleanValue(environment["CMUX_OMX_HUD_DISABLED"]) == true {
+            || tmuxBooleanValue(environment["WMUX_OMX_HUD_DISABLED"]) == true {
             return true
         }
 
@@ -119,8 +119,8 @@ extension WMUXCLI {
     /// Whether `commandText`, a pane command as a shell would receive it, starts the OMX HUD.
     func tmuxCommandLooksLikeOMXHud(_ commandText: String) -> Bool {
         let environment = ProcessInfo.processInfo.environment
-        let launchedThroughOMXShim = environment["CMUX_OMX_CMUX_BIN"] != nil
-            || environment["CMUX_AGENT_LAUNCH_KIND"] == "omx"
+        let launchedThroughOMXShim = environment["WMUX_OMX_CMUX_BIN"] != nil
+            || environment["WMUX_AGENT_LAUNCH_KIND"] == "omx"
         return OMXHudCommandMatcher().matches(
             command: commandText,
             launchedThroughOMXShim: launchedThroughOMXShim
@@ -129,8 +129,8 @@ extension WMUXCLI {
 
     func tmuxDebugDiagnosticsEnabled() -> Bool {
         let environment = ProcessInfo.processInfo.environment
-        return tmuxBooleanValue(environment["CMUX_DEBUG"]) == true
-            || tmuxBooleanValue(environment["CMUX_TMUX_DEBUG"]) == true
+        return tmuxBooleanValue(environment["WMUX_DEBUG"]) == true
+            || tmuxBooleanValue(environment["WMUX_TMUX_DEBUG"]) == true
     }
 
     func tmuxWriteDebugDiagnostic(_ message: String) {

@@ -1,9 +1,9 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -223,7 +223,7 @@ struct RestoredAgentShellActivityLivenessTests {
         RestorableAgentSessionIndex.load(
             homeDirectory: "/tmp/cmux-deferred-restore-empty-home",
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processIdentityProvider: { _ in nil }
         )
@@ -241,12 +241,12 @@ struct RestoredAgentShellActivityLivenessTests {
         )
         // Pi overwrites its argv with a bare title, so the foreground process
         // carries no session identity of its own.
-        let piProcess = CmuxTopProcessArguments(arguments: ["pi"], environment: [:])
-        let otherPiSession = CmuxTopProcessArguments(
+        let piProcess = WmuxTopProcessArguments(arguments: ["pi"], environment: [:])
+        let otherPiSession = WmuxTopProcessArguments(
             arguments: ["pi", "--session", "9b7e1c2d-3a4f-4e5b-8c6d-7e8f9a0b1c2d"],
             environment: [:]
         )
-        let shellProcess = CmuxTopProcessArguments(arguments: ["zsh", "-l"], environment: [:])
+        let shellProcess = WmuxTopProcessArguments(arguments: ["zsh", "-l"], environment: [:])
 
         #expect(!RestoredAgentForegroundProcess.matches(
             agent,
@@ -285,8 +285,8 @@ struct RestoredAgentShellActivityLivenessTests {
             workingDirectory: Self.projectDirectory,
             launchCommand: nil
         )
-        let barePi = CmuxTopProcessArguments(arguments: ["pi"], environment: [:])
-        let sameSessionPi = CmuxTopProcessArguments(
+        let barePi = WmuxTopProcessArguments(arguments: ["pi"], environment: [:])
+        let sameSessionPi = WmuxTopProcessArguments(
             arguments: ["pi", "--session", Self.sessionID],
             environment: [:]
         )
@@ -323,7 +323,7 @@ struct RestoredAgentShellActivityLivenessTests {
             agent,
             foregroundProcessID: 4242,
             processArguments: { _ in
-                CmuxTopProcessArguments(arguments: ["pi", "--session", Self.sessionID], environment: [:])
+                WmuxTopProcessArguments(arguments: ["pi", "--session", Self.sessionID], environment: [:])
             },
             processIdentity: { _ in
                 identityRead += 1
@@ -411,7 +411,7 @@ struct RestoredAgentShellActivityLivenessTests {
         )
         let identity = AgentPIDProcessIdentity(pid: 4242, startSeconds: 100, startMicroseconds: 0)
         let recorded = RestoredAgentLiveness.RecordedProcess(pid: 4242, identity: identity)
-        let barePi = CmuxTopProcessArguments(arguments: ["pi"], environment: [:])
+        let barePi = WmuxTopProcessArguments(arguments: ["pi"], environment: [:])
         let workspaceId = UUID()
         let panelId = UUID()
 
@@ -436,7 +436,7 @@ struct RestoredAgentShellActivityLivenessTests {
             foregroundProcessID: 9999,
             currentProcessIdentity: { _ in nil },
             foregroundProcessArguments: { _ in
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: ["pi", "--session", Self.sessionID],
                     environment: [:]
                 )
@@ -478,7 +478,7 @@ struct RestoredAgentShellActivityLivenessTests {
             liveIndex: nil,
             foregroundProcessID: 9999,
             currentProcessIdentity: { _ in nil },
-            foregroundProcessArguments: { _ in CmuxTopProcessArguments(arguments: ["zsh", "-l"], environment: [:]) }
+            foregroundProcessArguments: { _ in WmuxTopProcessArguments(arguments: ["zsh", "-l"], environment: [:]) }
         ))
     }
 }

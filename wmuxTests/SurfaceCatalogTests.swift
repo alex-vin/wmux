@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -408,10 +408,10 @@ struct SurfaceCatalogTests {
             "browsers": [],
             "agents": [],
         ]
-        let initial = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
-        let termOne = try #require(CmuxTuiSnapshotParser.resources(from: initial).first { $0.id.key == "term_one" })
-        let termTwo = try #require(CmuxTuiSnapshotParser.resources(from: initial).first { $0.id.key == "term_two" })
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000)
+        let initial = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
+        let termOne = try #require(WmuxTuiSnapshotParser.resources(from: initial).first { $0.id.key == "term_one" })
+        let termTwo = try #require(WmuxTuiSnapshotParser.resources(from: initial).first { $0.id.key == "term_two" })
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000)
         catalog.replaceCloudState(initial, resources: [termOne, termTwo, port], info: provider.info)
         #expect(catalog.hasResources(on: machine))
 
@@ -423,12 +423,12 @@ struct SurfaceCatalogTests {
                 "value": ["id": "tab_one", "pane_id": "pane", "content_kind": "terminal", "content_id": "term_one", "name": "new"],
             ]],
         ]
-        let application = try #require(CmuxTuiSnapshotParser.applyingWithImpact(
+        let application = try #require(WmuxTuiSnapshotParser.applyingWithImpact(
             deltaPayload: try JSONSerialization.data(withJSONObject: delta),
             cursor: CloudVMCursor(generation: "g1", revision: 2),
             to: initial
         ))
-        let updated = try #require(CmuxTuiSnapshotParser.resources(from: application.state, matching: application.impact.resourceIDs).first { $0.id.key == "term_one" })
+        let updated = try #require(WmuxTuiSnapshotParser.resources(from: application.state, matching: application.impact.resourceIDs).first { $0.id.key == "term_one" })
         _ = catalog.applyCloudStateResourcePatch(
             application.state,
             resources: [updated],
@@ -460,8 +460,8 @@ struct SurfaceCatalogTests {
             "browsers": [],
             "agents": [],
         ]
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
-        let terminal = try #require(CmuxTuiSnapshotParser.resources(from: state).first)
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
+        let terminal = try #require(WmuxTuiSnapshotParser.resources(from: state).first)
         catalog.replaceCloudState(state, resources: [terminal], info: provider.info)
         #expect(catalog.hasResources(on: machine))
 
@@ -489,7 +489,7 @@ struct SurfaceCatalogTests {
             "browsers": [],
             "agents": [],
         ]
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
         var canonicalInfo = provider.info
         canonicalInfo.remoteWorkspaces = [
             SurfaceRemoteWorkspace(id: "ws", name: "canonical", index: 0, focused: true),

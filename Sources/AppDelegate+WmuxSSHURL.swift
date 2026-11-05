@@ -1,7 +1,7 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 import Bonsplit
 import Foundation
 import UniformTypeIdentifiers
@@ -27,7 +27,7 @@ enum DefaultTerminalRegistrationError: Error, LocalizedError {
         case .launchServicesRegistrationFailed:
             return String(
                 localized: "error.defaultTerminal.registrationFailed",
-                defaultValue: "cmux could not register as the default terminal app."
+                defaultValue: "wmux could not register as the default terminal app."
             )
         }
     }
@@ -179,7 +179,7 @@ enum DefaultTerminalUserAction {
             defaultValue: "macOS could not update every default terminal handler."
         )
         alert.addButton(withTitle: String(localized: "common.ok", defaultValue: "OK"))
-        alert.window.identifier = NSUserInterfaceItemIdentifier("cmux.defaultTerminalRegistrationError")
+        alert.window.identifier = NSUserInterfaceItemIdentifier("wmux.defaultTerminalRegistrationError")
         alert.runModal()
     }
 }
@@ -271,8 +271,8 @@ struct TerminalDefaultFileOpenRequest: Equatable {
 }
 
 @MainActor
-final class CmuxSSHURLProcessLauncher {
-    static let shared = CmuxSSHURLProcessLauncher()
+final class WmuxSSHURLProcessLauncher {
+    static let shared = WmuxSSHURLProcessLauncher()
 
     private var processes: [Int32: Process] = [:]
     private var isShuttingDown = false
@@ -288,7 +288,7 @@ final class CmuxSSHURLProcessLauncher {
     }
 
     @discardableResult
-    func start(request: CmuxSSHURLRequest, preferredWindow: NSWindow?) -> Bool {
+    func start(request: WmuxSSHURLRequest, preferredWindow: NSWindow?) -> Bool {
         let cliURL = Bundle.main.resourceURL?.appendingPathComponent("bin/cmux")
         guard let cliURL,
               FileManager.default.isExecutableFile(atPath: cliURL.path) else {
@@ -308,12 +308,12 @@ final class CmuxSSHURLProcessLauncher {
         process.executableURL = cliURL
         process.arguments = ["--socket", socketPath] + request.cliArguments
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_BUNDLED_CLI_PATH"] = cliURL.path
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_BUNDLED_CLI_PATH"] = cliURL.path
         // Opening an ssh:// link is the person's own action: the workspace takes focus
         // like an interactive `cmux ssh` unless the request carries `--no-focus`.
-        environment["CMUX_FOCUS_NEW"] = "1"
-        environment.removeValue(forKey: "CMUX_SOCKET")
+        environment["WMUX_FOCUS_NEW"] = "1"
+        environment.removeValue(forKey: "WMUX_SOCKET")
         process.environment = environment
 
         let outputPipe = Pipe()
@@ -331,7 +331,7 @@ final class CmuxSSHURLProcessLauncher {
                 guard terminationStatus != 0, !Self.shared.isShuttingDown else { return }
                 let format = String(
                     localized: "dialog.sshURL.launchFailed.exit",
-                    defaultValue: "cmux ssh exited with status %d."
+                    defaultValue: "wmux ssh exited with status %d."
                 )
                 Self.shared.presentLaunchFailure(
                     summary: String(format: format, Int(terminationStatus)),
@@ -353,7 +353,7 @@ final class CmuxSSHURLProcessLauncher {
             presentLaunchFailure(
                 summary: String(
                     localized: "dialog.sshURL.launchFailed.launch",
-                    defaultValue: "cmux ssh could not be launched."
+                    defaultValue: "wmux ssh could not be launched."
                 ),
                 output: error.localizedDescription,
                 preferredWindow: preferredWindow
@@ -394,7 +394,7 @@ final class CmuxSSHURLProcessLauncher {
 }
 
 @MainActor
-private final class CmuxSSHURLConfirmationGate: NSObject {
+private final class WmuxSSHURLConfirmationGate: NSObject {
     weak var connectButton: NSButton?
 
     @objc func checkboxChanged(_ sender: NSButton) {
@@ -462,7 +462,7 @@ extension AppDelegate {
         return false
     }
 
-    private struct CmuxExternalURLIntentCounts {
+    private struct WmuxExternalURLIntentCounts {
         var ssh = 0
         var navigation = 0
         var text = 0
@@ -472,22 +472,22 @@ extension AppDelegate {
         }
     }
 
-    private func cmuxExternalURLIntentCounts(in urls: [URL]) -> CmuxExternalURLIntentCounts {
-        urls.reduce(CmuxExternalURLIntentCounts()) { counts, url in
+    private func cmuxExternalURLIntentCounts(in urls: [URL]) -> WmuxExternalURLIntentCounts {
+        urls.reduce(WmuxExternalURLIntentCounts()) { counts, url in
             var nextCounts = counts
-            switch CmuxSSHURLRequest.parse(url) {
+            switch WmuxSSHURLRequest.parse(url) {
             case .success(.some), .failure:
                 nextCounts.ssh += 1
             case .success(nil):
                 break
             }
-            switch CmuxNavigationURLRequest.parse(url) {
+            switch WmuxNavigationURLRequest.parse(url) {
             case .success(.some), .failure:
                 nextCounts.navigation += 1
             case .success(nil):
                 break
             }
-            switch CmuxTextURLRequest.parse(url) {
+            switch WmuxTextURLRequest.parse(url) {
             case .success(.some), .failure:
                 nextCounts.text += 1
             case .success(nil):
@@ -499,11 +499,11 @@ extension AppDelegate {
 
     @discardableResult
     func handleCmuxNavigationURLs(from urls: [URL]) -> Bool {
-        var navigationRequests: [CmuxNavigationURLRequest] = []
-        var parseErrors: [(url: URL, error: CmuxNavigationURLParseError)] = []
+        var navigationRequests: [WmuxNavigationURLRequest] = []
+        var parseErrors: [(url: URL, error: WmuxNavigationURLParseError)] = []
 
         for url in urls {
-            switch CmuxNavigationURLRequest.parse(url) {
+            switch WmuxNavigationURLRequest.parse(url) {
             case .success(.some(let request)):
                 navigationRequests.append(request)
             case .success(nil):
@@ -538,10 +538,10 @@ extension AppDelegate {
 
     @discardableResult
     func handleCmuxSSHURLs(from urls: [URL]) -> Bool {
-        var sshURLRequests: [CmuxSSHURLRequest] = []
-        var sshURLParseErrors: [CmuxSSHURLParseError] = []
+        var sshURLRequests: [WmuxSSHURLRequest] = []
+        var sshURLParseErrors: [WmuxSSHURLParseError] = []
         for url in urls {
-            switch CmuxSSHURLRequest.parse(url) {
+            switch WmuxSSHURLRequest.parse(url) {
             case .success(.some(let request)):
                 sshURLRequests.append(request)
             case .success(nil):
@@ -568,10 +568,10 @@ extension AppDelegate {
 
     @discardableResult
     func handleCmuxTextURLs(from urls: [URL]) -> Bool {
-        var textURLRequests: [CmuxTextURLRequest] = []
-        var textURLParseErrors: [CmuxTextURLParseError] = []
+        var textURLRequests: [WmuxTextURLRequest] = []
+        var textURLParseErrors: [WmuxTextURLParseError] = []
         for url in urls {
-            switch CmuxTextURLRequest.parse(url) {
+            switch WmuxTextURLRequest.parse(url) {
             case .success(.some(let request)):
                 textURLRequests.append(request)
             case .success(nil):
@@ -596,7 +596,7 @@ extension AppDelegate {
         return true
     }
 
-    private func handleCmuxSSHURLRequest(_ request: CmuxSSHURLRequest) {
+    private func handleCmuxSSHURLRequest(_ request: WmuxSSHURLRequest) {
 #if DEBUG
         let target = request.originalURL.host ?? request.originalURL.path
         cmuxDebugLog("sshURL.prompt target=\(target) destinationLength=\(request.destination.count) hasPort=\(request.port != nil)")
@@ -612,7 +612,7 @@ extension AppDelegate {
             alert.messageText = ManagedRemoteConnectionsPolicy.disabledMessage
             alert.informativeText = String(
                 localized: "managedPolicy.remoteConnections.sshURLRefused",
-                defaultValue: "cmux cannot open SSH links while remote connections are disabled by your organization's device policy."
+                defaultValue: "wmux cannot open SSH links while remote connections are disabled by your organization's device policy."
             )
             alert.alertStyle = .informational
             alert.runModal()
@@ -631,13 +631,13 @@ extension AppDelegate {
         prepareForExplicitOpenIntentAtStartup()
         bootstrapInitialMainWindowAfterAcceptedExternalOpen(debugSource: "sshURL.confirmed")
         NSApp.activate(ignoringOtherApps: true)
-        _ = CmuxSSHURLProcessLauncher.shared.start(
+        _ = WmuxSSHURLProcessLauncher.shared.start(
             request: request,
             preferredWindow: NSApp.keyWindow ?? NSApp.mainWindow
         )
     }
 
-    private func handleCmuxTextURLRequest(_ request: CmuxTextURLRequest) {
+    private func handleCmuxTextURLRequest(_ request: WmuxTextURLRequest) {
 #if DEBUG
         let target = request.originalURL.host ?? request.originalURL.path
         cmuxDebugLog("textURL.prompt target=\(target) kind=\(request.kind.rawValue) textLength=\(request.text.count)")
@@ -675,7 +675,7 @@ extension AppDelegate {
         }
     }
 
-    private func confirmCmuxSSHURLRequest(_ request: CmuxSSHURLRequest) -> Bool {
+    private func confirmCmuxSSHURLRequest(_ request: WmuxSSHURLRequest) -> Bool {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = String(
@@ -703,7 +703,7 @@ extension AppDelegate {
             connectButton.isEnabled = false
         }
 
-        let gate = CmuxSSHURLConfirmationGate()
+        let gate = WmuxSSHURLConfirmationGate()
         if alert.buttons.count > 1 {
             gate.connectButton = alert.buttons[1]
         }
@@ -714,7 +714,7 @@ extension AppDelegate {
         return response == .alertSecondButtonReturn
     }
 
-    private func confirmCmuxTextURLRequest(_ request: CmuxTextURLRequest) -> Bool {
+    private func confirmCmuxTextURLRequest(_ request: WmuxTextURLRequest) -> Bool {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = request.kind == .prompt
@@ -750,8 +750,8 @@ extension AppDelegate {
     }
 
     private func cmuxSSHURLAccessoryView(
-        request: CmuxSSHURLRequest,
-        gate: CmuxSSHURLConfirmationGate
+        request: WmuxSSHURLRequest,
+        gate: WmuxSSHURLConfirmationGate
     ) -> NSView {
         let stack = NSStackView()
         stack.orientation = .vertical
@@ -772,7 +772,7 @@ extension AppDelegate {
         ))
         commandLabel.font = GlobalFontMagnification.systemFont(ofSize: NSFont.smallSystemFontSize, weight: .semibold)
 
-        let socketPath = CmuxSSHURLProcessLauncher.shared.resolvedSocketPath()
+        let socketPath = WmuxSSHURLProcessLauncher.shared.resolvedSocketPath()
         let commandScrollView = cmuxSSHURLTextPreview(request.cliPreview(socketPath: socketPath), height: 80)
 
         stack.addArrangedSubview(targetLabel)
@@ -785,7 +785,7 @@ extension AppDelegate {
                 defaultValue: "I trust this SSH target and want cmux to connect."
             ),
             target: gate,
-            action: #selector(CmuxSSHURLConfirmationGate.checkboxChanged(_:))
+            action: #selector(WmuxSSHURLConfirmationGate.checkboxChanged(_:))
         )
         checkbox.lineBreakMode = .byWordWrapping
         stack.addArrangedSubview(checkbox)
@@ -804,7 +804,7 @@ extension AppDelegate {
         return container
     }
 
-    private func cmuxTextURLAccessoryView(request: CmuxTextURLRequest) -> NSView {
+    private func cmuxTextURLAccessoryView(request: WmuxTextURLRequest) -> NSView {
         let stack = NSStackView()
         stack.orientation = .vertical
         stack.alignment = .leading
@@ -890,19 +890,19 @@ extension AppDelegate {
         return scrollView
     }
 
-    private func showCmuxSSHURLParseError(_ error: CmuxSSHURLParseError) {
+    private func showCmuxSSHURLParseError(_ error: WmuxSSHURLParseError) {
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = String(
             localized: "dialog.sshURL.blocked.title",
-            defaultValue: "cmux SSH Link Blocked"
+            defaultValue: "wmux SSH Link Blocked"
         )
         alert.informativeText = cmuxSSHURLParseErrorMessage(error)
         alert.addButton(withTitle: String(localized: "dialog.sshURL.blocked.ok", defaultValue: "OK"))
         alert.runModal()
     }
 
-    private func showCmuxTextURLPasteFailure(_ request: CmuxTextURLRequest) {
+    private func showCmuxTextURLPasteFailure(_ request: WmuxTextURLRequest) {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = request.kind == .prompt
@@ -910,25 +910,25 @@ extension AppDelegate {
             : String(localized: "dialog.textURL.rules.pasteFailed.title", defaultValue: "Couldn't Paste Rules Link")
         alert.informativeText = String(
             localized: "dialog.textURL.pasteFailed.message",
-            defaultValue: "cmux could not send the link text to a terminal."
+            defaultValue: "wmux could not send the link text to a terminal."
         )
         alert.addButton(withTitle: String(localized: "common.ok", defaultValue: "OK"))
         alert.runModal()
     }
 
-    private func showCmuxTextURLParseError(_ error: CmuxTextURLParseError) {
+    private func showCmuxTextURLParseError(_ error: WmuxTextURLParseError) {
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = String(
             localized: "dialog.textURL.blocked.title",
-            defaultValue: "cmux Link Blocked"
+            defaultValue: "wmux Link Blocked"
         )
         alert.informativeText = cmuxTextURLParseErrorMessage(error)
         alert.addButton(withTitle: String(localized: "dialog.textURL.blocked.ok", defaultValue: "OK"))
         alert.runModal()
     }
 
-    private func cmuxSSHURLParseErrorMessage(_ error: CmuxSSHURLParseError) -> String {
+    private func cmuxSSHURLParseErrorMessage(_ error: WmuxSSHURLParseError) -> String {
         switch error {
         case .missingDestination:
             return String(
@@ -1008,7 +1008,7 @@ extension AppDelegate {
         }
     }
 
-    private func cmuxTextURLParseErrorMessage(_ error: CmuxTextURLParseError) -> String {
+    private func cmuxTextURLParseErrorMessage(_ error: WmuxTextURLParseError) -> String {
         switch error {
         case .missingText:
             return String(

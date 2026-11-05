@@ -259,8 +259,8 @@ import Testing
     @Test func summarizerEnvironmentScrubsRecursionVarsAndPreservesBackend() {
         let policy = AutoNamingEnvironmentPolicy()
         let env = policy.summarizerEnvironment(from: [
-            "CMUX_WORKSPACE_ID": "ws",
-            "CMUX_SURFACE_ID": "sf",
+            "WMUX_WORKSPACE_ID": "ws",
+            "WMUX_SURFACE_ID": "sf",
             "CLAUDECODE": "1",
             "CLAUDE_CODE": "1",
             "CLAUDE_CODE_CHILD_SESSION": "child",
@@ -278,8 +278,8 @@ import Testing
             "PATH": "/usr/bin",
             "HOME": "/Users/dev"
         ])
-        #expect(env["CMUX_WORKSPACE_ID"] == nil)
-        #expect(env["CMUX_SURFACE_ID"] == nil)
+        #expect(env["WMUX_WORKSPACE_ID"] == nil)
+        #expect(env["WMUX_SURFACE_ID"] == nil)
         #expect(env["CLAUDECODE"] == nil)
         #expect(env["CLAUDE_CODE"] == nil)
         #expect(env["CLAUDE_CODE_CHILD_SESSION"] == nil)
@@ -301,7 +301,7 @@ import Testing
     @Test func codexSummarizerEnvironmentKeepsAuthDiscoveryButDropsOtherProviderCredentials() {
         let policy = AutoNamingEnvironmentPolicy()
         let env = policy.codexSummarizerEnvironment(from: [
-            "CMUX_WORKSPACE_ID": "ws",
+            "WMUX_WORKSPACE_ID": "ws",
             "ANTHROPIC_API_KEY": "anthropic",
             "AWS_SECRET_ACCESS_KEY": "aws",
             "GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcp.json",
@@ -312,7 +312,7 @@ import Testing
             "HOME": "/Users/dev"
         ])
 
-        #expect(env["CMUX_WORKSPACE_ID"] == nil)
+        #expect(env["WMUX_WORKSPACE_ID"] == nil)
         #expect(env["ANTHROPIC_API_KEY"] == nil)
         #expect(env["AWS_SECRET_ACCESS_KEY"] == nil)
         #expect(env["GOOGLE_APPLICATION_CREDENTIALS"] == nil)

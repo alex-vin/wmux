@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 
 extension TerminalController {
@@ -258,7 +258,7 @@ extension TerminalController {
         ])
     }
 
-    /// `workspace.cloud_vm_bind`: record which cloud machine a cmux-tui workspace hosts.
+    /// `workspace.cloud_vm_bind`: record which cloud machine a wmux-tui workspace hosts.
     /// Runs on the main actor like `workspace.cloud_vm_terminal_ready`: it mutates a
     /// published workspace property the sidebar observes. No focus change.
     func v2WorkspaceCloudVMBind(params: [String: Any]) -> V2CallResult {
@@ -284,7 +284,7 @@ extension TerminalController {
         let previousBinding = workspace.cloudVMBinding
         let sameMachine = previousBinding?.vmID == vmID
         let isBase = v2Bool(params, "base") ?? (sameMachine ? (previousBinding?.isBase ?? false) : false)
-        // Optional: which cmux-tui workspace on the machine this local workspace stands
+        // Optional: which wmux-tui workspace on the machine this local workspace stands
         // for. A rebind that omits it keeps the recorded one (Base re-opens rebind).
         let remoteRaw = v2RawString(params, "remote_workspace_id")?.trimmingCharacters(in: .whitespacesAndNewlines)
         let remoteWorkspaceID = remoteRaw?.isEmpty == false
@@ -308,7 +308,7 @@ extension TerminalController {
             "base": isBase,
             "remote_workspace_id": remoteWorkspaceID ?? NSNull(),
             "remote_workspace_name": remoteWorkspaceName ?? NSNull(),
-            "transport": "cmux-remote",
+            "transport": "wmux-remote",
         ])
     }
 

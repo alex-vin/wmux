@@ -1,5 +1,5 @@
 import Foundation
-import CmuxControlSocket
+import WmuxControlSocket
 
 extension TerminalController {
     private nonisolated static let automationCommandEnvelopePrefix = "__cmux_automation_origin "
@@ -21,7 +21,7 @@ extension TerminalController {
 
     nonisolated static func automationCommandEnvelope(
         from command: String
-    ) -> (command: String, origin: CmuxAutomationEventOrigin)? {
+    ) -> (command: String, origin: WmuxAutomationEventOrigin)? {
         guard command.hasPrefix(automationCommandEnvelopePrefix) else { return nil }
         let remainder = command.dropFirst(automationCommandEnvelopePrefix.count)
         let parts = remainder.split(separator: " ", maxSplits: 1).map(String.init)
@@ -38,7 +38,7 @@ extension TerminalController {
             .map { String($0.prefix(256)) }
         return (
             command: parts[1],
-            origin: CmuxAutomationEventOrigin(
+            origin: WmuxAutomationEventOrigin(
                 ruleID: ruleID,
                 chain: chain.isEmpty ? [ruleID] : chain
             )
@@ -198,7 +198,7 @@ extension TerminalController {
         method: String,
         params: [String: Any],
         allowFocus: Bool,
-        origin: CmuxAutomationEventOrigin
+        origin: WmuxAutomationEventOrigin
     ) async -> String {
         let request: [String: Any] = [
             "id": UUID().uuidString,
@@ -213,8 +213,8 @@ extension TerminalController {
                 defaultValue: "Could not prepare the automation action. Check the rule configuration and try again."
             )
         }
-        return await CmuxAutomationInvocationContext.$focusAllowed.withValue(allowFocus) {
-            await CmuxAutomationInvocationContext.$eventOrigin.withValue(origin) {
+        return await WmuxAutomationInvocationContext.$focusAllowed.withValue(allowFocus) {
+            await WmuxAutomationInvocationContext.$eventOrigin.withValue(origin) {
                 let response = await processCommandUsingSocketExecutionPolicyAsync(line) ?? ""
                 // Normal socket clients pass through this mapper after the
                 // dispatcher returns. Automation RPCs are in-process, so call

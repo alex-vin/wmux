@@ -1,11 +1,11 @@
-@testable import CmuxMobileHost
+@testable import WmuxMobileHost
 import Foundation
 import Testing
 import Darwin
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,7 +15,7 @@ struct AgentChatSessionRegistryHookStoreTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let sessionID = "24ec0052-450c-4914-b1dd-2ee80d4bc84b"
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 121,
@@ -33,15 +33,15 @@ struct AgentChatSessionRegistryHookStoreTests {
             in: snapshot,
             processArgumentsAndEnvironment: { pid in
                 guard pid == 121 else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: [
                         "node",
                         "/Users/example/.cmux-agent-wrapper/subrouter.js",
                     ],
                     environment: [
-                        "CMUX_AGENT_LAUNCH_KIND": "claude",
+                        "WMUX_AGENT_LAUNCH_KIND": "claude",
                         "CLAUDE_CODE_SESSION_ID": sessionID,
-                        "CMUX_AGENT_LAUNCH_CWD": "/Users/example/opaque-project",
+                        "WMUX_AGENT_LAUNCH_CWD": "/Users/example/opaque-project",
                     ]
                 )
             },
@@ -100,7 +100,7 @@ struct AgentChatSessionRegistryHookStoreTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let sessionID = "24ec0052-450c-4914-b1dd-2ee80d4bc84b"
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 122,
@@ -118,14 +118,14 @@ struct AgentChatSessionRegistryHookStoreTests {
             in: snapshot,
             processArgumentsAndEnvironment: { pid in
                 guard pid == 122 else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: [
                         "node",
                         "/Users/example/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js",
                     ],
                     environment: [
                         "CLAUDE_CODE_SESSION_ID": sessionID,
-                        "CMUX_AGENT_LAUNCH_CWD": "/Users/example/not-authoritative",
+                        "WMUX_AGENT_LAUNCH_CWD": "/Users/example/not-authoritative",
                     ]
                 )
             },
@@ -277,8 +277,8 @@ struct AgentChatSessionRegistryHookStoreTests {
         path: String?,
         workspaceID: UUID,
         surfaceID: UUID
-    ) -> CmuxTopProcessInfo {
-        CmuxTopProcessInfo(
+    ) -> WmuxTopProcessInfo {
+        WmuxTopProcessInfo(
             pid: pid,
             parentPID: 1,
             name: name,

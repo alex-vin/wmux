@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -136,9 +136,9 @@ struct CLIVaultForkSelectorTests {
 
     private static func runCLI(cliPath: String, socketPath: String, arguments: [String]) -> ProcessRunResult {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let process = Process()
         let stdoutPipe = Pipe()

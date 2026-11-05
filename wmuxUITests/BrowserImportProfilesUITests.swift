@@ -144,15 +144,15 @@ final class BrowserImportProfilesUITests: XCTestCase {
 
     private func launchApp() -> XCUIApplication {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_FIXTURE"] = #"{"browserName":"Helium","profiles":["You","austin"]}"#
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_DESTINATIONS"] = #"["Default"]"#
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_MODE"] = "capture-only"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_CAPTURE_PATH"] = capturePath
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_VARIANT"] = "inlineStrip"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_SHOW"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_DISMISSED"] = "0"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_BLANK_BROWSER"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_FIXTURE"] = #"{"browserName":"Helium","profiles":["You","austin"]}"#
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_DESTINATIONS"] = #"["Default"]"#
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_MODE"] = "capture-only"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_CAPTURE_PATH"] = capturePath
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_VARIANT"] = "inlineStrip"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_SHOW"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_DISMISSED"] = "0"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_BLANK_BROWSER"] = "1"
         launchAndActivate(app)
         openImportWizardFromBlankImportHint(app)
         return app
@@ -160,12 +160,12 @@ final class BrowserImportProfilesUITests: XCTestCase {
 
     private func launchAppForBlankImportHint() -> XCUIApplication {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_VARIANT"] = "inlineStrip"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_SHOW"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_DISMISSED"] = "0"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_BLANK_BROWSER"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SETTINGS_OPEN_CAPTURE_PATH"] = settingsOpenCapturePath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_VARIANT"] = "inlineStrip"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_SHOW"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_DISMISSED"] = "0"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_BLANK_BROWSER"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SETTINGS_OPEN_CAPTURE_PATH"] = settingsOpenCapturePath
         launchAndActivate(app)
         waitForBlankImportHint(app)
         return app

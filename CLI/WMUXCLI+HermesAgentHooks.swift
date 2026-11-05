@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 
@@ -71,7 +71,7 @@ extension WMUXCLI {
         env: [String: String]
     ) -> String? {
         guard def.name == "hermes-agent",
-              env["CMUX_HERMES_TUI_HOOK_BOOTSTRAP"] == "1",
+              env["WMUX_HERMES_TUI_HOOK_BOOTSTRAP"] == "1",
               let temporaryDirectory = normalizedHookValue(env["TMPDIR"]),
               temporaryDirectory.hasPrefix("/") else {
             return nil

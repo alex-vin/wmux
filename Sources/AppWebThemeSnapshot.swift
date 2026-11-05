@@ -1,8 +1,8 @@
-import CmuxFoundation
-import CmuxCloud
+import WmuxFoundation
+import WmuxCloud
 import AppKit
-import CmuxBrowser
-import CmuxTerminalCore
+import WmuxBrowser
+import WmuxTerminalCore
 import Foundation
 
 @MainActor
@@ -21,14 +21,14 @@ struct AppWebThemeSnapshot: Equatable {
         return resolved(
             backgroundColor: backgroundColor,
             foregroundColor: foregroundColor,
-            accent: (AppDelegate.shared?.accentColor ?? CmuxAccentColor())
+            accent: (AppDelegate.shared?.accentColor ?? WmuxAccentColor())
         )
     }
 
     static func resolved(
         backgroundColor: NSColor,
         foregroundColor: NSColor,
-        accent: CmuxAccentColor = CmuxAccentColor()
+        accent: WmuxAccentColor = WmuxAccentColor()
     ) -> AppWebThemeSnapshot {
         let colorScheme = cmuxReadableColorScheme(for: backgroundColor)
         let appearance = colorScheme == .dark ? "dark" : "light"
@@ -68,11 +68,11 @@ struct AppWebThemeSnapshot: Equatable {
         let browserTheme = theme.browserTheme
         let themedQueryNames = Set(browserTheme.queryItems.map(\.name))
         queryItems.removeAll { themedQueryNames.contains($0.name) }
-        queryItems.removeAll { $0.name == "cmux_app" }
-        queryItems.removeAll { $0.name == "cmux_scheme" }
+        queryItems.removeAll { $0.name == "wmux_app" }
+        queryItems.removeAll { $0.name == "wmux_scheme" }
         queryItems.append(contentsOf: browserTheme.queryItems)
-        queryItems.append(URLQueryItem(name: "cmux_app", value: "1"))
-        queryItems.append(URLQueryItem(name: "cmux_scheme", value: AuthEnvironment.callbackScheme))
+        queryItems.append(URLQueryItem(name: "wmux_app", value: "1"))
+        queryItems.append(URLQueryItem(name: "wmux_scheme", value: AuthEnvironment.callbackScheme))
         components?.queryItems = queryItems
         return components?.url ?? base
     }

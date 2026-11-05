@@ -1,13 +1,13 @@
 import AppKit
 import Bonsplit
 import Combine
-import CmuxSettings
-import CmuxTerminal
-import CmuxWorkspaces
+import WmuxSettings
+import WmuxTerminal
+import WmuxWorkspaces
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -3068,7 +3068,7 @@ struct WorkspaceProcessWideObserverRetirementTests {
             workspace.bonsplitController.configuration = configuration
             NotificationCenter.default.post(
                 name: .cmuxFeatureFlagsDidChange,
-                object: CmuxFeatureFlags.shared
+                object: WmuxFeatureFlags.shared
             )
             await drainMainActorQueue()
             #expect(!workspace.bonsplitController.configuration.appearance.splitButtons.isEmpty)
@@ -3081,7 +3081,7 @@ struct WorkspaceProcessWideObserverRetirementTests {
             // mutate a workspace whose window has already closed.
             NotificationCenter.default.post(
                 name: .cmuxFeatureFlagsDidChange,
-                object: CmuxFeatureFlags.shared
+                object: WmuxFeatureFlags.shared
             )
             workspace.retireFromOwningTabManager()
             await drainMainActorQueue()
@@ -3090,7 +3090,7 @@ struct WorkspaceProcessWideObserverRetirementTests {
             for _ in 0..<3 {
                 NotificationCenter.default.post(
                     name: .cmuxFeatureFlagsDidChange,
-                    object: CmuxFeatureFlags.shared
+                    object: WmuxFeatureFlags.shared
                 )
             }
             await drainMainActorQueue()

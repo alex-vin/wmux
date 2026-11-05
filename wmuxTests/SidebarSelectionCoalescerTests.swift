@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 private actor SidebarTestSleeperRegistrationGate {
     private var isOpen: Bool

@@ -1,4 +1,4 @@
-import CmuxSudoBroker
+import WmuxSudoBroker
 import Darwin
 import Foundation
 

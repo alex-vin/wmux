@@ -1,9 +1,9 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -19,7 +19,7 @@ struct CloudVMStateSnapshotComparisonTests {
     }
 
     private func state(_ object: [String: Any]) throws -> CloudVMState {
-        try #require(CmuxTuiSnapshotParser.state(fromSnapshot: object, machine: .cloud("vm-test")))
+        try #require(WmuxTuiSnapshotParser.state(fromSnapshot: object, machine: .cloud("vm-test")))
     }
 
     @Test("Connection age and request-client churn do not invalidate a session revision")

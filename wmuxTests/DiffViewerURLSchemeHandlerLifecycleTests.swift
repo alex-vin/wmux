@@ -1,10 +1,10 @@
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -30,7 +30,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
             try? FileManager.default.removeItem(at: fixtureURL)
         }
 
-        let files: [[String: String]] = (0..<CmuxDiffViewerURLSchemeHandler.maxRegisteredFiles).map { index in
+        let files: [[String: String]] = (0..<WmuxDiffViewerURLSchemeHandler.maxRegisteredFiles).map { index in
             [
                 "request_path": index == 0 ? "/index.html" : "/asset-\(index).html",
                 "file_path": entryURL.path,
@@ -40,7 +40,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
         let manifest: [String: Any] = ["token": token, "files": files]
         try JSONSerialization.data(withJSONObject: manifest).write(to: manifestURL, options: .atomic)
 
-        let handler = CmuxDiffViewerURLSchemeHandler()
+        let handler = WmuxDiffViewerURLSchemeHandler()
         #expect(await handler.registerFromManifest(token: token))
         #expect(handler.diffViewerRestorable(token: token, requestPath: "/index.html"))
 
@@ -52,16 +52,16 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
         let oversizedManifest: [String: Any] = ["token": token, "files": oversizedFiles]
         try JSONSerialization.data(withJSONObject: oversizedManifest)
             .write(to: manifestURL, options: .atomic)
-        let freshHandler = CmuxDiffViewerURLSchemeHandler()
+        let freshHandler = WmuxDiffViewerURLSchemeHandler()
         #expect(!(await freshHandler.registerFromManifest(token: token)))
         #expect(!freshHandler.diffViewerRestorable(token: token, requestPath: "/index.html"))
     }
 
     @Test
     func oversizedAllowlistIsRejectedAtRegistrationBoundary() async {
-        let handler = CmuxDiffViewerURLSchemeHandler()
-        let files = (0...CmuxDiffViewerURLSchemeHandler.maxRegisteredFiles).map { index in
-            CmuxDiffViewerURLSchemeHandler.RegisteredFile(
+        let handler = WmuxDiffViewerURLSchemeHandler()
+        let files = (0...WmuxDiffViewerURLSchemeHandler.maxRegisteredFiles).map { index in
+            WmuxDiffViewerURLSchemeHandler.RegisteredFile(
                 requestPath: "/asset-\(index).html",
                 fileURL: URL(fileURLWithPath: "/tmp/nonexistent-\(index).html"),
                 mimeType: "text/html"
@@ -71,7 +71,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
         do {
             try await handler.register(token: UUID().uuidString.lowercased(), files: files)
             Issue.record("Expected an oversized allowlist to be rejected")
-        } catch let error as CmuxDiffViewerSessionError {
+        } catch let error as WmuxDiffViewerSessionError {
             #expect(error == .allowlistTooLarge)
         } catch {
             Issue.record("Unexpected registration error: \(error)")
@@ -137,7 +137,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
     @Test(.timeLimit(.minutes(1)))
     func streamRefreshesManifestWhenTypedSessionAddsPatch() async throws {
         let token = UUID().uuidString.lowercased()
-        let trustedRoot = CmuxDiffViewerSessionPreparer.defaultTrustedRootURL
+        let trustedRoot = WmuxDiffViewerSessionPreparer.defaultTrustedRootURL
         let fixtureRoot = trustedRoot
             .appendingPathComponent("typed-session-refresh-\(UUID().uuidString)", isDirectory: true)
         let pageURL = fixtureRoot.appendingPathComponent("viewer.html", isDirectory: false)
@@ -177,7 +177,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
             "files": manifestFiles(false),
         ]).write(to: manifestURL, options: .atomic)
 
-        let handler = CmuxDiffViewerURLSchemeHandler()
+        let handler = WmuxDiffViewerURLSchemeHandler()
         try await handler.register(
             token: token,
             files: [
@@ -185,7 +185,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
             ]
         )
         let patchViewerURL = try #require(URL(
-            string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)\(patchPath)"
+            string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)\(patchPath)"
         ))
         #expect(handler.registeredFile(for: patchViewerURL) == nil)
 
@@ -216,9 +216,9 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
         try FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: rootURL) }
 
-        let handler = CmuxDiffViewerURLSchemeHandler()
+        let handler = WmuxDiffViewerURLSchemeHandler()
         let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
-        var registeredFiles: [CmuxDiffViewerURLSchemeHandler.RegisteredFile] = []
+        var registeredFiles: [WmuxDiffViewerURLSchemeHandler.RegisteredFile] = []
         var requests: [(task: DiffViewerRecordingSchemeTask, expectedBody: Data)] = []
 
         for index in 0..<8 {
@@ -232,7 +232,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
                 mimeType: "text/javascript"
             ))
             let requestURL = try #require(URL(
-                string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)\(requestPath)"
+                string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)\(requestPath)"
             ))
             requests.append((
                 DiffViewerRecordingSchemeTask(request: URLRequest(url: requestURL)),
@@ -334,7 +334,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
             ))
 
             let token = UUID().uuidString.lowercased()
-            let trustedRoot = CmuxDiffViewerSessionPreparer.defaultTrustedRootURL
+            let trustedRoot = WmuxDiffViewerSessionPreparer.defaultTrustedRootURL
             let fixtureRoot = trustedRoot
                 .appendingPathComponent("deferred-navigation-\(UUID().uuidString)", isDirectory: true)
             let openingURL = fixtureRoot.appendingPathComponent("opening.html", isDirectory: false)
@@ -354,7 +354,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
                 try? FileManager.default.removeItem(at: fixtureRoot)
             }
 
-            let handler = CmuxDiffViewerURLSchemeHandler.shared
+            let handler = WmuxDiffViewerURLSchemeHandler.shared
             try await handler.register(
                 token: token,
                 files: [
@@ -366,7 +366,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
                 ]
             )
             let completedViewerURL = try #require(URL(
-                string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/completed.html"
+                string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/completed.html"
             ))
             #expect(handler.registeredFile(for: completedViewerURL) == nil)
 
@@ -415,7 +415,7 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
     }
 
     private func makeFixture() async throws -> (
-        handler: CmuxDiffViewerURLSchemeHandler,
+        handler: WmuxDiffViewerURLSchemeHandler,
         webView: WKWebView,
         rootURL: URL,
         fileURL: URL,
@@ -430,13 +430,13 @@ struct DiffViewerURLSchemeHandlerLifecycleTests {
         try "<!doctype html><title>deadlock regression</title>"
             .write(to: fileURL, atomically: true, encoding: .utf8)
 
-        let handler = CmuxDiffViewerURLSchemeHandler()
+        let handler = WmuxDiffViewerURLSchemeHandler()
         try await handler.register(
             token: token,
             files: [.init(requestPath: "/index.html", fileURL: fileURL, mimeType: "text/html")]
         )
         let requestURL = try #require(URL(
-            string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html"
+            string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html"
         ))
         let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
         return (handler, webView, rootURL, fileURL, requestURL)

@@ -1,4 +1,4 @@
-import CmuxAgentJournal
+import WmuxAgentJournal
 import Foundation
 
 extension WMUXCLI {

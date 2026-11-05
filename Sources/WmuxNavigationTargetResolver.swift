@@ -13,10 +13,10 @@ import Foundation
 ///
 /// The type is a plain value over snapshot descriptors so the resolution rules
 /// are unit-testable without launching the app.
-struct CmuxNavigationTargetResolver {
-    typealias SurfaceDescriptor = CmuxNavigationSurfaceDescriptor
-    typealias WorkspaceDescriptor = CmuxNavigationWorkspaceDescriptor
-    typealias Resolution = CmuxNavigationResolution
+struct WmuxNavigationTargetResolver {
+    typealias SurfaceDescriptor = WmuxNavigationSurfaceDescriptor
+    typealias WorkspaceDescriptor = WmuxNavigationWorkspaceDescriptor
+    typealias Resolution = WmuxNavigationResolution
 
     let workspaces: [WorkspaceDescriptor]
     private let workspaceByRuntimeId: [UUID: WorkspaceDescriptor]
@@ -60,7 +60,7 @@ struct CmuxNavigationTargetResolver {
 
     /// Resolves a parsed navigation target to current-session identifiers, or
     /// nil when no open workspace/pane/surface matches either identity.
-    func resolve(_ request: CmuxNavigationURLRequest) -> Resolution? {
+    func resolve(_ request: WmuxNavigationURLRequest) -> Resolution? {
         if let resolution = resolve(request.target) {
             return resolution
         }
@@ -85,7 +85,7 @@ struct CmuxNavigationTargetResolver {
         }
     }
 
-    func resolve(_ target: CmuxNavigationURLRequest.Target) -> Resolution? {
+    func resolve(_ target: WmuxNavigationURLRequest.Target) -> Resolution? {
         switch target {
         case .workspace(let workspaceId):
             return resolveWorkspace(workspaceId).map { .workspace(workspaceId: $0.workspaceId) }

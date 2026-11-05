@@ -1,5 +1,5 @@
-import CmuxNotifications
-import CmuxSettings
+import WmuxNotifications
+import WmuxSettings
 import Foundation
 
 /// Live-retargeting delivery and clear semantics for agent notifications

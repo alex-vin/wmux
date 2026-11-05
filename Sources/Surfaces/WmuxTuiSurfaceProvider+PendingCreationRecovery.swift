@@ -1,4 +1,4 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 
 /// Read-your-write overlays for Cloud terminal creation and rename receipts.
@@ -6,7 +6,7 @@ import Foundation
 /// This extension owns the transient pending metadata used while the accepted
 /// daemon graph catches up with a mutation response.
 @MainActor
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Merges pending mutation receipts into derived rows until an accepted
     /// graph reaches each receipt. The canonical graph is never edited here.
     /// A generation change, or a cursorless snapshot after a versioned receipt,

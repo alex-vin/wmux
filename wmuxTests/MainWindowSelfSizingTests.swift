@@ -2,8 +2,8 @@
 import AppKit
 import SwiftUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -197,7 +197,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
     /// titlebar the user can grab) where the caller put it.
     @MainActor
     func testSetFrameRaisesUndersizedFrameToMinimumContentSize() {
-        let window = CmuxMainWindow(
+        let window = WmuxMainWindow(
             contentRect: NSRect(x: 0, y: 0, width: 900, height: 600),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
@@ -209,7 +209,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
             window.close()
         }
 
-        let minimum = CmuxMainWindow.minimumContentSize
+        let minimum = WmuxMainWindow.minimumContentSize
         let undersized = NSRect(x: 80, y: 500, width: 220, height: 120)
         window.setFrame(undersized, display: false)
 
@@ -235,7 +235,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
     @MainActor
     func testAnimatingSetFrameRaisesUndersizedFrameToMinimumContentSize() {
         for animate in [false, true] {
-            let window = CmuxMainWindow(
+            let window = WmuxMainWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 900, height: 600),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered,
@@ -247,7 +247,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
                 window.close()
             }
 
-            let minimum = CmuxMainWindow.minimumContentSize
+            let minimum = WmuxMainWindow.minimumContentSize
             let undersized = NSRect(x: 80, y: 500, width: 800, height: 200)
             window.setFrame(undersized, display: false, animate: animate)
 
@@ -272,9 +272,9 @@ final class MainWindowSelfSizingTests: XCTestCase {
     func testFrameRaiseReturnsFittingFramesByteForByte() {
         let fitting = NSRect(x: -120.5, y: 33.25, width: 901.5, height: 612.75)
         XCTAssertEqual(
-            CmuxMainWindow.frameByRaisingUndersizedDimensions(
+            WmuxMainWindow.frameByRaisingUndersizedDimensions(
                 fitting,
-                minimumSize: CmuxMainWindow.minimumContentSize,
+                minimumSize: WmuxMainWindow.minimumContentSize,
                 currentFrame: NSRect(x: 0, y: 0, width: 1_000, height: 700),
                 isLiveResize: true
             ),
@@ -292,7 +292,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
         let current = NSRect(x: 100, y: 100, width: 1_000, height: 694)
         let proposed = NSRect(x: 100, y: 100, width: 1_000, height: 95)
         let minimum = NSSize(width: 300, height: 400)
-        let raised = CmuxMainWindow.frameByRaisingUndersizedDimensions(
+        let raised = WmuxMainWindow.frameByRaisingUndersizedDimensions(
             proposed,
             minimumSize: minimum,
             currentFrame: current,
@@ -308,7 +308,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
         let current = NSRect(x: 100, y: 100, width: 1_000, height: 694)
         let proposed = NSRect(x: 100, y: 699, width: 1_000, height: 95)
         let minimum = NSSize(width: 300, height: 400)
-        let raised = CmuxMainWindow.frameByRaisingUndersizedDimensions(
+        let raised = WmuxMainWindow.frameByRaisingUndersizedDimensions(
             proposed,
             minimumSize: minimum,
             currentFrame: current,
@@ -325,7 +325,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
         let current = NSRect(x: 100, y: 100, width: 1_000, height: 694)
         let proposed = NSRect(x: 100, y: 100, width: 1_000, height: 95)
         let minimum = NSSize(width: 300, height: 400)
-        let raised = CmuxMainWindow.frameByRaisingUndersizedDimensions(
+        let raised = WmuxMainWindow.frameByRaisingUndersizedDimensions(
             proposed,
             minimumSize: minimum,
             currentFrame: current,
@@ -341,7 +341,7 @@ final class MainWindowSelfSizingTests: XCTestCase {
         let current = NSRect(x: 100, y: 100, width: 1_000, height: 694)
         let proposed = NSRect(x: 1_020, y: 100, width: 80, height: 694)
         let minimum = NSSize(width: 300, height: 400)
-        let raised = CmuxMainWindow.frameByRaisingUndersizedDimensions(
+        let raised = WmuxMainWindow.frameByRaisingUndersizedDimensions(
             proposed,
             minimumSize: minimum,
             currentFrame: current,

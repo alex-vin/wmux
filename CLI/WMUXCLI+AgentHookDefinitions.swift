@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 extension WMUXCLI {
@@ -20,7 +20,7 @@ extension WMUXCLI {
         let createConfigDirIfMissing: Bool // for agents whose hook dir is created lazily
         let configDirResolver: (@Sendable () -> String)?
         let sessionStoreSuffix: String // e.g. "cursor" -> ~/.cmuxterm/cursor-hook-sessions.json
-        let disableEnvVar: String   // e.g. "CMUX_CURSOR_HOOKS_DISABLED"
+        let disableEnvVar: String   // e.g. "WMUX_CURSOR_HOOKS_DISABLED"
         let hookMarker: String      // Marker in commands: "wmux hooks cursor"
         let binaryName: String
         let format: HookFormat
@@ -402,21 +402,21 @@ extension WMUXCLI {
         let routedArguments = command.hasPrefix("wmux ") ? String(command.dropFirst("wmux ".count)) : command
         let noOpSnippet = shellNoOpSnippet(noOpCommand)
         let executableExpression = agentHookCLIExecutableExpression(agent: def.name)
-        let invocation = "if [ -n \"${CMUX_SOCKET_PATH:-}\" ]; then \"$cmux_cli\" --socket \"$CMUX_SOCKET_PATH\" \(routedArguments); else \"$cmux_cli\" \(routedArguments); fi"
+        let invocation = "if [ -n \"${WMUX_SOCKET_PATH:-}\" ]; then \"$wmux_cli\" --socket \"$WMUX_SOCKET_PATH\" \(routedArguments); else \"$wmux_cli\" \(routedArguments); fi"
         let dispatch = failOpen ? "{ \(invocation); } || \(noOpSnippet)" : invocation
-        return "cmux_cli=\"\(executableExpression)\"; if [ -z \"$cmux_cli\" ] || [ ! -x \"$cmux_cli\" ]; then cmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi; if [ -n \"$CMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && [ -n \"$cmux_cli\" ]; then \(dispatch); else \(noOpSnippet); fi"
+        return "wmux_cli=\"\(executableExpression)\"; if [ -z \"$wmux_cli\" ] || [ ! -x \"$wmux_cli\" ]; then wmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi; if [ -n \"$WMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && [ -n \"$wmux_cli\" ]; then \(dispatch); else \(noOpSnippet); fi"
     }
 
     /// Synchronous Codex lifecycle hook command. Capturing the callback's
     /// parent PID before dispatch prevents a descendant from reusing an
-    /// inherited `CMUX_CODEX_PID` as its own owner identity.
+    /// inherited `WMUX_CODEX_PID` as its own owner identity.
     static func codexSynchronousAgentHookShellCommand(
         _ command: String,
         for def: AgentHookDef,
         failOpen: Bool = false
     ) -> String {
         let dispatch = agentHookShellCommand(command, for: def, failOpen: failOpen)
-        return "CMUX_CODEX_HOOK_PID=\"${PPID:-}\"; export CMUX_CODEX_HOOK_PID; \(dispatch)"
+        return "WMUX_CODEX_HOOK_PID=\"${PPID:-}\"; export WMUX_CODEX_HOOK_PID; \(dispatch)"
     }
 
     private static func exitTwoPropagatingAgentHookShellCommand(
@@ -426,7 +426,7 @@ extension WMUXCLI {
     ) -> String {
         let routedArguments = command.hasPrefix("wmux ") ? String(command.dropFirst("wmux ".count)) : command
         let noOpSnippet = shellNoOpSnippet(noOpCommand)
-        return "cmux_cli=\"${CMUX_BUNDLED_CLI_PATH:-}\"; if [ -z \"$cmux_cli\" ] || [ ! -x \"$cmux_cli\" ]; then cmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi; if [ -n \"$CMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && [ -n \"$cmux_cli\" ]; then if [ -n \"${CMUX_SOCKET_PATH:-}\" ]; then \"$cmux_cli\" --socket \"$CMUX_SOCKET_PATH\" \(routedArguments); else \"$cmux_cli\" \(routedArguments); fi; status=$?; if [ \"$status\" -eq 2 ]; then exit 2; fi; if [ \"$status\" -ne 0 ]; then \(noOpSnippet); fi; else \(noOpSnippet); fi"
+        return "wmux_cli=\"${WMUX_BUNDLED_CLI_PATH:-}\"; if [ -z \"$wmux_cli\" ] || [ ! -x \"$wmux_cli\" ]; then wmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi; if [ -n \"$WMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && [ -n \"$wmux_cli\" ]; then if [ -n \"${WMUX_SOCKET_PATH:-}\" ]; then \"$wmux_cli\" --socket \"$WMUX_SOCKET_PATH\" \(routedArguments); else \"$wmux_cli\" \(routedArguments); fi; status=$?; if [ \"$status\" -eq 2 ]; then exit 2; fi; if [ \"$status\" -ne 0 ]; then \(noOpSnippet); fi; else \(noOpSnippet); fi"
     }
 
     static func usesPinnedHookDispatch(_ def: AgentHookDef) -> Bool {
@@ -470,7 +470,7 @@ extension WMUXCLI {
             phase: "exit",
             routedArguments: routedArguments,
             socketPath: socketPath,
-            statusExpression: "$cmux_hook_status"
+            statusExpression: "$wmux_hook_status"
         )
         let fallbackInvocation = pinnedHookInvocation(
             executable: "wmux",
@@ -500,9 +500,9 @@ extension WMUXCLI {
             dispatch = "if \(ambientGuard) && \(ambientInvocation); then :; elif command -v wmux >/dev/null 2>&1; then \(fallbackInvocation); else \(noOpSnippet); fi"
         }
         let completion = failOpen
-            ? "if [ \"$cmux_hook_status\" -ne 0 ]; then \(noOpSnippet); fi; exit 0"
-            : "exit $cmux_hook_status"
-        return ": \(pinnedHookMarker(for: def)); \(shellTraceStart); printenv \(def.disableEnvVar) | grep -qx 1 && { \(shellTraceDisabled); \(noOpSnippet); } || { \(pinnedHookAmbientEnvironment); \(dispatch); cmux_hook_status=$?; \(shellTraceExit); \(completion); }"
+            ? "if [ \"$wmux_hook_status\" -ne 0 ]; then \(noOpSnippet); fi; exit 0"
+            : "exit $wmux_hook_status"
+        return ": \(pinnedHookMarker(for: def)); \(shellTraceStart); printenv \(def.disableEnvVar) | grep -qx 1 && { \(shellTraceDisabled); \(noOpSnippet); } || { \(pinnedHookAmbientEnvironment); \(dispatch); wmux_hook_status=$?; \(shellTraceExit); \(completion); }"
     }
 
     // Grok validates plain environment references before invoking the shell.
@@ -512,22 +512,22 @@ extension WMUXCLI {
     // trim only printenv's final newline and the sentinel. Missing values also
     // produce that pair, and their lookup remains safe under `set -e`.
     static let pinnedHookAmbientEnvironment =
-        "cmux_hook_ambient_socket=$(printenv CMUX_SOCKET_PATH || printf '\\n'; printf '.'); cmux_hook_ambient_socket=${cmux_hook_ambient_socket%??}; cmux_hook_ambient_cli=$(printenv CMUX_BUNDLED_CLI_PATH || printf '\\n'; printf '.'); cmux_hook_ambient_cli=${cmux_hook_ambient_cli%??}"
+        "wmux_hook_ambient_socket=$(printenv WMUX_SOCKET_PATH || printf '\\n'; printf '.'); wmux_hook_ambient_socket=${wmux_hook_ambient_socket%??}; wmux_hook_ambient_cli=$(printenv WMUX_BUNDLED_CLI_PATH || printf '\\n'; printf '.'); wmux_hook_ambient_cli=${wmux_hook_ambient_cli%??}"
 
     /// Shell test that is true only when the hook inherited a live cmux terminal
     /// environment: a socket that exists plus an executable bundled CLI file.
     /// `-f` matters because a directory also satisfies `-x`.
     static let pinnedHookAmbientDispatchGuard =
-        "[ -n \"${cmux_hook_ambient_socket:-}\" ] && [ -S \"${cmux_hook_ambient_socket:-}\" ] && [ -f \"${cmux_hook_ambient_cli:-}\" ] && [ -x \"${cmux_hook_ambient_cli:-}\" ]"
+        "[ -n \"${wmux_hook_ambient_socket:-}\" ] && [ -S \"${wmux_hook_ambient_socket:-}\" ] && [ -f \"${wmux_hook_ambient_cli:-}\" ] && [ -x \"${wmux_hook_ambient_cli:-}\" ]"
 
     /// Dispatches through the launching terminal's own cmux build and socket.
     static func pinnedHookAmbientInvocation(routedArguments: String) -> String {
-        "\(pinnedHookEnvironmentPrefix(routedArguments: routedArguments))\"${cmux_hook_ambient_cli:-}\" --socket \"${cmux_hook_ambient_socket:-}\" \(routedArguments)"
+        "\(pinnedHookEnvironmentPrefix(routedArguments: routedArguments))\"${wmux_hook_ambient_cli:-}\" --socket \"${wmux_hook_ambient_socket:-}\" \(routedArguments)"
     }
 
     private static func pinnedHookEnvironmentPrefix(routedArguments: String) -> String {
         routedArguments.hasPrefix("hooks enqueue ")
-            ? "CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=\(agentHookAdmissionResponseTimeoutSeconds) "
+            ? "WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=\(agentHookAdmissionResponseTimeoutSeconds) "
             : ""
     }
 
@@ -547,7 +547,7 @@ extension WMUXCLI {
         env: [String: String] = ProcessInfo.processInfo.environment,
         arguments: [String] = ProcessInfo.processInfo.arguments
     ) -> String? {
-        if let bundledPath = normalizedHookInstallValue(env["CMUX_BUNDLED_CLI_PATH"]) {
+        if let bundledPath = normalizedHookInstallValue(env["WMUX_BUNDLED_CLI_PATH"]) {
             let expanded = NSString(string: bundledPath).expandingTildeInPath
             if isExecutableFilePath(expanded) {
                 return expanded
@@ -580,10 +580,10 @@ extension WMUXCLI {
     private static func pinnedAgentHookSocketPath(
         env: [String: String] = ProcessInfo.processInfo.environment
     ) -> String? {
-        if let socketPath = normalizedHookInstallValue(env["CMUX_SOCKET_PATH"]) {
+        if let socketPath = normalizedHookInstallValue(env["WMUX_SOCKET_PATH"]) {
             return NSString(string: socketPath).expandingTildeInPath
         }
-        guard let tag = normalizedHookInstallValue(env["CMUX_TAG"]) else {
+        guard let tag = normalizedHookInstallValue(env["WMUX_TAG"]) else {
             return nil
         }
         let slug = tag
@@ -740,7 +740,7 @@ extension WMUXCLI {
         }
 
         let guardedPrefixes = [
-            "[ -n \"$CMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && command -v wmux >/dev/null 2>&1 && ",
+            "[ -n \"$WMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && command -v wmux >/dev/null 2>&1 && ",
             "[ \"$\(def.disableEnvVar)\" != \"1\" ] && command -v wmux >/dev/null 2>&1 && ",
         ]
         let fallbackSuffix = " || echo '{}'"
@@ -771,15 +771,15 @@ extension WMUXCLI {
     }
 
     private static func bundledCLICmuxCommandTokenLists(from command: String) -> [[String]]? {
-        guard command.contains("CMUX_BUNDLED_CLI_PATH"),
-              command.contains("cmux_cli="),
+        guard command.contains("WMUX_BUNDLED_CLI_PATH"),
+              command.contains("wmux_cli="),
               command.contains("command -v wmux") else {
             return nil
         }
 
         let invocationPrefixes = [
-            "\"$cmux_cli\" --socket \"$CMUX_SOCKET_PATH\" ",
-            "\"$cmux_cli\" ",
+            "\"$wmux_cli\" --socket \"$WMUX_SOCKET_PATH\" ",
+            "\"$wmux_cli\" ",
         ]
         var tokenLists: [[String]] = []
         for prefix in invocationPrefixes {

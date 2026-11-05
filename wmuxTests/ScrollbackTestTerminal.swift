@@ -1,10 +1,10 @@
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 import GhosttyKit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -186,7 +186,7 @@ final class ScrollbackTestTerminal {
     /// startup input, which Ghostty writes before any later input.
     func inputBytesBeforeBarrier() async throws -> Data {
         let runtime = try #require(surface.surface)
-        let marker = "CMUX_SCROLL_BARRIER_\(UUID().uuidString)"
+        let marker = "WMUX_SCROLL_BARRIER_\(UUID().uuidString)"
         marker.withCString { ghostty_surface_text(runtime, $0, UInt(marker.utf8.count)) }
         var bytes = Data()
         for await input in inputs {

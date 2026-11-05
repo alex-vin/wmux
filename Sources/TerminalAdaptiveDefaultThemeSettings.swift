@@ -1,5 +1,5 @@
-import CmuxSettings
-import CmuxTerminalCore
+import WmuxSettings
+import WmuxTerminalCore
 import Foundation
 
 /// App-owned access to cmux's managed adaptive terminal palette preference.
@@ -12,7 +12,7 @@ struct TerminalAdaptiveDefaultThemeSettings {
     private static let key = SettingCatalog().terminal.adaptiveDefaultTheme
 
     static let didChangeNotification = Notification.Name(
-        "cmux.terminalAdaptiveDefaultThemeSettingsDidChange"
+        "wmux.terminalAdaptiveDefaultThemeSettingsDidChange"
     )
 
     static var userDefaultsKey: String { key.userDefaultsKey }
@@ -38,7 +38,7 @@ struct TerminalAdaptiveDefaultThemeSettings {
 extension GhosttyConfig {
     /// Loads the resolved Ghostty config with cmux's adaptive-default
     /// preference. App code uses this wrapper so every config consumer shares
-    /// the same setting, while `CmuxTerminalCore` remains settings-independent.
+    /// the same setting, while `WmuxTerminalCore` remains settings-independent.
     static func loadForCmux(
         preferredColorScheme: ColorSchemePreference? = nil,
         useCache: Bool = true,
@@ -53,10 +53,10 @@ extension GhosttyConfig {
                 TerminalAdaptiveDefaultThemeSettings(defaults: defaults)
                     .isEnabled
         )
-        if let value = defaults.object(forKey: CmuxJSONFontSettings.sidebarUserDefaultsKey) as? NSNumber {
+        if let value = defaults.object(forKey: WmuxJSONFontSettings.sidebarUserDefaultsKey) as? NSNumber {
             loaded.sidebarFontSize = Self.clampedSidebarFontSize(value.doubleValue)
         }
-        if let value = defaults.object(forKey: CmuxJSONFontSettings.surfaceTabBarUserDefaultsKey) as? NSNumber {
+        if let value = defaults.object(forKey: WmuxJSONFontSettings.surfaceTabBarUserDefaultsKey) as? NSNumber {
             loaded.surfaceTabBarFontSize = Self.clampedSurfaceTabBarFontSize(value.doubleValue)
         }
         return loaded

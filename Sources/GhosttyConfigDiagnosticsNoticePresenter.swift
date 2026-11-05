@@ -1,6 +1,6 @@
 import AppKit
-import CmuxTerminalCore
-import CmuxWorkspaces
+import WmuxTerminalCore
+import WmuxWorkspaces
 import SwiftUI
 
 /// Shows Ghostty config errors in a small card in the corner of the active
@@ -102,7 +102,7 @@ final class GhosttyConfigDiagnosticsNoticePresenter {
         panel.hidesOnDeactivate = false
         panel.isReleasedWhenClosed = false
         panel.animationBehavior = .utilityWindow
-        panel.identifier = NSUserInterfaceItemIdentifier("cmux.ghosttyConfigDiagnosticsNotice")
+        panel.identifier = NSUserInterfaceItemIdentifier("wmux.ghosttyConfigDiagnosticsNotice")
         panel.contentView = hostingView
 
         // Sit below the Bonsplit tab bar so it stays fully visible, with the

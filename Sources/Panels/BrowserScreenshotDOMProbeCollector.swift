@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import QuartzCore
 import WebKit
 

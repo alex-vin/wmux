@@ -1,6 +1,6 @@
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
-import CmuxSettings
+import WmuxSettings
 
 struct AgentSessionPanelView: View {
     @Environment(\.cmuxAccentColor) private var cmuxAccent

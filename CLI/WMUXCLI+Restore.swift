@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 
@@ -100,7 +100,7 @@ extension WMUXCLI {
                     bindingPayload: bindingPayload,
                     surfaceID: params["surface_id"] as? String,
                     workspaceID: payload["workspace_id"] as? String
-                        ?? processEnvironment["CMUX_WORKSPACE_ID"],
+                        ?? processEnvironment["WMUX_WORKSPACE_ID"],
                     client: client,
                     workingDirectoryBeforeRestore: workingDirectoryBeforeRestore
                 )
@@ -117,7 +117,7 @@ extension WMUXCLI {
                 bindingPayload: bindingPayload,
                 surfaceID: surfaceID,
                 workspaceID: payload["workspace_id"] as? String
-                    ?? processEnvironment["CMUX_WORKSPACE_ID"],
+                    ?? processEnvironment["WMUX_WORKSPACE_ID"],
                 client: client
             )
         }
@@ -200,7 +200,7 @@ extension WMUXCLI {
         try runAdmittedRestore(
             execution: execution, record: record, recordSessionID: surfaceRecordCheckpointID,
             payload: payload, bindingPayload: bindingPayload, client: client,
-            surfaceID: surfaceID, workspaceID: payload["workspace_id"] as? String ?? processEnvironment["CMUX_WORKSPACE_ID"],
+            surfaceID: surfaceID, workspaceID: payload["workspace_id"] as? String ?? processEnvironment["WMUX_WORKSPACE_ID"],
             effectiveWorkingDirectory: effectiveWorkingDirectory,
             workingDirectoryBeforeRestore: workingDirectoryBeforeRestore
         )
@@ -339,7 +339,7 @@ extension WMUXCLI {
         guard let ttyName else { return nil }
 
         let resolution = AgentTTYBindingResolution.reportedTTY.rawValue
-        let workspaceID = normalizedHandleValue(processEnvironment["CMUX_WORKSPACE_ID"])
+        let workspaceID = normalizedHandleValue(processEnvironment["WMUX_WORKSPACE_ID"])
         var params: [String: Any] = [
             "tty_name": ttyName,
             "tty_resolution": resolution,
@@ -433,7 +433,7 @@ extension WMUXCLI {
 
     func restoreRecord(
         from object: [String: Any],
-        verb: CMUXCLIContinuationVerb = .restore
+        verb: WMUXCLIContinuationVerb = .restore
     ) throws -> RestoreRecord {
         guard let mode = object["mode"] as? String,
               let kind = object["kind"] as? String else {
@@ -525,7 +525,7 @@ extension WMUXCLI {
 
     private func optionalStringArray(
         _ value: Any?,
-        verb: CMUXCLIContinuationVerb
+        verb: WMUXCLIContinuationVerb
     ) throws -> [String]? {
         guard let value,
               !(value is NSNull) else {
@@ -543,7 +543,7 @@ extension WMUXCLI {
 
     func restoreLaunchCommand(
         from value: Any?,
-        verb: CMUXCLIContinuationVerb = .restore,
+        verb: WMUXCLIContinuationVerb = .restore,
         allowEmptyWhenContinuationArgumentsExist: Bool = false
     ) throws -> AgentLaunchCommand? {
         guard let object = value as? [String: Any] else { return nil }

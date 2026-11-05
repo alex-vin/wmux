@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxTerminal
+import WmuxTerminal
 
 /// Cross-container live-panel moves involving the Dock.
 ///

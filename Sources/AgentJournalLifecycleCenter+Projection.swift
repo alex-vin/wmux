@@ -1,4 +1,4 @@
-import CmuxAgentJournal
+import WmuxAgentJournal
 import Foundation
 
 extension AgentJournalLifecycleCenter {
@@ -73,7 +73,7 @@ extension AgentJournalLifecycleCenter {
                 // An incomplete fold must not paint partial replay state:
                 // record the failure and paint nothing (live events still
                 // reduce and self-correct per session).
-                CmuxEventBus.shared.publish(
+                WmuxEventBus.shared.publish(
                     name: "agent.journal.replay_failed",
                     category: "agent",
                     source: "journal",
@@ -155,7 +155,7 @@ extension AgentJournalLifecycleCenter {
     }
 
     static func publishUnattributedDiagnostic(_ event: AgentJournalEvent) {
-        CmuxEventBus.shared.publish(
+        WmuxEventBus.shared.publish(
             name: "agent.journal.unattributed",
             category: "agent",
             source: "journal",
@@ -198,7 +198,7 @@ extension AgentJournalLifecycleCenter {
         guard let owner else {
             // Fail closed and record it in release builds too: the panel no
             // longer exists, so the assignment is dropped, never re-homed.
-            CmuxEventBus.shared.publish(
+            WmuxEventBus.shared.publish(
                 name: "agent.journal.apply_skipped",
                 category: "agent",
                 source: "journal",

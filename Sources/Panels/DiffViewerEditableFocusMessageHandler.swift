@@ -1,5 +1,5 @@
 import WebKit
-import CmuxBrowser
+import WmuxBrowser
 
 @MainActor
 final class DiffViewerEditableFocusMessageHandler: NSObject, WKScriptMessageHandler {
@@ -12,7 +12,7 @@ final class DiffViewerEditableFocusMessageHandler: NSObject, WKScriptMessageHand
         didReceive message: WKScriptMessage
     ) {
         guard DiffCommentsBridge.isTrustedDiffViewerFrame(message.frameInfo),
-              let webView = message.webView as? CmuxWebView,
+              let webView = message.webView as? WmuxWebView,
               let body = message.body as? [String: Any],
               let viewer = body["viewer"] as? Bool,
               let editable = body["editable"] as? Bool,

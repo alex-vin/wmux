@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -23,7 +23,7 @@ struct KimiRestorableAgentTests {
         #expect(String(decoding: encoded, as: UTF8.self) == #""kimi""#)
         #expect(try JSONDecoder().decode(RestorableAgentKind.self, from: encoded) == kind)
 
-        let registration = CmuxVaultAgentRegistration.builtInKimi
+        let registration = WmuxVaultAgentRegistration.builtInKimi
         #expect(registration.id == "kimi")
         #expect(registration.name == "Kimi Code")
         #expect(registration.detect.processNames == ["kimi", "kimi-cli", "kimi-code"])
@@ -61,9 +61,9 @@ struct KimiRestorableAgentTests {
 
     @Test("Customized Kimi registration with canonical template keeps executable ownership")
     func canonicalTemplateDoesNotOverrideCustomExecutable() {
-        var registration = CmuxVaultAgentRegistration.builtInKimi
+        var registration = WmuxVaultAgentRegistration.builtInKimi
         registration.name = "Custom Kimi"
-        registration.detect = CmuxVaultAgentDetectRule(processName: "custom-kimi")
+        registration.detect = WmuxVaultAgentDetectRule(processName: "custom-kimi")
         let snapshot = SessionRestorableAgentSnapshot(
             kind: .custom("kimi"),
             sessionId: "custom-session",
@@ -77,7 +77,7 @@ struct KimiRestorableAgentTests {
 
     @Test("Kimi's OS process title remains detectable")
     func processTitleDetection() {
-        let definition = CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let definition = WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "Kimi Code",
             processPath: "/Users/example/.local/share/uv/tools/kimi-cli/bin/python",
             arguments: ["Kimi Code"],
@@ -106,7 +106,7 @@ struct KimiRestorableAgentTests {
     @Test("Pre-existing custom Kimi Vault registrations remain decodable")
     func customVaultRegistrationStaysDecodable() throws {
         let registration = try JSONDecoder().decode(
-            CmuxVaultAgentRegistration.self,
+            WmuxVaultAgentRegistration.self,
             from: Data("""
             {
               "id": "kimi",
@@ -124,10 +124,10 @@ struct KimiRestorableAgentTests {
 
     @Test("Custom Kimi registration keeps command ownership across snapshot persistence")
     func customVaultRegistrationSurvivesSnapshotRoundTrip() throws {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "kimi",
             name: "Custom Kimi",
-            detect: CmuxVaultAgentDetectRule(processName: "custom-kimi"),
+            detect: WmuxVaultAgentDetectRule(processName: "custom-kimi"),
             sessionIdSource: .argvOption("--resume"),
             resumeCommand: "custom-kimi --resume {{sessionId}}",
             forkCommand: "custom-kimi --fork {{sessionId}}"
@@ -254,14 +254,14 @@ struct KimiRestorableAgentTests {
             to: stateDirectory.appendingPathComponent("kimi-hook-sessions.json", isDirectory: false),
             options: .atomic
         )
-        let customRegistration = CmuxVaultAgentRegistration(
+        let customRegistration = WmuxVaultAgentRegistration(
             id: "kimi",
             name: "Custom Kimi",
-            detect: CmuxVaultAgentDetectRule(processName: "custom-kimi"),
+            detect: WmuxVaultAgentDetectRule(processName: "custom-kimi"),
             sessionIdSource: .argvOption("--resume"),
             resumeCommand: "custom-kimi --resume {{sessionId}}"
         )
-        let registry = CmuxVaultAgentRegistry(registrations: [customRegistration])
+        let registry = WmuxVaultAgentRegistry(registrations: [customRegistration])
 
         let snapshot = try #require(
             RestorableAgentSessionIndex.load(
@@ -435,7 +435,7 @@ struct RestorableAgentPersistedKindDecodingTests {
     struct KindCase: Sendable, CustomTestStringConvertible {
         let id: String
         let kind: RestorableAgentKind
-        let registration: CmuxVaultAgentRegistration?
+        let registration: WmuxVaultAgentRegistration?
 
         var testDescription: String { id }
     }
@@ -448,10 +448,10 @@ struct RestorableAgentPersistedKindDecodingTests {
         KindCase(
             id: "ollama",
             kind: .custom("ollama"),
-            registration: CmuxVaultAgentRegistration(
+            registration: WmuxVaultAgentRegistration(
                 id: "ollama",
                 name: "Custom Ollama",
-                detect: CmuxVaultAgentDetectRule(processName: "ollama"),
+                detect: WmuxVaultAgentDetectRule(processName: "ollama"),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "custom-ollama --resume {{sessionId}}"
             )

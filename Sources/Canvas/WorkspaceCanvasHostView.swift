@@ -1,17 +1,17 @@
 import SwiftUI
 import AppKit
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxCanvasUI
-import CmuxFoundation
-import CmuxSettings
-import CmuxSettingsUI
+import WmuxAppKitSupportUI
+import WmuxCanvasUI
+import WmuxFoundation
+import WmuxSettings
+import WmuxSettingsUI
 
 /// SwiftUI host for a workspace's canvas layout.
 ///
 /// This is the single legacy-observing boundary: it watches the
 /// `ObservableObject` workspace, projects panels into value snapshots
-/// (`CanvasPaneDescriptor`), and hands them to the `CmuxCanvasUI` package
+/// (`CanvasPaneDescriptor`), and hands them to the `WmuxCanvasUI` package
 /// through an `NSViewRepresentable`. The canvas itself never observes
 /// stores, and the package never sees panel types — content crosses the
 /// seam as `CanvasPaneContentMount` witnesses.
@@ -190,7 +190,7 @@ private struct CanvasRootRepresentable: NSViewRepresentable {
     let descriptors: [CanvasPaneDescriptor]
     let focusedPanelId: UUID?
     let isWorkspaceVisible: Bool
-    let accentColor: CmuxAccentColor
+    let accentColor: WmuxAccentColor
 
     func makeNSView(context: Context) -> CanvasRootView {
         let workspace = workspace

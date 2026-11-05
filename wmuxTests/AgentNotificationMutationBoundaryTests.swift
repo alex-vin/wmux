@@ -1,11 +1,11 @@
-import CmuxControlSocket
-import CmuxCore
+import WmuxControlSocket
+import WmuxCore
 import Darwin
 import Foundation
 import Testing
 @preconcurrency import XCTest
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,7 +15,7 @@ extension AgentNotificationRegressionTests {
     @Test("Socket PID evidence rejects a changed birth-time key")
     func staleSocketPIDEvidenceIsRejected() throws {
         let identity = try #require(agentLiveProcessIdentity(pid: Darwin.getpid()))
-        let staleKey = CmuxTopProcessScopeCacheKey(
+        let staleKey = WmuxTopProcessScopeCacheKey(
             pid: identity.scopeCacheKey.pid,
             startSeconds: identity.scopeCacheKey.startSeconds &+ 1,
             startMicroseconds: identity.scopeCacheKey.startMicroseconds
@@ -43,12 +43,12 @@ extension AgentNotificationRegressionTests {
         let fixture = try makeFixture()
         defer { fixture.restore() }
         let identity = try #require(agentLiveProcessIdentity(pid: Darwin.getpid()))
-        let staleKey = CmuxTopProcessScopeCacheKey(
+        let staleKey = WmuxTopProcessScopeCacheKey(
             pid: identity.scopeCacheKey.pid,
             startSeconds: identity.scopeCacheKey.startSeconds &+ 1,
             startMicroseconds: identity.scopeCacheKey.startMicroseconds
         )
-        let scope = CmuxTopProcessScope(
+        let scope = WmuxTopProcessScope(
             workspaceID: fixture.source.id,
             surfaceID: fixture.panelId,
             attributionReason: "test"
@@ -155,7 +155,7 @@ extension AgentNotificationRegressionTests {
         let deadline = ContinuousClock.now + timeout
         while ContinuousClock.now < deadline {
             if let identity = agentLiveProcessIdentity(pid: pid),
-               case .resolved(let scope) = CmuxTopProcessSnapshot.cmuxScopeProbe(
+               case .resolved(let scope) = WmuxTopProcessSnapshot.cmuxScopeProbe(
                    for: Int(pid),
                    expectedCacheKey: identity.scopeCacheKey
                ),
@@ -188,7 +188,7 @@ extension AgentNotificationRegressionTests {
         // The marker comes from the final image; never exec again after it. macOS 26
         // hides a platform binary's environment, so that image is Xcode's python, not sh.
         try """
-        export CMUX_SURFACE_ID='\(fixture.panelId.uuidString)'
+        export WMUX_SURFACE_ID='\(fixture.panelId.uuidString)'
         exec "$(xcrun --find python3)" -c 'import pathlib, time; pathlib.Path("\(execMarker.path)").touch(); time.sleep(600)'
         """.write(to: scopedScript, atomically: true, encoding: .utf8)
 
@@ -196,7 +196,7 @@ extension AgentNotificationRegressionTests {
         process.executableURL = URL(fileURLWithPath: "/bin/sh")
         process.arguments = [initialScript.path]
         var environment = ProcessInfo.processInfo.environment
-        ["CMUX_WORKSPACE_ID", "CMUX_TAB_ID", "CMUX_SURFACE_ID", "CMUX_PANEL_ID"].forEach {
+        ["WMUX_WORKSPACE_ID", "WMUX_TAB_ID", "WMUX_SURFACE_ID", "WMUX_PANEL_ID"].forEach {
             environment.removeValue(forKey: $0)
         }
         process.environment = environment
@@ -213,7 +213,7 @@ extension AgentNotificationRegressionTests {
         #expect(await waitForMarker(at: readyMarker))
 
         let identity = try #require(agentLiveProcessIdentity(pid: process.processIdentifier))
-        let priorProbe = CmuxTopProcessSnapshot.cmuxScopeProbe(
+        let priorProbe = WmuxTopProcessSnapshot.cmuxScopeProbe(
             for: Int(process.processIdentifier), expectedCacheKey: identity.scopeCacheKey
         )
         #expect(priorProbe == .resolved(nil))

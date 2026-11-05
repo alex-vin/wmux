@@ -1,8 +1,8 @@
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Foundation
 
-extension CmuxTaskManagerCodingAgentDefinition {
-    static let builtIns: [CmuxTaskManagerCodingAgentDefinition] = [
+extension WmuxTaskManagerCodingAgentDefinition {
+    static let builtIns: [WmuxTaskManagerCodingAgentDefinition] = [
         .init(id: "claude", displayName: "Claude Code", assetName: "AgentIcons/Claude",
               launchKinds: ["claude", "claudeteams", "claude-teams", "omc"],
               directBasenames: ["claude", "claude.exe", "claude-code", "claude_code", "claude-teams", "omc"],

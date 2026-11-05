@@ -25,7 +25,7 @@ import tempfile
 import time
 
 DEFAULT_URL = "https://ci-cache.cmux.com"
-LOCKFILE = "cmux.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+LOCKFILE = "wmux.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 SPM_CACHE_LAYOUT = "scripts/ci/swiftpm-cache-layout"
 MAX_ARCHIVE = 2 * 1024**3
 MAX_EXPANDED = 16 * 1024**3

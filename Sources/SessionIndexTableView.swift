@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 /// SwiftUI bridge for the AppKit-virtualized Vault session list.

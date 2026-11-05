@@ -1,9 +1,8 @@
 import AppKit
-import CmuxUpdater
 import QuartzCore
 import SwiftUI
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// Counts the async notifications that land inside a measured window, so a
 /// failure can name the input that drove an extra sidebar body pass.
@@ -249,15 +248,15 @@ struct SidebarHiddenPresentationTests {
         // and reconciliation across a hidden/revealed sidebar.
         UserDefaults.standard.set(true, forKey: cloudMarkerKey)
         defaults.set(
-            CmuxExtensionSidebarSelection.defaultProviderId,
-            forKey: CmuxExtensionSidebarSelection.defaultsKey
+            WmuxExtensionSidebarSelection.defaultProviderId,
+            forKey: WmuxExtensionSidebarSelection.defaultsKey
         )
 
-        let featureFlags = CmuxFeatureFlags(
+        let featureFlags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in nil }
         )
-        featureFlags.setOverride(true, for: CmuxFeatureFlags.appKitSidebarListFlag)
+        featureFlags.setOverride(true, for: WmuxFeatureFlags.appKitSidebarListFlag)
 
         let tabManager = TabManager(autoWelcomeIfNeeded: false)
         for _ in 0..<3 {
@@ -276,7 +275,7 @@ struct SidebarHiddenPresentationTests {
             .environmentObject(sidebarState)
             .environmentObject(SidebarSelectionState())
             .environmentObject(FileExplorerState())
-            .environmentObject(CmuxConfigStore())
+            .environmentObject(WmuxConfigStore())
             .environment(
                 \.sidebarLazyContractProbe,
                 SidebarLazyContractProbe(
@@ -487,16 +486,16 @@ struct SidebarHiddenPresentationTests {
         #expect(
             ContentView.retainsDefaultAppKitSidebar(
                 appKitListEnabled: true,
-                effectiveProviderId: CmuxExtensionSidebarSelection.defaultProviderId
+                effectiveProviderId: WmuxExtensionSidebarSelection.defaultProviderId
             )
         )
         #expect(
             !ContentView.retainsDefaultAppKitSidebar(
                 appKitListEnabled: true,
-                effectiveProviderId: CmuxExtensionSidebarSelection.hostedExtensionsProviderId
+                effectiveProviderId: WmuxExtensionSidebarSelection.hostedExtensionsProviderId
             )
         )
-        let bundledProviderId = try #require(CmuxExtensionSidebarSelection.providers.first?.descriptor.id)
+        let bundledProviderId = try #require(WmuxExtensionSidebarSelection.providers.first?.descriptor.id)
         #expect(
             !ContentView.retainsDefaultAppKitSidebar(
                 appKitListEnabled: true,
@@ -508,9 +507,9 @@ struct SidebarHiddenPresentationTests {
             .appendingPathComponent("cmux-sidebar-visibility-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: customSidebarsDirectory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: customSidebarsDirectory) }
-        let customProviderId = CmuxExtensionSidebarSelection.customSidebarProviderPrefix + "lifecycle-test"
+        let customProviderId = WmuxExtensionSidebarSelection.customSidebarProviderPrefix + "lifecycle-test"
         try Data().write(to: customSidebarsDirectory.appendingPathComponent("lifecycle-test.swift"))
-        CmuxExtensionSidebarSelection.withCustomSidebarsDirectoryForTesting(customSidebarsDirectory) {
+        WmuxExtensionSidebarSelection.withCustomSidebarsDirectoryForTesting(customSidebarsDirectory) {
             #expect(
                 !ContentView.retainsDefaultAppKitSidebar(
                     appKitListEnabled: true,
@@ -521,7 +520,7 @@ struct SidebarHiddenPresentationTests {
         #expect(
             !ContentView.retainsDefaultAppKitSidebar(
                 appKitListEnabled: false,
-                effectiveProviderId: CmuxExtensionSidebarSelection.defaultProviderId
+                effectiveProviderId: WmuxExtensionSidebarSelection.defaultProviderId
             )
         )
     }

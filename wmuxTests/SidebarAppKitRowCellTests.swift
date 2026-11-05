@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import AppKit
-import CmuxSettings
-import CmuxSidebar
+import WmuxSettings
+import WmuxSidebar
 import SwiftUI
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// Behavior tests for the pure-AppKit workspace row cell: hover enforcement
 /// (authoritative sweep) and optimistic selection paint semantics.
@@ -2480,7 +2480,7 @@ struct SidebarGroupHeaderBadgeColorTests {
 
     @Test
     func groupBadgeFallsBackToCmuxAccentNotSystemAccent() throws {
-        #expect(try Self.badgeFill(notificationBadgeColorHex: nil) == CmuxAccentColor().nsColor(isDark: true).cgColor)
+        #expect(try Self.badgeFill(notificationBadgeColorHex: nil) == WmuxAccentColor().nsColor(isDark: true).cgColor)
     }
 
     @Test

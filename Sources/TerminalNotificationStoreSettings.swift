@@ -50,7 +50,7 @@ enum NotificationPaneFlashSettings {
 }
 
 enum TaggedRunBadgeSettings {
-    static let environmentKey = "CMUX_TAG"
+    static let environmentKey = "WMUX_TAG"
     private static let maxTagLength = 10
 
     static func normalizedTag(from env: [String: String] = ProcessInfo.processInfo.environment) -> String? {
@@ -87,7 +87,7 @@ enum AppFocusState {
         // Only treat the app as "focused" for notification suppression when a main terminal window
         // is key. If Settings/About/debug panels are key, we still want notifications to show.
         if let raw = keyWindow.identifier?.rawValue {
-            return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+            return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
         }
         return false
     }

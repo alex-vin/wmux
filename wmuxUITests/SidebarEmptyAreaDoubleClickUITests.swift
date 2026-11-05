@@ -61,8 +61,8 @@ final class SidebarEmptyAreaDoubleClickUITests: XCTestCase {
             "-AppleLocale", "en_US",
             "-NSAppSleepDisabled", "YES",
         ]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-empty-area-\(UUID().uuidString.prefix(8))"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-empty-area-\(UUID().uuidString.prefix(8))"
         launchAndEnsureRunning(app)
         app.activate()
 
@@ -247,7 +247,7 @@ final class SidebarEmptyAreaDoubleClickUITests: XCTestCase {
 
     // MARK: - Feature flag
 
-    /// `CmuxFeatureFlagResolution` gives a cached remote value precedence over a
+    /// `WmuxFeatureFlagResolution` gives a cached remote value precedence over a
     /// local override, so a machine that already cached the rollout value would
     /// ignore the override and run the same sidebar in both tests. Park the
     /// cached remote value for the duration of the test and restore it after.

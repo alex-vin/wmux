@@ -1,7 +1,7 @@
 import Foundation
 
 /// Identifies the narrowest workspace, pane, or surface that owns a process.
-struct CmuxTopProcessOwner: Hashable, Sendable {
+struct WmuxTopProcessOwner: Hashable, Sendable {
     let workspaceID: UUID?
     let workspaceRef: String?
     let paneID: UUID?
@@ -40,7 +40,7 @@ struct CmuxTopProcessOwner: Hashable, Sendable {
         Self.identifier(id: workspaceID, ref: workspaceRef)
     }
 
-    func commonOwner(with other: CmuxTopProcessOwner) -> CmuxTopProcessOwner? {
+    func commonOwner(with other: WmuxTopProcessOwner) -> WmuxTopProcessOwner? {
         guard Self.identifiersMatch(
             lhsID: workspaceID,
             lhsRef: workspaceRef,
@@ -63,7 +63,7 @@ struct CmuxTopProcessOwner: Hashable, Sendable {
             rhsID: other.paneID,
             rhsRef: other.paneRef
         ) {
-            return CmuxTopProcessOwner(
+            return WmuxTopProcessOwner(
                 workspaceID: workspaceID,
                 workspaceRef: workspaceRef,
                 paneID: paneID ?? other.paneID,
@@ -79,7 +79,7 @@ struct CmuxTopProcessOwner: Hashable, Sendable {
             rhsID: other.paneID,
             rhsRef: other.paneRef
         ) {
-            return CmuxTopProcessOwner(
+            return WmuxTopProcessOwner(
                 workspaceID: workspaceID,
                 workspaceRef: workspaceRef,
                 paneID: paneID ?? other.paneID,
@@ -89,7 +89,7 @@ struct CmuxTopProcessOwner: Hashable, Sendable {
                 surfaceType: nil
             )
         }
-        return CmuxTopProcessOwner(
+        return WmuxTopProcessOwner(
             workspaceID: workspaceID,
             workspaceRef: workspaceRef,
             paneID: nil,

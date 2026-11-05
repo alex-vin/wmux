@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -62,7 +62,7 @@ struct CloudDisplayMembershipProjectionTests {
         memberships: [[String: Any]] = [["display_id": "display:1", "client_id": "mac-a", "view_id": "panel-a"]],
         generation: String = "membership"
     ) throws -> CloudVMState {
-        try #require(CmuxTuiSnapshotParser.state(
+        try #require(WmuxTuiSnapshotParser.state(
             fromSnapshot: document(revision: revision, memberships: memberships, generation: generation),
             machine: machine
         ))
@@ -80,8 +80,8 @@ struct CloudDisplayMembershipProjectionTests {
     }
 
     private func resources(_ state: CloudVMState) -> [SurfaceResource] {
-        [CmuxTuiSnapshotParser.display(machine: machine),
-         CmuxTuiSnapshotParser.resources(from: state).first { $0.kind == .terminal }].compactMap { $0 }
+        [WmuxTuiSnapshotParser.display(machine: machine),
+         WmuxTuiSnapshotParser.resources(from: state).first { $0.kind == .terminal }].compactMap { $0 }
     }
 
     @Test("Closing a display pane removes the display from its workspace for every client")
@@ -321,7 +321,7 @@ struct CloudDisplayMembershipProjectionTests {
             ("window", document(revision: 1, memberships: [["display_id": displayID, "client_id": "mac-a", "view_id": "panel-a"]], windowID: "cloud-workspace:other-vm:ws_cloud")),
             ("session", document(revision: 1, memberships: [["display_id": displayID, "client_id": "mac-a", "view_id": "panel-a"]], sessionID: "other-session")),
         ] {
-            let parsed = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: mutation.1, machine: machine))
+            let parsed = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: mutation.1, machine: machine))
             #expect(parsed.displayMemberships.isEmpty, "\(mutation.0) provenance must not enter the accepted state")
         }
     }
@@ -330,7 +330,7 @@ struct CloudDisplayMembershipProjectionTests {
     func revisionOrderingPreservesAcceptedProjection() throws {
         let initial = try state()
         let nextDocument = document(revision: 2, memberships: [], generation: "membership")
-        let next = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: nextDocument, machine: machine))
+        let next = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: nextDocument, machine: machine))
         #expect(next.displayMemberships.isEmpty)
         #expect(CloudVMStateSyncDecision.forDelta(
             generation: "membership", previousRevision: 1, revision: 2, current: initial.cursor

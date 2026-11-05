@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxTerminal
+import WmuxBrowser
+import WmuxTerminal
 
 extension NSEvent {
     var cmuxIsUndoRedoCommandEquivalent: Bool {
@@ -14,7 +14,7 @@ extension NSEvent {
 }
 
 /// Identity of a key event currently being force-dispatched into a responder's
-/// `keyDown(with:)` by `NSWindow.cmux_performKeyEquivalent(with:)`.
+/// `keyDown(with:)` by `NSWindow.wmux_performKeyEquivalent(with:)`.
 ///
 /// Forwarding keyDown can re-enter `performKeyEquivalent` with the same event
 /// while the dispatch is still on the stack: WebKit replays unhandled keys
@@ -29,7 +29,7 @@ extension NSEvent {
 /// copy. Key autorepeat produces distinct events (fresh timestamps), so
 /// repeat typing is never throttled. The dispatching window's number is part
 /// of the identity so windows cannot suppress each other's dispatches.
-private struct CmuxForceDispatchedKeyEventIdentity: Hashable {
+private struct WmuxForceDispatchedKeyEventIdentity: Hashable {
     let windowNumber: Int
     let eventType: UInt
     let keyCode: UInt16
@@ -50,7 +50,7 @@ private struct CmuxForceDispatchedKeyEventIdentity: Hashable {
 /// before `keyDown(with:)` and removed when the dispatch unwinds, so WebKit's
 /// legitimate replay of an unhandled key (which arrives after the original
 /// dispatch has fully unwound) is still force-dispatched normally.
-private var cmuxInFlightForceDispatchedKeyEventIdentities = Set<CmuxForceDispatchedKeyEventIdentity>()
+private var cmuxInFlightForceDispatchedKeyEventIdentities = Set<WmuxForceDispatchedKeyEventIdentity>()
 
 extension NSApplication {
     /// Routes undo and redo before AppKit can invoke the shared window undo
@@ -68,7 +68,7 @@ extension NSWindow {
     /// Identifies synchronous replay of the exact key this window is forwarding.
     func cmuxIsForceDispatchingKeyDown(_ event: NSEvent) -> Bool {
         cmuxInFlightForceDispatchedKeyEventIdentities.contains(
-            CmuxForceDispatchedKeyEventIdentity(event, windowNumber: windowNumber)
+            WmuxForceDispatchedKeyEventIdentity(event, windowNumber: windowNumber)
         )
     }
 
@@ -92,7 +92,7 @@ extension NSWindow {
     func cmuxRouteUndoRedoCommandEquivalentAwayFromAppKit(
         _ event: NSEvent,
         terminalView: GhosttyNSView?,
-        webView: CmuxUndoableWebView?,
+        webView: WmuxUndoableWebView?,
         webKitKeyDownReentry: Bool
     ) -> Bool {
         guard event.cmuxIsUndoRedoCommandEquivalent,
@@ -157,7 +157,7 @@ extension NSWindow {
     }
 
     /// Single chokepoint for every direct `keyDown(with:)` force-dispatch made
-    /// by `cmux_performKeyEquivalent(with:)`.
+    /// by `wmux_performKeyEquivalent(with:)`.
     ///
     /// Dispatches `event` into `target`'s `keyDown(with:)` unless the same
     /// event is already being force-dispatched lower on this window's call
@@ -171,7 +171,7 @@ extension NSWindow {
         to target: NSResponder,
         reason: @autoclosure () -> String
     ) -> Bool {
-        let identity = CmuxForceDispatchedKeyEventIdentity(event, windowNumber: windowNumber)
+        let identity = WmuxForceDispatchedKeyEventIdentity(event, windowNumber: windowNumber)
         guard !cmuxInFlightForceDispatchedKeyEventIdentities.contains(identity) else {
 #if DEBUG
             cmuxDebugLog("  → \(reason()) reentry; declining force-dispatch of in-flight key event")

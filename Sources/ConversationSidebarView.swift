@@ -1,5 +1,5 @@
-import CmuxAgentChat
-import CmuxFoundation
+import WmuxAgentChat
+import WmuxFoundation
 import Foundation
 import SwiftUI
 

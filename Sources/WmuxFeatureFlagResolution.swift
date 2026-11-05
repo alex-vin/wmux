@@ -1,13 +1,13 @@
-struct CmuxFeatureFlagResolution: Equatable, Sendable {
+struct WmuxFeatureFlagResolution: Equatable, Sendable {
     let effectiveValue: Bool
-    let source: CmuxFeatureFlagSource
+    let source: WmuxFeatureFlagSource
     let allowsLocalOverride: Bool
 
     init(
         remoteValue: Bool?,
         overrideValue: Bool?,
         defaultValue: Bool,
-        overridePolicy: CmuxFeatureFlagOverridePolicy = .remoteFirst
+        overridePolicy: WmuxFeatureFlagOverridePolicy = .remoteFirst
     ) {
         allowsLocalOverride = overridePolicy == .localFirst
             || (overridePolicy == .remoteFirst && remoteValue == nil)

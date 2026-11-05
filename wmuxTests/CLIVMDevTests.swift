@@ -3,8 +3,8 @@ import Darwin
 import Foundation
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -98,8 +98,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
     private func vmDevEnvironment(socketPath: String, home: URL) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         // `vm dev` binds the folder to the machine in ~/.cmuxterm; keep that out of the
         // developer's home.
         environment["HOME"] = home.path

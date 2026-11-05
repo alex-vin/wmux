@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Persistent File Preview code-view chrome settings.

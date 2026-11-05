@@ -1,4 +1,4 @@
-import CmuxSwiftRenderUI
+import WmuxSwiftRenderUI
 import Foundation
 import Darwin
 
@@ -8,7 +8,7 @@ private enum CustomSidebarDirectoryOverrideForTesting {
 }
 #endif
 
-extension CmuxExtensionSidebarSelection {
+extension WmuxExtensionSidebarSelection {
     #if DEBUG
     static var customSidebarsDirectoryOverrideForTesting: URL? {
         CustomSidebarDirectoryOverrideForTesting.value
@@ -43,7 +43,7 @@ enum CustomSidebarFileWriteResult: Equatable {
     case failed
 }
 
-extension CmuxExtensionSidebarSelection {
+extension WmuxExtensionSidebarSelection {
     static func discoveredCustomSidebarNames(
         sidebarsDirectory: URL,
         fileManager: FileManager = .default

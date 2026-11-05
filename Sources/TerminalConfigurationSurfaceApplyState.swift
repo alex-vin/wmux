@@ -1,4 +1,4 @@
-import CmuxTerminal
+import WmuxTerminal
 
 /// Per-surface state retained only while one config snapshot is being applied.
 @MainActor

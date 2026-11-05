@@ -1,7 +1,7 @@
-import CmuxCloud
-import CmuxFoundation
-import CmuxSettings
-import CmuxRemoteSession
+import WmuxCloud
+import WmuxFoundation
+import WmuxSettings
+import WmuxRemoteSession
 import Foundation
 import Darwin
 
@@ -148,7 +148,7 @@ struct DetectedSSHSession: Equatable, Sendable {
                 try operation.throwIfCancelled()
                 let normalizedLocalURL = localURL.standardizedFileURL
                 guard normalizedLocalURL.isFileURL else {
-                    throw NSError(domain: "cmux.detected-ssh.drop", code: 1, userInfo: [
+                    throw NSError(domain: "wmux.detected-ssh.drop", code: 1, userInfo: [
                         NSLocalizedDescriptionKey: String(
                             localized: "detectedSSH.fileDrop.error.notFileURL",
                             defaultValue: "Couldn't upload the dropped item because it isn't a local file. Drop a file from Finder, then try again."
@@ -190,7 +190,7 @@ struct DetectedSSHSession: Equatable, Sendable {
                             detail
                         )
                     }
-                    throw NSError(domain: "cmux.detected-ssh.drop", code: 2, userInfo: [
+                    throw NSError(domain: "wmux.detected-ssh.drop", code: 2, userInfo: [
                         NSLocalizedDescriptionKey: message,
                     ])
                 }
@@ -225,14 +225,14 @@ struct DetectedSSHSession: Equatable, Sendable {
                     ),
                     detail
                 )
-            throw NSError(domain: "cmux.detected-ssh.drop", code: 3, userInfo: [
+            throw NSError(domain: "wmux.detected-ssh.drop", code: 3, userInfo: [
                 NSLocalizedDescriptionKey: message,
             ])
         }
         guard let remoteHomeDirectory = remotePastePolicy.remoteHomeDirectory(
             fromMaintenanceOutput: result.stdout
         ) else {
-            throw NSError(domain: "cmux.detected-ssh.drop", code: 5, userInfo: [
+            throw NSError(domain: "wmux.detected-ssh.drop", code: 5, userInfo: [
                 NSLocalizedDescriptionKey: String(
                     localized: "detectedSSH.fileDrop.error.uploadFailed",
                     defaultValue: "Couldn't upload the file to the remote session. Check that the remote host is reachable, then try again."
@@ -262,7 +262,7 @@ struct DetectedSSHSession: Equatable, Sendable {
                     ),
                     detail
                 )
-            throw NSError(domain: "cmux.detected-ssh.drop", code: 4, userInfo: [
+            throw NSError(domain: "wmux.detected-ssh.drop", code: 4, userInfo: [
                 NSLocalizedDescriptionKey: message,
             ])
         }
@@ -459,7 +459,7 @@ struct DetectedSSHSession: Equatable, Sendable {
                 throw TerminalImageTransferExecutionError.cancelled
             }
             terminateProcessAndWait()
-            throw NSError(domain: "cmux.detected-ssh.drop", code: 3, userInfo: [
+            throw NSError(domain: "wmux.detected-ssh.drop", code: 3, userInfo: [
                 NSLocalizedDescriptionKey: String(
                     localized: "detectedSSH.fileDrop.error.scpTimedOut",
                     defaultValue: "File transfer timed out. Check the remote host and network connection, then try again."
@@ -658,7 +658,7 @@ enum TerminalSSHSessionDetector {
         guard SurfaceResumeCommandCanonicalizer.isShellExpansionSafeCommand(command) else {
             return nil
         }
-        let cwd = environment["CMUX_AGENT_LAUNCH_CWD"] ?? environment["PWD"]
+        let cwd = environment["WMUX_AGENT_LAUNCH_CWD"] ?? environment["PWD"]
         return SurfaceResumeBindingSnapshot(
             name: "ssh \(session.destination)",
             kind: "ssh",
@@ -698,10 +698,10 @@ enum TerminalSSHSessionDetector {
 
     private static func isManagedSSHWrapper(environment: [String: String]) -> Bool {
         [
-            "CMUX_SSH_PTY_SESSION_ID",
-            "CMUX_REMOTE_PTY_SESSION_ID",
-            "CMUX_SSH_ATTEMPT_ID",
-            "CMUX_SSH_STARTUP_PID",
+            "WMUX_SSH_PTY_SESSION_ID",
+            "WMUX_REMOTE_PTY_SESSION_ID",
+            "WMUX_SSH_ATTEMPT_ID",
+            "WMUX_SSH_STARTUP_PID",
         ].contains { key in
             guard let value = environment[key] else { return false }
             return !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

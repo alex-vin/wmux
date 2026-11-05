@@ -8,8 +8,8 @@ private let shellIntegrationFishExecutablePath = [
     "/bin/fish",
 ].first { FileManager.default.isExecutableFile(atPath: $0) }
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -103,19 +103,19 @@ struct ShellIntegrationSendTransportTests {
             """
             source '\(integrationFile.path)'
             function tmux
-                string join ' ' -- $argv >> "$CMUX_TEST_LOG"
+                string join ' ' -- $argv >> "$WMUX_TEST_LOG"
             end
             _cmux_tmux_sync_cmux_environment
-            cat "$CMUX_TEST_LOG"
+            cat "$WMUX_TEST_LOG"
             """,
         ]
         process.environment = [
-            "CMUX_PANEL_ID": "stale-surface",
-            "CMUX_SOCKET_PATH": "127.0.0.1:64011",
-            "CMUX_SURFACE_ID": "stale-surface",
-            "CMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
-            "CMUX_TEST_LOG": logFile.path,
-            "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_PANEL_ID": "stale-surface",
+            "WMUX_SOCKET_PATH": "127.0.0.1:64011",
+            "WMUX_SURFACE_ID": "stale-surface",
+            "WMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_TEST_LOG": logFile.path,
+            "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
             "HOME": directory.path,
             "PATH": "/usr/bin:/bin",
             "TERM": "xterm-256color",
@@ -131,15 +131,15 @@ struct ShellIntegrationSendTransportTests {
 
         #expect(process.terminationStatus == 0, "\(error)\n\(output)")
         #expect(
-            output.contains("set-environment -g CMUX_SOCKET_PATH 127.0.0.1:64011"),
+            output.contains("set-environment -g WMUX_SOCKET_PATH 127.0.0.1:64011"),
             Comment(rawValue: output)
         )
         #expect(
-            output.contains("set-environment -g CMUX_WORKSPACE_ID 11111111-1111-1111-1111-111111111111"),
+            output.contains("set-environment -g WMUX_WORKSPACE_ID 11111111-1111-1111-1111-111111111111"),
             Comment(rawValue: output)
         )
-        #expect(output.contains("set-environment -gu CMUX_SURFACE_ID"), Comment(rawValue: output))
-        #expect(output.contains("set-environment -gu CMUX_PANEL_ID"), Comment(rawValue: output))
+        #expect(output.contains("set-environment -gu WMUX_SURFACE_ID"), Comment(rawValue: output))
+        #expect(output.contains("set-environment -gu WMUX_PANEL_ID"), Comment(rawValue: output))
     }
 
     @Test("reattached tmux zsh adopts the named session workspace binding")
@@ -195,10 +195,10 @@ struct ShellIntegrationSendTransportTests {
             """,
         ]
         process.environment = [
-            "CMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
-            "CMUX_SOCKET_PATH": "/tmp/cmux-shell-state-test.sock",
-            "CMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
-            "CMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
+            "WMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
+            "WMUX_SOCKET_PATH": "/tmp/cmux-shell-state-test.sock",
+            "WMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
             "HOME": directory.path,
             "PATH": "/usr/bin:/bin",
             "TERM": "xterm-256color",
@@ -248,13 +248,13 @@ struct ShellIntegrationSendTransportTests {
             process.arguments = ["--noprofile", "--norc", "-c", Self.tmuxEnvironmentRefreshScript(scriptFile: scriptFile)]
         }
         process.environment = [
-            "CMUX_PANEL_ID": "stale-surface",
-            "CMUX_SOCKET_PATH": "127.0.0.1:63135",
-            "CMUX_SURFACE_ID": "stale-surface",
-            "CMUX_TAB_ID": "stale-workspace",
-            "CMUX_TERMINAL_LIFECYCLE_ID": "stale-lifecycle",
-            "CMUX_SSH_ATTEMPT_ID": "stale-attempt",
-            "CMUX_WORKSPACE_ID": "stale-workspace",
+            "WMUX_PANEL_ID": "stale-surface",
+            "WMUX_SOCKET_PATH": "127.0.0.1:63135",
+            "WMUX_SURFACE_ID": "stale-surface",
+            "WMUX_TAB_ID": "stale-workspace",
+            "WMUX_TERMINAL_LIFECYCLE_ID": "stale-lifecycle",
+            "WMUX_SSH_ATTEMPT_ID": "stale-attempt",
+            "WMUX_WORKSPACE_ID": "stale-workspace",
             "HOME": directory.path,
             "PATH": "/usr/bin:/bin",
             "TERM": "xterm-256color",
@@ -319,17 +319,17 @@ struct ShellIntegrationSendTransportTests {
         ]
         process.currentDirectoryURL = repository
         var environment = [
-            "CMUX_BUNDLED_CLI_PATH": cmuxFile.path,
-            "CMUX_SOCKET_PATH": "127.0.0.1:64011",
-            "CMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
-            "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_BUNDLED_CLI_PATH": cmuxFile.path,
+            "WMUX_SOCKET_PATH": "127.0.0.1:64011",
+            "WMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
             "HOME": directory.path,
             "PATH": "\(binDirectory.path):/usr/bin:/bin",
             "TERM": "xterm-256color",
         ]
         if let surfaceID {
-            environment["CMUX_PANEL_ID"] = surfaceID
-            environment["CMUX_SURFACE_ID"] = surfaceID
+            environment["WMUX_PANEL_ID"] = surfaceID
+            environment["WMUX_SURFACE_ID"] = surfaceID
         }
         process.environment = environment
         process.standardOutput = standardOutput
@@ -424,7 +424,7 @@ struct ShellIntegrationSendTransportTests {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
         process.environment = [
-            "CMUX_SOCKET_PATH": socketPath,
+            "WMUX_SOCKET_PATH": socketPath,
             "PATH": path,
             "HOME": dir.path,
         ]
@@ -456,17 +456,17 @@ struct ShellIntegrationSendTransportTests {
         tmux() {
           if [ "$1" = show-environment ]; then
             if [ "${2:-}" = -g ]; then
-              printf '%s\\n' 'CMUX_SOCKET_PATH=127.0.0.1:63135' 'CMUX_SSH_ATTEMPT_ID=stale-attempt' 'CMUX_TAB_ID=stale-workspace' 'CMUX_TERMINAL_LIFECYCLE_ID=stale-lifecycle' 'CMUX_WORKSPACE_ID=stale-workspace'
+              printf '%s\\n' 'WMUX_SOCKET_PATH=127.0.0.1:63135' 'WMUX_SSH_ATTEMPT_ID=stale-attempt' 'WMUX_TAB_ID=stale-workspace' 'WMUX_TERMINAL_LIFECYCLE_ID=stale-lifecycle' 'WMUX_WORKSPACE_ID=stale-workspace'
             else
-              printf '%s\\n' 'CMUX_SOCKET_PATH=127.0.0.1:55272' 'CMUX_SSH_ATTEMPT_ID=current-attempt' 'CMUX_TAB_ID=current-workspace' 'CMUX_TERMINAL_LIFECYCLE_ID=current-lifecycle' 'CMUX_WORKSPACE_ID=current-workspace'
+              printf '%s\\n' 'WMUX_SOCKET_PATH=127.0.0.1:55272' 'WMUX_SSH_ATTEMPT_ID=current-attempt' 'WMUX_TAB_ID=current-workspace' 'WMUX_TERMINAL_LIFECYCLE_ID=current-lifecycle' 'WMUX_WORKSPACE_ID=current-workspace'
             fi
           fi
         }
         _cmux_tmux_sync_cmux_environment
         printf 'workspace=%s\\nsocket=%s\\nlifecycle=%s\\nattempt=%s\\nsurface=%s\\npanel=%s\\n' \
-          "${CMUX_WORKSPACE_ID:-<unset>}" "${CMUX_SOCKET_PATH:-<unset>}" \
-          "${CMUX_TERMINAL_LIFECYCLE_ID:-<unset>}" "${CMUX_SSH_ATTEMPT_ID:-<unset>}" \
-          "${CMUX_SURFACE_ID:-<unset>}" "${CMUX_PANEL_ID:-<unset>}"
+          "${WMUX_WORKSPACE_ID:-<unset>}" "${WMUX_SOCKET_PATH:-<unset>}" \
+          "${WMUX_TERMINAL_LIFECYCLE_ID:-<unset>}" "${WMUX_SSH_ATTEMPT_ID:-<unset>}" \
+          "${WMUX_SURFACE_ID:-<unset>}" "${WMUX_PANEL_ID:-<unset>}"
         """
     }
 }

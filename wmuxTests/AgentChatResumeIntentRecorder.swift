@@ -1,4 +1,4 @@
-import CmuxAgentChat
+import WmuxAgentChat
 
 /// Closure-backed recorder scoped to the app unit-test target.
 struct AgentChatResumeIntentRecorder: AgentChatResumeIntentRecording {

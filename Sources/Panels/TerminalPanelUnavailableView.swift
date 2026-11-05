@@ -1,5 +1,5 @@
 import SwiftUI
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 
 /// A Bonsplit terminal tab whose panel registry entry is stale must remain
 /// explainable instead of falling through to an empty view.
@@ -8,7 +8,7 @@ struct TerminalPanelUnavailableView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            CmuxSystemSymbolImage(
+            WmuxSystemSymbolImage(
                 magnified: "exclamationmark.triangle",
                 pointSize: 28,
                 tint: Color(nsColor: .secondaryLabelColor)

@@ -1,11 +1,11 @@
 import AppKit
-import CmuxSettings
-import CmuxSettingsUI
+import WmuxSettings
+import WmuxSettingsUI
 
 /// Shared, cross-tag default for which display new cmux DEV windows open on.
 ///
 /// The value is a display's `localizedName` (e.g. `"LG HDR 4K"`), persisted in
-/// the shared `cmux.json` under `app.devWindowDisplay` through ``CmuxSettings``.
+/// the shared `cmux.json` under `app.devWindowDisplay` through ``WmuxSettings``.
 ///
 /// It lives in `cmux.json` (a fixed path shared across bundle ids) rather than
 /// per-bundle `UserDefaults` on purpose: every tagged dev build has its own
@@ -14,7 +14,7 @@ import CmuxSettingsUI
 /// or cmd-clicking a Tag Opener link). The shared config file is the only store
 /// all of those read. Release builds never apply it.
 ///
-/// This is a thin wrapper over ``CmuxSettings/JSONConfigStore``: the
+/// This is a thin wrapper over ``WmuxSettings/JSONConfigStore``: the
 /// window-creation hook reads it synchronously via the store's `snapshotValue`
 /// seam, and the Debug menu / CLI write through the store's async `set`.
 enum DevWindowDisplayDefault {

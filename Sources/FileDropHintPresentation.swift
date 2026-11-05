@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 
 /// Owns only drag feedback. Dismissing a hint must not cancel WebKit's drop delivery.
 @MainActor

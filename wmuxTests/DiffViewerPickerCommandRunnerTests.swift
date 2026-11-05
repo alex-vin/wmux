@@ -1,22 +1,22 @@
-import CmuxBrowser
-import CmuxFoundation
+import WmuxBrowser
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 /// The app-host half of the diff-viewer picker contract: the `WKURLSchemeTask`
 /// teardown path, which needs WebKit and the app-target
-/// `CmuxDiffViewerURLSchemeHandler`.
+/// `WmuxDiffViewerURLSchemeHandler`.
 ///
 /// Concurrency-limit and cancellation coverage for the runner itself lives in
-/// `CmuxBrowserTests/DiffViewerPickerCommandRunnerTests.swift`.
+/// `WmuxBrowserTests/DiffViewerPickerCommandRunnerTests.swift`.
 @MainActor
 @Suite(.serialized)
 struct DiffViewerPickerCommandRunnerTests {
@@ -46,7 +46,7 @@ struct DiffViewerPickerCommandRunnerTests {
     }
 
     private func makePickerFixture(runner: DiffViewerPickerCommandRunner) async throws -> (
-        handler: CmuxDiffViewerURLSchemeHandler,
+        handler: WmuxDiffViewerURLSchemeHandler,
         webView: WKWebView,
         rootURL: URL,
         requestURL: URL
@@ -60,13 +60,13 @@ struct DiffViewerPickerCommandRunnerTests {
         try "<!doctype html><title>picker cancellation</title>"
             .write(to: fileURL, atomically: true, encoding: .utf8)
 
-        let handler = CmuxDiffViewerURLSchemeHandler(pickerCommandRunner: runner)
+        let handler = WmuxDiffViewerURLSchemeHandler(pickerCommandRunner: runner)
         try await handler.register(
             token: token,
             files: [.init(requestPath: "/index.html", fileURL: fileURL, mimeType: "text/html")]
         )
         var components = URLComponents()
-        components.scheme = CmuxDiffViewerURLSchemeHandler.scheme
+        components.scheme = WmuxDiffViewerURLSchemeHandler.scheme
         components.host = token
         components.path = "/__cmux_diff_viewer_refs"
         components.queryItems = [URLQueryItem(name: "repo", value: rootURL.path)]

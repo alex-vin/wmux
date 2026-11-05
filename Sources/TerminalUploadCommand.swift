@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Darwin
 import Foundation
 
@@ -105,18 +105,18 @@ struct TerminalUploadCommand: Sendable, Equatable {
         sshOptions: [String]
     ) -> [String: String] {
         var env: [String: String] = [
-            "CMUX_UPLOAD_LOCAL_PATH": localPath,
-            "CMUX_UPLOAD_REMOTE_PATH": remotePath,
-            "CMUX_UPLOAD_DESTINATION": destination,
+            "WMUX_UPLOAD_LOCAL_PATH": localPath,
+            "WMUX_UPLOAD_REMOTE_PATH": remotePath,
+            "WMUX_UPLOAD_DESTINATION": destination,
         ]
         if let port {
-            env["CMUX_UPLOAD_PORT"] = String(port)
+            env["WMUX_UPLOAD_PORT"] = String(port)
         }
         if let identityFile, !identityFile.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            env["CMUX_UPLOAD_IDENTITY_FILE"] = identityFile
+            env["WMUX_UPLOAD_IDENTITY_FILE"] = identityFile
         }
         if !sshOptions.isEmpty {
-            env["CMUX_UPLOAD_SSH_OPTIONS"] = sshOptions.joined(separator: "\n")
+            env["WMUX_UPLOAD_SSH_OPTIONS"] = sshOptions.joined(separator: "\n")
         }
         return env
     }

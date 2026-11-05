@@ -1,6 +1,6 @@
-import CmuxCloud
-import CmuxCore
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCore
+import WmuxSurfaceCatalogModel
 import Foundation
 
 extension SurfaceCatalog {

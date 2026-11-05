@@ -206,12 +206,12 @@ final class CLIRestoreSessionTransferTests {
         currentDirectory: URL? = nil
     ) -> ProcessRunResult {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         // Belt and braces: if the CLI ever tried to launch cmux here, it
         // would run this no-op instead of opening an app.
-        environment["CMUX_TEST_OPEN_TOOL_PATH"] = "/usr/bin/false"
+        environment["WMUX_TEST_OPEN_TOOL_PATH"] = "/usr/bin/false"
         let cliPath: String
         do {
             cliPath = try BundledCLITestSupport.bundledCLIPath(for: Self.self)

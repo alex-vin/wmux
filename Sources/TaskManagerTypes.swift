@@ -1,9 +1,9 @@
 import Darwin
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Foundation
 import SwiftUI
 
-struct CmuxTaskManagerRow: Identifiable, Equatable {
+struct WmuxTaskManagerRow: Identifiable, Equatable {
     enum Kind: String, Equatable {
         case window
         case workspace
@@ -55,7 +55,7 @@ struct CmuxTaskManagerRow: Identifiable, Equatable {
     let level: Int
     let title: String
     let detail: String
-    let resources: CmuxTaskManagerResources
+    let resources: WmuxTaskManagerResources
     let isDimmed: Bool
     let workspaceId: UUID?
     let surfaceId: UUID?
@@ -77,7 +77,7 @@ struct CmuxTaskManagerRow: Identifiable, Equatable {
         level: Int,
         title: String,
         detail: String,
-        resources: CmuxTaskManagerResources,
+        resources: WmuxTaskManagerResources,
         isDimmed: Bool,
         workspaceId: UUID?,
         surfaceId: UUID?,
@@ -156,9 +156,9 @@ struct CmuxTaskManagerRow: Identifiable, Equatable {
             .sorted()
     }
 
-    func withAgentAssetName(_ assetName: String?) -> CmuxTaskManagerRow {
+    func withAgentAssetName(_ assetName: String?) -> WmuxTaskManagerRow {
         guard agentAssetName != assetName else { return self }
-        return CmuxTaskManagerRow(
+        return WmuxTaskManagerRow(
             id: id,
             kind: kind,
             level: level,
@@ -177,7 +177,7 @@ struct CmuxTaskManagerRow: Identifiable, Equatable {
     }
 }
 
-struct CmuxTaskManagerSortOrder: Equatable {
+struct WmuxTaskManagerSortOrder: Equatable {
     enum Column: Equatable {
         case name
         case cpu
@@ -204,22 +204,22 @@ struct CmuxTaskManagerSortOrder: Equatable {
         }
     }
 
-    static let defaultOrder = CmuxTaskManagerSortOrder(column: .cpu, direction: .descending)
+    static let defaultOrder = WmuxTaskManagerSortOrder(column: .cpu, direction: .descending)
 
     let column: Column
     let direction: Direction
 
-    func toggled(for selectedColumn: Column) -> CmuxTaskManagerSortOrder {
+    func toggled(for selectedColumn: Column) -> WmuxTaskManagerSortOrder {
         if selectedColumn == column {
-            return CmuxTaskManagerSortOrder(column: column, direction: direction.toggled)
+            return WmuxTaskManagerSortOrder(column: column, direction: direction.toggled)
         }
-        return CmuxTaskManagerSortOrder(
+        return WmuxTaskManagerSortOrder(
             column: selectedColumn,
             direction: selectedColumn.defaultDirection
         )
     }
 
-    func sortedRows(_ rows: [CmuxTaskManagerRow]) -> [CmuxTaskManagerRow] {
+    func sortedRows(_ rows: [WmuxTaskManagerRow]) -> [WmuxTaskManagerRow] {
         guard !rows.isEmpty else { return rows }
         var index = 0
         let rootLevel = rows.reduce(Int.max) { min($0, $1.level) }
@@ -228,7 +228,7 @@ struct CmuxTaskManagerSortOrder: Equatable {
     }
 
     private func parseNodes(
-        _ rows: [CmuxTaskManagerRow],
+        _ rows: [WmuxTaskManagerRow],
         index: inout Int,
         level: Int
     ) -> [SortNode] {
@@ -268,13 +268,13 @@ struct CmuxTaskManagerSortOrder: Equatable {
         }
     }
 
-    private func flatten(_ nodes: [SortNode]) -> [CmuxTaskManagerRow] {
+    private func flatten(_ nodes: [SortNode]) -> [WmuxTaskManagerRow] {
         nodes.flatMap { node in
             [node.row] + flatten(node.children)
         }
     }
 
-    private func compare(_ lhs: CmuxTaskManagerRow, _ rhs: CmuxTaskManagerRow) -> ComparisonResult {
+    private func compare(_ lhs: WmuxTaskManagerRow, _ rhs: WmuxTaskManagerRow) -> ComparisonResult {
         switch column {
         case .name:
             return lhs.title.localizedStandardCompare(rhs.title)
@@ -295,12 +295,12 @@ struct CmuxTaskManagerSortOrder: Equatable {
 }
 
 private struct SortNode {
-    let row: CmuxTaskManagerRow
+    let row: WmuxTaskManagerRow
     let children: [SortNode]
 }
 
-struct CmuxTaskManagerResources: Equatable {
-    static let zero = CmuxTaskManagerResources(cpuPercent: 0, residentBytes: 0, processCount: 0)
+struct WmuxTaskManagerResources: Equatable {
+    static let zero = WmuxTaskManagerResources(cpuPercent: 0, residentBytes: 0, processCount: 0)
 
     let cpuPercent: Double
     let memoryBytes: Int64
@@ -332,7 +332,7 @@ struct CmuxTaskManagerResources: Equatable {
 
     /// Canonical (deduped + ascending) ordering so synthesized
     /// `Equatable` stays stable across snapshot reorderings. See
-    /// `CmuxTaskManagerRow.canonicalIds` for the same rationale.
+    /// `WmuxTaskManagerRow.canonicalIds` for the same rationale.
     private static func canonicalIds(_ ids: [Int]) -> [Int] {
         guard !ids.isEmpty else { return ids }
         return Array(Set(ids)).sorted()
@@ -375,13 +375,13 @@ struct CmuxTaskManagerResources: Equatable {
     }
 }
 
-struct CmuxTaskManagerMemoryDiagnostic: Sendable {
+struct WmuxTaskManagerMemoryDiagnostic: Sendable {
     let summary: String
     let appFootprintBytes: Int64
     let appResidentBytes: Int64
     let childRSSBytes: Int64
     let childProcessCount: Int
-    let groups: [CmuxTaskManagerMemoryGroup]
+    let groups: [WmuxTaskManagerMemoryGroup]
 
     init?(_ payload: [String: Any]?) {
         guard let payload else { return nil }
@@ -393,7 +393,7 @@ struct CmuxTaskManagerMemoryDiagnostic: Sendable {
         self.childRSSBytes = Self.int64(children["recursive_rss_bytes"])
         self.childProcessCount = Self.int(children["process_count"]) ?? 0
         self.groups = (children["groups"] as? [[String: Any]] ?? [])
-            .compactMap(CmuxTaskManagerMemoryGroup.init)
+            .compactMap(WmuxTaskManagerMemoryGroup.init)
     }
 
     static func string(_ raw: Any?) -> String? {
@@ -429,7 +429,7 @@ struct CmuxTaskManagerMemoryDiagnostic: Sendable {
     }
 }
 
-enum CmuxTaskManagerFormat {
+enum WmuxTaskManagerFormat {
     private static let isoFormatter = ISO8601DateFormatter()
     private static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -466,7 +466,7 @@ enum CmuxTaskManagerFormat {
     }
 }
 
-struct CmuxTaskManagerCodingAgentDefinition: Equatable, Sendable {
+struct WmuxTaskManagerCodingAgentDefinition: Equatable, Sendable {
     let id: String
     let displayName: String
     let assetName: String?
@@ -519,12 +519,12 @@ struct CmuxTaskManagerCodingAgentDefinition: Equatable, Sendable {
         processPath: String?,
         arguments: [String],
         environment: [String: String]
-    ) -> CmuxTaskManagerCodingAgentDefinition? {
+    ) -> WmuxTaskManagerCodingAgentDefinition? {
         let definitions = builtIns
         // The process's own executable identity outranks the launch-kind
-        // environment: CMUX_AGENT_LAUNCH_* is inherited by every descendant
+        // environment: WMUX_AGENT_LAUNCH_* is inherited by every descendant
         // of the launched pane, so a later `ollama run` inside a pane that
-        // launched claude still carries CMUX_AGENT_LAUNCH_KIND=claude. The
+        // launched claude still carries WMUX_AGENT_LAUNCH_KIND=claude. The
         // env var only identifies processes (wrappers, script hosts) whose
         // executable matches no agent definition of its own.
         let basenames = candidateBasenames(
@@ -539,7 +539,7 @@ struct CmuxTaskManagerCodingAgentDefinition: Equatable, Sendable {
             return definition
         }
 
-        let launchKind = normalized(environment["CMUX_AGENT_LAUNCH_KIND"])
+        let launchKind = normalized(environment["WMUX_AGENT_LAUNCH_KIND"])
         if let launchKind,
            let definition = definitions.first(where: {
                $0.launchKinds.contains(launchKind) && $0.matchesRequiredArguments(arguments)

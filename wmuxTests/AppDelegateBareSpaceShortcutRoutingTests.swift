@@ -1,8 +1,8 @@
 import AppKit
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -235,7 +235,7 @@ final class AppDelegateBareSpaceShortcutRoutingTests: XCTestCase {
         windowId = createdWindowId
         let window = try XCTUnwrap(window(withId: createdWindowId))
         let styleMask = window.styleMask
-        let expectedContentSize = CmuxMainWindow.defaultContentRect(styleMask: styleMask).size
+        let expectedContentSize = WmuxMainWindow.defaultContentRect(styleMask: styleMask).size
         let contentSize = window.contentRect(forFrameRect: window.frame).size
         XCTAssertEqual(contentSize.width, expectedContentSize.width, accuracy: 1)
         XCTAssertEqual(contentSize.height, expectedContentSize.height, accuracy: 1)

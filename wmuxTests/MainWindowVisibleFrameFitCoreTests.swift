@@ -1,9 +1,9 @@
 import AppKit
-import CmuxWindowing
+import WmuxWindowing
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -613,7 +613,7 @@ struct MainWindowZoomPlacementTests {
     @Test func nativeTilingLiveResizeClearsZoomWithoutCallingSetFrameDuringTracking() throws {
         try withZoomedWindow { window, delegate in
             // AppKit's native tile animation emits live-resize callbacks but
-            // bypasses CmuxMainWindow.setFrame throughout the animation.
+            // bypasses WmuxMainWindow.setFrame throughout the animation.
             delegate.windowWillStartLiveResize?(Notification(
                 name: NSWindow.willStartLiveResizeNotification,
                 object: window
@@ -731,11 +731,11 @@ struct MainWindowZoomPlacementTests {
     }
 
     private func withZoomedWindow(
-        _ body: (CmuxMainWindow, any NSWindowDelegate) throws -> Void
+        _ body: (WmuxMainWindow, any NSWindowDelegate) throws -> Void
     ) throws {
         _ = NSApplication.shared
         let screen = try #require(NSScreen.screens.first)
-        let window = CmuxMainWindow(
+        let window = WmuxMainWindow(
             contentRect: NSRect(x: screen.visibleFrame.minX + 50, y: screen.visibleFrame.minY + 50, width: 600, height: 400),
             styleMask: [.titled, .resizable, .closable],
             backing: .buffered,
@@ -748,7 +748,7 @@ struct MainWindowZoomPlacementTests {
         try body(window, controller)
     }
 
-    private func shrinkAndExpectZoomRecovery(_ window: CmuxMainWindow) {
+    private func shrinkAndExpectZoomRecovery(_ window: WmuxMainWindow) {
         var shrunk = window.frame
         shrunk.size.height -= 80
         window.setFrameForManagedPlacement(shrunk, display: false)
@@ -759,7 +759,7 @@ struct MainWindowZoomPlacementTests {
         #expect(NSScreen.screens.contains { $0.visibleFrame == window.frame })
     }
 
-    private func expectActivationPreservesPlacement(_ window: CmuxMainWindow) {
+    private func expectActivationPreservesPlacement(_ window: WmuxMainWindow) {
         let placed = window.frame
         #expect(!window.isZoomed)
         #expect(!window.cmuxWantsZoomedFrame)
@@ -767,7 +767,7 @@ struct MainWindowZoomPlacementTests {
         #expect(window.frame == placed)
     }
 
-    private func repairOnActivation(_ window: CmuxMainWindow) {
+    private func repairOnActivation(_ window: WmuxMainWindow) {
         let displays = NSScreen.screens.enumerated().map { index, screen in
             SessionDisplayGeometry(displayID: UInt32(index + 1), frame: screen.frame, visibleFrame: screen.visibleFrame)
         }

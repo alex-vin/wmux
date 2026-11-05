@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxControlSocket
+import WmuxControlSocket
 import Foundation
 
 /// The project-domain witnesses: the byte-faithful bodies of the former

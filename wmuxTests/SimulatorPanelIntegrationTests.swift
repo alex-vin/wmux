@@ -1,14 +1,14 @@
-#if canImport(CmuxSimulator)
+#if canImport(WmuxSimulator)
 import AppKit
-import CmuxControlSocket
-import CmuxSimulator
-import CmuxSimulatorUI
-import CmuxWorkspaces
+import WmuxControlSocket
+import WmuxSimulator
+import WmuxSimulatorUI
+import WmuxWorkspaces
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -79,8 +79,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("Session restore preserves preferred Simulator identity")
     func sessionPersistence() throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -163,8 +163,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("Remote disable closes the worker and re-enable replaces it")
     func remoteFeatureFlagLifecycle() async throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -244,8 +244,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("Cancelling application termination restores the live Simulator panel")
     func cancelledApplicationTerminationRestoresPanel() async throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -282,8 +282,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("External file drops target Simulator import instead of file previews")
     func externalFileDropRouting() async throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -478,8 +478,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("Context discovers the default device before returning identity")
     func contextDiscoversDefaultDevice() async throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -536,8 +536,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("Context reads persisted identity without starting a stopped Simulator")
     func contextReadsPersistedIdentityWithoutStartingDevice() async throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -601,8 +601,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("Event log reads cached history without starting a stopped Simulator")
     func eventLogReadsCachedHistoryWithoutStartingDevice() async throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -664,8 +664,8 @@ struct SimulatorPanelIntegrationTests {
 
     @Test("Screenshot preparation starts a restored shutdown Simulator")
     func screenshotPreparationStartsRestoredShutdownDevice() async throws {
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousOverride, for: simulatorFlag) }

@@ -29,9 +29,9 @@ final class MultiWindowNotificationsUITests: XCTestCase {
 
     func testNotificationsRouteToCorrectWindow() {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -120,9 +120,9 @@ final class MultiWindowNotificationsUITests: XCTestCase {
 
     func testNotificationsPopoverCanCloseViaShortcutAndEscape() {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -161,9 +161,9 @@ final class MultiWindowNotificationsUITests: XCTestCase {
 
     func testNotificationsPopoverJumpToLatestButtonShowsShortcut() {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -190,7 +190,7 @@ final class MultiWindowNotificationsUITests: XCTestCase {
 
     func testNotificationsPopoverOpensPhoneForwardingControls() {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -227,11 +227,11 @@ final class MultiWindowNotificationsUITests: XCTestCase {
     func testEmptyNotificationsPopoverBlocksTerminalTyping() throws {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += ["-socketControlMode", "allowAll"]
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -263,7 +263,7 @@ final class MultiWindowNotificationsUITests: XCTestCase {
         XCTAssertTrue(clearAllButton.waitForExistence(timeout: 2.0), "Expected Clear All button in empty notifications popover")
         XCTAssertFalse(clearAllButton.isEnabled, "Expected Clear All button to be disabled with no notifications")
 
-        let marker = "cmux_notif_block_\(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(8))"
+        let marker = "wmux_notif_block_\(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(8))"
         let before = readCurrentTerminalText() ?? ""
         XCTAssertFalse(before.contains(marker), "Unexpected marker precondition collision")
 
@@ -280,15 +280,15 @@ final class MultiWindowNotificationsUITests: XCTestCase {
     func testNotifyCLIDoesNotStealFocusAcrossWindows() throws {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += ["-socketControlMode", "allowAll"]
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_NOTIFY_SOURCE_TERMINAL_READY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_ENABLE_DUPLICATE_LAUNCH_OBSERVER"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_NOTIFY_SOURCE_TERMINAL_READY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_ENABLE_DUPLICATE_LAUNCH_OBSERVER"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -440,13 +440,13 @@ final class MultiWindowNotificationsUITests: XCTestCase {
     func testOpenNotificationCLISelectsWorkspaceSurfaceAndMarksRowRead() throws {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += ["-socketControlMode", "allowAll"]
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -561,15 +561,15 @@ final class MultiWindowNotificationsUITests: XCTestCase {
         let app = XCUIApplication.cmuxTestApplication()
         let title = "window-route-\(UUID().uuidString.prefix(8))"
         app.launchArguments += ["-socketControlMode", "allowAll"]
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_WINDOW_ROUTE_CLI"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_WINDOW_ROUTE_CLI_TITLE"] = title
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_WINDOW_ROUTE_CLI"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_WINDOW_ROUTE_CLI_TITLE"] = title
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),
@@ -1011,12 +1011,12 @@ final class MultiWindowNotificationsUITests: XCTestCase {
         socketPath: String,
         arguments: [String],
         responseTimeoutSeconds: Double = 3.0,
-        cliStrategy: CmuxCLIStrategy = .any
+        cliStrategy: WmuxCLIStrategy = .any
     ) -> (terminationStatus: Int32, stdout: String, stderr: String) {
         var args = ["--socket", socketPath]
         args.append(contentsOf: arguments)
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = String(responseTimeoutSeconds)
+        environment["WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = String(responseTimeoutSeconds)
 
         let cliPaths = resolveCmuxCLIPaths(strategy: cliStrategy)
         if cliPaths.isEmpty, cliStrategy == .bundledOnly {
@@ -1064,7 +1064,7 @@ final class MultiWindowNotificationsUITests: XCTestCase {
         return lastPermissionFailure ?? fallbackResult
     }
 
-    enum CmuxCLIStrategy: Equatable {
+    enum WmuxCLIStrategy: Equatable {
         case any
         case bundledOnly
     }
@@ -1077,14 +1077,14 @@ final class MultiWindowNotificationsUITests: XCTestCase {
             "signals=\(data["socketFailureSignals"] ?? "")"
     }
 
-    private func resolveCmuxCLIPaths(strategy: CmuxCLIStrategy) -> [String] {
+    private func resolveCmuxCLIPaths(strategy: WmuxCLIStrategy) -> [String] {
         let fileManager = FileManager.default
         let env = ProcessInfo.processInfo.environment
         var candidates: [String] = []
         var productDirectories: [String] = []
 
         if strategy == .any {
-            for key in ["CMUX_UI_TEST_CLI_PATH", "CMUXTERM_CLI"] {
+            for key in ["WMUX_UI_TEST_CLI_PATH", "WMUXTERM_CLI"] {
                 if let value = env[key], !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     candidates.append(value)
                 }
@@ -1145,7 +1145,7 @@ final class MultiWindowNotificationsUITests: XCTestCase {
 
     private func appendCLIPathCandidates(
         fromProductsDirectory productsDir: String,
-        strategy: CmuxCLIStrategy,
+        strategy: WmuxCLIStrategy,
         to candidates: inout [String]
     ) {
         candidates.append("\(productsDir)/cmux DEV.app/Contents/Resources/bin/cmux")
@@ -1242,7 +1242,7 @@ final class MultiWindowNotificationsUITests: XCTestCase {
         _ = waitForCondition(timeout: timeout) {
             for candidate in primaryCandidates {
                 guard FileManager.default.fileExists(atPath: candidate) else { continue }
-                // Primary candidate is the explicitly requested CMUX_SOCKET_PATH. If it responds,
+                // Primary candidate is the explicitly requested WMUX_SOCKET_PATH. If it responds,
                 // prefer it even before workspace contents are fully initialized.
                 if self.socketRespondsToPing(at: candidate) {
                     resolvedPath = candidate
@@ -1302,7 +1302,7 @@ final class MultiWindowNotificationsUITests: XCTestCase {
     }
 
     private func stableSocketPath() -> String {
-        // Mirrors CmuxStateDirectory.url() + cmux.sock (non-TCC ~/.local/state/cmux;
+        // Mirrors WmuxStateDirectory.url() + cmux.sock (non-TCC ~/.local/state/cmux;
         // see https://github.com/manaflow-ai/cmux/issues/5146).
         FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent(".local/state/cmux", isDirectory: true)

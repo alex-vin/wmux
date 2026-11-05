@@ -1,7 +1,7 @@
 import AppKit
-import CmuxSidebar
+import WmuxSidebar
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// `sidebar.compactAgentStatus`: agent hook status rows fold into one
 /// leading glyph that also carries pull request and branch state.

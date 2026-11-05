@@ -23,7 +23,7 @@ struct ClaudeNotificationStatusLifecycleTests {
             ttyName: "ttys-claude-notify-pid",
             storeURL: context.root.appendingPathComponent("claude-hook-sessions.json")
         )
-        environment["CMUX_CLAUDE_PID"] = "\(claudePID)"
+        environment["WMUX_CLAUDE_PID"] = "\(claudePID)"
 
         let result = harness.runProcess(
             executablePath: context.cliPath,

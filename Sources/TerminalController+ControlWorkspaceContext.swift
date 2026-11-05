@@ -1,12 +1,12 @@
-import CmuxCloud
-import CmuxControlSocket
-import CmuxCore
-import CmuxFoundation
-import CmuxPanes
-import CmuxProductAnalytics
-import CmuxRemoteWorkspace
-import CmuxRemoteSession
-import CmuxWorkspaces
+import WmuxCloud
+import WmuxControlSocket
+import WmuxCore
+import WmuxFoundation
+import WmuxPanes
+import WmuxProductAnalytics
+import WmuxRemoteWorkspace
+import WmuxRemoteSession
+import WmuxWorkspaces
 import Foundation
 
 extension RemotePTYLifecycleCommitLease: @retroactive ControlRemotePTYLifecycleCommitLease {
@@ -603,7 +603,7 @@ extension TerminalController: ControlWorkspaceContext {
             )
         }
         // Deprecated: `cmux ssh` no longer sends this shape (TTY SSH moved to
-        // cmux-tui in #13866). A hand-written call still gets a persistent PTY
+        // wmux-tui in #13866). A hand-written call still gets a persistent PTY
         // slot, but agent resume bindings are not registered or replayed for it.
         if preserveAfterTerminalExit,
            transport == .ssh,

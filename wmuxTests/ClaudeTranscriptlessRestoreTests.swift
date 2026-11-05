@@ -1,9 +1,9 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -23,7 +23,7 @@ struct ClaudeTranscriptlessRestoreTests {
         let defaultsName: String
 
         var environment: [String: String] {
-            ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+            ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         }
 
         func transcriptURL(sessionID: String) -> URL {
@@ -131,7 +131,7 @@ struct ClaudeTranscriptlessRestoreTests {
         RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: fixture.environment,
             processArgumentsProvider: { _ in nil },

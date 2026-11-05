@@ -2,8 +2,8 @@ import AppKit
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -13,7 +13,7 @@ import Testing
 struct NewWorkspaceMenuModelTests {
 
     @MainActor
-    private func loadStore(globalJSON: String) throws -> (store: CmuxConfigStore, root: URL) {
+    private func loadStore(globalJSON: String) throws -> (store: WmuxConfigStore, root: URL) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(
             "cmux-menu-model-tests-\(UUID().uuidString)",
             isDirectory: true
@@ -21,7 +21,7 @@ struct NewWorkspaceMenuModelTests {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         let globalConfigURL = root.appendingPathComponent("cmux.json")
         try globalJSON.write(to: globalConfigURL, atomically: true, encoding: .utf8)
-        let store = CmuxConfigStore(
+        let store = WmuxConfigStore(
             globalConfigPath: globalConfigURL.path,
             localConfigPath: nil,
             startFileWatchers: false
@@ -100,7 +100,7 @@ struct NewWorkspaceMenuModelTests {
         """)
         defer { try? FileManager.default.removeItem(at: root) }
 
-        let agent = CmuxResolvedConfigAction.builtIn(.newAgentChat)
+        let agent = WmuxResolvedConfigAction.builtIn(.newAgentChat)
         let model = NewWorkspaceMenuModel.build(
             newWorkspaceContextMenuItems: store.newWorkspaceContextMenuItems,
             agentChatAction: agent,
@@ -127,9 +127,9 @@ struct NewWorkspaceMenuModelTests {
             return action.action.id
         }
         #expect(createIDs == [
-            CmuxSurfaceTabBarBuiltInAction.newWorkspace.configID,
+            WmuxSurfaceTabBarBuiltInAction.newWorkspace.configID,
             "terminal-command",
-            CmuxSurfaceTabBarBuiltInAction.newAgentChat.configID,
+            WmuxSurfaceTabBarBuiltInAction.newAgentChat.configID,
         ])
         #expect(createRows.contains(.separator))
         #expect(layoutRows.map { $0.menuAction.action.id } == ["review-layout"])

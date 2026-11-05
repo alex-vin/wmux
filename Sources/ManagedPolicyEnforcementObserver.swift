@@ -1,6 +1,6 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Applies MDM managed-policy transitions to a running app.

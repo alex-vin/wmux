@@ -1,11 +1,11 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -17,7 +17,7 @@ struct AgentHibernationProcessSnapshotCoordinatorTests {
         let captureScheduled = AsyncStream<Void>.makeStream()
         let allowCapture = AsyncStream<Void>.makeStream()
         let captureCount = OSAllocatedUnfairLock(initialState: 0)
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [],
             sampledAt: .now,
             includesProcessDetails: false
@@ -62,7 +62,7 @@ struct AgentHibernationProcessSnapshotCoordinatorTests {
         let captureScheduled = AsyncStream<Void>.makeStream()
         let allowCapture = AsyncStream<Void>.makeStream()
         let captureCount = OSAllocatedUnfairLock(initialState: 0)
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [],
             sampledAt: .now,
             includesProcessDetails: false
@@ -103,7 +103,7 @@ struct AgentHibernationProcessSnapshotCoordinatorTests {
         let ttyDevice = Int64(123)
         let processGroupID = 101
         let processes = (101...133).map { processID in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: processID,
                 processIdentity: AgentPIDProcessIdentity(
                     pid: pid_t(processID), startSeconds: Int64(processID), startMicroseconds: 1
@@ -123,7 +123,7 @@ struct AgentHibernationProcessSnapshotCoordinatorTests {
                 threadCount: 1
             )
         }
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: processes,
             sampledAt: .now,
             includesProcessDetails: false,
@@ -169,9 +169,9 @@ struct AgentHibernationProcessSnapshotCoordinatorTests {
         let leader = AgentPIDProcessIdentity(pid: 101, startSeconds: 10, startMicroseconds: 1)
         let original = AgentPIDProcessIdentity(pid: 102, startSeconds: 11, startMicroseconds: 1)
         let replacement = AgentPIDProcessIdentity(pid: 102, startSeconds: 12, startMicroseconds: 1)
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [leader, original].map { identity in
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: Int(identity.pid), processIdentity: identity, parentPID: 101,
                     name: "fixture", path: nil, ttyDevice: 42, cmuxWorkspaceID: nil,
                     cmuxSurfaceID: nil, cmuxAttributionReason: nil, processGroupID: 101,

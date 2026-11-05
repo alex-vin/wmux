@@ -1,9 +1,9 @@
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 
 extension WMUXCLI {
-    static let cmuxThemeOverrideBundleIdentifier = CmuxGhosttyConfigPathResolver.releaseBundleIdentifier
+    static let cmuxThemeOverrideBundleIdentifier = WmuxGhosttyConfigPathResolver.releaseBundleIdentifier
     static let cmuxThemesReloadNotificationName = "com.cmuxterm.themes.reload-config"
 
     struct ThemeSelection {
@@ -45,17 +45,17 @@ extension WMUXCLI {
 
         let selection = currentThemeSelection(targetBundleIdentifier: targetBundleIdentifier)
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_THEME_PICKER_CONFIG"] = try cmuxThemeOverrideConfigURL(
+        environment["WMUX_THEME_PICKER_CONFIG"] = try cmuxThemeOverrideConfigURL(
             targetBundleIdentifier: targetBundleIdentifier
         ).path
-        environment["CMUX_THEME_PICKER_BUNDLE_ID"] = targetBundleIdentifier
-        environment["CMUX_THEME_PICKER_TARGET"] = defaultThemePickerTargetMode(current: selection).rawValue
-        environment["CMUX_THEME_PICKER_COLOR_SCHEME"] = defaultAppearancePrefersDarkThemes() ? "dark" : "light"
+        environment["WMUX_THEME_PICKER_BUNDLE_ID"] = targetBundleIdentifier
+        environment["WMUX_THEME_PICKER_TARGET"] = defaultThemePickerTargetMode(current: selection).rawValue
+        environment["WMUX_THEME_PICKER_COLOR_SCHEME"] = defaultAppearancePrefersDarkThemes() ? "dark" : "light"
         if let light = selection.light {
-            environment["CMUX_THEME_PICKER_INITIAL_LIGHT"] = light
+            environment["WMUX_THEME_PICKER_INITIAL_LIGHT"] = light
         }
         if let dark = selection.dark {
-            environment["CMUX_THEME_PICKER_INITIAL_DARK"] = dark
+            environment["WMUX_THEME_PICKER_INITIAL_DARK"] = dark
         }
         if let resourcesURL = bundledGhosttyResourcesURL() {
             environment["GHOSTTY_RESOURCES_DIR"] = resourcesURL.path

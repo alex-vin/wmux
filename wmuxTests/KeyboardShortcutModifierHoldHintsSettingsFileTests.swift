@@ -1,11 +1,11 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
-import struct CmuxSettings.NotificationsCatalogSection
+import struct WmuxSettings.NotificationsCatalogSection
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -222,7 +222,7 @@ struct PaneAttentionColorTests {
 
     @Test
     func flashFollowsThemeForegroundWhenUnset() {
-        let accent = CmuxAccentColor()
+        let accent = WmuxAccentColor()
         let color = WorkspaceAttentionColor(
             configuredHex: nil,
             accent: accent,
@@ -248,8 +248,8 @@ struct PaneAttentionColorTests {
     }
 
     private func assertUsesInjectedAccent(configuredHex: String?) {
-        for mode in CmuxAccentColorMode.allCases {
-            let accent = CmuxAccentColor(mode: mode)
+        for mode in WmuxAccentColorMode.allCases {
+            let accent = WmuxAccentColor(mode: mode)
             #expect(
                 WorkspaceAttentionColor(configuredHex: configuredHex, accent: accent).nsColor.hexString() ==
                     accent.dynamicNSColor.hexString()

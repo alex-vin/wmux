@@ -3,7 +3,7 @@
 // the previous snapshot of the same tab. Format: docs/browser-repl/README.md.
 (function (root) {
   "use strict";
-  const ns = (root.CmuxBrowserRepl = root.CmuxBrowserRepl || {});
+  const ns = (root.WmuxBrowserRepl = root.WmuxBrowserRepl || {});
   const core = ns.core;
 
   const CELL_ROLES = new Set(["cell", "gridcell", "columnheader", "rowheader"]);

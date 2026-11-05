@@ -1,6 +1,6 @@
 import AppKit
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxTerminal
+import WmuxTerminalCore
 import GhosttyKit
 
 /// Adapts Ghostty intents to the existing cmux owners; it owns no workspace state.

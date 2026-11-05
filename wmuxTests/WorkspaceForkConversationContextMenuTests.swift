@@ -1,11 +1,11 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -79,11 +79,11 @@ struct WorkspaceForkConversationContextMenuTests {
         let livePanelId = UUID()
         let processId = 7_286
         let executable = "/usr/local/bin/\(agentId)"
-        let registry = CmuxVaultAgentRegistry(registrations: [
-            CmuxVaultAgentRegistration(
+        let registry = WmuxVaultAgentRegistry(registrations: [
+            WmuxVaultAgentRegistration(
                 id: agentId,
                 name: "Forkable Test Agent",
-                detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+                detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "{{executable}} --session {{sessionId}}",
                 forkCommand: "{{executable}} --session {{sessionId}} --fork"
@@ -105,9 +105,9 @@ struct WorkspaceForkConversationContextMenuTests {
             ]
         )
 
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: processId,
                     parentPID: 1,
                     name: agentId,
@@ -135,7 +135,7 @@ struct WorkspaceForkConversationContextMenuTests {
             capturedAtProvider: { 42 },
             processArgumentsProvider: { pid in
                 guard pid == processId else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: [executable, "--session", sessionId],
                     environment: ["PWD": cwd.path]
                 )
@@ -175,11 +175,11 @@ struct WorkspaceForkConversationContextMenuTests {
         let processId = 7_287
         let processIdentity = AgentPIDProcessIdentity(pid: pid_t(processId), startSeconds: 43, startMicroseconds: 7)
         let executable = "/usr/local/bin/\(agentId)"
-        let registry = CmuxVaultAgentRegistry(registrations: [
-            CmuxVaultAgentRegistration(
+        let registry = WmuxVaultAgentRegistry(registrations: [
+            WmuxVaultAgentRegistration(
                 id: agentId,
                 name: "Forkable Cache Agent",
-                detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+                detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "{{executable}} --session {{sessionId}}",
                 forkCommand: "{{executable}} --session {{sessionId}} --fork"
@@ -201,7 +201,7 @@ struct WorkspaceForkConversationContextMenuTests {
             ]
         )
 
-        let processSnapshotLock = OSAllocatedUnfairLock(initialState: CmuxTopProcessSnapshot(
+        let processSnapshotLock = OSAllocatedUnfairLock(initialState: WmuxTopProcessSnapshot(
             processes: [],
             sampledAt: Date(timeIntervalSince1970: 42),
             includesProcessDetails: true
@@ -217,12 +217,12 @@ struct WorkspaceForkConversationContextMenuTests {
                     capturedAtProvider: { snapshot.sampledAt.timeIntervalSince1970 },
                     processArgumentsProvider: { pid in
                         pid == processId
-                            ? CmuxTopProcessArguments(
+                            ? WmuxTopProcessArguments(
                                 arguments: [executable, "--session", sessionId],
                                 environment: [
                                     "PWD": cwd.path,
-                                    "CMUX_WORKSPACE_ID": liveWorkspaceId.uuidString,
-                                    "CMUX_SURFACE_ID": livePanelId.uuidString,
+                                    "WMUX_WORKSPACE_ID": liveWorkspaceId.uuidString,
+                                    "WMUX_SURFACE_ID": livePanelId.uuidString,
                                 ]
                             )
                             : nil
@@ -245,9 +245,9 @@ struct WorkspaceForkConversationContextMenuTests {
         )
 
         processSnapshotLock.withLock {
-            $0 = CmuxTopProcessSnapshot(
+            $0 = WmuxTopProcessSnapshot(
                 processes: [
-                    CmuxTopProcessInfo(
+                    WmuxTopProcessInfo(
                         pid: processId,
                         parentPID: 1,
                         name: agentId,
@@ -301,11 +301,11 @@ struct WorkspaceForkConversationContextMenuTests {
         let workspaceId = UUID()
         let panelId = UUID()
         let executable = "/usr/local/bin/\(agentId)"
-        let registry = CmuxVaultAgentRegistry(registrations: [
-            CmuxVaultAgentRegistration(
+        let registry = WmuxVaultAgentRegistry(registrations: [
+            WmuxVaultAgentRegistration(
                 id: agentId,
                 name: "Forkable Probe Agent",
-                detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+                detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "{{executable}} --session {{sessionId}}",
                 forkCommand: "{{executable}} --session {{sessionId}} --fork"
@@ -336,7 +336,7 @@ struct WorkspaceForkConversationContextMenuTests {
                     fileManager: fm,
                     registry: registry,
                     processSnapshotProvider: {
-                        CmuxTopProcessSnapshot(
+                        WmuxTopProcessSnapshot(
                             processes: [],
                             sampledAt: sampledAt,
                             includesProcessDetails: true
@@ -393,9 +393,9 @@ struct WorkspaceForkConversationContextMenuTests {
                 SharedLiveAgentIndexLoader(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     processSnapshotProvider: {
-                        CmuxTopProcessSnapshot(processes: [], sampledAt: now.withLock { $0 }, includesProcessDetails: true)
+                        WmuxTopProcessSnapshot(processes: [], sampledAt: now.withLock { $0 }, includesProcessDetails: true)
                     },
                     capturedAtProvider: { now.withLock { $0 }.timeIntervalSince1970 },
                     processArgumentsProvider: { _ in nil }
@@ -655,7 +655,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: staleLiveSnapshot,
@@ -1111,10 +1111,10 @@ struct WorkspaceForkConversationContextMenuTests {
 
     @Test
     func customForkTemplateMustRenderBeforeSupportProbeAcceptsIt() async {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "needs-cwd",
             name: "Needs CWD",
-            detect: CmuxVaultAgentDetectRule(processNames: ["needs-cwd"]),
+            detect: WmuxVaultAgentDetectRule(processNames: ["needs-cwd"]),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "needs-cwd --session {{sessionId}}",
             forkCommand: "needs-cwd --cwd {{cwd}} --session {{sessionId}} --fork"
@@ -1185,9 +1185,9 @@ struct WorkspaceForkConversationContextMenuTests {
             RestorableAgentSessionIndex.load(
                 homeDirectory: root.path,
                 fileManager: .default,
-                registry: CmuxVaultAgentRegistry(registrations: [
-                    CmuxVaultAgentRegistration.builtInPi,
-                    CmuxVaultAgentRegistration.builtInOmp,
+                registry: WmuxVaultAgentRegistry(registrations: [
+                    WmuxVaultAgentRegistration.builtInPi,
+                    WmuxVaultAgentRegistration.builtInOmp,
                 ]),
                 detectedSnapshots: [
                     RestorableAgentSessionIndex.PanelKey(
@@ -1289,7 +1289,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: snapshot,
@@ -1355,7 +1355,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+                    registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: snapshot,
@@ -1454,7 +1454,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+                    registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: snapshot,
@@ -1536,7 +1536,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: liveSnapshot,
@@ -1623,7 +1623,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+                    registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
                     detectedSnapshots: [
                         firstPanelKey: (
                             snapshot: snapshot,
@@ -1743,7 +1743,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         firstPanelKey: (
                             snapshot: firstSnapshot,
@@ -1851,7 +1851,7 @@ struct WorkspaceForkConversationContextMenuTests {
                     index: RestorableAgentSessionIndex.load(
                         homeDirectory: root.path,
                         fileManager: fm,
-                        registry: CmuxVaultAgentRegistry(registrations: []),
+                        registry: WmuxVaultAgentRegistry(registrations: []),
                         detectedSnapshots: [:]
                     ),
                     liveAgentProcessFingerprint: [],
@@ -1969,7 +1969,7 @@ struct WorkspaceForkConversationContextMenuTests {
                     index: RestorableAgentSessionIndex.load(
                         homeDirectory: root.path,
                         fileManager: fm,
-                        registry: CmuxVaultAgentRegistry(registrations: []),
+                        registry: WmuxVaultAgentRegistry(registrations: []),
                         detectedSnapshots: [livePanelKey: (
                             snapshot: snapshot, updatedAt: 0, processIDs: [], agentProcessIDs: [], sessionIDSource: .explicit
                         )]
@@ -2040,7 +2040,7 @@ struct WorkspaceForkConversationContextMenuTests {
                     index: RestorableAgentSessionIndex.load(
                         homeDirectory: root.path,
                         fileManager: fm,
-                        registry: CmuxVaultAgentRegistry(registrations: []),
+                        registry: WmuxVaultAgentRegistry(registrations: []),
                         detectedSnapshots: [:]
                     ),
                     liveAgentProcessFingerprint: [],
@@ -2164,7 +2164,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         firstPanelKey: (
                             snapshot: firstSnapshot,
@@ -2293,7 +2293,7 @@ struct WorkspaceForkConversationContextMenuTests {
                     index: RestorableAgentSessionIndex.load(
                         homeDirectory: root.path,
                         fileManager: fm,
-                        registry: CmuxVaultAgentRegistry(registrations: []),
+                        registry: WmuxVaultAgentRegistry(registrations: []),
                         detectedSnapshots: [:]
                     ),
                     liveAgentProcessFingerprint: [],
@@ -2425,7 +2425,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         firstPanelKey: (
                             snapshot: firstSnapshot,
@@ -2590,7 +2590,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         firstPanelKey: (
                             snapshot: firstSnapshot,
@@ -2716,7 +2716,7 @@ struct WorkspaceForkConversationContextMenuTests {
                     index: RestorableAgentSessionIndex.load(
                         homeDirectory: root.path,
                         fileManager: fm,
-                        registry: CmuxVaultAgentRegistry(registrations: []),
+                        registry: WmuxVaultAgentRegistry(registrations: []),
                         detectedSnapshots: [:]
                     ),
                     liveAgentProcessFingerprint: [],
@@ -2773,7 +2773,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+                    registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: snapshot,
@@ -2861,7 +2861,7 @@ struct WorkspaceForkConversationContextMenuTests {
             let index = RestorableAgentSessionIndex.load(
                 homeDirectory: root.path,
                 fileManager: .default,
-                registry: CmuxVaultAgentRegistry(registrations: []),
+                registry: WmuxVaultAgentRegistry(registrations: []),
                 detectedSnapshots: includePanel ? [
                     panelKey: (
                         snapshot: snapshot,
@@ -2962,7 +2962,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [
+                    registry: WmuxVaultAgentRegistry(registrations: [
                         .builtInPi,
                     ]),
                     detectedSnapshots: [
@@ -3049,7 +3049,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+                    registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: snapshot,
@@ -3137,7 +3137,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [
+                    registry: WmuxVaultAgentRegistry(registrations: [
                         .builtInPi,
                     ]),
                     detectedSnapshots: [
@@ -3281,7 +3281,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [
+                    registry: WmuxVaultAgentRegistry(registrations: [
                         .builtInPi,
                     ]),
                     detectedSnapshots: [
@@ -3630,7 +3630,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         currentPanelKey: (
                             snapshot: snapshot,
@@ -3793,7 +3793,7 @@ struct WorkspaceForkConversationContextMenuTests {
         struct Scenario {
             let launcher: String
             let kind: RestorableAgentKind
-            let registration: CmuxVaultAgentRegistration
+            let registration: WmuxVaultAgentRegistration
             let supportedOutput: String
             let unsupportedOutput: String
         }
@@ -3864,7 +3864,7 @@ struct WorkspaceForkConversationContextMenuTests {
                     let index = RestorableAgentSessionIndex.load(
                         homeDirectory: root.path,
                         fileManager: fm,
-                        registry: CmuxVaultAgentRegistry(registrations: [
+                        registry: WmuxVaultAgentRegistry(registrations: [
                             scenario.registration,
                         ]),
                         detectedSnapshots: [
@@ -3932,7 +3932,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: snapshot,
@@ -4032,7 +4032,7 @@ struct WorkspaceForkConversationContextMenuTests {
         #expect(ContentView.commandPaletteSnapshotForkAvailability(builtIn) == .requiresProbe)
         #expect(builtIn.forkCommand?.contains("'PATH=/custom/omp/bin:/usr/bin'") == true)
 
-        var metadataOverride = CmuxVaultAgentRegistration.builtInOmp
+        var metadataOverride = WmuxVaultAgentRegistration.builtInOmp
         metadataOverride.name = "Project OMP"
         metadataOverride.iconAssetName = "AgentIcons/ProjectOMP"
         let metadataOverridden = SessionRestorableAgentSnapshot(
@@ -4044,7 +4044,7 @@ struct WorkspaceForkConversationContextMenuTests {
         )
         #expect(ContentView.commandPaletteSnapshotForkAvailability(metadataOverridden) == .requiresProbe)
 
-        var projectOverride = CmuxVaultAgentRegistration.builtInOmp
+        var projectOverride = WmuxVaultAgentRegistration.builtInOmp
         projectOverride.name = "Project OMP"
         projectOverride.forkCommand = "{{executable}} --branch {{sessionId}}"
         let overridden = SessionRestorableAgentSnapshot(
@@ -4611,7 +4611,7 @@ struct WorkspaceForkConversationContextMenuTests {
     @Test
     func persistedBuiltInOmpSnapshotMigratesLegacyForkTemplate() throws {
         let sessionId = "omp-session-123"
-        var legacyRegistration = CmuxVaultAgentRegistration.builtInOmp
+        var legacyRegistration = WmuxVaultAgentRegistration.builtInOmp
         legacyRegistration.forkCommand = "{{executable}} --session {{sessionId}} --fork"
         let persisted = SessionRestorableAgentSnapshot(
             kind: .custom("omp"),
@@ -4652,7 +4652,7 @@ struct WorkspaceForkConversationContextMenuTests {
         )
         #expect(decodedOverride.registration == projectOverride)
 
-        var historicalRegistration = CmuxVaultAgentRegistration.builtInOmp
+        var historicalRegistration = WmuxVaultAgentRegistration.builtInOmp
         historicalRegistration.iconAssetName = nil
         historicalRegistration.forkCommand = nil
         let historical = SessionRestorableAgentSnapshot(
@@ -4684,7 +4684,7 @@ struct WorkspaceForkConversationContextMenuTests {
         #expect(decodedLegacyWithoutIcon.registration == .builtInOmp)
         #expect(decodedLegacyWithoutIcon.forkCommand?.contains("'--fork' '\(sessionId)'") == true)
 
-        var customForkRegistration = CmuxVaultAgentRegistration.builtInOmp
+        var customForkRegistration = WmuxVaultAgentRegistration.builtInOmp
         customForkRegistration.forkCommand = "{{executable}} --branch {{sessionId}}"
         let customFork = SessionRestorableAgentSnapshot(
             kind: .custom("omp"),
@@ -4704,7 +4704,7 @@ struct WorkspaceForkConversationContextMenuTests {
     @Test
     func persistedPiProjectRegistrationKeepsForkOwnership() throws {
         let sessionId = "pi-session-123"
-        var projectRegistration = CmuxVaultAgentRegistration.builtInPi
+        var projectRegistration = WmuxVaultAgentRegistration.builtInPi
         projectRegistration.name = "Project Pi"
         projectRegistration.forkCommand = nil
         let persisted = SessionRestorableAgentSnapshot(
@@ -4732,7 +4732,7 @@ struct WorkspaceForkConversationContextMenuTests {
         #expect(decoded.registration == projectRegistration)
         #expect(decoded.forkCommand == nil)
 
-        var legacyBuiltIn = CmuxVaultAgentRegistration.builtInPi
+        var legacyBuiltIn = WmuxVaultAgentRegistration.builtInPi
         legacyBuiltIn.forkCommand = "{{executable}} --session {{sessionId}} --fork"
         let legacySnapshot = SessionRestorableAgentSnapshot(
             kind: .custom("pi"),
@@ -4749,7 +4749,7 @@ struct WorkspaceForkConversationContextMenuTests {
         #expect(decodedLegacy.registration == .builtInPi)
         #expect(decodedLegacy.forkCommand?.contains("'--fork' '\(sessionId)'") == true)
 
-        var historicalBuiltIn = CmuxVaultAgentRegistration.builtInPi
+        var historicalBuiltIn = WmuxVaultAgentRegistration.builtInPi
         historicalBuiltIn.iconAssetName = nil
         historicalBuiltIn.forkCommand = nil
         let historicalSnapshot = SessionRestorableAgentSnapshot(
@@ -4777,9 +4777,9 @@ struct WorkspaceForkConversationContextMenuTests {
         let liveAgentIndex = SharedLiveAgentIndex(
             indexLoader: {
                 SharedLiveAgentIndexLoader(
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     processSnapshotProvider: {
-                        CmuxTopProcessSnapshot(
+                        WmuxTopProcessSnapshot(
                             processes: [],
                             sampledAt: Date(timeIntervalSince1970: 42),
                             includesProcessDetails: true
@@ -4822,9 +4822,9 @@ struct WorkspaceForkConversationContextMenuTests {
             indexLoader: {
                 SharedLiveAgentIndexLoader(
                     homeDirectory: root.path,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     processSnapshotProvider: {
-                        CmuxTopProcessSnapshot(
+                        WmuxTopProcessSnapshot(
                             processes: [],
                             sampledAt: Date(timeIntervalSince1970: 42),
                             includesProcessDetails: true
@@ -4895,7 +4895,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+                    registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: liveSnapshot,
@@ -4956,7 +4956,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: staleLiveSnapshot,
@@ -5020,7 +5020,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+                    registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: rejectedLiveSnapshot,
@@ -5111,7 +5111,7 @@ struct WorkspaceForkConversationContextMenuTests {
                 let index = RestorableAgentSessionIndex.load(
                     homeDirectory: root.path,
                     fileManager: fm,
-                    registry: CmuxVaultAgentRegistry(registrations: []),
+                    registry: WmuxVaultAgentRegistry(registrations: []),
                     detectedSnapshots: [
                         panelKey: (
                             snapshot: snapshotWithExecutable,
@@ -5123,12 +5123,12 @@ struct WorkspaceForkConversationContextMenuTests {
                     ],
                     processArgumentsProvider: { pid in
                         guard pid == liveProcessId else { return nil }
-                        return CmuxTopProcessArguments(
+                        return WmuxTopProcessArguments(
                             arguments: [executable.path, "--session", snapshotWithExecutable.sessionId],
                             environment: [
                                 "PWD": root.path,
-                                "CMUX_WORKSPACE_ID": panelKey.workspaceId.uuidString,
-                                "CMUX_SURFACE_ID": panelKey.panelId.uuidString,
+                                "WMUX_WORKSPACE_ID": panelKey.workspaceId.uuidString,
+                                "WMUX_SURFACE_ID": panelKey.panelId.uuidString,
                             ]
                         )
                     },
@@ -5187,9 +5187,9 @@ struct WorkspaceForkConversationContextMenuTests {
     ) throws {
         try """
         #!/bin/sh
-        cat <<'CMUX_EXECUTABLE_FIXTURE'
+        cat <<'WMUX_EXECUTABLE_FIXTURE'
         \(output)
-        CMUX_EXECUTABLE_FIXTURE
+        WMUX_EXECUTABLE_FIXTURE
         """
             .write(to: executable, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: executable.path)
@@ -5283,7 +5283,7 @@ struct WorkspaceForkConversationContextMenuTests {
         workspaceRoot: String,
         executablePath: String = "/usr/local/bin/agent-wrapper"
     ) -> SessionRestorableAgentSnapshot {
-        let registration: CmuxVaultAgentRegistration = launcher == "omp" ? .builtInOmp : .builtInPi
+        let registration: WmuxVaultAgentRegistration = launcher == "omp" ? .builtInOmp : .builtInPi
         return SessionRestorableAgentSnapshot(
             kind: .custom(launcher),
             sessionId: "pi-family-session",

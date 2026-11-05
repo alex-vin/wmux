@@ -3,8 +3,8 @@ import AppKit
 /// A read-only alert details view whose viewport is capped to the visible
 /// screen while its complete text remains scrollable and selectable.
 @MainActor
-final class CmuxAlertScrollableDetailsView: NSScrollView {
-    static let accessibilityIdentifier = "CmuxAlertScrollableDetails"
+final class WmuxAlertScrollableDetailsView: NSScrollView {
+    static let accessibilityIdentifier = "WmuxAlertScrollableDetails"
     static let maximumVisibleFrameHeightFraction: CGFloat = 0.4
 
     private(set) var contentHeight: CGFloat = 0

@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 struct AboutPanelView: View {
@@ -12,10 +12,10 @@ struct AboutPanelView: View {
     private var version: String? { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String }
     private var build: String? { Bundle.main.infoDictionary?["CFBundleVersion"] as? String }
     private var commit: String? {
-        if let value = Bundle.main.infoDictionary?["CMUXCommit"] as? String, !value.isEmpty {
+        if let value = Bundle.main.infoDictionary?["WMUXCommit"] as? String, !value.isEmpty {
             return value
         }
-        let env = ProcessInfo.processInfo.environment["CMUX_COMMIT"] ?? ""
+        let env = ProcessInfo.processInfo.environment["WMUX_COMMIT"] ?? ""
         return env.isEmpty ? nil : env
     }
     private var copyright: String? { Bundle.main.infoDictionary?["NSHumanReadableCopyright"] as? String }

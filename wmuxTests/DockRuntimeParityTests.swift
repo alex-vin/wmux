@@ -1,17 +1,17 @@
 import AppKit
 import Bonsplit
 import Combine
-import CmuxControlSocket
-import CmuxFoundation
-import CmuxNotifications
-import CmuxTerminal
+import WmuxControlSocket
+import WmuxFoundation
+import WmuxNotifications
+import WmuxTerminal
 import Foundation
 import Observation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

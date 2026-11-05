@@ -1,15 +1,15 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import Bonsplit
-import CMUXAgentLaunch
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxSidebarInterpreterClient
-import CmuxSidebarRemoteRender
-import CmuxSwiftRender
-import CmuxSwiftRenderUI
+import WMUXAgentLaunch
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxSidebarInterpreterClient
+import WmuxSidebarRemoteRender
+import WmuxSwiftRender
+import WmuxSwiftRenderUI
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -488,7 +488,7 @@ struct RightSidebarPanelView: View {
     @ViewBuilder
     private var customSidebarPanel: some View {
         if let name = fileExplorerState.customSidebarName,
-           let fileURL = CmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) {
+           let fileURL = WmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) {
             TimelineView(.periodic(from: .now, by: 1)) { timeline in
                 CustomSidebarSurface(
                     fileURL: fileURL,

@@ -6,7 +6,7 @@ import Foundation
 /// The sidecar stores the high-water mark of the latest leased range rather than
 /// every sequence. Callers serialize access to the in-memory lease; the file lock
 /// still serializes range reservations across processes.
-final class CmuxEventSequenceStore: @unchecked Sendable {
+final class WmuxEventSequenceStore: @unchecked Sendable {
     static let defaultBlockSize = 256
 
     private let stateURL: URL
@@ -15,7 +15,7 @@ final class CmuxEventSequenceStore: @unchecked Sendable {
     private var nextSequence: Int64 = 0
     private var reservedThrough: Int64 = 0
 
-    init(eventLogURL: URL, blockSize: Int = CmuxEventSequenceStore.defaultBlockSize) {
+    init(eventLogURL: URL, blockSize: Int = WmuxEventSequenceStore.defaultBlockSize) {
         self.stateURL = eventLogURL.appendingPathExtension("seq")
         self.lockURL = eventLogURL.appendingPathExtension("seq.lock")
         self.blockSize = Int64(max(1, blockSize))

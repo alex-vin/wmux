@@ -1,8 +1,8 @@
 #if DEBUG
-import CMUXDebugLog
+import WMUXDebugLog
 
 @inline(__always)
 func cmuxDebugLog(_ message: @autoclosure () -> String) {
-    CMUXDebugLog.logDebugEvent(message())
+    WMUXDebugLog.logDebugEvent(message())
 }
 #endif

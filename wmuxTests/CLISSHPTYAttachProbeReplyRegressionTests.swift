@@ -1,10 +1,10 @@
 import Darwin
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -74,13 +74,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
             )
 
             var environment = ProcessInfo.processInfo.environment
-            environment["CMUX_SOCKET_PATH"] = socketPath
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-            environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
-            environment["CMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] = "1"
-            environment.removeValue(forKey: "CMUX_SSH_PTY_ATTACH_SUPPRESS_REPLAY")
+            environment["WMUX_SOCKET_PATH"] = socketPath
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+            environment["WMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] = "1"
+            environment.removeValue(forKey: "WMUX_SSH_PTY_ATTACH_SUPPRESS_REPLAY")
             if suppressingReplay {
-                environment["CMUX_SSH_PTY_ATTACH_SUPPRESS_REPLAY"] = "1"
+                environment["WMUX_SSH_PTY_ATTACH_SUPPRESS_REPLAY"] = "1"
             }
             let result = runProcess(
                 executablePath: cliPath,
@@ -190,8 +190,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         let result = runProcess(
             executablePath: cliPath,
             arguments: [
@@ -289,10 +289,10 @@ extension CLINotifyProcessIntegrationRegressionTests {
             let bridgeHandled = startBridgeReadyThenCloseServer(listenerFD: bridge.fd)
 
             var environment = ProcessInfo.processInfo.environment
-            environment["CMUX_SOCKET_PATH"] = socketPath
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-            environment.removeValue(forKey: "CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY")
-            environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = scenario.wrapperRetry
+            environment["WMUX_SOCKET_PATH"] = socketPath
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment.removeValue(forKey: "WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY")
+            environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = scenario.wrapperRetry
             let result = runProcess(
                 executablePath: cliPath,
                 arguments: [
@@ -407,9 +407,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
             let bridgeHandled = startBridgeReadyThenCloseServer(listenerFD: bridge.fd)
 
             var environment = ProcessInfo.processInfo.environment
-            environment["CMUX_SOCKET_PATH"] = socketPath
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-            environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+            environment["WMUX_SOCKET_PATH"] = socketPath
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
             let result = runProcess(
                 executablePath: cliPath,
                 arguments: [
@@ -503,9 +503,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
         let result = runProcess(
             executablePath: cliPath,
             arguments: [
@@ -599,11 +599,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         let bridgeHandled = startBridgeReadyThenCloseServer(listenerFD: bridge.fd)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
-        environment.removeValue(forKey: "CMUX_TERMINAL_LIFECYCLE_ID")
-        environment.removeValue(forKey: "CMUX_SSH_ATTEMPT_ID")
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+        environment.removeValue(forKey: "WMUX_TERMINAL_LIFECYCLE_ID")
+        environment.removeValue(forKey: "WMUX_SSH_ATTEMPT_ID")
         let result = runProcess(
             executablePath: cliPath,
             arguments: [
@@ -697,8 +697,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let queuedProbeReplies =
             "\u{1B}]11;rgb:e5e5/e9e9/f0f0\u{1B}\\" +

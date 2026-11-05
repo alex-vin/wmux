@@ -82,7 +82,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             case "surface.create":
                 XCTAssertEqual(params["workspace_id"] as? String, workspaceID)
                 XCTAssertTrue((params["initial_command"] as? String)?.contains("$31") == true)
-                XCTAssertTrue((params["initial_command"] as? String)?.contains("@cmux_local_server_id") == true)
+                XCTAssertTrue((params["initial_command"] as? String)?.contains("@wmux_local_server_id") == true)
                 return self.v2Response(id: id, ok: true, result: [
                     "workspace_id": workspaceID,
                     "surface_id": createdSurfaceID,
@@ -94,13 +94,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
-        environment["CMUX_LOCAL_TMUX_STATE_DIR"] = root.path
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_LOCAL_TMUX_BIN"] = fakeTmuxURL.path
+        environment["WMUX_LOCAL_TMUX_STATE_DIR"] = root.path
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
 
         let attach = runProcess(
             executablePath: cliPath,

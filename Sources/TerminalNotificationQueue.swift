@@ -1,6 +1,6 @@
-import CmuxRemoteSession
-import CmuxNotifications
-import CmuxSettings
+import WmuxRemoteSession
+import WmuxNotifications
+import WmuxSettings
 import Foundation
 
 fileprivate struct QueuedTerminalNotificationKey: Hashable, Sendable {

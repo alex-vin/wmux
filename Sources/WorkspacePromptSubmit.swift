@@ -1,5 +1,5 @@
 import Bonsplit
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 enum IMessageModeSettings {
@@ -249,7 +249,7 @@ extension TabManager {
                 panelId: Self.panelId(in: workspace, forSurfaceId: surfaceId)
             )
             if messageRecorded {
-                CmuxEventBus.shared.publishWorkspacePromptSubmitted(
+                WmuxEventBus.shared.publishWorkspacePromptSubmitted(
                     workspaceId: workspaceId,
                     message: message,
                     preview: Workspace.conversationMessagePreview(from: message),
@@ -275,7 +275,7 @@ extension TabManager {
 
     /// Resolves a hook-reported surface id to the panel it belongs to.
     ///
-    /// Hook payloads carry `CMUX_SURFACE_ID`, which is a surface id for split
+    /// Hook payloads carry `WMUX_SURFACE_ID`, which is a surface id for split
     /// panes but already a panel id for the simple case, so both shapes are
     /// accepted the same way the focused-notification seam accepts them.
     private static func panelId(in workspace: Workspace, forSurfaceId surfaceId: String?) -> UUID? {

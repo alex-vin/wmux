@@ -48,7 +48,7 @@ enum SSHStartupCommandTestSupport {
     }
 
     private static func payloadRange(in command: String) -> Range<String.Index>? {
-        if let assignment = command.range(of: "cmux_payload=") {
+        if let assignment = command.range(of: "wmux_payload=") {
             let end = command[assignment.upperBound...].firstIndex(of: "\n") ?? command.endIndex
             return unquoted(assignment.upperBound..<end, in: command)
         }

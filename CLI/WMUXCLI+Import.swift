@@ -1,11 +1,11 @@
 import Foundation
-import CmuxFoundation
-import CmuxTerminalImport
+import WmuxFoundation
+import WmuxTerminalImport
 import Darwin
 
 /// `cmux import`: bring fonts, colors and terminal behavior over from another terminal.
 ///
-/// Parsing and mapping live in the CmuxTerminalImport package; this file only
+/// Parsing and mapping live in the WmuxTerminalImport package; this file only
 /// resolves paths, prints the plan, asks for confirmation and writes cmux's own
 /// Ghostty config and theme files. The source terminal's files and the user's
 /// `~/.config/ghostty/config` are never written.
@@ -116,7 +116,7 @@ extension WMUXCLI {
         let themeDirectory = configURL.deletingLastPathComponent().appendingPathComponent("themes", isDirectory: true)
         let plan = GhosttyImportMapper(fontResolver: CoreTextFontFamilyResolver())
             .plan(for: settings, themeDirectory: themeDirectory)
-        let themeFile = CmuxManagedThemeConfigFile(url: configURL)
+        let themeFile = WmuxManagedThemeConfigFile(url: configURL)
         let currentContents = try themeFile.readContents() ?? ""
         let patch = GhosttyConfigDiffer().diff(plan.settings, against: currentContents)
         let currentTheme = try themeFile.managedThemeValue()
@@ -226,7 +226,7 @@ extension WMUXCLI {
             )
             try file.contents.write(to: file.url, atomically: true, encoding: .utf8)
         }
-        let editor = CmuxGhosttyConfigSettingEditor()
+        let editor = WmuxGhosttyConfigSettingEditor()
         for setting in plan.settings {
             guard let change = patch.changes.first(where: { $0.key == setting.key }), !change.isUnchanged else {
                 continue
@@ -234,7 +234,7 @@ extension WMUXCLI {
             try editor.writeSetting(key: setting.key, values: setting.values, to: configURL, fileManager: fileManager)
         }
         if let themeValue = plan.themeValue {
-            try CmuxManagedThemeConfigFile(url: configURL).write(rawThemeValue: themeValue)
+            try WmuxManagedThemeConfigFile(url: configURL).write(rawThemeValue: themeValue)
         }
     }
 

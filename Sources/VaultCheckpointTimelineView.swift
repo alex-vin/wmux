@@ -1,6 +1,6 @@
 import Foundation
 import os
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 private let vaultCheckpointTimelineLogger = Logger(

@@ -1,8 +1,8 @@
 import Foundation
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 
-extension CmuxSettingsFileStore {
+extension WmuxSettingsFileStore {
     func parseAppSection(
         _ section: [String: Any],
         sourcePath: String,
@@ -26,10 +26,10 @@ extension CmuxSettingsFileStore {
         }
         if section.keys.contains("accentColor") {
             if let raw = jsonString(section["accentColor"]),
-               let parsed = CmuxAccentColorMode.parseSettingsFileValue(raw) {
-                snapshot.managedUserDefaults[CmuxAccentColorMode.userDefaultsKey] = .string(parsed.mode.rawValue)
+               let parsed = WmuxAccentColorMode.parseSettingsFileValue(raw) {
+                snapshot.managedUserDefaults[WmuxAccentColorMode.userDefaultsKey] = .string(parsed.mode.rawValue)
                 if let hex = parsed.customHex {
-                    snapshot.managedUserDefaults[CmuxAccentColorMode.customHexUserDefaultsKey] = .string(hex)
+                    snapshot.managedUserDefaults[WmuxAccentColorMode.customHexUserDefaultsKey] = .string(hex)
                 }
             } else {
                 logInvalid("app.accentColor", sourcePath: sourcePath)

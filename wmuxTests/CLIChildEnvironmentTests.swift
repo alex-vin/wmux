@@ -42,7 +42,7 @@ import Foundation
         ])
         #expect(child["CFFIXED_USER_HOME"] == "/tmp/cli-fixture")
         #expect(child["XDG_CONFIG_HOME"] == "/tmp/cli-fixture/.config")
-        #expect(child["CMUX_APP_HOST_ISOLATION_REQUIRED"] == nil)
+        #expect(child["WMUX_APP_HOST_ISOLATION_REQUIRED"] == nil)
     }
 
     /// A fixture that points XDG_CONFIG_HOME inside its own home is testing

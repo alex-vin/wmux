@@ -1,10 +1,10 @@
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -176,7 +176,7 @@ struct TerminalLocalImageTransferFileLifetimeTests {
         try #require(Data(base64Encoded: Self.onePixelPNGBase64)).write(to: imageURL)
         let captureURL = directory.appendingPathComponent("input.bin")
         let scriptURL = directory.appendingPathComponent("capture.py")
-        let ready = "CMUX_IMAGE_CAPTURE_READY"
+        let ready = "WMUX_IMAGE_CAPTURE_READY"
         let script = """
         import base64, json, os, select, shlex, sys, termios, time, tty
         fd = sys.stdin.fileno()

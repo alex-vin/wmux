@@ -1,21 +1,21 @@
 @preconcurrency import XCTest
-import CmuxTerminal
+import WmuxTerminal
 import Testing
-import CmuxControlSocket
-import CmuxFoundation
-import CmuxTerminalCore
-import CmuxSettings
+import WmuxControlSocket
+import WmuxFoundation
+import WmuxTerminalCore
+import WmuxSettings
 import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 import WebKit
-import CMUXMobileCore
+import WMUXMobileCore
 import ObjectiveC.runtime
 import Bonsplit
 import UserNotifications
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -4527,7 +4527,7 @@ final class GhosttySurfaceOverlayTests: XCTestCase {
 #if DEBUG
         // Skips outside its dedicated CI step, which sets the variable. A pull
         // request that edits this test runs that step too (choose_ci_suite.py).
-        guard ProcessInfo.processInfo.environment["CMUX_RENDERER_MEMORY_REGRESSION"] == "1" else {
+        guard ProcessInfo.processInfo.environment["WMUX_RENDERER_MEMORY_REGRESSION"] == "1" else {
             throw XCTSkip("Runs in the isolated renderer-memory CI invocation")
         }
         _ = NSApplication.shared

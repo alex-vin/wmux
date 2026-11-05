@@ -35,7 +35,7 @@ extension TerminalNotificationStore {
         let globalConfigPath = initialManager.flatMap {
             appDelegate.mainWindowContext(for: $0)?.cmuxConfigStore?.globalConfigPath
         }
-            ?? CmuxConfigStore.defaultGlobalConfigPath()
+            ?? WmuxConfigStore.defaultGlobalConfigPath()
         let policyRequestId = beginDesktopNotificationHookResolution(
             tabId: initialTarget.tabId,
             surfaceId: initialTarget.surfaceId,

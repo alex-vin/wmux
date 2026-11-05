@@ -1,11 +1,11 @@
-import CmuxFoundation
-import CMUXAgentLaunch
+import WmuxFoundation
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -150,7 +150,7 @@ extension AgentRestoreLiveOwnerAdmissionTests {
         let ownerWorkspaceID = UUID()
         let ownerSurfaceID = UUID()
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let hookEnvironment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let hookEnvironment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         try FileManager.default.createDirectory(at: hookStateDirectory, withIntermediateDirectories: true)
         let recordedIdentity: AgentPIDProcessIdentity
         if ownerState == .dead || ownerState == .absent {
@@ -199,14 +199,14 @@ extension AgentRestoreLiveOwnerAdmissionTests {
             RestorableAgentSessionIndex.load(
                 homeDirectory: rootPath,
                 fileManager: .default,
-                registry: CmuxVaultAgentRegistry(registrations: [.builtInGrok, .builtInAmp, .builtInPi]),
+                registry: WmuxVaultAgentRegistry(registrations: [.builtInGrok, .builtInAmp, .builtInPi]),
                 detectedSnapshots: [:],
                 environment: hookEnvironment,
                 processArgumentsProvider: { candidatePID in
                     guard candidatePID == processID else { return nil }
-                    // Deliberately no CMUX_WORKSPACE_ID / CMUX_SURFACE_ID: this is
+                    // Deliberately no WMUX_WORKSPACE_ID / WMUX_SURFACE_ID: this is
                     // the nohup/setsid/daemonized shape from #11043.
-                    return CmuxTopProcessArguments(
+                    return WmuxTopProcessArguments(
                         arguments: launchArguments,
                         environment: [:]
                     )

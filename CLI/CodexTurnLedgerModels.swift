@@ -1,18 +1,18 @@
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
 /// The process identity carried by one Codex hook invocation.
 ///
-/// CMUX_CODEX_PID is a launch-time claim and is inherited by descendants.
-/// The hook shell also supplies CMUX_CODEX_HOOK_PID, identifying the process
+/// WMUX_CODEX_PID is a launch-time claim and is inherited by descendants.
+/// The hook shell also supplies WMUX_CODEX_HOOK_PID, identifying the process
 /// that actually caused the callback.
 struct CodexHookInvocation: Equatable, Sendable {
-    static let tokenEnvironmentKey = "CMUX_CODEX_INVOCATION_ID"
-    static let parentTokenEnvironmentKey = "CMUX_CODEX_PARENT_INVOCATION_ID"
-    static let ownerPIDEnvironmentKey = "CMUX_CODEX_PID"
-    static let observedPIDEnvironmentKey = "CMUX_CODEX_HOOK_PID"
-    static let ledgerPathEnvironmentKey = "CMUX_CODEX_TURN_LEDGER_PATH"
-    static let forkSessionEnvironmentKey = "CMUX_CODEX_FORK_SESSION"
+    static let tokenEnvironmentKey = "WMUX_CODEX_INVOCATION_ID"
+    static let parentTokenEnvironmentKey = "WMUX_CODEX_PARENT_INVOCATION_ID"
+    static let ownerPIDEnvironmentKey = "WMUX_CODEX_PID"
+    static let observedPIDEnvironmentKey = "WMUX_CODEX_HOOK_PID"
+    static let ledgerPathEnvironmentKey = "WMUX_CODEX_TURN_LEDGER_PATH"
+    static let forkSessionEnvironmentKey = "WMUX_CODEX_FORK_SESSION"
 
     let token: String?
     let parentToken: String?

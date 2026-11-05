@@ -1,10 +1,10 @@
-import CmuxControlSocket
-import CmuxSettings
+import WmuxControlSocket
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -20,10 +20,10 @@ struct FocusHistoryScopeTests {
         )
 
         #expect(mapping.defaultsKey == SettingCatalog().app.focusHistoryIncludesPanesAndTabs.userDefaultsKey)
-        #expect(CmuxSettingsFileStore.supportedSettingsJSONPaths.contains("app.focusHistoryIncludesPanesAndTabs"))
+        #expect(WmuxSettingsFileStore.supportedSettingsJSONPaths.contains("app.focusHistoryIncludesPanesAndTabs"))
         let settingName = "focusHistoryIncludesPanesAndTabs"
         let templateLine = try #require(
-            CmuxSettingsFileStore.defaultTemplate().split(separator: "\n").first {
+            WmuxSettingsFileStore.defaultTemplate().split(separator: "\n").first {
                 $0.contains("\"\(settingName)\"")
             }
         ).trimmingCharacters(in: .whitespaces)

@@ -1,8 +1,8 @@
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     nonisolated static let defaultWaitTimeoutMs = 30_000
     nonisolated static let maxWaitTimeoutMs = 3_600_000
 
@@ -17,7 +17,7 @@ extension CmuxTuiSurfaceProvider {
 /// OUTPUT (the whole log, not the visible rows). Together they turn "run this to
 /// completion and give me the result" into `wait-exit` + `output` instead of a prompt
 /// regex and a screenful of text.
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Returns the cwd of the process group currently owning the remote PTY.
     /// This is deliberately a live process query: the snapshot's `cwd` is the
     /// terminal's spawn directory and remains stale after a remote `cd`.

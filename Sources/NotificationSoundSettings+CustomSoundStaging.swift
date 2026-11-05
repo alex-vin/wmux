@@ -626,8 +626,8 @@ struct NotificationSoundProcessRunner: NotificationSoundProcessRunning, Sendable
 /// This keeps the global picker and sparse per-agent matrix on the same cache
 /// and prevents concurrent selections from replacing the same destination.
 extension NotificationSoundSettings {
-    static let customSoundBaseName = "cmux-custom-notification-sound"
-    static let systemSoundBaseName = "cmux-system-notification-sound"
+    static let customSoundBaseName = "wmux-custom-notification-sound"
+    static let systemSoundBaseName = "wmux-system-notification-sound"
     static let systemSoundDirectoryURL = URL(
         fileURLWithPath: "/System/Library/Sounds",
         isDirectory: true

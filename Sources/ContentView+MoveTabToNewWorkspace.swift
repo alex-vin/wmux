@@ -1,6 +1,6 @@
-import CmuxCommandPalette
+import WmuxCommandPalette
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 extension ContentView {

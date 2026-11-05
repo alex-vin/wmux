@@ -1,4 +1,4 @@
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Foundation
 
 /// Transition notifications for a workspace's todo state: a single cmux

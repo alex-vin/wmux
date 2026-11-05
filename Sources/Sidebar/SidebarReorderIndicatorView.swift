@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 
 /// The insertion line shared by local workspace rows and the Cloud outline.
 @MainActor
@@ -36,7 +36,7 @@ final class SidebarReorderIndicatorView: NSView {
     }
 
     /// The resolved cmux accent, set by the owner.
-    var accentColor = CmuxAccentColor() {
+    var accentColor = WmuxAccentColor() {
         didSet {
             guard accentColor != oldValue else { return }
             updateColor()

@@ -1,10 +1,10 @@
 import AppKit
-import CmuxAgentJournal
-import CmuxControlSocket
-import CmuxCore
+import WmuxAgentJournal
+import WmuxControlSocket
+import WmuxCore
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -427,8 +427,8 @@ extension AgentNotificationRegressionTests {
         let fixture = try makeLiveRetargetFixture()
         defer { fixture.restore() }
 
-        // `cmux notify` from a moved pane: spawn-time CMUX_WORKSPACE_ID is
-        // stale but CMUX_SURFACE_ID is the pane's stable identity — the
+        // `cmux notify` from a moved pane: spawn-time WMUX_WORKSPACE_ID is
+        // stale but WMUX_SURFACE_ID is the pane's stable identity — the
         // notification must follow the surface, not fall back to the stale
         // workspace's focused pane.
         let result = TerminalController.shared.v2NotificationCreateForCaller(params: [
@@ -615,7 +615,7 @@ extension AgentNotificationRegressionTests {
     func testTTYDeviceMatchRequiresUniqueSurface() throws {
         let workspace = Workspace(), panel = try #require(workspace.focusedPanelId)
         workspace.registerReportedSurfaceTTYName("/dev/null", panelId: panel)
-        #expect(workspace.surfaceTTYDevices[panel] == CmuxTopProcessSnapshot.deviceIdentifier(forTTYName: "/dev/null"))
+        #expect(workspace.surfaceTTYDevices[panel] == WmuxTopProcessSnapshot.deviceIdentifier(forTTYName: "/dev/null"))
         let w1 = UUID(), s1 = UUID(), w2 = UUID(), s2 = UUID()
         let bindings: [(workspaceId: UUID, surfaceId: UUID, ttyDevice: Int64)] = [
             (workspaceId: w1, surfaceId: s1, ttyDevice: 7),

@@ -1,7 +1,7 @@
-import CmuxControlSocket
-import CmuxWorkspaces
+import WmuxControlSocket
+import WmuxWorkspaces
 import Foundation
-import CmuxSettings
+import WmuxSettings
 
 /// The workspace-group-domain witnesses for the stage-3c
 /// ``ControlCommandCoordinator``: app-model witnesses for the former

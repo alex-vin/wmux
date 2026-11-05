@@ -1,7 +1,7 @@
-import CmuxCloud
-import CmuxControlSocket
-import CmuxSettings
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxControlSocket
+import WmuxSettings
+import WmuxSurfaceCatalogModel
 import Foundation
 
 // The socket face of the surface catalog: `surface.catalog`, `surface.project`,
@@ -322,7 +322,7 @@ extension TerminalController {
             // shows connection controls until VPN access is ready; this read
             // never creates a forward or requests a public preview.
             let privateURL = await catalog.resources[resource]?.url
-            guard let provider = await catalog.provider(for: resource.machine) as? CmuxTuiSurfaceProvider else {
+            guard let provider = await catalog.provider(for: resource.machine) as? WmuxTuiSurfaceProvider else {
                 throw SurfaceCatalogError.unsupported(SurfaceCatalog.portPreviewUnavailableMessage(machineID: resource.machine.rawValue))
             }
             let url = try await provider.portLinkURL(port: port)
@@ -339,12 +339,12 @@ extension TerminalController {
             return v2Error(id: id, code: "invalid_params", message: "vm.link_socket requires `id`. Run `cmux vm ls` to find one.")
         }
         return v2VmCall(id: id, timeoutSeconds: 120) {
-            let link = try await CmuxTuiSurfaceProviderRegistry.shared.linkSocketPath(machineID: vmId)
+            let link = try await WmuxTuiSurfaceProviderRegistry.shared.linkSocketPath(machineID: vmId)
             return ["socket_path": link.socketPath, "session": link.session]
         }
     }
 
-    /// `vm.workspace_new {id, name?, focus?, open?}` → creates a cmux-tui workspace on the
+    /// `vm.workspace_new {id, name?, focus?, open?}` → creates a wmux-tui workspace on the
     /// machine and, when opened, gives it a starter terminal and projects it locally. A
     /// headless request stages that same workspace without projecting it locally.
     nonisolated func socketWorkerVMWorkspaceNewResponse(id: Any?, params: [String: Any]) -> String {
@@ -370,7 +370,7 @@ extension TerminalController {
             var precreatedWorkspace: SurfaceRemoteWorkspace?
             if reuse, let name {
                 let lookup: CloudTreeRemoteWorkspaceLookup
-                if let cloudProvider = provider as? CmuxTuiSurfaceProvider {
+                if let cloudProvider = provider as? WmuxTuiSurfaceProvider {
                     let resolved = try await cloudProvider.getOrCreateRemoteWorkspace(name: name)
                     if resolved.existing {
                         lookup = .found(resolved.workspace, CloudTreeRemoteWorkspaceMembers(terminals: [], browsers: [], displays: []))
@@ -492,7 +492,7 @@ extension TerminalController {
             return v2Error(id: id, code: "invalid_params", message: "vm.workspace_open requires `id`.")
         }
         guard let remoteWorkspaceID = Self.surfaceString(params["workspace_id"]), !remoteWorkspaceID.isEmpty else {
-            return v2Error(id: id, code: "invalid_params", message: "vm.workspace_open requires `workspace_id` (a cmux-tui workspace id from `cmux vm tree`).")
+            return v2Error(id: id, code: "invalid_params", message: "vm.workspace_open requires `workspace_id` (a wmux-tui workspace id from `cmux vm tree`).")
         }
         let here = Self.surfaceBool(params["here"]) ?? false
         // `workspace_id` is the REMOTE workspace here; the local target rides as `target_workspace_id`.
@@ -563,7 +563,7 @@ extension TerminalController {
         }
     }
 
-    /// `vm.workspace_close {id, workspace_id}` → closes the cmux-tui workspace; its
+    /// `vm.workspace_close {id, workspace_id}` → closes the wmux-tui workspace; its
     /// terminals KEEP RUNNING and detach into the Terminals pool (the sidebar's "Close
     /// Workspace (Keep Terminals)"). Use `vm.workspace_delete` to also kill them.
     nonisolated func socketWorkerVMWorkspaceCloseResponse(id: Any?, params: [String: Any]) -> String {
@@ -603,7 +603,7 @@ extension TerminalController {
         }
     }
 
-    /// `vm.workspace_rename {id, workspace_id, name}` → renames the cmux-tui workspace
+    /// `vm.workspace_rename {id, workspace_id, name}` → renames the wmux-tui workspace
     /// (the sidebar's "Rename…", through the catalog's shared mutation lane).
     nonisolated func socketWorkerVMWorkspaceRenameResponse(id: Any?, params: [String: Any]) -> String {
         guard let vmId = Self.surfaceString(params["id"]), !vmId.isEmpty,
@@ -765,11 +765,11 @@ extension TerminalController {
 
     // MARK: - Headless terminal I/O (agent primitives)
 
-    /// The cmux-tui provider for a cloud machine; the local machine and any provider
+    /// The wmux-tui provider for a cloud machine; the local machine and any provider
     /// without a remote session have no headless terminal I/O.
-    nonisolated static func cloudTuiProvider(machineID: String, catalog: SurfaceCatalog) async throws -> CmuxTuiSurfaceProvider {
+    nonisolated static func cloudTuiProvider(machineID: String, catalog: SurfaceCatalog) async throws -> WmuxTuiSurfaceProvider {
         let machine = SurfaceMachineID.cloud(machineID)
-        guard let provider = try await Self.surfaceProvider(for: machine, catalog: catalog) as? CmuxTuiSurfaceProvider else {
+        guard let provider = try await Self.surfaceProvider(for: machine, catalog: catalog) as? WmuxTuiSurfaceProvider else {
             throw SurfaceCatalogError.noProvider(machine)
         }
         return provider
@@ -865,7 +865,7 @@ extension TerminalController {
         guard let pattern = params["pattern"] as? String, !pattern.isEmpty else {
             return v2Error(id: id, code: "invalid_params", message: "vm.terminal_wait requires a non-empty `pattern` (a regex matched against the screen text).")
         }
-        let timeoutMs = CmuxTuiSurfaceProvider.clampedWaitTimeoutMs(
+        let timeoutMs = WmuxTuiSurfaceProvider.clampedWaitTimeoutMs(
             (params["timeout_ms"] as? Int) ?? Int(Self.surfaceString(params["timeout_ms"]) ?? "")
         )
         let socketTimeout = TimeInterval(max(60, timeoutMs / 1000 + 15))
@@ -888,7 +888,7 @@ extension TerminalController {
               let terminalID = Self.surfaceString(params["terminal_id"]), !terminalID.isEmpty else {
             return v2Error(id: id, code: "invalid_params", message: "vm.terminal_wait_exit requires `id` and `terminal_id`.")
         }
-        let timeoutMs = CmuxTuiSurfaceProvider.clampedWaitTimeoutMs(
+        let timeoutMs = WmuxTuiSurfaceProvider.clampedWaitTimeoutMs(
             (params["timeout_ms"] as? Int) ?? Int(Self.surfaceString(params["timeout_ms"]) ?? "")
         )
         let socketTimeout = TimeInterval(max(60, timeoutMs / 1000 + 15))
@@ -948,7 +948,7 @@ extension TerminalController {
                 workspacesByID: owners
             )
         }) { machineID in
-            _ = await CmuxTuiSurfaceProviderRegistry.shared.providerRefreshingIfMissing(machineID: machineID)
+            _ = await WmuxTuiSurfaceProviderRegistry.shared.providerRefreshingIfMissing(machineID: machineID)
         }
     }
 

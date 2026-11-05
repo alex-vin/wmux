@@ -1,11 +1,11 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,11 +15,11 @@ struct AgentHibernationProcessSignalBoundaryTests {
         workspaceId: UUID(),
         panelId: UUID()
     )
-    private nonisolated static let signalScopeArguments = CmuxTopProcessArguments(
+    private nonisolated static let signalScopeArguments = WmuxTopProcessArguments(
         arguments: ["/usr/bin/test-agent"],
         environment: [
-            "CMUX_WORKSPACE_ID": signalScopeKey.workspaceId.uuidString,
-            "CMUX_SURFACE_ID": signalScopeKey.panelId.uuidString,
+            "WMUX_WORKSPACE_ID": signalScopeKey.workspaceId.uuidString,
+            "WMUX_SURFACE_ID": signalScopeKey.panelId.uuidString,
         ]
     )
 
@@ -37,11 +37,11 @@ struct AgentHibernationProcessSignalBoundaryTests {
             startMicroseconds: 2
         )
         let signaledTargets = OSAllocatedUnfairLock(initialState: [pid_t]())
-        let wrongScopeArguments = CmuxTopProcessArguments(
+        let wrongScopeArguments = WmuxTopProcessArguments(
             arguments: ["/usr/bin/test-agent"],
             environment: [
-                "CMUX_WORKSPACE_ID": UUID().uuidString,
-                "CMUX_SURFACE_ID": UUID().uuidString,
+                "WMUX_WORKSPACE_ID": UUID().uuidString,
+                "WMUX_SURFACE_ID": UUID().uuidString,
             ]
         )
 

@@ -166,7 +166,7 @@ struct DockControlDefinition: Codable, Equatable, Identifiable, Sendable {
 
     private static func validationError(code: Int, message: String) -> NSError {
         NSError(
-            domain: "cmux.dock",
+            domain: "wmux.dock",
             code: code,
             userInfo: [NSLocalizedDescriptionKey: message]
         )

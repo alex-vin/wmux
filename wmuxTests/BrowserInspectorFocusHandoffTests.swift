@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -37,7 +37,7 @@ struct BrowserInspectorFocusHandoffTests {
         let anchor = NSView(frame: NSRect(x: 80, y: 60, width: 480, height: 260))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         window.makeKeyAndOrderFront(nil)
         contentView.layoutSubtreeIfNeeded()
         BrowserWindowPortalRegistry.bind(webView: webView, to: anchor, visibleInUI: true, zPriority: 1)
@@ -63,7 +63,7 @@ struct BrowserInspectorFocusHandoffTests {
             object: nil,
             queue: nil
         ) { notification in
-            if notification.object as? CmuxWebView === webView {
+            if notification.object as? WmuxWebView === webView {
                 clickIntentCount += 1
             }
         }

@@ -1,5 +1,5 @@
 import AppKit
-import CmuxCore
+import WmuxCore
 import Darwin
 import Foundation
 /// Live delivery-target resolution for agent hook events.
@@ -28,14 +28,14 @@ import Foundation
 /// Live identity of a process: its controlling-terminal device
 /// (`proc_bsdinfo.e_tdev`) and its start-time-keyed scope cache key. nil when
 /// the process is gone.
-nonisolated func agentLiveProcessIdentity(pid: pid_t) -> (ttyDevice: Int64?, scopeCacheKey: CmuxTopProcessScopeCacheKey)? {
+nonisolated func agentLiveProcessIdentity(pid: pid_t) -> (ttyDevice: Int64?, scopeCacheKey: WmuxTopProcessScopeCacheKey)? {
     guard pid > 0 else { return nil }
     var info = proc_bsdinfo()
     let expectedSize = MemoryLayout<proc_bsdinfo>.stride
     let size = proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &info, Int32(expectedSize))
     guard size == expectedSize else { return nil }
     let device = Int64(info.e_tdev)
-    return (device > 0 ? device : nil, CmuxTopProcessSnapshot.scopeCacheKey(from: info))
+    return (device > 0 ? device : nil, WmuxTopProcessSnapshot.scopeCacheKey(from: info))
 }
 
 /// Darwin-backed process inspector kept behind the package's pure handoff
@@ -73,8 +73,8 @@ private struct LiveAgentDeliveryProcessInspector: AgentDeliveryProcessInspector 
                 scopeCacheKey: identity.scopeCacheKey
             )
         }
-        let scope: CmuxTopProcessScope?
-        switch CmuxTopProcessSnapshot.cmuxScopeProbe(
+        let scope: WmuxTopProcessScope?
+        switch WmuxTopProcessSnapshot.cmuxScopeProbe(
             for: Int(pid),
             expectedCacheKey: identity.scopeCacheKey
         ) {
@@ -143,7 +143,7 @@ extension Workspace {
             invalidateReportedSurfaceTTYRuntime(panelId: panelId)
             return
         }
-        surfaceRegistry.surfaceTTYDevices[panelId] = CmuxTopProcessSnapshot.deviceIdentifier(forTTYName: ttyName)
+        surfaceRegistry.surfaceTTYDevices[panelId] = WmuxTopProcessSnapshot.deviceIdentifier(forTTYName: ttyName)
         surfaceRegistry.runtimeReportedTTYSurfaceIDs.insert(panelId)
         surfaceRegistry.runtimeReportedTTYSurfaceGenerations[panelId] =
             terminal.surface.runtimeSurfaceGeneration
@@ -261,7 +261,7 @@ extension DockSplitStore {
                transfer.ttyReportRuntimeSurfaceGeneration
                 == terminal.surface.runtimeSurfaceGeneration,
                let reportedDevice = transfer.ttyName.flatMap(
-                   CmuxTopProcessSnapshot.deviceIdentifier(forTTYName:)
+                   WmuxTopProcessSnapshot.deviceIdentifier(forTTYName:)
                ),
                !devices.contains(reportedDevice) {
                 devices.append(reportedDevice)
@@ -321,7 +321,7 @@ extension AppDelegate {
     /// The live pane that owns the given agent process right now: the
     /// process's controlling tty matched against every surface's pty device
     /// (unique-match only), with the exact live process's start-time-keyed
-    /// `CMUX_SURFACE_ID` environment re-homed through
+    /// `WMUX_SURFACE_ID` environment re-homed through
     /// `notificationSurfaceOwner` as a nested-PTY fallback. Disagreement fails
     /// closed.
     func liveAgentDeliveryTarget(

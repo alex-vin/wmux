@@ -1,11 +1,11 @@
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
@@ -82,7 +82,7 @@ struct CloudNotificationSyncTests {
             ],
             "cursor": ["generation": "gen-1", "revision": "7"],
         ]
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: .cloud("vm-1")))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: .cloud("vm-1")))
         let rows = CloudVMNotificationRow.rows(from: state)
         #expect(rows.map(\.title) == ["first", "second"], "rows sort oldest first by created_at_ms")
         #expect(rows[0].readBy == ["mac-a"])
@@ -290,12 +290,12 @@ struct CloudNotificationSyncTests {
         """#
         let snapshot = try #require(JSONSerialization.jsonObject(with: Data(snapshotJSON.utf8)) as? [String: Any])
         let machine = SurfaceMachineID.cloud("vm-abbf70c854e14df9bd6d3dee8c91a1d3")
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
         #expect(state.cursor == CloudVMCursor(generation: "8c9e6270-69d1-4441-8c59-80836fb80dc9", revision: 26))
         #expect(CloudVMNotificationRow.rows(from: state).count == 6)
 
         let cursor = CloudVMCursor(generation: "8c9e6270-69d1-4441-8c59-80836fb80dc9", revision: 27)
-        let application = CmuxTuiSnapshotParser.applyingWithImpact(
+        let application = WmuxTuiSnapshotParser.applyingWithImpact(
             deltaPayload: Data(deltaJSON.utf8),
             cursor: cursor,
             to: state

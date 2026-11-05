@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 import Foundation
 import os
 import UserNotifications
@@ -165,7 +165,7 @@ enum NotificationSoundSettings {
     /// Live Do Not Disturb assertion store written by the Focus daemon.
     static let defaultAssertionsFileURL: URL = {
 #if DEBUG
-        if let override = ProcessInfo.processInfo.environment["CMUX_DEBUG_DND_ASSERTIONS_PATH"],
+        if let override = ProcessInfo.processInfo.environment["WMUX_DEBUG_DND_ASSERTIONS_PATH"],
            !override.isEmpty {
             return URL(fileURLWithPath: override, isDirectory: false)
         }
@@ -406,12 +406,12 @@ enum NotificationSoundSettings {
                 capturesErrorOutput: false
             )
             var commandEnvironment = ProcessInfo.processInfo.environment
-            commandEnvironment["CMUX_NOTIFICATION_TITLE"] = title
-            commandEnvironment["CMUX_NOTIFICATION_SUBTITLE"] = subtitle
-            commandEnvironment["CMUX_NOTIFICATION_BODY"] = body
+            commandEnvironment["WMUX_NOTIFICATION_TITLE"] = title
+            commandEnvironment["WMUX_NOTIFICATION_SUBTITLE"] = subtitle
+            commandEnvironment["WMUX_NOTIFICATION_BODY"] = body
             // Remote-origin text (ssh relay, cloud machine) is untrusted data; the
             // command can gate on this instead of trusting every notification alike.
-            commandEnvironment["CMUX_NOTIFICATION_ORIGIN"] = origin.wireValue
+            commandEnvironment["WMUX_NOTIFICATION_ORIGIN"] = origin.wireValue
             let environment = commandEnvironment
             Task.detached(priority: .utility) {
                 defer { releaseCustomCommandAdmission() }

@@ -169,7 +169,7 @@ extension WMUXCLI {
         try registry.validateServerSocketIfPresent()
         let environment = ProcessInfo.processInfo.environment
         let path: String?
-        if let override = environment["CMUX_LOCAL_TMUX_BIN"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        if let override = environment["WMUX_LOCAL_TMUX_BIN"]?.trimmingCharacters(in: .whitespacesAndNewlines),
            !override.isEmpty {
             path = URL(fileURLWithPath: resolvePath(override)).standardizedFileURL.path
         } else {

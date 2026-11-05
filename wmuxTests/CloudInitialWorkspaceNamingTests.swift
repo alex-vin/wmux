@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -84,7 +84,7 @@ struct CloudInitialWorkspaceNamingTests {
 
             fixture.catalog.replaceCloudState(
                 fixture.provider.graph,
-                resources: CmuxTuiSnapshotParser.resources(from: fixture.provider.graph),
+                resources: WmuxTuiSnapshotParser.resources(from: fixture.provider.graph),
                 info: fixture.provider.info
             )
             fixture.renameService.reconcileRemoteState(

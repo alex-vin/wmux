@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -32,11 +32,11 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
             "signal.signal(signal.SIGHUP, signal.SIG_IGN)",
             "signal.signal(signal.SIGINT, signal.SIG_IGN)",
             "def terminate(signum, frame):",
-            "    with open(os.environ['CMUX_TEST_AUTH_CHILD_SIGNAL'], 'w') as output:",
+            "    with open(os.environ['WMUX_TEST_AUTH_CHILD_SIGNAL'], 'w') as output:",
             "        output.write('term\\n')",
             "    sys.exit(143)",
             "signal.signal(signal.SIGTERM, terminate)",
-            "with open(os.environ['CMUX_TEST_AUTH_CHILD_PID'], 'w') as output:",
+            "with open(os.environ['WMUX_TEST_AUTH_CHILD_PID'], 'w') as output:",
             "    output.write(str(os.getpid()) + '\\n')",
             "subprocess.run(['/bin/sleep', '30'])",
         ])
@@ -46,13 +46,13 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
 
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
         environment[SSHForegroundAuthenticationLaunch.environmentKey] = "foreground-auth-token"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_AUTH_CHILD_PID"] = childPIDFile.path
-        environment["CMUX_TEST_AUTH_CHILD_SIGNAL"] = childSignalLog.path
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_AUTH_CHILD_PID"] = childPIDFile.path
+        environment["WMUX_TEST_AUTH_CHILD_SIGNAL"] = childSignalLog.path
 
         let command = SSHPTYAttachStartupCommandBuilder.command(
             sessionID: "ssh-test-session",
@@ -134,15 +134,15 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
         try Self.writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
             "case \" $* \" in",
-            "  *\" ssh-pty-attach \"*) printf '%s\\n' attach >> \"${CMUX_TEST_ATTACH_FILE}\"; exit 253 ;;",
+            "  *\" ssh-pty-attach \"*) printf '%s\\n' attach >> \"${WMUX_TEST_ATTACH_FILE}\"; exit 253 ;;",
             "  *) exit 0 ;;",
             "esac",
         ])
         try Self.writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
+            "count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
             "count=$((count + 1))",
-            "printf '%s' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "if [ \"$count\" -eq 1 ]; then",
             "  printf '%s\\n' 'ssh: connect to host boot-retry.example.test port 22: Network is unreachable' >&2",
             "  exit 255",
@@ -151,7 +151,7 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
         ])
         try Self.writeShellFile(at: fakeSleep, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$1\" >> \"${CMUX_TEST_SLEEP_FILE}\"",
+            "printf '%s\\n' \"$1\" >> \"${WMUX_TEST_SLEEP_FILE}\"",
         ])
         for executable in [fakeCLI, fakeSSH, fakeSleep] {
             try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
@@ -159,17 +159,17 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
 
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
         environment[SSHForegroundAuthenticationLaunch.environmentKey] = "foreground-auth-token"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_ATTACH_FILE"] = attachFile.path
-        environment["CMUX_TEST_SLEEP_FILE"] = sleepFile.path
-        environment["CMUX_SSH_RECONNECT_LIMIT"] = "2"
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
-        environment["CMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_ATTACH_FILE"] = attachFile.path
+        environment["WMUX_TEST_SLEEP_FILE"] = sleepFile.path
+        environment["WMUX_SSH_RECONNECT_LIMIT"] = "2"
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
+        environment["WMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
 
         let command = SSHPTYAttachStartupCommandBuilder.command(
             sessionID: "ssh-test-session",
@@ -235,9 +235,9 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
             "#!/bin/sh",
             "case \" $* \" in",
             "  *\" workspace.remote.foreground_auth_ready \"*)",
-            "    for argument in \"$@\"; do cmux_test_last_argument=\"$argument\"; done",
-            "    if [ \"$cmux_test_last_argument\" = - ]; then /bin/cat > \"$CMUX_TEST_AUTH_PAYLOAD_LOG\"; else printf '%s\\n' \"$cmux_test_last_argument\" > \"$CMUX_TEST_AUTH_PAYLOAD_LOG\"; fi",
-            "    /bin/zsh -fc 'zmodload zsh/system || exit 2; : >> \"$CMUX_TEST_RESOLVED_AUTH_LOCK\" || exit 2; if zsystem flock -t 0 -e -f cmux_test_lock_fd \"$CMUX_TEST_RESOLVED_AUTH_LOCK\"; then exit 1; fi; exit 0'",
+            "    for argument in \"$@\"; do wmux_test_last_argument=\"$argument\"; done",
+            "    if [ \"$wmux_test_last_argument\" = - ]; then /bin/cat > \"$WMUX_TEST_AUTH_PAYLOAD_LOG\"; else printf '%s\\n' \"$wmux_test_last_argument\" > \"$WMUX_TEST_AUTH_PAYLOAD_LOG\"; fi",
+            "    /bin/zsh -fc 'zmodload zsh/system || exit 2; : >> \"$WMUX_TEST_RESOLVED_AUTH_LOCK\" || exit 2; if zsystem flock -t 0 -e -f wmux_test_lock_fd \"$WMUX_TEST_RESOLVED_AUTH_LOCK\"; then exit 1; fi; exit 0'",
             "    exit $?",
             "    ;;",
             "  *\" ssh-pty-attach \"*) exit 253 ;;",
@@ -248,7 +248,7 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
             "#!/bin/sh",
             "previous_arg=",
             "for arg in \"$@\"; do",
-            "  if [ \"$arg\" = '-G' ]; then printf 'controlpath %s\\n' \"${CMUX_TEST_CONTROL_PATH}\"; exit 0; fi",
+            "  if [ \"$arg\" = '-G' ]; then printf 'controlpath %s\\n' \"${WMUX_TEST_CONTROL_PATH}\"; exit 0; fi",
             "  if [ \"$previous_arg\" = '-O' ] && [ \"$arg\" = 'check' ]; then exit 0; fi",
             "  previous_arg=\"$arg\"",
             "done",
@@ -260,15 +260,15 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
 
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
         environment[SSHForegroundAuthenticationLaunch.environmentKey] = "foreground-auth-token"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_CONTROL_PATH"] = controlPath
-        environment["CMUX_TEST_AUTH_PAYLOAD_LOG"] =
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_CONTROL_PATH"] = controlPath
+        environment["WMUX_TEST_AUTH_PAYLOAD_LOG"] =
             foregroundAuthPayloadLog.path
-        environment["CMUX_TEST_RESOLVED_AUTH_LOCK"] =
+        environment["WMUX_TEST_RESOLVED_AUTH_LOCK"] =
             resolvedAuthenticationLockPath
 
         let command = SSHPTYAttachStartupCommandBuilder.command(
@@ -311,15 +311,15 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
         try Self.writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
             "case \" $* \" in",
-            "  *\" ssh-pty-attach \"*) printf '%s\\n' attach >> \"${CMUX_TEST_ATTACH_FILE}\"; exit 253 ;;",
+            "  *\" ssh-pty-attach \"*) printf '%s\\n' attach >> \"${WMUX_TEST_ATTACH_FILE}\"; exit 253 ;;",
             "  *) exit 0 ;;",
             "esac",
         ])
         try Self.writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
+            "count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
             "count=$((count + 1))",
-            "printf '%s' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "printf '%s\\n' 'ssh: connect to host boot-retry.example.test port 22: Network is unreachable' >&2",
             "exit 255",
         ])
@@ -330,15 +330,15 @@ struct SSHForegroundAuthenticationMarkerCleanupTests {
 
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
         environment[SSHForegroundAuthenticationLaunch.environmentKey] = "foreground-auth-token"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_ATTACH_FILE"] = attachFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
-        environment["CMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_ATTACH_FILE"] = attachFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
+        environment["WMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
 
         let result = try Self.runProcess(
             command: SSHPTYAttachStartupCommandBuilder.command(

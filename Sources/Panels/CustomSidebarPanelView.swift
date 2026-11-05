@@ -1,12 +1,12 @@
-import CmuxAppKitSupportUI
-import CmuxNotifications
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxSidebar
-import CmuxSidebarInterpreterClient
-import CmuxSidebarRemoteRender
-import CmuxSwiftRender
-import CmuxSwiftRenderUI
+import WmuxAppKitSupportUI
+import WmuxNotifications
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxSidebar
+import WmuxSidebarInterpreterClient
+import WmuxSidebarRemoteRender
+import WmuxSwiftRender
+import WmuxSwiftRenderUI
 import SwiftUI
 
 struct CustomSidebarPanelView: View {

@@ -1,5 +1,5 @@
-import CmuxAgentJournal
-import CmuxSettings
+import WmuxAgentJournal
+import WmuxSettings
 import Foundation
 
 /// Owns the app's agent message store and publishes its receipts on the
@@ -17,7 +17,7 @@ enum AgentMessageCenter {
             isEnabled: { AgentMessageCenter.isEnabled() },
             onChange: { change in
                 let message = change.message
-                CmuxEventBus.shared.publish(
+                WmuxEventBus.shared.publish(
                     name: "agent.message.\(change.state.rawValue)",
                     category: "agent",
                     source: "agent.message",
@@ -95,13 +95,13 @@ enum AgentMessageCenter {
         store.isReceivingDisabled(scope: scope, id: id.uuidString)
     }
 
-    /// `CMUX_AGENT_MESSAGES_PATH`, else a per-install file next to the agent
+    /// `WMUX_AGENT_MESSAGES_PATH`, else a per-install file next to the agent
     /// journal. In-memory under automated tests.
     static func defaultFileURL(
         bundleIdentifier: String? = Bundle.main.bundleIdentifier,
         isRunningUnderAutomatedTests: Bool = SessionRestorePolicy.isRunningUnderAutomatedTests()
     ) -> URL? {
-        if let override = ProcessInfo.processInfo.environment["CMUX_AGENT_MESSAGES_PATH"],
+        if let override = ProcessInfo.processInfo.environment["WMUX_AGENT_MESSAGES_PATH"],
            !override.isEmpty {
             return URL(fileURLWithPath: override)
         }
@@ -122,7 +122,7 @@ enum AgentMessageCenter {
             options: .regularExpression
         )
         return appSupport
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("agent-messages-\(safeBundleID).jsonl", isDirectory: false)
     }
 

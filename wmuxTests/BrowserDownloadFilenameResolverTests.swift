@@ -1,12 +1,12 @@
 import Foundation
-import CmuxBrowser
+import WmuxBrowser
 import CoreServices
 import Testing
 import UniformTypeIdentifiers
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -239,7 +239,7 @@ import WebKit
 
     @MainActor
     @Test func scriptedDownloadInterceptionKeepsFullHookOutOfSubframes() throws {
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let scripts = webView.configuration.userContentController.userScripts
 
         let mainFrameScript = try #require(
@@ -308,7 +308,7 @@ import WebKit
         }
         defer { NotificationCenter.default.removeObserver(observer) }
 
-        (try #require(panel.webView as? CmuxWebView)).onSessionDownloadEvent?([
+        (try #require(panel.webView as? WmuxWebView)).onSessionDownloadEvent?([
             "type": "saved",
             "download_id": "session-download-1",
             "filename": "report.csv",
@@ -430,7 +430,7 @@ import WebKit
             try Self.cookie(name: "wrong-path", domain: ".example.test", path: "/admin"),
         ]
 
-        let names = Set(CmuxWebView.cookiesForDownloadRequest(cookies, url: url).map(\.name))
+        let names = Set(WmuxWebView.cookiesForDownloadRequest(cookies, url: url).map(\.name))
 
         #expect(names == ["parent", "host"])
     }
@@ -444,7 +444,7 @@ import WebKit
             try Self.cookie(name: "future", domain: "example.test", expires: Date(timeIntervalSince1970: 4_102_444_800)),
         ]
 
-        let names = Set(CmuxWebView.cookiesForDownloadRequest(cookies, url: url).map(\.name))
+        let names = Set(WmuxWebView.cookiesForDownloadRequest(cookies, url: url).map(\.name))
 
         #expect(names == ["plain", "future"])
     }

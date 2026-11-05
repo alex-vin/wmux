@@ -1,5 +1,5 @@
 import CoreFoundation
-import CmuxControlSocket
+import WmuxControlSocket
 import Darwin
 import Foundation
 
@@ -164,7 +164,7 @@ extension WMUXCLI {
     }
 
     func isTransientEventStreamError(_ error: Error) -> Bool {
-        // The decision itself lives in CmuxControlSocket
+        // The decision itself lives in WmuxControlSocket
         // (`EventStreamFailure.isTransient`) so it can be unit-tested without the
         // CLI target; this wrapper only maps CLI spellings onto it.
         if let cliError = error as? CLIError {

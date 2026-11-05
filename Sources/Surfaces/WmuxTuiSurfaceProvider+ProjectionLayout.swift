@@ -1,6 +1,6 @@
 import Foundation
 
-extension CmuxTuiSurfaceProvider: SurfaceProjectionLayoutProviding {
+extension WmuxTuiSurfaceProvider: SurfaceProjectionLayoutProviding {
     /// Refresh through the provider's ordering fence, then read geometry from the
     /// graph already published to the sidebar. Never join a separate snapshot to
     /// catalog resources captured at a different revision.

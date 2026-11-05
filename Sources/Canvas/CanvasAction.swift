@@ -1,6 +1,6 @@
 import Foundation
-import CmuxCanvas
-import CmuxCanvasUI
+import WmuxCanvas
+import WmuxCanvasUI
 
 /// Every user-invokable canvas operation, behind one shared entrypoint.
 ///

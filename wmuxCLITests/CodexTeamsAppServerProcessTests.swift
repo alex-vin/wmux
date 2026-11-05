@@ -18,10 +18,10 @@ struct CodexTeamsAppServerProcessTests {
         let childMarker = root.appendingPathComponent("child")
         let childPIDMarker = root.appendingPathComponent("child-pid")
         let script = """
-        echo \"$$\" > \"$CMUX_CODEX_PARENT_MARKER\"
-        /bin/sh -c 'echo \"$$\" > \"$CMUX_CODEX_CHILD_MARKER\"; while :; do /bin/sleep 1; done' &
+        echo \"$$\" > \"$WMUX_CODEX_PARENT_MARKER\"
+        /bin/sh -c 'echo \"$$\" > \"$WMUX_CODEX_CHILD_MARKER\"; while :; do /bin/sleep 1; done' &
         child=$!
-        echo \"$child\" > \"$CMUX_CODEX_CHILD_PID_MARKER\"
+        echo \"$child\" > \"$WMUX_CODEX_CHILD_PID_MARKER\"
         wait \"$child\"
         """
         let process = try CodexTeamsAppServerProcess(
@@ -29,9 +29,9 @@ struct CodexTeamsAppServerProcessTests {
             executablePath: "/bin/sh",
             arguments: ["-c", script],
             environment: [
-                "CMUX_CODEX_PARENT_MARKER": parentMarker.path,
-                "CMUX_CODEX_CHILD_MARKER": childMarker.path,
-                "CMUX_CODEX_CHILD_PID_MARKER": childPIDMarker.path,
+                "WMUX_CODEX_PARENT_MARKER": parentMarker.path,
+                "WMUX_CODEX_CHILD_MARKER": childMarker.path,
+                "WMUX_CODEX_CHILD_PID_MARKER": childPIDMarker.path,
                 "PATH": "/usr/bin:/bin",
             ],
             logURL: nil

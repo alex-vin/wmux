@@ -1,6 +1,6 @@
 import AppKit
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// Red/green regression coverage for the sidebar close-clipping fix
 /// (https://github.com/manaflow-ai/cmux/pull/11242). Closing a workspace

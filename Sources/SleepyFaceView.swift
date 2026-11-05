@@ -1,5 +1,5 @@
-import CmuxSettingsUI
-import CmuxSettings
+import WmuxSettingsUI
+import WmuxSettings
 import SwiftUI
 
 /// Cute pixel-art sleeping scene for Sleepy Mode. Renders from the live

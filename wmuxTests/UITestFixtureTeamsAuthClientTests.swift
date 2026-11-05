@@ -1,15 +1,15 @@
-import CMUXAuthCore
-import CmuxAuthRuntime
+import WMUXAuthCore
+import WmuxAuthRuntime
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 #if DEBUG
-/// Session priming refreshes teams whenever `CMUX_UITEST_AUTH_FIXTURE_TEAMS`
+/// Session priming refreshes teams whenever `WMUX_UITEST_AUTH_FIXTURE_TEAMS`
 /// is set, so every team call in a fixture-teams launch must stay off the
 /// live client, even when the value is malformed.
 @Suite("UI test fixture teams client")
@@ -17,8 +17,8 @@ struct UITestFixtureTeamsAuthClientTests {
     @Test func malformedTeamsStillKeepTeamCallsOffTheLiveClient() async throws {
         let live = TeamChangeAuthClient()
         let client = UITestFixtureTeamsAuthClient.wrapping(live, environment: [
-            "CMUX_UITEST_AUTH_FIXTURE": "1",
-            "CMUX_UITEST_AUTH_FIXTURE_TEAMS": "not a team list",
+            "WMUX_UITEST_AUTH_FIXTURE": "1",
+            "WMUX_UITEST_AUTH_FIXTURE_TEAMS": "not a team list",
         ])
 
         #expect(try await client.listTeams().isEmpty)
@@ -29,7 +29,7 @@ struct UITestFixtureTeamsAuthClientTests {
     @Test func launchesWithoutFixtureTeamsUseTheLiveClient() async throws {
         let live = TeamChangeAuthClient()
         let client = UITestFixtureTeamsAuthClient.wrapping(live, environment: [
-            "CMUX_UITEST_AUTH_FIXTURE": "1",
+            "WMUX_UITEST_AUTH_FIXTURE": "1",
         ])
 
         #expect(try await client.listTeams().map(\.id) == ["team-a", "team-b"])

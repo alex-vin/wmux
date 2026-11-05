@@ -1,7 +1,7 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     func refreshCloudBrowserRoutes() {}
 
     func materializeBrowserPane(

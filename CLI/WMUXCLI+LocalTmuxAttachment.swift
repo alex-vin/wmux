@@ -205,7 +205,7 @@ extension WMUXCLI {
             return summary
         }
         if request.workspace == nil, request.window == nil,
-           let caller = ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] {
+           let caller = ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] {
             let summary = try workspaceSummary(workspaceSelector: caller, windowID: nil, client: client, fallbackTitle: record.workspaceTitle, fallbackCwd: record.cwd)
             guard summary.id != nil else {
                 throw CLIError(message: profile.workspaceNotFound())

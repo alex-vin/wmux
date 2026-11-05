@@ -8,7 +8,7 @@
 // for that call to a tool that declares readOnlyHint.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
 
   // Runs in the page world. arg: { op: "list" } or { op: "call", name, input }.

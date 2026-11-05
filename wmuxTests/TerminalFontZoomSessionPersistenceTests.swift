@@ -1,13 +1,13 @@
 import Foundation
 import Testing
-import CmuxFoundation
-import CmuxRemoteSession
-import CmuxSettings
-import CmuxTerminalCore
-@testable import CmuxTerminal
+import WmuxFoundation
+import WmuxRemoteSession
+import WmuxSettings
+import WmuxTerminalCore
+@testable import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -63,20 +63,20 @@ struct TerminalFontZoomSessionPersistenceTests {
                 )
         )
         #expect(
-            CmuxSettings.ShortcutAction.increaseWorkspaceTerminalFontSize.defaultStroke
-                == CmuxSettings.ShortcutStroke(key: "=", command: true, control: true)
+            WmuxSettings.ShortcutAction.increaseWorkspaceTerminalFontSize.defaultStroke
+                == WmuxSettings.ShortcutStroke(key: "=", command: true, control: true)
         )
         #expect(
-            CmuxSettings.ShortcutAction.decreaseWorkspaceTerminalFontSize.defaultStroke
-                == CmuxSettings.ShortcutStroke(key: "-", command: true, control: true)
+            WmuxSettings.ShortcutAction.decreaseWorkspaceTerminalFontSize.defaultStroke
+                == WmuxSettings.ShortcutStroke(key: "-", command: true, control: true)
         )
         #expect(
-            CmuxSettings.ShortcutAction.resetWorkspaceTerminalFontSize.defaultStroke
-                == CmuxSettings.ShortcutStroke(key: "0", command: true, control: true)
+            WmuxSettings.ShortcutAction.resetWorkspaceTerminalFontSize.defaultStroke
+                == WmuxSettings.ShortcutStroke(key: "0", command: true, control: true)
         )
         #expect(
-            CmuxSettings.ShortcutAction.equalizeSplits.defaultStroke
-                == CmuxSettings.ShortcutStroke(
+            WmuxSettings.ShortcutAction.equalizeSplits.defaultStroke
+                == WmuxSettings.ShortcutStroke(
                     key: "=",
                     command: true,
                     shift: true,
@@ -120,7 +120,7 @@ struct TerminalFontZoomSessionPersistenceTests {
                 globalFontMagnificationPercent: GlobalFontMagnification.storedPercent
             ).fontSize
         )
-        let configuredBasePoints = CmuxSurfaceConfigTemplate.baseFontSize(
+        let configuredBasePoints = WmuxSurfaceConfigTemplate.baseFontSize(
             fromRuntimePoints: configuredRuntimePoints,
             percent: GlobalFontMagnification.storedPercent
         )
@@ -391,7 +391,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         #expect(workspace.closePanel(firstPanelID, force: true))
 
         let windowDock = manager.makeWindowDockStore(windowId: UUID())
-        var configTemplate = CmuxSurfaceConfigTemplate()
+        var configTemplate = WmuxSurfaceConfigTemplate()
         configTemplate.fontSizeLineage = TerminalFontSizeLineage(
             basePoints: 5,
             isExplicitOverride: true
@@ -482,7 +482,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         #expect(secondWorkspace.closePanel(secondPanelID, force: true))
 
         let windowDock = manager.makeWindowDockStore(windowId: UUID())
-        var configTemplate = CmuxSurfaceConfigTemplate()
+        var configTemplate = WmuxSurfaceConfigTemplate()
         configTemplate.fontSizeLineage = TerminalFontSizeLineage(
             basePoints: 5,
             isExplicitOverride: true
@@ -721,7 +721,7 @@ struct TerminalFontZoomSessionPersistenceTests {
         )
         #expect(workspace.closePanel(firstPanelID, force: true))
 
-        var configTemplate = CmuxSurfaceConfigTemplate()
+        var configTemplate = WmuxSurfaceConfigTemplate()
         configTemplate.fontSizeLineage = TerminalFontSizeLineage(
             basePoints: TerminalFontSizePolicy.minimumRuntimePoints,
             isExplicitOverride: true
@@ -1110,7 +1110,7 @@ struct TerminalFontZoomSessionPersistenceTests {
 
     @Test("cleared zoom follows current config when the runtime is recreated")
     func clearedZoomDoesNotSeedRuntimeRecreation() {
-        var restoredTemplate = CmuxSurfaceConfigTemplate()
+        var restoredTemplate = WmuxSurfaceConfigTemplate()
         restoredTemplate.setFontSize(5.5, isExplicitOverride: true)
         let surface = TerminalSurface(
             tabId: UUID(),
@@ -1134,7 +1134,7 @@ struct TerminalFontZoomSessionPersistenceTests {
 
     @Test("initial non-explicit template preserves its font size for first runtime creation")
     func initialNonExplicitTemplateSeedsFirstRuntimeCreation() {
-        var inheritedTemplate = CmuxSurfaceConfigTemplate()
+        var inheritedTemplate = WmuxSurfaceConfigTemplate()
         inheritedTemplate.setFontSize(12, isExplicitOverride: false)
         let surface = TerminalSurface(
             tabId: UUID(),

@@ -1,4 +1,4 @@
-enum CmuxFeatureFlagSource: Equatable, Sendable {
+enum WmuxFeatureFlagSource: Equatable, Sendable {
     case remote
     case override
     case `default`

@@ -1,12 +1,12 @@
-import CmuxFoundation
-import CMUXAgentLaunch
+import WmuxFoundation
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 import SQLite3
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -21,7 +21,7 @@ struct ForkParentFallbackResidualTests {
         let processArguments = fixture.processArguments(
             argv: ["/opt/cmux-tools/claude-custom", "--resume", sessionId, "--fork-session"],
             launchKind: "claude",
-            extraEnvironment: ["CMUX_AGENT_LAUNCH_EXECUTABLE": "/opt/cmux-tools/claude-custom"]
+            extraEnvironment: ["WMUX_AGENT_LAUNCH_EXECUTABLE": "/opt/cmux-tools/claude-custom"]
         )
         let identity = AgentPIDProcessIdentity(
             pid: pid_t(fixture.processID),
@@ -31,7 +31,7 @@ struct ForkParentFallbackResidualTests {
         let loader = SharedLiveAgentIndexLoader(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             processSnapshotProvider: {
                 fixture.processSnapshot(processName: "claude-custom", processPath: "/opt/cmux-tools/claude-custom")
             },
@@ -61,11 +61,11 @@ struct ForkParentFallbackResidualTests {
             ),
             registration: nil
         )
-        let process = CmuxTopProcessArguments(
+        let process = WmuxTopProcessArguments(
             arguments: ["/opt/cmux-tools/not-claude", "--resume", snapshot.sessionId, "--fork-session"],
             environment: [
-                "CMUX_AGENT_LAUNCH_KIND": "claude",
-                "CMUX_AGENT_LAUNCH_EXECUTABLE": "/opt/cmux-tools/claude-custom",
+                "WMUX_AGENT_LAUNCH_KIND": "claude",
+                "WMUX_AGENT_LAUNCH_EXECUTABLE": "/opt/cmux-tools/claude-custom",
             ]
         )
 
@@ -88,11 +88,11 @@ struct ForkParentFallbackResidualTests {
             ),
             registration: nil
         )
-        let claudeTeamsProcess = CmuxTopProcessArguments(
+        let claudeTeamsProcess = WmuxTopProcessArguments(
             arguments: ["/usr/local/bin/claude", "--resume", claudeTeamsSnapshot.sessionId],
             environment: [
-                "CMUX_AGENT_LAUNCH_KIND": "claudeTeams",
-                "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/cmux",
+                "WMUX_AGENT_LAUNCH_KIND": "claudeTeams",
+                "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/cmux",
             ]
         )
         #expect(CachedAgentProcessIdentityValidator().currentProcess(claudeTeamsProcess, matches: claudeTeamsSnapshot))
@@ -113,16 +113,16 @@ struct ForkParentFallbackResidualTests {
             registration: nil
         )
         #expect(CachedAgentProcessIdentityValidator().currentProcess(
-            CmuxTopProcessArguments(
+            WmuxTopProcessArguments(
                 arguments: ["/usr/local/bin/cmux", "codex-teams", "resume", codexTeamsSnapshot.sessionId],
-                environment: ["CMUX_AGENT_LAUNCH_KIND": "codexTeams"]
+                environment: ["WMUX_AGENT_LAUNCH_KIND": "codexTeams"]
             ),
             matches: codexTeamsSnapshot
         ))
         #expect(CachedAgentProcessIdentityValidator().currentProcess(
-            CmuxTopProcessArguments(
+            WmuxTopProcessArguments(
                 arguments: ["/usr/local/bin/cmux", "codex-teams", "resume", claudeTeamsSnapshot.sessionId],
-                environment: ["CMUX_AGENT_LAUNCH_KIND": "codexTeams"]
+                environment: ["WMUX_AGENT_LAUNCH_KIND": "codexTeams"]
             ),
             matches: claudeTeamsSnapshot
         ) == false)
@@ -196,7 +196,7 @@ struct ForkParentFallbackResidualTests {
             parentSessionId: fixture.hookRecord(kind: "codex", sessionId: parentSessionId, panelId: fixture.parentPanelId),
         ])
         let detected = RestorableAgentSessionIndex.processDetectedSnapshots(
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             fileManager: fixture.fileManager,
             processSnapshot: fixture.processSnapshot(processName: "cmux", processPath: "/usr/local/bin/cmux"),
             capturedAt: 42,
@@ -212,7 +212,7 @@ struct ForkParentFallbackResidualTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: detected,
             processArgumentsProvider: { _ in nil },
             processIdentityProvider: { _ in nil }
@@ -236,7 +236,7 @@ struct ForkParentFallbackResidualTests {
             childSessionId: fixture.hookRecord(kind: "codex", sessionId: childSessionId, panelId: fixture.panelId, updatedAt: 20),
         ])
         let detected = RestorableAgentSessionIndex.processDetectedSnapshots(
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             fileManager: fixture.fileManager,
             processSnapshot: fixture.processSnapshot(processName: "cmux", processPath: "/usr/local/bin/cmux"),
             capturedAt: 42,
@@ -252,7 +252,7 @@ struct ForkParentFallbackResidualTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: detected,
             processArgumentsProvider: { _ in nil },
             processIdentityProvider: { _ in nil }
@@ -289,8 +289,8 @@ struct ForkParentFallbackResidualTests {
             argv: liveArguments,
             launchKind: "claudeTeams",
             extraEnvironment: [
-                "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/cmux",
-                "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(launchArguments),
+                "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/cmux",
+                "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(launchArguments),
             ]
         )
         let identity = AgentPIDProcessIdentity(
@@ -301,7 +301,7 @@ struct ForkParentFallbackResidualTests {
         let loader = SharedLiveAgentIndexLoader(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             processSnapshotProvider: {
                 fixture.processSnapshot(processName: "claude", processPath: "/usr/local/bin/claude")
             },
@@ -350,10 +350,10 @@ struct ForkParentFallbackResidualTests {
             try? fileManager.removeItem(at: root)
         }
 
-        func processSnapshot(processName: String, processPath: String?) -> CmuxTopProcessSnapshot {
-            CmuxTopProcessSnapshot(
+        func processSnapshot(processName: String, processPath: String?) -> WmuxTopProcessSnapshot {
+            WmuxTopProcessSnapshot(
                 processes: [
-                    CmuxTopProcessInfo(
+                    WmuxTopProcessInfo(
                         pid: processID,
                         parentPID: 1,
                         name: processName,
@@ -379,19 +379,19 @@ struct ForkParentFallbackResidualTests {
             argv: [String],
             launchKind: String?,
             extraEnvironment: [String: String] = [:]
-        ) -> CmuxTopProcessArguments {
+        ) -> WmuxTopProcessArguments {
             var environment = [
-                "CMUX_AGENT_LAUNCH_CWD": cwd.path,
-                "CMUX_BUNDLED_CLI_PATH": "/usr/local/bin/cmux",
-                "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-                "CMUX_SURFACE_ID": panelId.uuidString,
+                "WMUX_AGENT_LAUNCH_CWD": cwd.path,
+                "WMUX_BUNDLED_CLI_PATH": "/usr/local/bin/cmux",
+                "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+                "WMUX_SURFACE_ID": panelId.uuidString,
                 "PWD": cwd.path,
             ]
             if let launchKind {
-                environment["CMUX_AGENT_LAUNCH_KIND"] = launchKind
+                environment["WMUX_AGENT_LAUNCH_KIND"] = launchKind
             }
             environment.merge(extraEnvironment) { _, new in new }
-            return CmuxTopProcessArguments(arguments: argv, environment: environment)
+            return WmuxTopProcessArguments(arguments: argv, environment: environment)
         }
 
         func hookRecord(

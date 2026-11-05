@@ -1,5 +1,5 @@
 /// Metadata for a registered PostHog runtime flag.
-struct CmuxFeatureFlagDefinition: Identifiable, Equatable, Sendable {
+struct WmuxFeatureFlagDefinition: Identifiable, Equatable, Sendable {
     var id: String { key }
 
     let key: String

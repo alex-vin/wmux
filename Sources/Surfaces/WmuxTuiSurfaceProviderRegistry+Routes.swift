@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSettings
+import WmuxCloud
+import WmuxSettings
 import Foundation
 
 /// Routes Cloud traffic through the current account-owned registry.
-extension CmuxTuiSurfaceProviderRegistry {
+extension WmuxTuiSurfaceProviderRegistry {
     /// The headless link's local mux socket for a machine, connecting if needed.
     func linkSocketPath(machineID: String) async throws -> (socketPath: String, session: String) {
         guard !isRetired, !ManagedDevicePolicy().isEnforced(.disableCloud), isCloudEnabled(), !Task.isCancelled else {

@@ -1,6 +1,6 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 
 extension SidebarBonsplitTabWorkspaceDropView {
     /// SwiftUI and NSTableView sidebars share this same native destination.

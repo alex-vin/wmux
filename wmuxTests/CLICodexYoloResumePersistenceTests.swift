@@ -104,25 +104,25 @@ extension CLINotifyProcessIntegrationRegressionTests {
                 }
             }
 
-            var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("CMUX_CODEX_") }
+            var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("WMUX_CODEX_") }
             environment["HOME"] = root.path
-            environment["CMUX_SOCKET_PATH"] = socketPath
-            environment["CMUX_WORKSPACE_ID"] = workspaceId
-            environment["CMUX_SURFACE_ID"] = surfaceId
-            environment["CMUX_CLI_TTY_NAME"] = ttyName
-            environment["CMUX_AGENT_HOOK_STATE_DIR"] = root.path
-            environment["CMUX_AGENT_LAUNCH_KIND"] = "codex"
-            environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = executable
-            environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated([executable])
-            environment["CMUX_AGENT_LAUNCH_CWD"] = root.path
-            environment["CMUX_CODEX_PID"] = String(scenario.currentPID)
+            environment["WMUX_SOCKET_PATH"] = socketPath
+            environment["WMUX_WORKSPACE_ID"] = workspaceId
+            environment["WMUX_SURFACE_ID"] = surfaceId
+            environment["WMUX_CLI_TTY_NAME"] = ttyName
+            environment["WMUX_AGENT_HOOK_STATE_DIR"] = root.path
+            environment["WMUX_AGENT_LAUNCH_KIND"] = "codex"
+            environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = executable
+            environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated([executable])
+            environment["WMUX_AGENT_LAUNCH_CWD"] = root.path
+            environment["WMUX_CODEX_PID"] = String(scenario.currentPID)
             // Native hooks identify the process that caused this callback,
             // separately from the owner PID inherited by nested Codex launches.
-            environment["CMUX_CODEX_HOOK_PID"] = String(scenario.currentPID)
+            environment["WMUX_CODEX_HOOK_PID"] = String(scenario.currentPID)
             for key in ["CODEX_HOME", "ANTHROPIC_BASE_URL", "CLAUDE_CONFIG_DIR"] {
                 environment.removeValue(forKey: key)
             }
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
             let result = runProcess(
                 executablePath: cliPath,

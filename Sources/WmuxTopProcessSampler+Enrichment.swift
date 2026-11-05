@@ -1,17 +1,17 @@
 import Foundation
 
-extension CmuxTopProcessSampler {
+extension WmuxTopProcessSampler {
     /// Adds missing fields to the same census without repeating its resource reads.
-    func enrich(_ capture: CmuxTopProcessCapture, fields: CmuxTopProcessFields) throws -> CmuxTopProcessCapture {
+    func enrich(_ capture: WmuxTopProcessCapture, fields: WmuxTopProcessFields) throws -> WmuxTopProcessCapture {
         let missing = fields.subtracting(capture.fields)
         guard !missing.isEmpty else { return capture }
-        let resourcesByPID: [Int: CmuxTopProcessInfo]
+        let resourcesByPID: [Int: WmuxTopProcessInfo]
         if missing.contains(.resources) {
             resourcesByPID = Dictionary(uniqueKeysWithValues: processRecords(
                 from: capture.listing.processes, includeResources: true
             ).map { ($0.pid, $0) })
         } else { resourcesByPID = [:] }
-        var records: [CmuxTopProcessInfo] = []
+        var records: [WmuxTopProcessInfo] = []
         records.reserveCapacity(capture.snapshot.processesByPID.count)
         var missingCount = capture.snapshot.enumerationMissingProcessCount
         let readsIdentitySensitiveData = missing.contains(.details) || missing.contains(.scope)
@@ -27,7 +27,7 @@ extension CmuxTopProcessSampler {
                 if !reader.processHasExited(pid: pid) { missingCount += 1 }
                 continue
             }
-            let key = CmuxTopProcessSnapshot.scopeCacheKey(from: bsd)
+            let key = WmuxTopProcessSnapshot.scopeCacheKey(from: bsd)
             guard !readsIdentitySensitiveData || reader.matches(pid: pid, key: key) else {
                 if !reader.processHasExited(pid: pid) { missingCount += 1 }
                 continue
@@ -40,7 +40,7 @@ extension CmuxTopProcessSampler {
                 if !reader.processHasExited(pid: pid) { missingCount += 1 }
                 continue
             }
-            records.append(CmuxTopProcessInfo(
+            records.append(WmuxTopProcessInfo(
                 pid: pid, processIdentity: process.processIdentity,
                 parentPID: process.parentPID, name: name, path: path,
                 ttyDevice: process.ttyDevice,
@@ -54,13 +54,13 @@ extension CmuxTopProcessSampler {
             ))
         }
         let combined = capture.fields.union(missing)
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: records, sampledAt: capture.snapshot.sampledAt,
             includesProcessDetails: combined.contains(.details), includesCMUXScope: combined.contains(.scope),
             includesResources: combined.contains(.resources),
             enumerationIsComplete: capture.snapshot.enumerationIsComplete && missingCount == 0,
             enumerationMissingProcessCount: missingCount
         )
-        return CmuxTopProcessCapture(listing: capture.listing, snapshot: snapshot, fields: combined)
+        return WmuxTopProcessCapture(listing: capture.listing, snapshot: snapshot, fields: combined)
     }
 }

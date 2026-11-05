@@ -1,9 +1,9 @@
-import CmuxAgentJournal
-import CmuxSettings
+import WmuxAgentJournal
+import WmuxSettings
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -28,7 +28,7 @@ struct AgentMessageOffSwitchSettingsTests {
         #expect(AgentMessagesCatalogSection().enabled.defaultValue)
 
         try #"{"agentMessages":{"enabled":false}}"#.write(to: configURL, atomically: true, encoding: .utf8)
-        let store = CmuxSettingsFileStore(
+        let store = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],

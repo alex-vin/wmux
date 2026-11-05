@@ -1,14 +1,14 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxSurfaceCatalogModel
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxSurfaceCatalogModel
 import Foundation
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -437,9 +437,9 @@ struct CloudTreeHeaderActionsTests {
         return (window, host)
     }
 
-    static func resolvedIconViews(in root: NSView) -> [CmuxResolvedIconImageView] {
+    static func resolvedIconViews(in root: NSView) -> [WmuxResolvedIconImageView] {
         root.subviews.flatMap { view in
-            [view as? CmuxResolvedIconImageView].compactMap { $0 } + resolvedIconViews(in: view)
+            [view as? WmuxResolvedIconImageView].compactMap { $0 } + resolvedIconViews(in: view)
         }
     }
 

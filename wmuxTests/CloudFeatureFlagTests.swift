@@ -1,11 +1,11 @@
-import CmuxCloud
-import CmuxCommandPalette
-import CmuxSettings
+import WmuxCloud
+import WmuxCommandPalette
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -19,14 +19,14 @@ struct CloudFeatureFlagTests {
         let suite = "cmux.agentInbox.flag.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             overrideCapability: .init(bundleIdentifier: "com.cmuxterm.app", isDebugBuild: false),
             remoteFlagValueProvider: { _ in nil }
         )
         flags.applyLoadedFlags()
         #expect(!flags.isAgentInboxQuickViewEnabled)
-        let definition = try #require(CmuxFeatureFlags.allFlags.first { $0.key == "agent-inbox-quick-view-enabled-release" })
+        let definition = try #require(WmuxFeatureFlags.allFlags.first { $0.key == "agent-inbox-quick-view-enabled-release" })
         #expect(definition.defaultWhenUnavailable == false)
     }
 
@@ -35,10 +35,10 @@ struct CloudFeatureFlagTests {
         let suite = "cmux.cloud.flag.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let definition = CmuxFeatureFlags.cloudMachinesFlag
-        #expect(!CmuxFeatureFlags.allFlags.contains { $0.key == definition.key })
+        let definition = WmuxFeatureFlags.cloudMachinesFlag
+        #expect(!WmuxFeatureFlags.allFlags.contains { $0.key == definition.key })
         var requestedKeys: [String] = []
-        let flags = CmuxFeatureFlags(defaults: defaults, remoteFlagValueProvider: { key in
+        let flags = WmuxFeatureFlags(defaults: defaults, remoteFlagValueProvider: { key in
             requestedKeys.append(key)
             return nil
         })
@@ -55,13 +55,13 @@ struct CloudFeatureFlagTests {
         let suite = "cmux.retired.rollout.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let retiredKeys = [CmuxFeatureFlags.cloudMachinesFlag.key, "pro-upgrade-ui-enabled-release"]
+        let retiredKeys = [WmuxFeatureFlags.cloudMachinesFlag.key, "pro-upgrade-ui-enabled-release"]
         for key in retiredKeys {
             defaults.set(remoteValue, forKey: "cmux.flags.remote.\(key)")
             defaults.set(false, forKey: "cmux.flags.override.\(key)")
         }
         var requestedKeys: [String] = []
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             overrideCapability: .init(bundleIdentifier: "com.cmuxterm.app", isDebugBuild: false),
             remoteFlagValueProvider: { key in
@@ -73,7 +73,7 @@ struct CloudFeatureFlagTests {
         flags.applyLoadedFlags()
         for key in retiredKeys {
             #expect(!requestedKeys.contains(key))
-            #expect(!CmuxFeatureFlags.allFlags.contains { $0.key == key })
+            #expect(!WmuxFeatureFlags.allFlags.contains { $0.key == key })
         }
         let policy = ManagedDevicePolicy(defaults: defaults, releaseDomainDefaults: nil, forcedObject: { _, _ in nil })
         #expect(CloudMachinesFeature.isAvailable(policy: policy))
@@ -92,7 +92,7 @@ struct CloudFeatureFlagTests {
         let suite = "cmux.remaining.flags.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let accessors: [(String, KeyPath<CmuxFeatureFlags, Bool>)] = [
+        let accessors: [(String, KeyPath<WmuxFeatureFlags, Bool>)] = [
             ("mobile-connect-button-enabled-release", \.isMobileConnectButtonEnabled),
             ("sidebar-account-button-enabled-release", \.isSidebarAccountButtonEnabled),
             ("agent-chat-ui-enabled-release", \.isAgentChatUIEnabled),
@@ -101,7 +101,7 @@ struct CloudFeatureFlagTests {
             ("workspace-todo-controls-enabled-release", \.isWorkspaceTodoControlsEnabled)
         ]
         for (enabledKey, _) in accessors {
-            let flags = CmuxFeatureFlags(
+            let flags = WmuxFeatureFlags(
                 defaults: defaults,
                 remoteFlagValueProvider: { $0 == enabledKey },
                 pinsFlagsToLocalValues: false
@@ -350,7 +350,7 @@ struct CloudFeatureFlagTests {
         var enabled = true
         var block = false
         var lists = 0
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }),
             isCloudEnabled: { enabled },
             allowsBackgroundWork: { false },

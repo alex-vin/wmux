@@ -1,6 +1,6 @@
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxWorkspaces
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxWorkspaces
 import CoreGraphics
 import Foundation
 import SwiftUI

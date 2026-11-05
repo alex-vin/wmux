@@ -1,5 +1,5 @@
 import AppKit
-import CmuxSettingsUI
+import WmuxSettingsUI
 
 extension AppDelegate {
     enum VisibleGlobalSearchShortcutRoute {

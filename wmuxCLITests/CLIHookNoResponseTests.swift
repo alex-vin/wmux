@@ -47,15 +47,15 @@ struct CLIHookNoResponseTests {
 
     @Test func nonActionableFeedHooksDoNotWaitForSocketResponseAcrossAgents() throws {
         let cases = [
-            FeedHookCase(source: "codex", event: "PreToolUse", toolName: "apply_patch", pidKey: "CMUX_CODEX_PID"),
-            FeedHookCase(source: "codex", event: "PreToolUse", toolName: "mcp__cmux_cua__get_app_state", pidKey: "CMUX_CODEX_PID"),
-            FeedHookCase(source: "claude", event: "PreToolUse", toolName: "mcp__cmux-cua__get_window_state", pidKey: "CMUX_CLAUDE_PID"),
-            FeedHookCase(source: "gemini", event: "PreToolUse", toolName: "read", pidKey: "CMUX_GEMINI_PID"),
-            FeedHookCase(source: "kiro", event: "postToolUse", toolName: "fs_write", pidKey: "CMUX_KIRO_PID"),
-            FeedHookCase(source: "hermes-agent", event: "pre_tool_call", toolName: "terminal", pidKey: "CMUX_HERMES_AGENT_PID"),
-            FeedHookCase(source: "antigravity", event: "PreToolUse", toolName: "Bash", pidKey: "CMUX_ANTIGRAVITY_PID"),
-            FeedHookCase(source: "antigravity", event: "PostToolUse", toolName: "run_command", pidKey: "CMUX_ANTIGRAVITY_PID"),
-            FeedHookCase(source: "cursor", event: "beforeShellExecution", toolName: "Bash", pidKey: "CMUX_CURSOR_PID"),
+            FeedHookCase(source: "codex", event: "PreToolUse", toolName: "apply_patch", pidKey: "WMUX_CODEX_PID"),
+            FeedHookCase(source: "codex", event: "PreToolUse", toolName: "mcp__cmux_cua__get_app_state", pidKey: "WMUX_CODEX_PID"),
+            FeedHookCase(source: "claude", event: "PreToolUse", toolName: "mcp__cmux-cua__get_window_state", pidKey: "WMUX_CLAUDE_PID"),
+            FeedHookCase(source: "gemini", event: "PreToolUse", toolName: "read", pidKey: "WMUX_GEMINI_PID"),
+            FeedHookCase(source: "kiro", event: "postToolUse", toolName: "fs_write", pidKey: "WMUX_KIRO_PID"),
+            FeedHookCase(source: "hermes-agent", event: "pre_tool_call", toolName: "terminal", pidKey: "WMUX_HERMES_AGENT_PID"),
+            FeedHookCase(source: "antigravity", event: "PreToolUse", toolName: "Bash", pidKey: "WMUX_ANTIGRAVITY_PID"),
+            FeedHookCase(source: "antigravity", event: "PostToolUse", toolName: "run_command", pidKey: "WMUX_ANTIGRAVITY_PID"),
+            FeedHookCase(source: "cursor", event: "beforeShellExecution", toolName: "Bash", pidKey: "WMUX_CURSOR_PID"),
         ]
 
         for testCase in cases {
@@ -91,10 +91,10 @@ struct CLIHookNoResponseTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": "33333333-3333-3333-3333-333333333333",
-                "CMUX_SURFACE_ID": "44444444-4444-4444-4444-444444444444",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": "33333333-3333-3333-3333-333333333333",
+                "WMUX_SURFACE_ID": "44444444-4444-4444-4444-444444444444",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
             environment[testCase.pidKey] = "626262"
 
@@ -119,8 +119,8 @@ struct CLIHookNoResponseTests {
             })
             let params = try #require(request["params"] as? [String: Any])
             let event = try #require(params["event"] as? [String: Any])
-            #expect(event["workspace_id"] as? String == environment["CMUX_WORKSPACE_ID"])
-            #expect(event["surface_id"] as? String == environment["CMUX_SURFACE_ID"])
+            #expect(event["workspace_id"] as? String == environment["WMUX_WORKSPACE_ID"])
+            #expect(event["surface_id"] as? String == environment["WMUX_SURFACE_ID"])
         }
     }
 
@@ -181,13 +181,13 @@ struct CLIHookNoResponseTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_AGENT_LAUNCH_KIND": "kiro",
-                "CMUX_AGENT_LAUNCH_EXECUTABLE": "/Users/example/.cargo/bin/kiro-cli",
-                "CMUX_AGENT_LAUNCH_ARGV_B64": Self.base64NULSeparated([
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_AGENT_LAUNCH_KIND": "kiro",
+                "WMUX_AGENT_LAUNCH_EXECUTABLE": "/Users/example/.cargo/bin/kiro-cli",
+                "WMUX_AGENT_LAUNCH_ARGV_B64": Self.base64NULSeparated([
                     "/Users/example/.cargo/bin/kiro-cli",
                     "chat",
                     "--agent",
@@ -195,9 +195,9 @@ struct CLIHookNoResponseTests {
                     "--resume-id",
                     "old-session",
                 ]),
-                "CMUX_AGENT_LAUNCH_CWD": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_SOCKET_PASSWORD": "test-password",
+                "WMUX_AGENT_LAUNCH_CWD": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PASSWORD": "test-password",
             ],
             standardInput: #"{"session_id":"kiro-lifecycle-no-response","cwd":"\#(root.path)","hook_event_name":"SessionStart"}"#,
             timeout: 1.0
@@ -244,11 +244,11 @@ struct CLIHookNoResponseTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": "33333333-3333-3333-3333-333333333333",
-                "CMUX_SURFACE_ID": "44444444-4444-4444-4444-444444444444",
-                "CMUX_CODEX_PID": "626262",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": "33333333-3333-3333-3333-333333333333",
+                "WMUX_SURFACE_ID": "44444444-4444-4444-4444-444444444444",
+                "WMUX_CODEX_PID": "626262",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: input,
             timeout: 0.5

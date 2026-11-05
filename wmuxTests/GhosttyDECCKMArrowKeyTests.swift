@@ -2,10 +2,10 @@ import AppKit
 import Carbon.HIToolbox
 import Foundation
 import Testing
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -24,8 +24,8 @@ struct GhosttyDECCKMArrowKeyTests {
     func windowKeyEquivalentTerminalArrowsEncodeDECCKMBytes() throws {
         AppDelegate.installWindowResponderSwizzlesForTesting()
 
-        let captureReadyMarker = "CMUX_DECCKM_READY_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
-        let captureMarker = "CMUX_DECCKM_HEX_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        let captureReadyMarker = "WMUX_DECCKM_READY_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        let captureMarker = "WMUX_DECCKM_HEX_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
         let scriptURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("cmux-decckm-arrow-capture-\(UUID().uuidString).py")
         let script = """

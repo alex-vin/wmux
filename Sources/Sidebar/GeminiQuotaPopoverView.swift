@@ -1,6 +1,6 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxGeminiQuota
+import WmuxAppKitSupportUI
+import WmuxGeminiQuota
 import SwiftUI
 
 /// Compact popover card for inspecting Gemini quotas and switching/binding accounts per terminal surface.

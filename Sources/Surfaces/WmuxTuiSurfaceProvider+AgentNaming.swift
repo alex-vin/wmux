@@ -1,8 +1,8 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider: SurfaceAgentNaming {
+extension WmuxTuiSurfaceProvider: SurfaceAgentNaming {
     /// Automatic names use the revision captured before the agent computed them.
     /// Refresh supplies current topology, but never upgrades that name precondition.
     func renameAgentTab(context: CloudAgentNameContext, name: String) async throws {
@@ -23,7 +23,7 @@ extension CmuxTuiSurfaceProvider: SurfaceAgentNaming {
               let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw CancellationError()
         }
-        let receipt = try validatedReceipt(CmuxTuiSnapshotParser.mutationCursor(fromResult: object), against: cursor)
+        let receipt = try validatedReceipt(WmuxTuiSnapshotParser.mutationCursor(fromResult: object), against: cursor)
         recordPendingRemoteRename(tabID: tabID, name: name, receipt: receipt)
         _ = await refreshCurrentGraph(force: true)
     }

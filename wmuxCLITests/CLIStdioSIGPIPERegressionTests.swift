@@ -60,8 +60,8 @@ final class CLIStdioSIGPIPERegressionTests: XCTestCase {
 
     private func cliTestEnvironment() -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         return environment
     }
 

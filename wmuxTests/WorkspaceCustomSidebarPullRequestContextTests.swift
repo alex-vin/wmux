@@ -1,9 +1,9 @@
 import XCTest
-import CmuxWorkspaces
-import CmuxSwiftRender
+import WmuxWorkspaces
+import WmuxSwiftRender
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,17 +15,17 @@ final class WorkspaceCustomSidebarPullRequestContextTests: XCTestCase {
         try withTemporaryCustomSidebarsDirectory { directory in
             let fileURL = directory.appendingPathComponent("\(sidebarName).swift")
             try #"Text("Restored")"#.write(to: fileURL, atomically: true, encoding: .utf8)
-            CmuxEventBus.shared.resetForTesting()
-            defer { CmuxEventBus.shared.resetForTesting() }
+            WmuxEventBus.shared.resetForTesting()
+            defer { WmuxEventBus.shared.resetForTesting() }
 
             let workspace = Workspace()
             let paneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
-            CmuxEventBus.shared.resetForTesting()
+            WmuxEventBus.shared.resetForTesting()
             let panel = try XCTUnwrap(
                 workspace.newCustomSidebarSurface(inPane: paneId, name: sidebarName, focus: true)
             )
             let surfaceEvent = try XCTUnwrap(
-                CmuxEventBus.shared.retainedSnapshot().first { $0["name"] as? String == "surface.created" }
+                WmuxEventBus.shared.retainedSnapshot().first { $0["name"] as? String == "surface.created" }
             )
             let surfacePayload = try XCTUnwrap(surfaceEvent["payload"] as? [String: Any])
             XCTAssertEqual(surfacePayload["kind"] as? String, "custom_sidebar")
@@ -55,12 +55,12 @@ final class WorkspaceCustomSidebarPullRequestContextTests: XCTestCase {
         try withTemporaryCustomSidebarsDirectory { directory in
             let fileURL = directory.appendingPathComponent("\(sidebarName).swift")
             try #"Text("Split")"#.write(to: fileURL, atomically: true, encoding: .utf8)
-            CmuxEventBus.shared.resetForTesting()
-            defer { CmuxEventBus.shared.resetForTesting() }
+            WmuxEventBus.shared.resetForTesting()
+            defer { WmuxEventBus.shared.resetForTesting() }
 
             let workspace = Workspace()
             let sourcePaneId = try XCTUnwrap(workspace.bonsplitController.focusedPaneId)
-            CmuxEventBus.shared.resetForTesting()
+            WmuxEventBus.shared.resetForTesting()
 
             let panel = try XCTUnwrap(
                 workspace.splitPaneWithCustomSidebar(
@@ -73,7 +73,7 @@ final class WorkspaceCustomSidebarPullRequestContextTests: XCTestCase {
             let customPaneId = try XCTUnwrap(workspace.paneId(forPanelId: panel.id))
 
             XCTAssertNotEqual(customPaneId.id, sourcePaneId.id)
-            let events = CmuxEventBus.shared.retainedSnapshot()
+            let events = WmuxEventBus.shared.retainedSnapshot()
             let paneEvent = try XCTUnwrap(events.first { $0["name"] as? String == "pane.created" })
             XCTAssertEqual(paneEvent["pane_id"] as? String, customPaneId.id.uuidString)
             let panePayload = try XCTUnwrap(paneEvent["payload"] as? [String: Any])
@@ -222,7 +222,7 @@ final class WorkspaceCustomSidebarPullRequestContextTests: XCTestCase {
         )
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
-        return try CmuxExtensionSidebarSelection.withCustomSidebarsDirectoryForTesting(directory) {
+        return try WmuxExtensionSidebarSelection.withCustomSidebarsDirectoryForTesting(directory) {
             try body(directory)
         }
     }

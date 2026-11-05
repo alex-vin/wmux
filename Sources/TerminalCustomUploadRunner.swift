@@ -1,6 +1,6 @@
-import CmuxCloud
-import CmuxFoundation
-import CmuxSettings
+import WmuxCloud
+import WmuxFoundation
+import WmuxSettings
 import Darwin
 import Foundation
 
@@ -202,7 +202,7 @@ struct TerminalCustomUploadRunner {
     // MARK: - Process bridge
 
     private static func uploadError(_ message: String) -> NSError {
-        NSError(domain: "cmux.upload.command", code: 1, userInfo: [NSLocalizedDescriptionKey: message])
+        NSError(domain: "wmux.upload.command", code: 1, userInfo: [NSLocalizedDescriptionKey: message])
     }
 
     /// Default ``ProcessRunner``: spawns `/bin/sh -c command` as its own process
@@ -253,7 +253,7 @@ struct TerminalCustomUploadRunner {
         try operation.throwIfCancelled()
 
         // Inherit the app environment (so PATH/HOME etc. resolve the user's tools)
-        // and layer the CMUX_UPLOAD_* context on top.
+        // and layer the WMUX_UPLOAD_* context on top.
         var mergedEnvironment = ProcessInfo.processInfo.environment
         for (key, value) in environment {
             mergedEnvironment[key] = value

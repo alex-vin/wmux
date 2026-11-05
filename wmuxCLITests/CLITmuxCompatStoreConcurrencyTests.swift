@@ -39,9 +39,9 @@ struct CLITmuxCompatStoreConcurrencyTests {
         let serverDone = Self.startClientDrain(listenerFD: listenerFD, expectedClients: Self.writerCount)
 
         let environment = [
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_SOCKET_PASSWORD": "",
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_SOCKET_PASSWORD": "",
+            "WMUX_CLI_SENTRY_DISABLED": "1",
             "CFFIXED_USER_HOME": home.path,
             "HOME": home.path,
             "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",
@@ -105,9 +105,9 @@ struct CLITmuxCompatStoreConcurrencyTests {
             executablePath: cliPath,
             arguments: ["set-buffer", "--name", "buf", "--", "payload"],
             environment: [
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_SOCKET_PASSWORD": "",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_SOCKET_PASSWORD": "",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
                 "CFFIXED_USER_HOME": home.path,
                 "HOME": home.path,
                 "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",

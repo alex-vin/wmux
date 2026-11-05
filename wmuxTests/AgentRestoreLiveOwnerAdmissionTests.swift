@@ -1,12 +1,12 @@
-import CmuxFoundation
-import CMUXAgentLaunch
+import WmuxFoundation
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -273,7 +273,7 @@ struct AgentRestoreLiveOwnerAdmissionTests {
 
         let revalidated = fixture.index.liveSessionOwners.revalidated(
             processArgumentsProvider: { _ in
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: ["/usr/local/bin/not-grok"],
                     environment: [:]
                 )
@@ -297,7 +297,7 @@ struct AgentRestoreLiveOwnerAdmissionTests {
                 kind: fixture.agent.kind.rawValue,
                 sessionID: fixture.sessionID,
                 processArgumentsProvider: { _ in
-                    CmuxTopProcessArguments(
+                    WmuxTopProcessArguments(
                         arguments: ["/usr/local/bin/not-grok"],
                         environment: [:]
                     )
@@ -325,7 +325,7 @@ struct AgentRestoreLiveOwnerAdmissionTests {
             registration: .builtInAntigravity
         )
         let validator = CachedAgentProcessIdentityValidator()
-        let freshLaunch = CmuxTopProcessArguments(
+        let freshLaunch = WmuxTopProcessArguments(
             arguments: ["agy", "--dangerously-skip-permissions"],
             environment: [:]
         )
@@ -348,11 +348,11 @@ struct AgentRestoreLiveOwnerAdmissionTests {
         #expect(!validator.currentProcess(freshLaunch, matches: snapshot))
         // An explicit selector still has to name this session.
         #expect(validator.currentProcess(
-            CmuxTopProcessArguments(arguments: ["agy", "--conversation", sessionID], environment: [:]),
+            WmuxTopProcessArguments(arguments: ["agy", "--conversation", sessionID], environment: [:]),
             matches: snapshot
         ))
         #expect(!validator.currentProcess(
-            CmuxTopProcessArguments(
+            WmuxTopProcessArguments(
                 arguments: ["agy", "--conversation", "11111111-2222-3333-4444-555555555555"],
                 environment: [:]
             ),
@@ -361,9 +361,9 @@ struct AgentRestoreLiveOwnerAdmissionTests {
         ))
         // So does an exported process identity.
         #expect(!validator.currentProcess(
-            CmuxTopProcessArguments(
+            WmuxTopProcessArguments(
                 arguments: ["agy"],
-                environment: ["CMUX_AGENT_SESSION_ID": "11111111-2222-3333-4444-555555555555"]
+                environment: ["WMUX_AGENT_SESSION_ID": "11111111-2222-3333-4444-555555555555"]
             ),
             matches: snapshot,
             hermesSessionValidation: .currentHookRecord
@@ -386,7 +386,7 @@ struct AgentRestoreLiveOwnerAdmissionTests {
                 source: "test"
             )
         )
-        let process = CmuxTopProcessArguments(
+        let process = WmuxTopProcessArguments(
             arguments: ["/usr/local/bin/claude", "--session-id", "different-session"],
             environment: [:]
         )
@@ -406,18 +406,18 @@ struct AgentRestoreLiveOwnerAdmissionTests {
         let validator = CachedAgentProcessIdentityValidator()
         let arguments = ["/usr/local/bin/pi", flag, sessionID]
         #expect(!validator.currentProcess(
-            CmuxTopProcessArguments(arguments: arguments, environment: [:]),
+            WmuxTopProcessArguments(arguments: arguments, environment: [:]),
             matches: snapshot
         ))
         #expect(validator.currentProcess(
-            CmuxTopProcessArguments(
+            WmuxTopProcessArguments(
                 arguments: arguments,
-                environment: ["CMUX_AGENT_SESSION_ID": sessionID]
+                environment: ["WMUX_AGENT_SESSION_ID": sessionID]
             ),
             matches: snapshot
         ))
         #expect(validator.currentProcess(
-            CmuxTopProcessArguments(
+            WmuxTopProcessArguments(
                 arguments: ["/usr/local/bin/pi", "--session", sessionID],
                 environment: [:]
             ),
@@ -433,7 +433,7 @@ struct AgentRestoreLiveOwnerAdmissionTests {
             workingDirectory: nil
         )
         #expect(!CachedAgentProcessIdentityValidator().currentProcess(
-            CmuxTopProcessArguments(arguments: ["/usr/local/bin/custom-agent"], environment: [:]),
+            WmuxTopProcessArguments(arguments: ["/usr/local/bin/custom-agent"], environment: [:]),
             matches: snapshot
         ))
     }
@@ -447,7 +447,7 @@ struct AgentRestoreLiveOwnerAdmissionTests {
         let index = fixture.index.liveSessionOwners.revalidated(
             processArgumentsProvider: { _ in
                 inspectedArguments = true
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: ["/usr/local/bin/grok", "--session-id", fixture.sessionID],
                     environment: [:]
                 )
@@ -493,7 +493,7 @@ extension AgentRestoreLiveOwnerAdmissionTests {
 
     @Test("A canonical local-tmux restore command remains attachable")
     func canonicalLocalTmuxOwnerGetsAttachInput() {
-        let command = "/usr/bin/env TMUX= CMUX_LOCAL_TMUX=1 '/opt/homebrew/bin/tmux' -S '/tmp/cmux/server.sock' if-shell -F '#{==:#{@cmux_local_server_id},01234567-89ab-cdef-0123-456789abcdef}' 'attach-session -t $1' 'run-shell false'"
+        let command = "/usr/bin/env TMUX= WMUX_LOCAL_TMUX=1 '/opt/homebrew/bin/tmux' -S '/tmp/cmux/server.sock' if-shell -F '#{==:#{@wmux_local_server_id},01234567-89ab-cdef-0123-456789abcdef}' 'attach-session -t $1' 'run-shell false'"
         let input = AgentRestoreAttachCommand.startupInput(
             kind: "terminal",
             sessionID: "unused",

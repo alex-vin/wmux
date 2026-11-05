@@ -1,9 +1,9 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -30,12 +30,12 @@ struct PiFeedOwnershipTests {
             }
             appDelegate.tabManager = nil
             AppDelegate.shared = previousAppDelegate
-            CmuxEventBus.shared.resetForTesting()
+            WmuxEventBus.shared.resetForTesting()
         }
 
         let store = WorkstreamStore(ringCapacity: 10)
         FeedCoordinator.shared.install(store: store)
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
 
         let event = WorkstreamEvent(
             sessionId: "pi-live-ownership-test",
@@ -117,12 +117,12 @@ struct PiFeedOwnershipTests {
             }
             appDelegate.tabManager = nil
             AppDelegate.shared = previousAppDelegate
-            CmuxEventBus.shared.resetForTesting()
+            WmuxEventBus.shared.resetForTesting()
         }
 
         let store = WorkstreamStore(ringCapacity: 100)
         FeedCoordinator.shared.install(store: store)
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
         let events = (0..<64).map { index in
             WorkstreamEvent(
                 sessionId: "pi-live-batch-\(index)",
@@ -448,11 +448,11 @@ struct PiFeedOwnershipTests {
             tabManager.closeWorkspace(workspace)
             appDelegate.tabManager = nil
             AppDelegate.shared = previousAppDelegate
-            CmuxEventBus.shared.resetForTesting()
+            WmuxEventBus.shared.resetForTesting()
         }
         let store = WorkstreamStore(ringCapacity: 10)
         FeedCoordinator.shared.install(store: store)
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
         let event = WorkstreamEvent(
             sessionId: "pi-live-workspace-only",
             hookEventName: .postToolUse,
@@ -475,7 +475,7 @@ struct PiFeedOwnershipTests {
     }
 
     static func receivedFeedEventPayloads() -> [[String: Any]] {
-        CmuxEventBus.shared.retainedSnapshot().compactMap { event in
+        WmuxEventBus.shared.retainedSnapshot().compactMap { event in
             guard event["name"] as? String == "feed.item.received" else { return nil }
             return event["payload"] as? [String: Any]
         }

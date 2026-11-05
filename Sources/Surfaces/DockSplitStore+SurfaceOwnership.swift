@@ -1,6 +1,6 @@
-import CmuxCloud
+import WmuxCloud
 import Bonsplit
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 
 extension DockSplitStore {

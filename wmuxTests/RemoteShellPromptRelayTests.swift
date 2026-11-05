@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -62,7 +62,7 @@ struct RemoteShellPromptRelayTests {
         )
 
         #expect(script.contains(
-            "unset CMUX_CODEX_WRAPPER_SHIM; if [ -x \"$HOME/.cmux/bin/cmux-codex-wrapper\" ]"
+            "unset WMUX_CODEX_WRAPPER_SHIM; if [ -x \"$HOME/.cmux/bin/cmux-codex-wrapper\" ]"
         ))
         #expect(script.contains("command -v bash"))
     }
@@ -248,8 +248,8 @@ struct RemoteShellPromptRelayTests {
         try """
         #!/bin/sh
         if [ "${1:-}" = rpc ] && [ "${2:-}" = surface.report_tty ]; then
-          printf 'call\\n' >> "$CMUX_TEST_LOG"
-          [ "$(/usr/bin/wc -l < "$CMUX_TEST_LOG")" -gt 1 ] || exit 1
+          printf 'call\\n' >> "$WMUX_TEST_LOG"
+          [ "$(/usr/bin/wc -l < "$WMUX_TEST_LOG")" -gt 1 ] || exit 1
         fi
         printf '{"ok":true}\\n'
         """.write(to: cmuxFile, atomically: true, encoding: .utf8)
@@ -268,20 +268,20 @@ struct RemoteShellPromptRelayTests {
             _cmux_report_tty_once
             _cmux_report_tty_once
             for _cmux_i in (seq 1 20)
-                test -s "$CMUX_TEST_LOG"; and break
+                test -s "$WMUX_TEST_LOG"; and break
                 sleep 0.05
             end
-            printf 'calls=%s\\nreported=%s\\n' (count (cat "$CMUX_TEST_LOG")) "$_CMUX_TTY_REPORTED"
+            printf 'calls=%s\\nreported=%s\\n' (count (cat "$WMUX_TEST_LOG")) "$_CMUX_TTY_REPORTED"
             """,
         ]
         process.environment = [
-            "CMUX_BUNDLED_CLI_PATH": cmuxFile.path,
-            "CMUX_SOCKET_PATH": "127.0.0.1:64011",
-            "CMUX_SSH_ATTEMPT_ID": "44444444-4444-4444-4444-444444444444",
-            "CMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
-            "CMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
-            "CMUX_TEST_LOG": logFile.path,
-            "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_BUNDLED_CLI_PATH": cmuxFile.path,
+            "WMUX_SOCKET_PATH": "127.0.0.1:64011",
+            "WMUX_SSH_ATTEMPT_ID": "44444444-4444-4444-4444-444444444444",
+            "WMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
+            "WMUX_TEST_LOG": logFile.path,
+            "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
             "HOME": directory.path,
             "PATH": "\(binDirectory.path):/usr/bin:/bin",
             "TERM": "xterm-256color",
@@ -328,7 +328,7 @@ struct RemoteShellPromptRelayTests {
             atomically: true,
             encoding: .utf8
         )
-        try "#!/bin/sh\nprintf '%s\\n' \"$*\" > \"$CMUX_TEST_LOG\"\n".write(
+        try "#!/bin/sh\nprintf '%s\\n' \"$*\" > \"$WMUX_TEST_LOG\"\n".write(
             to: cmuxFile,
             atomically: true,
             encoding: .utf8
@@ -337,7 +337,7 @@ struct RemoteShellPromptRelayTests {
 
         let modeSetup = mode == "git"
             ? "_CMUX_SHELL_ACTIVITY_LAST=prompt"
-            : "CMUX_NO_GIT_WATCH=1; export CMUX_NO_GIT_WATCH"
+            : "WMUX_NO_GIT_WATCH=1; export WMUX_NO_GIT_WATCH"
         let process = Process()
         let standardOutput = Pipe()
         let standardError = Pipe()
@@ -349,29 +349,29 @@ struct RemoteShellPromptRelayTests {
             _CMUX_PWD_LAST_PWD="$PWD"
             _CMUX_PORTS_LAST_RUN="${EPOCHSECONDS:-$SECONDS}"
             \(modeSetup)
-            exec 9<> "$CMUX_TEST_LOG"
+            exec 9<> "$WMUX_TEST_LOG"
             \(promptFunction)
-            cmux_relay_line=""
-            IFS= read -r -t 2 cmux_relay_line <&9 || true
-            printf '%s\n' "$cmux_relay_line"
+            wmux_relay_line=""
+            IFS= read -r -t 2 wmux_relay_line <&9 || true
+            printf '%s\n' "$wmux_relay_line"
             exec 9>&-
             """,
         ]
         process.currentDirectoryURL = repository
         var environment = [
-            "CMUX_BUNDLED_CLI_PATH": cmuxFile.path,
-            "CMUX_SOCKET_PATH": "127.0.0.1:64011",
-            "CMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
-            "CMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
-            "CMUX_TEST_LOG": logFile.path,
-            "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_BUNDLED_CLI_PATH": cmuxFile.path,
+            "WMUX_SOCKET_PATH": "127.0.0.1:64011",
+            "WMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
+            "WMUX_TEST_LOG": logFile.path,
+            "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
             "HOME": directory.path,
             "PATH": "\(binDirectory.path):/usr/bin:/bin",
             "TERM": "xterm-256color",
         ]
         if let surfaceID {
-            environment["CMUX_PANEL_ID"] = surfaceID
-            environment["CMUX_SURFACE_ID"] = surfaceID
+            environment["WMUX_PANEL_ID"] = surfaceID
+            environment["WMUX_SURFACE_ID"] = surfaceID
         }
         process.environment = environment
         process.standardOutput = standardOutput

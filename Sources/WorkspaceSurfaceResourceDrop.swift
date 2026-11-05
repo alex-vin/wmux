@@ -1,5 +1,5 @@
 import Bonsplit
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 
 extension SurfaceDestination {

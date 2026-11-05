@@ -99,8 +99,8 @@ extension CLISSHPTYAttachReplayBoundaryTests {
                 "--attachment-id", surfaceID,
             ]
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         process.environment = environment
         process.standardInput = FileHandle(fileDescriptor: stdinFD, closeOnDealloc: true)
         process.standardOutput = FileHandle(fileDescriptor: stdoutFD, closeOnDealloc: true)

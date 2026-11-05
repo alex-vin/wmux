@@ -1,7 +1,7 @@
 import AppKit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// Regression coverage for sidebar rows painting clipped after workspace
 /// closes (https://github.com/manaflow-ai/cmux — "multiple closes leave rows

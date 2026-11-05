@@ -1,12 +1,12 @@
 import AppKit
-import CMUXMobileCore
-import CmuxCloud
-import CmuxSurfaceCatalogModel
-import CmuxWorkspacePresence
+import WMUXMobileCore
+import WmuxCloud
+import WmuxSurfaceCatalogModel
+import WmuxWorkspacePresence
 import SwiftUI
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #else
 @testable import cmux
 #endif

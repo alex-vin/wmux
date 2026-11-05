@@ -1,9 +1,9 @@
-import CMUXMobileCore
+import WMUXMobileCore
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -164,7 +164,7 @@ import Testing
         let defaults = UserDefaults(suiteName: "presence-prod-origin-\(UUID().uuidString)")!
         #expect(PresenceHeartbeatClient.resolvedServiceURL(
             environment: [
-                "CMUX_AUTH_ENVIRONMENT": "production",
+                "WMUX_AUTH_ENVIRONMENT": "production",
                 PresenceSettings.serviceURLEnvKey: "https://cmux-presence-dev.example",
             ],
             defaults: defaults

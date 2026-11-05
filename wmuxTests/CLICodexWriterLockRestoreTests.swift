@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 import Testing
@@ -8,7 +8,7 @@ import Testing
 struct CLICodexWriterLockRestoreTests {
     @Test("The final exec guard covers current and older apps, including legacy records", arguments: [false, true], [false, true])
     func heldWriterBlocksThenReleaseResumes(legacy: Bool, advertisesAdmission: Bool) throws {
-        let runner = CMUXCLIErrorOutputRegressionTests()
+        let runner = WMUXCLIErrorOutputRegressionTests()
         let cli = try runner.bundledCLIPath()
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("cmux-12805-\(UUID().uuidString)")
         let capturedUser = root.appendingPathComponent("saved-user")
@@ -79,7 +79,7 @@ struct CLICodexWriterLockRestoreTests {
             defer { responder.stop() }
             var environment = [
                 "HOME": root.path, "CFFIXED_USER_HOME": root.path, "PATH": "/usr/bin:/bin",
-                "CMUX_SOCKET_PATH": socket, "CMUX_CLI_SENTRY_DISABLED": "1", "SHELL": "/bin/sh"
+                "WMUX_SOCKET_PATH": socket, "WMUX_CLI_SENTRY_DISABLED": "1", "SHELL": "/bin/sh"
             ]
             // CI relocates test-built package frameworks. Preserve only those
             // loader overrides, so this CLI uses the same product as its host.
@@ -119,7 +119,7 @@ struct CLICodexWriterLockRestoreTests {
     /// the shared coordination lock, which must not fail an unowned restore.
     @Test("Coordination-lock contention is retried, and persistent contention says so", arguments: [true, false])
     func coordinationContentionIsTransient(releases: Bool) throws {
-        let runner = CMUXCLIErrorOutputRegressionTests()
+        let runner = WMUXCLIErrorOutputRegressionTests()
         let cli = try runner.bundledCLIPath()
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("cmux-coordination-\(UUID().uuidString)")
         let home = root.appendingPathComponent(".codex")
@@ -182,7 +182,7 @@ struct CLICodexWriterLockRestoreTests {
         defer { responder.stop() }
         var environment = [
             "HOME": root.path, "CFFIXED_USER_HOME": root.path, "PATH": "/usr/bin:/bin",
-            "CMUX_SOCKET_PATH": socket, "CMUX_CLI_SENTRY_DISABLED": "1", "SHELL": "/bin/sh"
+            "WMUX_SOCKET_PATH": socket, "WMUX_CLI_SENTRY_DISABLED": "1", "SHELL": "/bin/sh"
         ]
         for key in ["DYLD_LIBRARY_PATH", "DYLD_FRAMEWORK_PATH"] {
             environment[key] = ProcessInfo.processInfo.environment[key]

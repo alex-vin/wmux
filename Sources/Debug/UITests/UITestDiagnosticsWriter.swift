@@ -35,11 +35,11 @@ final class UITestDiagnosticsWriter {
 
     func write(stage: String) {
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["CMUX_UI_TEST_DIAGNOSTICS_PATH"], !path.isEmpty else { return }
+        guard let path = env["WMUX_UI_TEST_DIAGNOSTICS_PATH"], !path.isEmpty else { return }
 
         var payload = load(at: path)
         let windows = NSApp.windows
-        let targetDisplayID = env["CMUX_UI_TEST_TARGET_DISPLAY_ID"] ?? ""
+        let targetDisplayID = env["WMUX_UI_TEST_TARGET_DISPLAY_ID"] ?? ""
         payload["stage"] = stage
         payload["pid"] = String(ProcessInfo.processInfo.processIdentifier)
         payload["bundleId"] = Bundle.main.bundleIdentifier ?? ""
@@ -70,7 +70,7 @@ final class UITestDiagnosticsWriter {
     }
 
     private func appendPortalDiagnostics(to payload: inout [String: String], environment env: [String: String]) {
-        guard env["CMUX_UI_TEST_PORTAL_STATS"] == "1" else { return }
+        guard env["WMUX_UI_TEST_PORTAL_STATS"] == "1" else { return }
         let stats = TerminalWindowPortalRegistry.debugPortalStats()
         payload["portal_count"] = stringValue(stats["portal_count"])
         payload["portal_hosted_mapping_count"] = stringValue(stats["hosted_mapping_count"])
@@ -81,7 +81,7 @@ final class UITestDiagnosticsWriter {
     }
 
     private func appendRenderDiagnostics(to payload: inout [String: String], environment env: [String: String]) {
-        guard env["CMUX_UI_TEST_DISPLAY_RENDER_STATS"] == "1" else { return }
+        guard env["WMUX_UI_TEST_DISPLAY_RENDER_STATS"] == "1" else { return }
         guard let state = renderDiagnostics() else {
             payload["renderStatsAvailable"] = "0"
             for key in ["renderPanelId", "renderDrawCount", "renderPresentCount", "renderLastPresentTime", "renderWindowVisible", "renderAppIsActive", "renderDesiredFocus", "renderIsFirstResponder"] { payload[key] = "" }

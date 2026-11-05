@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 struct BrowserDesignModeToolbarButton: View {
@@ -15,7 +15,7 @@ struct BrowserDesignModeToolbarButton: View {
                 guard await onToggle() else { return }
             }
         } label: {
-            CmuxSystemSymbolImage(
+            WmuxSystemSymbolImage(
                 systemName: controller.isActive ? "paintbrush.pointed.fill" : "paintbrush.pointed",
                 pointSize: iconPointSize,
                 weight: .medium,

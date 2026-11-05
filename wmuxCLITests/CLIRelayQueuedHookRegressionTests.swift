@@ -40,8 +40,8 @@ struct CLIRelayQueuedHookRegressionTests {
         let params = try admittedParams(from: relay)
         let environment = try #require(params["environment"] as? [String: Any])
         #expect(params["caller_tty"] as? String == "8535")
-        #expect(environment["CMUX_WORKSPACE_ID"] == nil)
-        #expect(environment["CMUX_SURFACE_ID"] == nil)
+        #expect(environment["WMUX_WORKSPACE_ID"] == nil)
+        #expect(environment["WMUX_SURFACE_ID"] == nil)
         #expect(relay.requests().compactMap { $0["method"] as? String } == [
             "agent.hook.enqueue",
         ])
@@ -86,8 +86,8 @@ struct CLIRelayQueuedHookRegressionTests {
                 home: FileManager.default.temporaryDirectory,
                 extra: [
                     "SSH_TTY": "/dev/pts/8540",
-                    "CMUX_WORKSPACE_ID": remoteWorkspaceID,
-                    "CMUX_SURFACE_ID": remoteSurfaceID,
+                    "WMUX_WORKSPACE_ID": remoteWorkspaceID,
+                    "WMUX_SURFACE_ID": remoteSurfaceID,
                 ]
             ),
             standardInput: rawPayload,
@@ -143,8 +143,8 @@ struct CLIRelayQueuedHookRegressionTests {
                 home: root,
                 extra: [
                     "SSH_TTY": "/dev/pts/8536",
-                    "CMUX_WORKSPACE_ID": "stale-workspace",
-                    "CMUX_SURFACE_ID": "stale-surface",
+                    "WMUX_WORKSPACE_ID": "stale-workspace",
+                    "WMUX_SURFACE_ID": "stale-surface",
                 ]
             ),
             standardInput: """
@@ -214,9 +214,9 @@ struct CLIRelayQueuedHookRegressionTests {
                 extra: [
                     "SSH_TTY": "/dev/pts/8537",
                     "PWD": workspace.path,
-                    "CMUX_ROVODEV_SESSIONS_DIR": sessionsRoot.path,
-                    "CMUX_WORKSPACE_ID": "stale-workspace",
-                    "CMUX_SURFACE_ID": "stale-surface",
+                    "WMUX_ROVODEV_SESSIONS_DIR": sessionsRoot.path,
+                    "WMUX_WORKSPACE_ID": "stale-workspace",
+                    "WMUX_SURFACE_ID": "stale-surface",
                 ]
             ),
             standardInput: """
@@ -279,9 +279,9 @@ struct CLIRelayQueuedHookRegressionTests {
                 home: root,
                 extra: [
                     "SSH_TTY": "/dev/pts/8539",
-                    "CMUX_GEMINI_PID": "8539",
-                    "CMUX_WORKSPACE_ID": "stale-workspace",
-                    "CMUX_SURFACE_ID": "stale-surface",
+                    "WMUX_GEMINI_PID": "8539",
+                    "WMUX_WORKSPACE_ID": "stale-workspace",
+                    "WMUX_SURFACE_ID": "stale-surface",
                 ]
             ),
             standardInput: """
@@ -357,10 +357,10 @@ struct CLIRelayQueuedHookRegressionTests {
             home: root,
             extra: [
                 "SSH_TTY": "/dev/pts/8538",
-                "CMUX_AGENT_LAUNCH_KIND": "claude",
-                "CMUX_AGENT_LAUNCH_ARGV_B64": launchArgumentsBase64,
-                "CMUX_WORKSPACE_ID": "stale-workspace",
-                "CMUX_SURFACE_ID": "stale-surface",
+                "WMUX_AGENT_LAUNCH_KIND": "claude",
+                "WMUX_AGENT_LAUNCH_ARGV_B64": launchArgumentsBase64,
+                "WMUX_WORKSPACE_ID": "stale-workspace",
+                "WMUX_SURFACE_ID": "stale-surface",
             ]
         )
 
@@ -526,13 +526,13 @@ struct CLIRelayQueuedHookRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": replayWorkspaceID,
-                "CMUX_SURFACE_ID": replaySurfaceID,
-                "CMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
-                "CMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
-                "CMUX_AGENT_HOOK_STATE_DIR": (stateDirectory ?? root).path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": replayWorkspaceID,
+                "WMUX_SURFACE_ID": replaySurfaceID,
+                "WMUX_AGENT_HOOK_RELAY_ORIGIN": "1",
+                "WMUX_AGENT_HOOK_ROUTE_SNAPSHOT": "1",
+                "WMUX_AGENT_HOOK_STATE_DIR": (stateDirectory ?? root).path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: payload,
             timeout: 10
@@ -582,9 +582,9 @@ struct CLIRelayQueuedHookRegressionTests {
         var environment = [
             "HOME": home.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_RELAY_ID": RelayQueuedHookMockServer.relayID,
-            "CMUX_RELAY_TOKEN": String(repeating: "a", count: 64),
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_RELAY_ID": RelayQueuedHookMockServer.relayID,
+            "WMUX_RELAY_TOKEN": String(repeating: "a", count: 64),
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         environment.merge(extra, uniquingKeysWith: { _, value in value })
         return environment
@@ -691,7 +691,7 @@ struct CLIRelayQueuedHookRegressionTests {
 
 private final class RelayQueuedHookMockServer: @unchecked Sendable {
     static let relayID = "relay-hook-regression"
-    /// Token the tests pass in `CMUX_RELAY_TOKEN` (64 hex `a`s).
+    /// Token the tests pass in `WMUX_RELAY_TOKEN` (64 hex `a`s).
     static let relayToken = Data(repeating: 0xAA, count: 32)
 
     /// Success line proving the token over the client's nonce, as the app's

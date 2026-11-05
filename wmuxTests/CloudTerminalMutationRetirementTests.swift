@@ -1,9 +1,9 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,7 +14,7 @@ struct CloudTerminalMutationRetirementTests {
     @Test("Suspension cancels an admitted turn before it can mutate the machine")
     func suspensionCancelsAnAdmittedMutation() async {
         let catalog = SurfaceCatalog()
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: VMSummary(
                 id: "retirement-\(UUID())", provider: "freestyle", status: "running",
                 image: "fixture", createdAt: 0, base: nil

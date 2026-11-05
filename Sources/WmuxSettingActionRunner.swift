@@ -1,9 +1,9 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Which config files may declare `"type": "setting"` actions.
-enum CmuxSettingActionTrust {
+enum WmuxSettingActionTrust {
     /// Setting actions rewrite the global cmux.json, so they only run when the
     /// user's global config, or a pack it references, declared them. A
     /// missing source fails closed.
@@ -24,7 +24,7 @@ enum CmuxSettingActionTrust {
 /// `cmux config set|toggle|cycle|preset` uses, and the config file watcher
 /// applies the result like any other cmux.json edit.
 @MainActor
-enum CmuxSettingActionRunner {
+enum WmuxSettingActionRunner {
     private static var stores: [String: JSONConfigStore] = [:]
 
     /// Starts the change and returns whether it was accepted to run. A
@@ -37,15 +37,15 @@ enum CmuxSettingActionRunner {
     /// they get.
     @discardableResult
     static func run(
-        _ change: CmuxSettingChange,
+        _ change: WmuxSettingChange,
         actionSourcePath: String?,
         globalConfigPath: String,
-        settingPresets: [String: CmuxSettingValue] = [:],
+        settingPresets: [String: WmuxSettingValue] = [:],
         confirm: Bool = false,
         title: String? = nil,
         presentingWindow: NSWindow? = nil
     ) -> Bool {
-        guard CmuxSettingActionTrust.allowsSettingAction(
+        guard WmuxSettingActionTrust.allowsSettingAction(
             actionSourcePath: actionSourcePath,
             globalConfigPath: globalConfigPath
         ) else {
@@ -85,7 +85,7 @@ enum CmuxSettingActionRunner {
         return true
     }
 
-    static func confirmationAlert(for change: CmuxSettingChange, title: String?) -> NSAlert {
+    static func confirmationAlert(for change: WmuxSettingChange, title: String?) -> NSAlert {
         let alert = NSAlert()
         alert.alertStyle = .informational
         let trimmedTitle = title?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -112,9 +112,9 @@ enum CmuxSettingActionRunner {
     }
 
     private static func apply(
-        _ change: CmuxSettingChange,
+        _ change: WmuxSettingChange,
         globalConfigPath: String,
-        settingPresets: [String: CmuxSettingValue],
+        settingPresets: [String: WmuxSettingValue],
         presentingWindow: NSWindow?
     ) {
         let store = store(for: globalConfigPath)
@@ -128,7 +128,7 @@ enum CmuxSettingActionRunner {
                     presetOverrides: settingPresets
                 )
             } catch {
-                NSLog("[CmuxConfig] setting action on '%@' failed: %@", change.displayTarget, String(describing: error))
+                NSLog("[WmuxConfig] setting action on '%@' failed: %@", change.displayTarget, String(describing: error))
                 presentFailure(error, window: presentingWindow)
             }
         }
@@ -153,7 +153,7 @@ enum CmuxSettingActionRunner {
         alert.informativeText = (error as? LocalizedError)?.errorDescription
             ?? String(
                 localized: "settingAction.failed.unreadable",
-                defaultValue: "cmux couldn't read or save ~/.config/cmux/cmux.json. Check it for a syntax error, then try again."
+                defaultValue: "wmux couldn't read or save ~/.config/cmux/cmux.json. Check it for a syntax error, then try again."
             )
         if let window = window ?? NSApp.keyWindow {
             alert.beginSheetModal(for: window)

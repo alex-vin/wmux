@@ -1,15 +1,15 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 /// The cmux-tui client's `remote-probe --json` capabilities travel to the control
-/// plane through `vm.cmux_remote_info` → `VMClient.openCmuxRemote`; the control plane
+/// plane through `vm.wmux_remote_info` → `VMClient.openCmuxRemote`; the control plane
 /// keys the machine host on them, so only well-formed tokens may leave the Mac.
 @Suite struct CloudVMCmuxTuiClientCapabilityTests {
     @Test func forwardsWellFormedTokensInOrderWithoutDuplicates() {

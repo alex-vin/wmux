@@ -1,6 +1,6 @@
 import Foundation
 import UserNotifications
-import CmuxSettings
+import WmuxSettings
 
 #if DEBUG
 struct NotificationDebugTarget: Sendable {

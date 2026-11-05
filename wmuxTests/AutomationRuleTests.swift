@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -144,13 +144,13 @@ struct AutomationRuleTests {
 
     @Test("automation RPCs preserve focus unless explicitly allowed")
     func focusPolicyIsOptIn() {
-        let suppressed = CmuxAutomationInvocationContext.$focusAllowed.withValue(false) {
+        let suppressed = WmuxAutomationInvocationContext.$focusAllowed.withValue(false) {
             TerminalController.socketCommandAllowsInAppFocusMutations(
                 commandKey: "workspace.select",
                 isV2: true
             )
         }
-        let allowed = CmuxAutomationInvocationContext.$focusAllowed.withValue(true) {
+        let allowed = WmuxAutomationInvocationContext.$focusAllowed.withValue(true) {
             TerminalController.socketCommandAllowsInAppFocusMutations(
                 commandKey: "workspace.select",
                 isV2: true
@@ -162,9 +162,9 @@ struct AutomationRuleTests {
 
     @Test("action-generated events carry their rule chain")
     func generatedEventCarriesOrigin() throws {
-        let bus = CmuxEventBus(retainedEventLimit: 4)
-        let origin = CmuxAutomationEventOrigin(ruleID: "a", chain: ["a", "b"])
-        CmuxAutomationInvocationContext.$eventOrigin.withValue(origin) {
+        let bus = WmuxEventBus(retainedEventLimit: 4)
+        let origin = WmuxAutomationEventOrigin(ruleID: "a", chain: ["a", "b"])
+        WmuxAutomationInvocationContext.$eventOrigin.withValue(origin) {
             bus.publish(name: "workspace.reordered", category: "workspace", source: "test")
         }
         let event = try #require(bus.retainedSnapshot().last)
@@ -507,14 +507,14 @@ struct AutomationRuleTests {
                     action: "run",
                     parameters: [
                         "command": .string(
-                            "printf '%s' \"$CMUX_AUTOMATION_EVENT_NAME\" > '\(markerPath)'"
+                            "printf '%s' \"$WMUX_AUTOMATION_EVENT_NAME\" > '\(markerPath)'"
                         )
                     ]
                 )]
             )
         ]))
 
-        let bus = CmuxEventBus(retainedEventLimit: 32)
+        let bus = WmuxEventBus(retainedEventLimit: 32)
         let engine = AutomationEngine(configStore: store, eventBus: bus)
         defer { engine.stop() }
         engine.start()
@@ -573,7 +573,7 @@ struct AutomationRuleTests {
             )
         ]))
 
-        let bus = CmuxEventBus(retainedEventLimit: 32)
+        let bus = WmuxEventBus(retainedEventLimit: 32)
         var notificationCount = 0
         let engine = AutomationEngine(
             configStore: store,

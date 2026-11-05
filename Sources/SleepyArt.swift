@@ -1,5 +1,5 @@
-import CmuxSettingsUI
-import CmuxSettings
+import WmuxSettingsUI
+import WmuxSettings
 import Foundation
 
 // MARK: - Pixel art assets

@@ -1,9 +1,9 @@
-import CmuxFoundation
-import CmuxWorkspaces
+import WmuxFoundation
+import WmuxWorkspaces
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 import Carbon.HIToolbox
-import CmuxSettingsUI
+import WmuxSettingsUI
 import Observation
 import SwiftUI
 import UniformTypeIdentifiers
@@ -565,7 +565,7 @@ private enum TextBoxDraftAttachmentStorage {
             return nil
         }
         let directory = appSupportDirectory
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent(directoryName, isDirectory: true)
         if createIfMissing {
             do {
@@ -869,7 +869,7 @@ private struct TextBoxAttachmentPreviewPopoverView: View {
                 .background(Color.black.opacity(0.82))
         } else {
             VStack(spacing: 10) {
-                CmuxSystemSymbolImage(magnified: "doc", pointSize: 42, weight: .regular, tint: .primary.opacity(0.86))
+                WmuxSystemSymbolImage(magnified: "doc", pointSize: 42, weight: .regular, tint: .primary.opacity(0.86))
                 Text(attachment.displayName)
                     .cmuxFont(size: 13, weight: .medium)
                     .lineLimit(2)
@@ -950,7 +950,7 @@ private struct TextBoxAttachmentChip: View {
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             } else {
-                CmuxSystemSymbolImage(magnified: "doc", pointSize: 12, weight: .medium, tint: foreground.opacity(0.88))
+                WmuxSystemSymbolImage(magnified: "doc", pointSize: 12, weight: .medium, tint: foreground.opacity(0.88))
                     .frame(
                         width: TextBoxLayout.attachmentImageSize,
                         height: TextBoxLayout.attachmentImageSize
@@ -964,7 +964,7 @@ private struct TextBoxAttachmentChip: View {
                 .frame(maxWidth: 118, alignment: .leading)
 
             Button(action: onRemove) {
-                CmuxSystemSymbolImage(magnified: "xmark", pointSize: 8, weight: .bold, tint: foreground.opacity(0.62))
+                WmuxSystemSymbolImage(magnified: "xmark", pointSize: 8, weight: .bold, tint: foreground.opacity(0.62))
                     .frame(width: 14, height: 14)
             }
             .buttonStyle(.plain)
@@ -2414,7 +2414,7 @@ struct TextBoxInputContainer: View {
 
     private func addFilesButton(foreground: Color) -> some View {
         Button(action: chooseFiles) {
-            CmuxSystemSymbolImage(magnified: "plus", pointSize: TextBoxLayout.iconSymbolSize, weight: .semibold, tint: foreground.opacity(0.82))
+            WmuxSystemSymbolImage(magnified: "plus", pointSize: TextBoxLayout.iconSymbolSize, weight: .semibold, tint: foreground.opacity(0.82))
                 .frame(width: TextBoxLayout.iconButtonSize, height: TextBoxLayout.iconButtonSize)
                 .background(
                     Circle()
@@ -2458,7 +2458,7 @@ struct TextBoxInputContainer: View {
                 showPendingCommentsPreview.toggle()
             } label: {
                 HStack(spacing: 5) {
-                    CmuxSystemSymbolImage(magnified: "text.bubble", pointSize: 11, weight: .medium, tint: foreground.opacity(0.92))
+                    WmuxSystemSymbolImage(magnified: "text.bubble", pointSize: 11, weight: .medium, tint: foreground.opacity(0.92))
                     Text(pendingCommentsLabel(count))
                         .cmuxFont(size: 12, weight: .medium)
                         .lineLimit(1)
@@ -2472,7 +2472,7 @@ struct TextBoxInputContainer: View {
             Button {
                 dismissPendingComments()
             } label: {
-                CmuxSystemSymbolImage(magnified: "xmark", pointSize: 9, weight: .bold, tint: foreground.opacity(0.92))
+                WmuxSystemSymbolImage(magnified: "xmark", pointSize: 9, weight: .bold, tint: foreground.opacity(0.92))
                     .frame(width: 16, height: 16)
                     .background(Circle().fill(foreground.opacity(0.12)))
             }
@@ -2926,7 +2926,7 @@ struct TextBoxInputContainer: View {
             guard let workspace = MainActor.assumeIsolated({
                 surface.owningWorkspace()
             }) else {
-                finish(.failure(NSError(domain: "cmux.textbox.attachment", code: 3)))
+                finish(.failure(NSError(domain: "wmux.textbox.attachment", code: 3)))
                 return
             }
             workspace.uploadDroppedFilesForRemoteTerminal(
@@ -3333,7 +3333,7 @@ final class TextBoxInputTextView: NSTextView {
     private static let localControlKeys: Set<String> = ["a", "e", "f", "b", "n", "p", "k", "h"]
     static let pendingAttachmentUploadPlaceholderCharacter = "\u{200B}"
     static let pendingAttachmentUploadPlaceholderAttribute = NSAttributedString.Key(
-        "cmux.textBoxPendingAttachmentUploadID"
+        "wmux.textBoxPendingAttachmentUploadID"
     )
     private var attachmentPreviewPopover: NSPopover?
     private var attachmentPreviewCharacterIndex: Int?
@@ -4566,7 +4566,7 @@ final class TextBoxInputTextView: NSTextView {
             backing: .buffered,
             defer: false
         )
-        panel.identifier = NSUserInterfaceItemIdentifier("cmux.textbox.mentionCompletionPanel")
+        panel.identifier = NSUserInterfaceItemIdentifier("wmux.textbox.mentionCompletionPanel")
         panel.isFloatingPanel = true
         panel.hidesOnDeactivate = true
         panel.becomesKeyOnlyIfNeeded = true

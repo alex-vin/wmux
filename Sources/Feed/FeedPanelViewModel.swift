@@ -1,5 +1,5 @@
-import CmuxFoundation
-import CMUXAgentLaunch
+import WmuxFoundation
+import WMUXAgentLaunch
 import Foundation
 import Observation
 import SwiftUI

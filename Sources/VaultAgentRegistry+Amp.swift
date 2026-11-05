@@ -1,14 +1,14 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
-extension CmuxVaultAgentRegistration {
+extension WmuxVaultAgentRegistration {
     /// Amp's built-in Vault registration backed by cmux's managed hook store.
-    static var builtInAmp: CmuxVaultAgentRegistration {
-        CmuxVaultAgentRegistration(
+    static var builtInAmp: WmuxVaultAgentRegistration {
+        WmuxVaultAgentRegistration(
             id: "amp",
             name: "Amp",
             iconAssetName: "AgentIcons/Amp",
-            detect: CmuxVaultAgentDetectRule(processName: "amp"),
+            detect: WmuxVaultAgentDetectRule(processName: "amp"),
             sessionIdSource: .cmuxHookStore(.amp),
             resumeCommand: RegisteredAgentResumeKind.amp.commandTemplate,
             cwd: .preserve

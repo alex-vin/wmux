@@ -1,6 +1,6 @@
-import CMUXAgentLaunch
-import CmuxTerminal
-import CMUXMobileCore
+import WMUXAgentLaunch
+import WmuxTerminal
+import WMUXMobileCore
 import Foundation
 
 extension TerminalController {

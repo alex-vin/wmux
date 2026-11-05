@@ -1,5 +1,5 @@
 import Foundation
-import CmuxCanvas
+import WmuxCanvas
 
 /// User-configurable canvas layout settings.
 ///

@@ -1042,54 +1042,54 @@ final class TerminalCmdClickUITests: XCTestCase {
         let app = XCUIApplication.cmuxTestApplication()
         if let socketPath {
             app.launchArguments += ["-socketControlMode", "allowAll"]
-            app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-            app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-            app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
+            app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+            app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+            app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
         }
-        app.launchEnvironment["CMUX_TAG"] = "ui-test-terminal-cmd-click"
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_PATH"] = setupDataPath
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_COMMAND_PATH"] = commandPath
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_FIXTURE_DIR"] = fixtureDirectoryURL.path
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_FILE_NAME"] = fileName
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_MODE"] = displayMode.rawValue
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_FORMAT"] = lineFormat.rawValue
+        app.launchEnvironment["WMUX_TAG"] = "ui-test-terminal-cmd-click"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_PATH"] = setupDataPath
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_COMMAND_PATH"] = commandPath
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_FIXTURE_DIR"] = fixtureDirectoryURL.path
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_FILE_NAME"] = fileName
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_MODE"] = displayMode.rawValue
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_FORMAT"] = lineFormat.rawValue
         if mouseReporting {
-            app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_MOUSE_REPORTING"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_MOUSE_REPORTING"] = "1"
         }
-        app.launchEnvironment["CMUX_UI_TEST_OPEN_SUPPORTED_FILES_IN_CMUX"] = openSupportedFilesInCmux ? "1" : "0"
+        app.launchEnvironment["WMUX_UI_TEST_OPEN_SUPPORTED_FILES_IN_CMUX"] = openSupportedFilesInCmux ? "1" : "0"
         if !displaySuffix.isEmpty {
-            app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_SUFFIX"] = displaySuffix
+            app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_SUFFIX"] = displaySuffix
         }
         if displayAsAbsolutePath {
-            app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_AS_ABSOLUTE_PATH"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_AS_ABSOLUTE_PATH"] = "1"
         }
         if let openMarkdownInCmuxViewer {
-            app.launchEnvironment["CMUX_UI_TEST_OPEN_MARKDOWN_IN_CMUX_VIEWER"] = openMarkdownInCmuxViewer ? "1" : "0"
+            app.launchEnvironment["WMUX_UI_TEST_OPEN_MARKDOWN_IN_CMUX_VIEWER"] = openMarkdownInCmuxViewer ? "1" : "0"
         }
         if !linePrefix.isEmpty {
-            app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_PREFIX"] = linePrefix
+            app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_PREFIX"] = linePrefix
         }
         if !extraFileNames.isEmpty,
            let data = try? JSONSerialization.data(withJSONObject: extraFileNames, options: [.sortedKeys]),
            let json = String(data: data, encoding: .utf8) {
-            app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_EXTRA_FILE_NAMES_JSON"] = json
+            app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_EXTRA_FILE_NAMES_JSON"] = json
         }
         if captureOpenPaths {
-            app.launchEnvironment["CMUX_UI_TEST_CAPTURE_OPEN_PATH"] = openCapturePath
+            app.launchEnvironment["WMUX_UI_TEST_CAPTURE_OPEN_PATH"] = openCapturePath
         }
         if lineFormat == .osc8 || lineFormat == .plainURL {
-            app.launchEnvironment["CMUX_UI_TEST_CAPTURE_OPEN_URL_PATH"] = openURLCapturePath
+            app.launchEnvironment["WMUX_UI_TEST_CAPTURE_OPEN_URL_PATH"] = openURLCapturePath
         }
         if captureHoverDiagnostics {
-            app.launchEnvironment["CMUX_UI_TEST_CMD_HOVER_DIAGNOSTICS_PATH"] = hoverDiagnosticsPath
+            app.launchEnvironment["WMUX_UI_TEST_CMD_HOVER_DIAGNOSTICS_PATH"] = hoverDiagnosticsPath
         }
         if let quicklookOverride {
-            app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_QUICKLOOK_OVERRIDE"] = quicklookOverride
+            app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_QUICKLOOK_OVERRIDE"] = quicklookOverride
         }
         if let viewportOffsetDelta {
-            app.launchEnvironment["CMUX_UI_TEST_TERMINAL_CMD_CLICK_VIEWPORT_OFFSET_DELTA"] = String(viewportOffsetDelta)
+            app.launchEnvironment["WMUX_UI_TEST_TERMINAL_CMD_CLICK_VIEWPORT_OFFSET_DELTA"] = String(viewportOffsetDelta)
         }
         launchAndEnsureForeground(app)
         return app

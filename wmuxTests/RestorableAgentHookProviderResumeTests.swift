@@ -1,8 +1,8 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -98,7 +98,7 @@ extension SocketListenerAcceptPolicyTests {
                 workingDirectory: "/tmp/rovo repo",
                 environment: [
                     "ATLASSIAN_TOKEN": "secret",
-                    "CMUX_ROVODEV_SESSIONS_DIR": "/tmp/rovo sessions"
+                    "WMUX_ROVODEV_SESSIONS_DIR": "/tmp/rovo sessions"
                 ],
                 capturedAt: 123,
                 source: "process"
@@ -107,7 +107,7 @@ extension SocketListenerAcceptPolicyTests {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "cd -- '/tmp/rovo repo' 2>/dev/null || [ ! -d '/tmp/rovo repo' ] && 'env' 'CMUX_ROVODEV_SESSIONS_DIR=/tmp/rovo sessions' '/opt/homebrew/bin/acli' 'rovodev' 'run' '--restore' 'session with space' '--yolo'"
+            "cd -- '/tmp/rovo repo' 2>/dev/null || [ ! -d '/tmp/rovo repo' ] && 'env' 'WMUX_ROVODEV_SESSIONS_DIR=/tmp/rovo sessions' '/opt/homebrew/bin/acli' 'rovodev' 'run' '--restore' 'session with space' '--yolo'"
         )
     }
 
@@ -401,8 +401,8 @@ extension SocketListenerAcceptPolicyTests {
             ampResume.hasPrefix("cd -- '/tmp/amp repo' 2>/dev/null || [ ! -d '/tmp/amp repo' ] && "),
             ampResume
         )
-        XCTAssertTrue(ampResume.contains("CMUX_AMP_WRAPPER_SHIM"), ampResume)
-        XCTAssertTrue(ampResume.contains("CMUX_CUSTOM_AMP_PATH=/Users/example/.local/bin/amp"), ampResume)
+        XCTAssertTrue(ampResume.contains("WMUX_AMP_WRAPPER_SHIM"), ampResume)
+        XCTAssertTrue(ampResume.contains("WMUX_CUSTOM_AMP_PATH=/Users/example/.local/bin/amp"), ampResume)
         XCTAssertTrue(ampResume.contains("AMP_SETTINGS_FILE=/tmp/amp-settings.json"), ampResume)
         XCTAssertTrue(ampResume.contains("T-019e032c-c31a-77a9-ad87-8298ec47029f"), ampResume)
         XCTAssertFalse(ampResume.contains("T-old-thread"), ampResume)

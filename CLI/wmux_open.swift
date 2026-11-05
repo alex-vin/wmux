@@ -1,9 +1,9 @@
 import CryptoKit
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Darwin
 import Foundation
 
-struct CMUXAgentTurnDiffBaselineRecord: Codable {
+struct WMUXAgentTurnDiffBaselineRecord: Codable {
     var workspaceId: String
     var surfaceId: String
     var sessionId: String
@@ -22,21 +22,21 @@ struct CMUXAgentTurnDiffBaselineRecord: Codable {
     var capturedAt: TimeInterval
 }
 
-struct CMUXAgentTurnDiffBaselineStore: Codable {
+struct WMUXAgentTurnDiffBaselineStore: Codable {
     var version: Int = 1
-    var records: [CMUXAgentTurnDiffBaselineRecord] = []
+    var records: [WMUXAgentTurnDiffBaselineRecord] = []
 }
 
-private enum CMUXAgentTurnUntrackedSnapshotLimits {
+private enum WMUXAgentTurnUntrackedSnapshotLimits {
     static let maxFiles = 64
     static let maxFileBytes: UInt64 = 1 * 1024 * 1024
     static let maxTotalBytes: UInt64 = 4 * 1024 * 1024
     static let maxBaselinePaths = 512
 }
 
-enum CMUXAgentTurnDiffBaselineFile {
+enum WMUXAgentTurnDiffBaselineFile {
     static func path(env: [String: String] = ProcessInfo.processInfo.environment) -> String {
-        if let overrideDirectory = normalized(env["CMUX_AGENT_HOOK_STATE_DIR"]) {
+        if let overrideDirectory = normalized(env["WMUX_AGENT_HOOK_STATE_DIR"]) {
             return URL(fileURLWithPath: homeExpandedPath(overrideDirectory, env: env), isDirectory: true)
                 .appendingPathComponent("agent-turn-diff-baselines.json", isDirectory: false)
                 .path
@@ -69,7 +69,7 @@ enum CMUXAgentTurnDiffBaselineFile {
     }
 }
 
-enum CMUXDiffViewerLocalization {
+enum WMUXDiffViewerLocalization {
     static func string(
         _ key: String,
         defaultValue: String,
@@ -529,84 +529,84 @@ extension WMUXCLI {
 
         static func localized() -> DiffViewerLabels {
             DiffViewerLabels(values: reviewParityLabels.merging([
-                "additions": CMUXDiffViewerLocalization.string("diffViewer.additions", defaultValue: "Additions"),
-                "addComment": CMUXDiffViewerLocalization.string("diffViewer.addComment", defaultValue: "Add comment"),
-                "bars": CMUXDiffViewerLocalization.string("diffViewer.bars", defaultValue: "Bars"),
-                "binaryFile": CMUXDiffViewerLocalization.string("diffViewer.binaryFile", defaultValue: "Binary file"),
-                "cancelComment": CMUXDiffViewerLocalization.string("diffViewer.cancelComment", defaultValue: "Cancel"),
-                "comments": CMUXDiffViewerLocalization.string("diffViewer.comments", defaultValue: "Comments"),
-                "commentPlaceholder": CMUXDiffViewerLocalization.string("diffViewer.commentPlaceholder", defaultValue: "Leave a comment"),
-                "deleteComment": CMUXDiffViewerLocalization.string("diffViewer.deleteComment", defaultValue: "Delete"),
-                "editComment": CMUXDiffViewerLocalization.string("diffViewer.editComment", defaultValue: "Edit"),
-                "noComments": CMUXDiffViewerLocalization.string("diffViewer.noComments", defaultValue: "No comments yet"),
-                "outdatedComment": CMUXDiffViewerLocalization.string("diffViewer.outdatedComment", defaultValue: "Outdated"),
-                "saveComment": CMUXDiffViewerLocalization.string("diffViewer.saveComment", defaultValue: "Comment"),
-                "changedFiles": CMUXDiffViewerLocalization.string("diffViewer.changedFiles", defaultValue: "Changed files"),
-                "classic": CMUXDiffViewerLocalization.string("diffViewer.classic", defaultValue: "Classic"),
-                "commit": CMUXDiffViewerLocalization.string("about.commit", defaultValue: "Commit"),
-                "collapseAllDiffs": CMUXDiffViewerLocalization.string("diffViewer.collapseAllDiffs", defaultValue: "Collapse all diffs"),
-                "collapseUnchangedContext": CMUXDiffViewerLocalization.string("diffViewer.collapseUnchangedContext", defaultValue: "Collapse unchanged context"),
-                "copyFailedGitApplyCommand": CMUXDiffViewerLocalization.string("diffViewer.copyFailedGitApplyCommand", defaultValue: "Could not copy git apply command."),
-                "copiedGitApplyCommand": CMUXDiffViewerLocalization.string("diffViewer.copiedGitApplyCommand", defaultValue: "Copied git apply command"),
-                "copyGitApplyCommand": CMUXDiffViewerLocalization.string("diffViewer.copyGitApplyCommand", defaultValue: "Copy git apply command"),
-                "deletions": CMUXDiffViewerLocalization.string("diffViewer.deletions", defaultValue: "Deletions"),
-                "diffStats": CMUXDiffViewerLocalization.string("diffViewer.diffStats", defaultValue: "Diff stats"),
-                "diffTarget": CMUXDiffViewerLocalization.string("diffViewer.diffTarget", defaultValue: "Diff target"),
-                "diffViewer": CMUXDiffViewerLocalization.string("diffViewer.diffViewer", defaultValue: "Diff viewer"),
-                "renderFailed": CMUXDiffViewerLocalization.string("diffViewer.renderFailed", defaultValue: "Could not render this diff. Check the patch input and try again."),
-                "disableWordDiffs": CMUXDiffViewerLocalization.string("diffViewer.disableWordDiffs", defaultValue: "Disable word diffs"),
-                "disableWordWrap": CMUXDiffViewerLocalization.string("diffViewer.disableWordWrap", defaultValue: "Disable word wrap"),
-                "enableWordDiffs": CMUXDiffViewerLocalization.string("diffViewer.enableWordDiffs", defaultValue: "Enable word diffs"),
-                "enableWordWrap": CMUXDiffViewerLocalization.string("diffViewer.enableWordWrap", defaultValue: "Enable word wrap"),
-                "expandAllDiffs": CMUXDiffViewerLocalization.string("diffViewer.expandAllDiffs", defaultValue: "Expand all diffs"),
-                "expandUnchangedContext": CMUXDiffViewerLocalization.string("diffViewer.expandUnchangedContext", defaultValue: "Expand unchanged context"),
-                "files": CMUXDiffViewerLocalization.string("diffViewer.files", defaultValue: "Files"),
-                "findClose": CMUXDiffViewerLocalization.string("diffViewer.findClose", defaultValue: "Close find"),
-                "findInDiff": CMUXDiffViewerLocalization.string("diffViewer.findInDiff", defaultValue: "Find in diff"),
-                "findNextMatch": CMUXDiffViewerLocalization.string("diffViewer.findNextMatch", defaultValue: "Next match"),
-                "findPreviousMatch": CMUXDiffViewerLocalization.string("diffViewer.findPreviousMatch", defaultValue: "Previous match"),
-                "hideBackgrounds": CMUXDiffViewerLocalization.string("diffViewer.hideBackgrounds", defaultValue: "Hide backgrounds"),
-                "hideFiles": CMUXDiffViewerLocalization.string("diffViewer.hideFiles", defaultValue: "Hide files"),
-                "hideFileSearch": CMUXDiffViewerLocalization.string("diffViewer.hideFileSearch", defaultValue: "Hide file search"),
-                "hideLineNumbers": CMUXDiffViewerLocalization.string("diffViewer.hideLineNumbers", defaultValue: "Hide line numbers"),
-                "indicatorStyle": CMUXDiffViewerLocalization.string("diffViewer.indicatorStyle", defaultValue: "Indicator style"),
-                "jumpToFile": CMUXDiffViewerLocalization.string("diffViewer.jumpToFile", defaultValue: "Jump to file"),
-                "loadingDiff": CMUXDiffViewerLocalization.string("diffViewer.loadingDiff", defaultValue: "Loading diff..."),
-                "loadingRenderer": CMUXDiffViewerLocalization.string("diffViewer.loadingRenderer", defaultValue: "Loading renderer..."),
-                "modeChange": CMUXDiffViewerLocalization.string("diffViewer.modeChange", defaultValue: "Mode {old} → {new}"),
-                "noFileDiffs": CMUXDiffViewerLocalization.string("diffViewer.noFileDiffs", defaultValue: "No file diffs found in patch input."),
-                "none": CMUXDiffViewerLocalization.string("diffViewer.none", defaultValue: "None"),
-                "openSourceURL": CMUXDiffViewerLocalization.string("diffViewer.openSourceURL", defaultValue: "Open source URL"),
-                "options": CMUXDiffViewerLocalization.string("diffViewer.options", defaultValue: "Options"),
-                "parsingDiff": CMUXDiffViewerLocalization.string("diffViewer.parsingDiff", defaultValue: "Parsing diff..."),
-                "refresh": CMUXDiffViewerLocalization.string("diffViewer.refresh", defaultValue: "Refresh"),
-                "renderingDiff": CMUXDiffViewerLocalization.string("diffViewer.renderingDiff", defaultValue: "Rendering diff..."),
-                "repoPath": CMUXDiffViewerLocalization.string("diffViewer.repoPath", defaultValue: "Repository path"),
-                "branchBase": CMUXDiffViewerLocalization.string("diffViewer.branchBase", defaultValue: "Branch base"),
-                "branchPickerCurrent": CMUXDiffViewerLocalization.string("diffViewer.branchPickerCurrent", defaultValue: "current"),
-                "branchPickerBasePrefix": CMUXDiffViewerLocalization.string("diffViewer.branchPickerBasePrefix", defaultValue: "Base:"),
-                "branchPickerComparing": CMUXDiffViewerLocalization.string("diffViewer.branchPickerComparing", defaultValue: "Comparing {head} against {base}"),
-                "branchPickerFilterPlaceholder": CMUXDiffViewerLocalization.string("diffViewer.branchPickerFilterPlaceholder", defaultValue: "Filter branches"),
-                "branchPickerGenerateFailed": CMUXDiffViewerLocalization.string("diffViewer.branchPickerGenerateFailed", defaultValue: "Could not generate the diff. Choose a branch to retry."),
-                "branchPickerGenerating": CMUXDiffViewerLocalization.string("diffViewer.branchPickerGenerating", defaultValue: "Generating diff against {ref}..."),
-                "branchPickerGroupBranches": CMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupBranches", defaultValue: "Branches"),
-                "branchPickerGroupRecent": CMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupRecent", defaultValue: "Recent"),
-                "branchPickerGroupRemotes": CMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupRemotes", defaultValue: "Remotes"),
-                "branchPickerGroupSuggested": CMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupSuggested", defaultValue: "Suggested"),
-                "branchPickerGroupWorktrees": CMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupWorktrees", defaultValue: "Worktrees"),
-                "branchPickerLoadFailed": CMUXDiffViewerLocalization.string("diffViewer.branchPickerLoadFailed", defaultValue: "Could not load branches."),
-                "branchPickerMore": CMUXDiffViewerLocalization.string("diffViewer.branchPickerMore", defaultValue: "{count} more, type to filter"),
-                "branchPickerLoading": CMUXDiffViewerLocalization.string("diffViewer.branchPickerLoading", defaultValue: "Loading branches..."),
-                "branchPickerNoMatches": CMUXDiffViewerLocalization.string("diffViewer.branchPickerNoMatches", defaultValue: "No matching branches"),
-                "branchPickerOpen": CMUXDiffViewerLocalization.string("diffViewer.branchPickerOpen", defaultValue: "Change diff base"),
-                "branchPickerUseRaw": CMUXDiffViewerLocalization.string("diffViewer.branchPickerUseRaw", defaultValue: "Use \"{ref}\" (raw)"),
-                "showBackgrounds": CMUXDiffViewerLocalization.string("diffViewer.showBackgrounds", defaultValue: "Show backgrounds"),
-                "showFiles": CMUXDiffViewerLocalization.string("diffViewer.showFiles", defaultValue: "Show files"),
-                "showFileSearch": CMUXDiffViewerLocalization.string("diffViewer.showFileSearch", defaultValue: "Show file search"),
-                "showLineNumbers": CMUXDiffViewerLocalization.string("diffViewer.showLineNumbers", defaultValue: "Show line numbers"),
-                "switchToSplitDiff": CMUXDiffViewerLocalization.string("diffViewer.switchToSplitDiff", defaultValue: "Switch to split diff"),
-                "switchToUnifiedDiff": CMUXDiffViewerLocalization.string("diffViewer.switchToUnifiedDiff", defaultValue: "Switch to unified diff"),
-                "untitled": CMUXDiffViewerLocalization.string("diffViewer.untitled", defaultValue: "Untitled"),
+                "additions": WMUXDiffViewerLocalization.string("diffViewer.additions", defaultValue: "Additions"),
+                "addComment": WMUXDiffViewerLocalization.string("diffViewer.addComment", defaultValue: "Add comment"),
+                "bars": WMUXDiffViewerLocalization.string("diffViewer.bars", defaultValue: "Bars"),
+                "binaryFile": WMUXDiffViewerLocalization.string("diffViewer.binaryFile", defaultValue: "Binary file"),
+                "cancelComment": WMUXDiffViewerLocalization.string("diffViewer.cancelComment", defaultValue: "Cancel"),
+                "comments": WMUXDiffViewerLocalization.string("diffViewer.comments", defaultValue: "Comments"),
+                "commentPlaceholder": WMUXDiffViewerLocalization.string("diffViewer.commentPlaceholder", defaultValue: "Leave a comment"),
+                "deleteComment": WMUXDiffViewerLocalization.string("diffViewer.deleteComment", defaultValue: "Delete"),
+                "editComment": WMUXDiffViewerLocalization.string("diffViewer.editComment", defaultValue: "Edit"),
+                "noComments": WMUXDiffViewerLocalization.string("diffViewer.noComments", defaultValue: "No comments yet"),
+                "outdatedComment": WMUXDiffViewerLocalization.string("diffViewer.outdatedComment", defaultValue: "Outdated"),
+                "saveComment": WMUXDiffViewerLocalization.string("diffViewer.saveComment", defaultValue: "Comment"),
+                "changedFiles": WMUXDiffViewerLocalization.string("diffViewer.changedFiles", defaultValue: "Changed files"),
+                "classic": WMUXDiffViewerLocalization.string("diffViewer.classic", defaultValue: "Classic"),
+                "commit": WMUXDiffViewerLocalization.string("about.commit", defaultValue: "Commit"),
+                "collapseAllDiffs": WMUXDiffViewerLocalization.string("diffViewer.collapseAllDiffs", defaultValue: "Collapse all diffs"),
+                "collapseUnchangedContext": WMUXDiffViewerLocalization.string("diffViewer.collapseUnchangedContext", defaultValue: "Collapse unchanged context"),
+                "copyFailedGitApplyCommand": WMUXDiffViewerLocalization.string("diffViewer.copyFailedGitApplyCommand", defaultValue: "Could not copy git apply command."),
+                "copiedGitApplyCommand": WMUXDiffViewerLocalization.string("diffViewer.copiedGitApplyCommand", defaultValue: "Copied git apply command"),
+                "copyGitApplyCommand": WMUXDiffViewerLocalization.string("diffViewer.copyGitApplyCommand", defaultValue: "Copy git apply command"),
+                "deletions": WMUXDiffViewerLocalization.string("diffViewer.deletions", defaultValue: "Deletions"),
+                "diffStats": WMUXDiffViewerLocalization.string("diffViewer.diffStats", defaultValue: "Diff stats"),
+                "diffTarget": WMUXDiffViewerLocalization.string("diffViewer.diffTarget", defaultValue: "Diff target"),
+                "diffViewer": WMUXDiffViewerLocalization.string("diffViewer.diffViewer", defaultValue: "Diff viewer"),
+                "renderFailed": WMUXDiffViewerLocalization.string("diffViewer.renderFailed", defaultValue: "Could not render this diff. Check the patch input and try again."),
+                "disableWordDiffs": WMUXDiffViewerLocalization.string("diffViewer.disableWordDiffs", defaultValue: "Disable word diffs"),
+                "disableWordWrap": WMUXDiffViewerLocalization.string("diffViewer.disableWordWrap", defaultValue: "Disable word wrap"),
+                "enableWordDiffs": WMUXDiffViewerLocalization.string("diffViewer.enableWordDiffs", defaultValue: "Enable word diffs"),
+                "enableWordWrap": WMUXDiffViewerLocalization.string("diffViewer.enableWordWrap", defaultValue: "Enable word wrap"),
+                "expandAllDiffs": WMUXDiffViewerLocalization.string("diffViewer.expandAllDiffs", defaultValue: "Expand all diffs"),
+                "expandUnchangedContext": WMUXDiffViewerLocalization.string("diffViewer.expandUnchangedContext", defaultValue: "Expand unchanged context"),
+                "files": WMUXDiffViewerLocalization.string("diffViewer.files", defaultValue: "Files"),
+                "findClose": WMUXDiffViewerLocalization.string("diffViewer.findClose", defaultValue: "Close find"),
+                "findInDiff": WMUXDiffViewerLocalization.string("diffViewer.findInDiff", defaultValue: "Find in diff"),
+                "findNextMatch": WMUXDiffViewerLocalization.string("diffViewer.findNextMatch", defaultValue: "Next match"),
+                "findPreviousMatch": WMUXDiffViewerLocalization.string("diffViewer.findPreviousMatch", defaultValue: "Previous match"),
+                "hideBackgrounds": WMUXDiffViewerLocalization.string("diffViewer.hideBackgrounds", defaultValue: "Hide backgrounds"),
+                "hideFiles": WMUXDiffViewerLocalization.string("diffViewer.hideFiles", defaultValue: "Hide files"),
+                "hideFileSearch": WMUXDiffViewerLocalization.string("diffViewer.hideFileSearch", defaultValue: "Hide file search"),
+                "hideLineNumbers": WMUXDiffViewerLocalization.string("diffViewer.hideLineNumbers", defaultValue: "Hide line numbers"),
+                "indicatorStyle": WMUXDiffViewerLocalization.string("diffViewer.indicatorStyle", defaultValue: "Indicator style"),
+                "jumpToFile": WMUXDiffViewerLocalization.string("diffViewer.jumpToFile", defaultValue: "Jump to file"),
+                "loadingDiff": WMUXDiffViewerLocalization.string("diffViewer.loadingDiff", defaultValue: "Loading diff..."),
+                "loadingRenderer": WMUXDiffViewerLocalization.string("diffViewer.loadingRenderer", defaultValue: "Loading renderer..."),
+                "modeChange": WMUXDiffViewerLocalization.string("diffViewer.modeChange", defaultValue: "Mode {old} → {new}"),
+                "noFileDiffs": WMUXDiffViewerLocalization.string("diffViewer.noFileDiffs", defaultValue: "No file diffs found in patch input."),
+                "none": WMUXDiffViewerLocalization.string("diffViewer.none", defaultValue: "None"),
+                "openSourceURL": WMUXDiffViewerLocalization.string("diffViewer.openSourceURL", defaultValue: "Open source URL"),
+                "options": WMUXDiffViewerLocalization.string("diffViewer.options", defaultValue: "Options"),
+                "parsingDiff": WMUXDiffViewerLocalization.string("diffViewer.parsingDiff", defaultValue: "Parsing diff..."),
+                "refresh": WMUXDiffViewerLocalization.string("diffViewer.refresh", defaultValue: "Refresh"),
+                "renderingDiff": WMUXDiffViewerLocalization.string("diffViewer.renderingDiff", defaultValue: "Rendering diff..."),
+                "repoPath": WMUXDiffViewerLocalization.string("diffViewer.repoPath", defaultValue: "Repository path"),
+                "branchBase": WMUXDiffViewerLocalization.string("diffViewer.branchBase", defaultValue: "Branch base"),
+                "branchPickerCurrent": WMUXDiffViewerLocalization.string("diffViewer.branchPickerCurrent", defaultValue: "current"),
+                "branchPickerBasePrefix": WMUXDiffViewerLocalization.string("diffViewer.branchPickerBasePrefix", defaultValue: "Base:"),
+                "branchPickerComparing": WMUXDiffViewerLocalization.string("diffViewer.branchPickerComparing", defaultValue: "Comparing {head} against {base}"),
+                "branchPickerFilterPlaceholder": WMUXDiffViewerLocalization.string("diffViewer.branchPickerFilterPlaceholder", defaultValue: "Filter branches"),
+                "branchPickerGenerateFailed": WMUXDiffViewerLocalization.string("diffViewer.branchPickerGenerateFailed", defaultValue: "Could not generate the diff. Choose a branch to retry."),
+                "branchPickerGenerating": WMUXDiffViewerLocalization.string("diffViewer.branchPickerGenerating", defaultValue: "Generating diff against {ref}..."),
+                "branchPickerGroupBranches": WMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupBranches", defaultValue: "Branches"),
+                "branchPickerGroupRecent": WMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupRecent", defaultValue: "Recent"),
+                "branchPickerGroupRemotes": WMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupRemotes", defaultValue: "Remotes"),
+                "branchPickerGroupSuggested": WMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupSuggested", defaultValue: "Suggested"),
+                "branchPickerGroupWorktrees": WMUXDiffViewerLocalization.string("diffViewer.branchPickerGroupWorktrees", defaultValue: "Worktrees"),
+                "branchPickerLoadFailed": WMUXDiffViewerLocalization.string("diffViewer.branchPickerLoadFailed", defaultValue: "Could not load branches."),
+                "branchPickerMore": WMUXDiffViewerLocalization.string("diffViewer.branchPickerMore", defaultValue: "{count} more, type to filter"),
+                "branchPickerLoading": WMUXDiffViewerLocalization.string("diffViewer.branchPickerLoading", defaultValue: "Loading branches..."),
+                "branchPickerNoMatches": WMUXDiffViewerLocalization.string("diffViewer.branchPickerNoMatches", defaultValue: "No matching branches"),
+                "branchPickerOpen": WMUXDiffViewerLocalization.string("diffViewer.branchPickerOpen", defaultValue: "Change diff base"),
+                "branchPickerUseRaw": WMUXDiffViewerLocalization.string("diffViewer.branchPickerUseRaw", defaultValue: "Use \"{ref}\" (raw)"),
+                "showBackgrounds": WMUXDiffViewerLocalization.string("diffViewer.showBackgrounds", defaultValue: "Show backgrounds"),
+                "showFiles": WMUXDiffViewerLocalization.string("diffViewer.showFiles", defaultValue: "Show files"),
+                "showFileSearch": WMUXDiffViewerLocalization.string("diffViewer.showFileSearch", defaultValue: "Show file search"),
+                "showLineNumbers": WMUXDiffViewerLocalization.string("diffViewer.showLineNumbers", defaultValue: "Show line numbers"),
+                "switchToSplitDiff": WMUXDiffViewerLocalization.string("diffViewer.switchToSplitDiff", defaultValue: "Switch to split diff"),
+                "switchToUnifiedDiff": WMUXDiffViewerLocalization.string("diffViewer.switchToUnifiedDiff", defaultValue: "Switch to unified diff"),
+                "untitled": WMUXDiffViewerLocalization.string("diffViewer.untitled", defaultValue: "Untitled"),
             ], uniquingKeysWith: { $1 }))
         }
     }
@@ -703,28 +703,28 @@ extension WMUXCLI {
 
         var menuLabel: String {
             switch self {
-            case .unstaged: return CMUXDiffViewerLocalization.string("diffViewer.source.unstaged", defaultValue: "Unstaged")
-            case .staged: return CMUXDiffViewerLocalization.string("diffViewer.source.staged", defaultValue: "Staged")
-            case .branch: return CMUXDiffViewerLocalization.string("diffViewer.source.branch", defaultValue: "Branch")
-            case .lastTurn: return CMUXDiffViewerLocalization.string("diffViewer.source.lastTurn", defaultValue: "Last turn")
+            case .unstaged: return WMUXDiffViewerLocalization.string("diffViewer.source.unstaged", defaultValue: "Unstaged")
+            case .staged: return WMUXDiffViewerLocalization.string("diffViewer.source.staged", defaultValue: "Staged")
+            case .branch: return WMUXDiffViewerLocalization.string("diffViewer.source.branch", defaultValue: "Branch")
+            case .lastTurn: return WMUXDiffViewerLocalization.string("diffViewer.source.lastTurn", defaultValue: "Last turn")
             }
         }
 
         var title: String {
             switch self {
-            case .unstaged: return CMUXDiffViewerLocalization.string("diffViewer.title.unstagedChanges", defaultValue: "Unstaged changes")
-            case .staged: return CMUXDiffViewerLocalization.string("diffViewer.title.stagedChanges", defaultValue: "Staged changes")
-            case .branch: return CMUXDiffViewerLocalization.string("diffViewer.title.branchDiff", defaultValue: "Branch diff")
-            case .lastTurn: return CMUXDiffViewerLocalization.string("diffViewer.title.lastTurnDiff", defaultValue: "Last turn diff")
+            case .unstaged: return WMUXDiffViewerLocalization.string("diffViewer.title.unstagedChanges", defaultValue: "Unstaged changes")
+            case .staged: return WMUXDiffViewerLocalization.string("diffViewer.title.stagedChanges", defaultValue: "Staged changes")
+            case .branch: return WMUXDiffViewerLocalization.string("diffViewer.title.branchDiff", defaultValue: "Branch diff")
+            case .lastTurn: return WMUXDiffViewerLocalization.string("diffViewer.title.lastTurnDiff", defaultValue: "Last turn diff")
             }
         }
 
         var emptyMessage: String {
             switch self {
-            case .unstaged: return CMUXDiffViewerLocalization.string("diffViewer.empty.unstaged", defaultValue: "No unstaged changes to diff.")
-            case .staged: return CMUXDiffViewerLocalization.string("diffViewer.empty.staged", defaultValue: "No staged changes to diff.")
-            case .branch: return CMUXDiffViewerLocalization.string("diffViewer.empty.branch", defaultValue: "No branch changes to diff.")
-            case .lastTurn: return CMUXDiffViewerLocalization.string("diffViewer.empty.lastTurn", defaultValue: "No last-turn changes to diff.")
+            case .unstaged: return WMUXDiffViewerLocalization.string("diffViewer.empty.unstaged", defaultValue: "No unstaged changes to diff.")
+            case .staged: return WMUXDiffViewerLocalization.string("diffViewer.empty.staged", defaultValue: "No staged changes to diff.")
+            case .branch: return WMUXDiffViewerLocalization.string("diffViewer.empty.branch", defaultValue: "No branch changes to diff.")
+            case .lastTurn: return WMUXDiffViewerLocalization.string("diffViewer.empty.lastTurn", defaultValue: "No last-turn changes to diff.")
             }
         }
     }
@@ -843,10 +843,10 @@ extension WMUXCLI {
         defer { client.close() }
 
         let windowHandle = try normalizeWindowHandle(parsedArgs.window, client: client)
-        let workspaceRaw = parsedArgs.workspace ?? (parsedArgs.window == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+        let workspaceRaw = parsedArgs.workspace ?? (parsedArgs.window == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
         let workspaceHandle = try normalizeWorkspaceHandle(workspaceRaw, client: client, windowHandle: windowHandle)
         let shouldInheritCallerSurface = parsedArgs.workspace == nil && parsedArgs.pane == nil && parsedArgs.window == nil
-        let surfaceRaw = parsedArgs.surface ?? (shouldInheritCallerSurface ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+        let surfaceRaw = parsedArgs.surface ?? (shouldInheritCallerSurface ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
         let surfaceHandle = try normalizeSurfaceHandle(surfaceRaw, client: client, workspaceHandle: workspaceHandle, windowHandle: windowHandle)
         let paneHandle = try normalizePaneHandle(parsedArgs.pane, client: client, workspaceHandle: workspaceHandle)
 
@@ -968,9 +968,9 @@ extension WMUXCLI {
             guard !didResolveTarget else { return }
             let activeClient = try connectedClient()
             windowHandle = try normalizeWindowHandle(parsedArgs.window, client: activeClient)
-            let workspaceRaw = parsedArgs.workspace ?? (parsedArgs.window == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+            let workspaceRaw = parsedArgs.workspace ?? (parsedArgs.window == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
             workspaceHandle = try normalizeWorkspaceHandle(workspaceRaw, client: activeClient, windowHandle: windowHandle)
-            let surfaceRaw = parsedArgs.surface ?? (parsedArgs.window == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+            let surfaceRaw = parsedArgs.surface ?? (parsedArgs.window == nil ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
             surfaceHandle = try normalizeSurfaceHandle(surfaceRaw, client: activeClient, workspaceHandle: workspaceHandle, windowHandle: windowHandle)
             didResolveTarget = true
         }
@@ -1545,7 +1545,7 @@ extension WMUXCLI {
             }
             let sessionId = normalizedDiffSourceValue(context.sessionId)
             let env = ProcessInfo.processInfo.environment
-            let baselineStorePath = CMUXAgentTurnDiffBaselineFile.path(env: env)
+            let baselineStorePath = WMUXAgentTurnDiffBaselineFile.path(env: env)
             if let record = try latestAgentTurnDiffBaseline(
                 repoRoot: repoRoot,
                 workspaceId: workspaceId,
@@ -1800,15 +1800,15 @@ extension WMUXCLI {
     func diffBranchBaseReasonLabel(_ reason: String) -> String {
         switch reason {
         case DiffBranchBaseReason.createdFrom:
-            return CMUXDiffViewerLocalization.string("diffViewer.baseReason.createdFrom", defaultValue: "created from")
+            return WMUXDiffViewerLocalization.string("diffViewer.baseReason.createdFrom", defaultValue: "created from")
         case DiffBranchBaseReason.prBase:
-            return CMUXDiffViewerLocalization.string("diffViewer.baseReason.prBase", defaultValue: "PR base")
+            return WMUXDiffViewerLocalization.string("diffViewer.baseReason.prBase", defaultValue: "PR base")
         case DiffBranchBaseReason.forkPoint:
-            return CMUXDiffViewerLocalization.string("diffViewer.baseReason.forkPoint", defaultValue: "fork point")
+            return WMUXDiffViewerLocalization.string("diffViewer.baseReason.forkPoint", defaultValue: "fork point")
         case DiffBranchBaseReason.default:
-            return CMUXDiffViewerLocalization.string("diffViewer.baseReason.default", defaultValue: "default")
+            return WMUXDiffViewerLocalization.string("diffViewer.baseReason.default", defaultValue: "default")
         case DiffBranchBaseReason.manual:
-            return CMUXDiffViewerLocalization.string("diffViewer.baseReason.manual", defaultValue: "manual")
+            return WMUXDiffViewerLocalization.string("diffViewer.baseReason.manual", defaultValue: "manual")
         default:
             return reason
         }
@@ -2070,7 +2070,7 @@ extension WMUXCLI {
             groups.append(
                 DiffBranchRefGroup(
                     id: "suggested",
-                    label: CMUXDiffViewerLocalization.string("diffViewer.refGroup.suggested", defaultValue: "Suggested"),
+                    label: WMUXDiffViewerLocalization.string("diffViewer.refGroup.suggested", defaultValue: "Suggested"),
                     rows: suggestedRows
                 )
             )
@@ -2125,7 +2125,7 @@ extension WMUXCLI {
             groups.append(
                 DiffBranchRefGroup(
                     id: "worktrees",
-                    label: CMUXDiffViewerLocalization.string("diffViewer.refGroup.worktrees", defaultValue: "Worktrees"),
+                    label: WMUXDiffViewerLocalization.string("diffViewer.refGroup.worktrees", defaultValue: "Worktrees"),
                     rows: worktreeRows
                 )
             )
@@ -2159,7 +2159,7 @@ extension WMUXCLI {
             groups.append(
                 DiffBranchRefGroup(
                     id: "branches",
-                    label: CMUXDiffViewerLocalization.string("diffViewer.refGroup.branches", defaultValue: "Branches"),
+                    label: WMUXDiffViewerLocalization.string("diffViewer.refGroup.branches", defaultValue: "Branches"),
                     rows: branchRows
                 )
             )
@@ -2183,7 +2183,7 @@ extension WMUXCLI {
             groups.append(
                 DiffBranchRefGroup(
                     id: "remotes",
-                    label: CMUXDiffViewerLocalization.string("diffViewer.refGroup.remotes", defaultValue: "Remotes"),
+                    label: WMUXDiffViewerLocalization.string("diffViewer.refGroup.remotes", defaultValue: "Remotes"),
                     rows: remoteRows
                 )
             )
@@ -2217,7 +2217,7 @@ extension WMUXCLI {
             groups.append(
                 DiffBranchRefGroup(
                     id: "recent",
-                    label: CMUXDiffViewerLocalization.string("diffViewer.refGroup.recent", defaultValue: "Recent"),
+                    label: WMUXDiffViewerLocalization.string("diffViewer.refGroup.recent", defaultValue: "Recent"),
                     rows: recentRows
                 )
             )
@@ -2572,7 +2572,7 @@ extension WMUXCLI {
     /// The untracked path list to persist in a baseline record, or nil when even the
     /// directory-collapsed listing exceeds `maxBaselinePaths`.
     private func agentTurnDiffBaselineUntrackedPaths(_ paths: [String], in repoRoot: String) throws -> [String]? {
-        let limit = CMUXAgentTurnUntrackedSnapshotLimits.maxBaselinePaths
+        let limit = WMUXAgentTurnUntrackedSnapshotLimits.maxBaselinePaths
         guard paths.count > limit else {
             return paths
         }
@@ -2590,7 +2590,7 @@ extension WMUXCLI {
     }
 
     private func gitUntrackedPatchSinceBaseline(
-        record: CMUXAgentTurnDiffBaselineRecord,
+        record: WMUXAgentTurnDiffBaselineRecord,
         in repoRoot: String,
         storePath: String
     ) throws -> String {
@@ -2917,7 +2917,7 @@ extension WMUXCLI {
 
     private func agentTurnDiffBaselineSnapshotFileURL(
         path: String,
-        record: CMUXAgentTurnDiffBaselineRecord,
+        record: WMUXAgentTurnDiffBaselineRecord,
         storePath: String
     ) -> URL? {
         guard let snapshotId = record.untrackedSnapshotId,
@@ -3035,7 +3035,7 @@ extension WMUXCLI {
         var hashes: [String: String] = [:]
         var capturedBytes: UInt64 = 0
         for path in paths {
-            guard hashes.count < CMUXAgentTurnUntrackedSnapshotLimits.maxFiles,
+            guard hashes.count < WMUXAgentTurnUntrackedSnapshotLimits.maxFiles,
                   let sourceURL = safeRepoPathURL(relativePath: path, repoRoot: repoRoot),
                   let components = safeRelativePathComponents(path) else {
                 continue
@@ -3045,8 +3045,8 @@ extension WMUXCLI {
                 continue
             }
             let fileSize = UInt64((attributes[.size] as? NSNumber)?.int64Value ?? 0)
-            guard fileSize <= CMUXAgentTurnUntrackedSnapshotLimits.maxFileBytes,
-                  capturedBytes + fileSize <= CMUXAgentTurnUntrackedSnapshotLimits.maxTotalBytes else {
+            guard fileSize <= WMUXAgentTurnUntrackedSnapshotLimits.maxFileBytes,
+                  capturedBytes + fileSize <= WMUXAgentTurnUntrackedSnapshotLimits.maxTotalBytes else {
                 continue
             }
             do {
@@ -3133,13 +3133,13 @@ extension WMUXCLI {
         let baseCommit = try agentTurnDiffBaselineCommit(in: repoRoot)
         let untrackedPaths = try gitUntrackedPaths(in: repoRoot)
         let baselineUntrackedPaths = try agentTurnDiffBaselineUntrackedPaths(untrackedPaths, in: repoRoot)
-        let storePath = CMUXAgentTurnDiffBaselineFile.path(env: env)
+        let storePath = WMUXAgentTurnDiffBaselineFile.path(env: env)
         let untrackedSnapshot = try gitUntrackedPathHashes(
             paths: untrackedPaths,
             in: repoRoot,
             storePath: storePath
         )
-        let record = CMUXAgentTurnDiffBaselineRecord(
+        let record = WMUXAgentTurnDiffBaselineRecord(
             workspaceId: workspaceId,
             surfaceId: surfaceId,
             sessionId: normalizedDiffSourceValue(sessionId) ?? "",
@@ -3154,10 +3154,10 @@ extension WMUXCLI {
             capturedAt: Date().timeIntervalSince1970
         )
         do {
-            var removedRecords: [CMUXAgentTurnDiffBaselineRecord] = []
+            var removedRecords: [WMUXAgentTurnDiffBaselineRecord] = []
             var shouldRemoveNewSnapshot = untrackedSnapshot.snapshotId != nil
             try updateAgentTurnDiffBaselineStore(path: storePath, update: { store in
-                func matchesCurrentScope(_ existing: CMUXAgentTurnDiffBaselineRecord) -> Bool {
+                func matchesCurrentScope(_ existing: WMUXAgentTurnDiffBaselineRecord) -> Bool {
                     standardizedDiffSourcePath(existing.repoRoot) == repoRoot &&
                         diffScopeIdentifierEquals(existing.workspaceId, workspaceId) &&
                         diffScopeIdentifierEquals(existing.surfaceId, surfaceId) &&
@@ -3252,8 +3252,8 @@ extension WMUXCLI {
         surfaceId: String,
         sessionId: String?,
         env: [String: String]
-    ) throws -> CMUXAgentTurnDiffBaselineRecord? {
-        let store = try readAgentTurnDiffBaselineStore(path: CMUXAgentTurnDiffBaselineFile.path(env: env))
+    ) throws -> WMUXAgentTurnDiffBaselineRecord? {
+        let store = try readAgentTurnDiffBaselineStore(path: WMUXAgentTurnDiffBaselineFile.path(env: env))
         let repoRoot = standardizedDiffSourcePath(repoRoot)
         let candidates = store.records.filter { record in
             standardizedDiffSourcePath(record.repoRoot) == repoRoot
@@ -3264,19 +3264,19 @@ extension WMUXCLI {
         return candidates.max(by: { $0.capturedAt < $1.capturedAt })
     }
 
-    private func readAgentTurnDiffBaselineStore(path: String) throws -> CMUXAgentTurnDiffBaselineStore {
+    private func readAgentTurnDiffBaselineStore(path: String) throws -> WMUXAgentTurnDiffBaselineStore {
         let url = URL(fileURLWithPath: path)
         guard FileManager.default.fileExists(atPath: url.path) else {
-            return CMUXAgentTurnDiffBaselineStore()
+            return WMUXAgentTurnDiffBaselineStore()
         }
         let data = try Data(contentsOf: url)
-        return try JSONDecoder().decode(CMUXAgentTurnDiffBaselineStore.self, from: data)
+        return try JSONDecoder().decode(WMUXAgentTurnDiffBaselineStore.self, from: data)
     }
 
     private func updateAgentTurnDiffBaselineStore(
         path: String,
-        update: (inout CMUXAgentTurnDiffBaselineStore) throws -> Void,
-        afterWrite: ((CMUXAgentTurnDiffBaselineStore) -> Void)? = nil
+        update: (inout WMUXAgentTurnDiffBaselineStore) throws -> Void,
+        afterWrite: ((WMUXAgentTurnDiffBaselineStore) -> Void)? = nil
     ) throws {
         let url = URL(fileURLWithPath: path)
         try createPrivateDirectory(at: url.deletingLastPathComponent())
@@ -3295,7 +3295,7 @@ extension WMUXCLI {
             throw posixError(errno)
         }
 
-        var store = (try? readAgentTurnDiffBaselineStore(path: path)) ?? CMUXAgentTurnDiffBaselineStore()
+        var store = (try? readAgentTurnDiffBaselineStore(path: path)) ?? WMUXAgentTurnDiffBaselineStore()
         try update(&store)
 
         let encoder = JSONEncoder()
@@ -3305,7 +3305,7 @@ extension WMUXCLI {
         afterWrite?(store)
     }
 
-    private func pruneAgentTurnDiffBaselineStore(_ store: inout CMUXAgentTurnDiffBaselineStore) {
+    private func pruneAgentTurnDiffBaselineStore(_ store: inout WMUXAgentTurnDiffBaselineStore) {
         let cutoff = Date().timeIntervalSince1970 - 60 * 60 * 24 * 7
         store.records = store.records
             .filter { $0.capturedAt >= cutoff }
@@ -3316,7 +3316,7 @@ extension WMUXCLI {
         // Records written before `maxBaselinePaths` existed can hold hundreds of
         // thousands of paths; drop those lists so every later store read stays small.
         for index in store.records.indices
-        where (store.records[index].untrackedPaths?.count ?? 0) > CMUXAgentTurnUntrackedSnapshotLimits.maxBaselinePaths {
+        where (store.records[index].untrackedPaths?.count ?? 0) > WMUXAgentTurnUntrackedSnapshotLimits.maxBaselinePaths {
             store.records[index].untrackedPaths = nil
             store.records[index].untrackedPathsOmitted = true
         }
@@ -3324,8 +3324,8 @@ extension WMUXCLI {
 
     private func pruneAgentTurnDiffBaselineArtifacts(
         storePath: String,
-        removedRecords: [CMUXAgentTurnDiffBaselineRecord],
-        retainedRecords: [CMUXAgentTurnDiffBaselineRecord]
+        removedRecords: [WMUXAgentTurnDiffBaselineRecord],
+        retainedRecords: [WMUXAgentTurnDiffBaselineRecord]
     ) {
         pruneAgentTurnDiffBaselineRefs(
             removedRecords: removedRecords,
@@ -3335,8 +3335,8 @@ extension WMUXCLI {
     }
 
     private func pruneAgentTurnDiffBaselineRefs(
-        removedRecords: [CMUXAgentTurnDiffBaselineRecord],
-        retainedRecords: [CMUXAgentTurnDiffBaselineRecord]
+        removedRecords: [WMUXAgentTurnDiffBaselineRecord],
+        retainedRecords: [WMUXAgentTurnDiffBaselineRecord]
     ) {
         var deletedKeys: Set<String> = []
         for record in removedRecords {
@@ -3377,7 +3377,7 @@ extension WMUXCLI {
 
     private func pruneAgentTurnDiffBaselineSnapshots(
         storePath: String,
-        retainedRecords: [CMUXAgentTurnDiffBaselineRecord]
+        retainedRecords: [WMUXAgentTurnDiffBaselineRecord]
     ) {
         let rootURL = agentTurnDiffBaselineSnapshotRootURL(storePath: storePath)
         let retainedSnapshotIds = Set(retainedRecords.compactMap(\.untrackedSnapshotId))
@@ -3397,8 +3397,8 @@ extension WMUXCLI {
     }
 
     private func agentTurnDiffBaselineRecordEquals(
-        _ lhs: CMUXAgentTurnDiffBaselineRecord,
-        _ rhs: CMUXAgentTurnDiffBaselineRecord
+        _ lhs: WMUXAgentTurnDiffBaselineRecord,
+        _ rhs: WMUXAgentTurnDiffBaselineRecord
     ) -> Bool {
         standardizedDiffSourcePath(lhs.repoRoot) == standardizedDiffSourcePath(rhs.repoRoot)
             && diffScopeIdentifierEquals(lhs.workspaceId, rhs.workspaceId)
@@ -3997,7 +3997,7 @@ extension WMUXCLI {
     }
 
     func diffViewerLoadingDiffMessage(_ target: String) -> String {
-        let format = CMUXDiffViewerLocalization.string(
+        let format = WMUXDiffViewerLocalization.string(
             "diffViewer.loadingDiffTarget",
             defaultValue: "Loading diff: %@"
         )
@@ -5537,7 +5537,7 @@ extension WMUXCLI {
         guard let workspaceId = normalizedDiffSourceValue(context.workspaceId),
               let surfaceId = normalizedDiffSourceValue(context.surfaceId),
               let store = try? readAgentTurnDiffBaselineStore(
-                path: CMUXAgentTurnDiffBaselineFile.path(env: ProcessInfo.processInfo.environment)
+                path: WMUXAgentTurnDiffBaselineFile.path(env: ProcessInfo.processInfo.environment)
               ) else {
             return []
         }
@@ -6634,7 +6634,7 @@ extension WMUXCLI {
 
     private func diffViewerHTTPReplacementWaitTimeout() -> TimeInterval {
         let defaultTimeout: TimeInterval = 120
-        let key = "CMUX_DIFF_VIEWER_WAIT_TIMEOUT_SECONDS"
+        let key = "WMUX_DIFF_VIEWER_WAIT_TIMEOUT_SECONDS"
         guard let raw = ProcessInfo.processInfo.environment[key]?.trimmingCharacters(in: .whitespacesAndNewlines),
               let value = TimeInterval(raw),
               value.isFinite else {
@@ -6644,11 +6644,11 @@ extension WMUXCLI {
     }
 
     private func sendDiffViewerHTTPWaitTimedOut(fileDescriptor fd: Int32, omitBody: Bool) throws {
-        let title = CMUXDiffViewerLocalization.string(
+        let title = WMUXDiffViewerLocalization.string(
             "diffViewer.loadingDiff",
             defaultValue: "Loading diff..."
         )
-        let message = CMUXDiffViewerLocalization.string(
+        let message = WMUXDiffViewerLocalization.string(
             "diffViewer.renderFailed",
             defaultValue: "Could not render this diff. Check the patch input and try again."
         )
@@ -7830,8 +7830,8 @@ extension WMUXCLI {
         Multiple files open as tabs in the same target pane.
 
         Options:
-          --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
-          --surface <id|ref|index>     Target surface whose pane should receive file tabs (default: $CMUX_SURFACE_ID)
+          --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
+          --surface <id|ref|index>     Target surface whose pane should receive file tabs (default: $WMUX_SURFACE_ID)
           --pane <id|ref|index>        Target pane for file tabs
           --window <id|ref|index>      Target window
           --focus <true|false>         Focus opened file previews and web pages
@@ -7859,8 +7859,8 @@ extension WMUXCLI {
           --staged                     Show staged git changes
           --branch                     Show current branch against merge base
           --last-turn                  Show changes since this surface's last agent-turn baseline
-          --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
-          --surface <id|ref|index>     Source surface to split from (default: $CMUX_SURFACE_ID)
+          --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
+          --surface <id|ref|index>     Source surface to split from (default: $WMUX_SURFACE_ID)
           --session <id>               Scope --last-turn to one agent session
           --window <id|ref|index>      Target window
           --cwd, --repo <path>          Git repository or worktree path for git sources

@@ -207,7 +207,7 @@ extension WMUXCLI {
         client: SocketClient
     ) -> LiveAgentDeliveryTargetProbeResult {
         // A relay-backed connection means this hook is not running in the
-        // app's process namespace (SSH/cloud host): its CMUX_CLAUDE_PID is a
+        // app's process namespace (SSH/cloud host): its WMUX_CLAUDE_PID is a
         // REMOTE pid, and resolving that number against the Mac's local
         // process table could match an unrelated local process attached to
         // some other pane. Surface/workspace UUIDs are machine-independent,

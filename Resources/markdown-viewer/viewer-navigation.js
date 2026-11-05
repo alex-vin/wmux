@@ -181,7 +181,7 @@
     };
   }
 
-  global.CmuxViewerNavigation = {
+  global.WmuxViewerNavigation = {
     install: install,
     installManualInputReset: installManualInputReset,
     performAction: performAction,

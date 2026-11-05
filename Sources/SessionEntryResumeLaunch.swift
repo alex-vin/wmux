@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 /// The terminal startup plan shared by every Vault resume entry point.
@@ -28,7 +28,7 @@ private struct SessionEntryResumeSnapshotComponents {
     /// Replay-safe environment required by the agent profile.
     let environment: [String: String]
     /// Registration metadata for custom Vault agents.
-    let registration: CmuxVaultAgentRegistration?
+    let registration: WmuxVaultAgentRegistration?
     /// Captured permission mode when the agent exposes one separately from argv.
     let permissionMode: String?
 }

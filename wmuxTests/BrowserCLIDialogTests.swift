@@ -1,9 +1,9 @@
 import AppKit
-import CMUXMobileCore
-import CmuxBrowser
+import WMUXMobileCore
+import WmuxBrowser
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #else
 @testable import cmux
 #endif
@@ -110,7 +110,7 @@ struct BrowserCLIDialogTests {
 
     @Test func userInteractionRestoresUIPresentationForSubsequentDialogs() async throws {
         try await withPanel { panel, _ in
-            let webView = try #require(panel.webView as? CmuxWebView)
+            let webView = try #require(panel.webView as? WmuxWebView)
             webView.onPhysicalUserInteraction?()
             enqueue(panel, kind: .javaScriptConfirm) { _, _ in }
             #expect(panel.activeInteractiveBrowserPromptIDs.count == 1)

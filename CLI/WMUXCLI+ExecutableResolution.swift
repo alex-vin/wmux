@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 
@@ -54,7 +54,7 @@ extension WMUXCLI {
         }
 
         var shimRoots = environment.compactMap { key, rawPath -> String? in
-            guard key == "CMUX_AGENT_COMMAND_SHIM_ROOT" || key.hasSuffix("_WRAPPER_SHIM_ROOT") else {
+            guard key == "WMUX_AGENT_COMMAND_SHIM_ROOT" || key.hasSuffix("_WRAPPER_SHIM_ROOT") else {
                 return nil
             }
             return rawPath
@@ -208,10 +208,10 @@ extension WMUXCLI {
     func shouldDispatchCmuxSubcommandHelp(command: String, commandArgs: [String]) -> Bool {
         switch command {
         case "agent":
-            return CmuxTuiRemoteRouting.vmAgentRequestsHelp(commandArgs)
+            return WmuxTuiRemoteRouting.vmAgentRequestsHelp(commandArgs)
         case "vm", "cloud", "coderouter":
-            return !CmuxTuiRemoteRouting.isAgentSubcommand(commandArgs.first)
-                || CmuxTuiRemoteRouting.vmAgentRequestsHelp(Array(commandArgs.dropFirst()))
+            return !WmuxTuiRemoteRouting.isAgentSubcommand(commandArgs.first)
+                || WmuxTuiRemoteRouting.vmAgentRequestsHelp(Array(commandArgs.dropFirst()))
         case "claude-teams", "codex-teams":
             return false
         case "omo", "omx", "omc":
@@ -242,7 +242,7 @@ extension WMUXCLI {
     /// in place and the user vets the directory normally.
     ///
     /// The opt-in decision is made here, once, by an exact argv check, and recorded
-    /// in `CMUX_CLAUDE_TEAMS_SANDBOXED` so teammate respawns (which run as a separate
+    /// in `WMUX_CLAUDE_TEAMS_SANDBOXED` so teammate respawns (which run as a separate
     /// `cmux __tmux-compat` process and cannot see this argv) re-apply the same
     /// decision without re-deriving it from untrusted command text — see
     /// `tmuxClaudeTeamsRespawnEnvironment()`.
@@ -252,7 +252,7 @@ extension WMUXCLI {
         ]
         if claudeTeamsHasDangerousSkipPermissions(commandArgs: commandArgs) {
             vars.append((key: "CLAUDE_CODE_SANDBOXED", value: "1"))
-            vars.append((key: "CMUX_CLAUDE_TEAMS_SANDBOXED", value: "1"))
+            vars.append((key: "WMUX_CLAUDE_TEAMS_SANDBOXED", value: "1"))
         }
         return vars
     }
@@ -321,7 +321,7 @@ extension WMUXCLI {
             unsetenv(key)
         }
         unsetenv(ClaudeTeamsRespawnEnvironmentTransport.environmentKey)
-        unsetenv("CMUX_CLAUDE_TEAMS_WRAPPER_LAUNCH")
+        unsetenv("WMUX_CLAUDE_TEAMS_WRAPPER_LAUNCH")
     }
 
     private func providerExecutableSearchDirectories(searchPath: String?) -> [String] {

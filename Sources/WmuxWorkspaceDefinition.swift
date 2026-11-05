@@ -1,16 +1,16 @@
 import Foundation
 
-struct CmuxWorkspaceDefinition: Codable, Sendable, Hashable {
+struct WmuxWorkspaceDefinition: Codable, Sendable, Hashable {
     var name: String?
     var cwd: String?
     var color: String?
     /// User-defined environment variables inherited by every shell spawned in the
-    /// workspace (issue #5995). Managed `CMUX_*` variables always win.
+    /// workspace (issue #5995). Managed `WMUX_*` variables always win.
     var env: [String: String]?
     /// Bootstrap command sent to the workspace's first terminal before that
     /// terminal's own surface `command`. Other panes do not wait for it.
     var setup: String?
-    var layout: CmuxLayoutNode?
+    var layout: WmuxLayoutNode?
 
     init(
         name: String? = nil,
@@ -18,7 +18,7 @@ struct CmuxWorkspaceDefinition: Codable, Sendable, Hashable {
         color: String? = nil,
         env: [String: String]? = nil,
         setup: String? = nil,
-        layout: CmuxLayoutNode? = nil
+        layout: WmuxLayoutNode? = nil
     ) {
         self.name = name
         self.cwd = cwd
@@ -39,7 +39,7 @@ struct CmuxWorkspaceDefinition: Codable, Sendable, Hashable {
         } else {
             setup = nil
         }
-        layout = try container.decodeIfPresent(CmuxLayoutNode.self, forKey: .layout)
+        layout = try container.decodeIfPresent(WmuxLayoutNode.self, forKey: .layout)
 
         if let rawColor = try container.decodeIfPresent(String.self, forKey: .color) {
             let defaults = decoder.userInfo[.cmuxWorkspaceColorDefaults] as? UserDefaults ?? .standard

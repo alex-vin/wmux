@@ -1,5 +1,5 @@
 import AppKit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Foundation
 
 /// Opens workspace-group configuration and documentation surfaces.
@@ -34,8 +34,8 @@ enum SidebarWorkspaceGroupConfigOpener {
     ) -> URL {
         let configURL = home
             .appendingPathComponent(".config", isDirectory: true)
-            .appendingPathComponent("cmux", isDirectory: true)
-            .appendingPathComponent("cmux.json", isDirectory: false)
+            .appendingPathComponent("wmux", isDirectory: true)
+            .appendingPathComponent("wmux.json", isDirectory: false)
         if !FileManager.default.fileExists(atPath: configURL.path) {
             try? FileManager.default.createDirectory(
                 at: configURL.deletingLastPathComponent(),

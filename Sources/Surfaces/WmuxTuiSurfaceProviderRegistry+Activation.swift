@@ -1,8 +1,8 @@
-import CmuxAuthRuntime
-import CmuxCloud
-import CmuxSettings
+import WmuxAuthRuntime
+import WmuxCloud
+import WmuxSettings
 
-extension CmuxTuiSurfaceProviderRegistry {
+extension WmuxTuiSurfaceProviderRegistry {
     /// Completes the readiness work that the former Beta Features toggle
     /// triggered. The shared hub actor joins concurrent callers to one startup
     /// task, so first-use enablement has one setup owner.
@@ -54,7 +54,7 @@ extension CmuxTuiSurfaceProviderRegistry {
         wireGuardHub: CloudWireGuardHub?,
         expectedTeamScope: AuthenticatedTeamScope
     ) async {
-        // The bundled cmux-tui client is optional. Cloud activation still
+        // The bundled wmux-tui client is optional. Cloud activation still
         // enables machine creation when this build cannot host the terminal
         // carrier; restored links remain retryable when a present hub is
         // temporarily unavailable. A present hub is also prepared in the

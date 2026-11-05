@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -88,7 +88,7 @@ struct FileExplorerGitStatusProviderTests {
         let fakeGitURL = try Self.writeExecutableScript(
             #"""
             #!/bin/sh
-            if [ "${CMUX_TEST_GIT_ENV:-}" != "expected" ]; then
+            if [ "${WMUX_TEST_GIT_ENV:-}" != "expected" ]; then
                 exit 3
             fi
             if [ "${GIT_OPTIONAL_LOCKS:-}" != "0" ]; then
@@ -96,7 +96,7 @@ struct FileExplorerGitStatusProviderTests {
             fi
             case "$1 $2" in
             "rev-parse --show-toplevel")
-                printf '%s\n' "$CMUX_TEST_REPO_ROOT"
+                printf '%s\n' "$WMUX_TEST_REPO_ROOT"
                 ;;
             "status --porcelain=v1")
                 printf ' T type-change.txt\0UU conflicted.txt\0'
@@ -110,8 +110,8 @@ struct FileExplorerGitStatusProviderTests {
             in: repoURL
         )
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_TEST_GIT_ENV"] = "expected"
-        environment["CMUX_TEST_REPO_ROOT"] = repoURL.path
+        environment["WMUX_TEST_GIT_ENV"] = "expected"
+        environment["WMUX_TEST_REPO_ROOT"] = repoURL.path
 
         let status = GitStatusProvider(
             gitExecutableURL: fakeGitURL,
@@ -134,17 +134,17 @@ struct FileExplorerGitStatusProviderTests {
         let fakeSSHURL = try Self.writeExecutableScript(
             #"""
             #!/bin/sh
-            if [ "${CMUX_TEST_SSH_ENV:-}" != "expected" ]; then
+            if [ "${WMUX_TEST_SSH_ENV:-}" != "expected" ]; then
                 exit 3
             fi
-            printf '%s\n---GIT_STATUS---\n M remote.txt\0' "$CMUX_TEST_REPO_ROOT"
+            printf '%s\n---GIT_STATUS---\n M remote.txt\0' "$WMUX_TEST_REPO_ROOT"
             """#,
             named: "fake-ssh",
             in: repoURL
         )
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_TEST_REPO_ROOT"] = repoURL.path
-        environment["CMUX_TEST_SSH_ENV"] = "expected"
+        environment["WMUX_TEST_REPO_ROOT"] = repoURL.path
+        environment["WMUX_TEST_SSH_ENV"] = "expected"
 
         let status = GitStatusProvider(
             sshExecutableURL: fakeSSHURL,
@@ -175,15 +175,15 @@ struct FileExplorerGitStatusProviderTests {
         let fakeSSHURL = try Self.writeExecutableScript(
             #"""
             #!/bin/sh
-            for arg in "$@"; do printf '%s\n' "$arg"; done > "$CMUX_TEST_SSH_ARGV_LOG"
-            printf '%s\n---GIT_STATUS---\n M remote.txt\0' "$CMUX_TEST_REPO_ROOT"
+            for arg in "$@"; do printf '%s\n' "$arg"; done > "$WMUX_TEST_SSH_ARGV_LOG"
+            printf '%s\n---GIT_STATUS---\n M remote.txt\0' "$WMUX_TEST_REPO_ROOT"
             """#,
             named: "fake-ssh",
             in: repoURL
         )
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_TEST_REPO_ROOT"] = repoURL.path
-        environment["CMUX_TEST_SSH_ARGV_LOG"] = argvLog.path
+        environment["WMUX_TEST_REPO_ROOT"] = repoURL.path
+        environment["WMUX_TEST_SSH_ARGV_LOG"] = argvLog.path
 
         let status = GitStatusProvider(
             sshExecutableURL: fakeSSHURL,

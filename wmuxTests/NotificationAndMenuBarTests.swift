@@ -7,12 +7,12 @@ import UniformTypeIdentifiers
 import WebKit
 import ObjectiveC.runtime
 import Bonsplit
-import CmuxCloud
-import CmuxSettings
+import WmuxCloud
+import WmuxSettings
 import UserNotifications
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -62,7 +62,7 @@ struct NotificationHookProcessIsolationTests {
             isAppFocused: false,
             isFocusedPanel: false
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "descriptor-isolation",
             command: "if [ -e /dev/fd/\(unrelatedDescriptor) ]; then printf '{\"notification\":{\"body\":\"inherited\"}}'; else cat; fi",
             timeoutSeconds: 5,
@@ -128,7 +128,7 @@ struct NotificationRequestedEffectsTests {
 final class TerminalNotificationPolicyEngineTests: XCTestCase {
     private func evaluate(
         request: TerminalNotificationPolicyRequest,
-        hooks: [CmuxResolvedNotificationHook]
+        hooks: [WmuxResolvedNotificationHook]
     ) async -> Result<TerminalNotificationPolicyEnvelope, TerminalNotificationPolicyFailure> {
         await TerminalNotificationPolicyEngine.evaluate(
             request: request,
@@ -160,7 +160,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isAppFocused: false,
             isFocusedPanel: false
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "teardown",
             command: "/bin/sh -c 'trap \"\" TERM; echo $$ > \(pidPath); exec /bin/sleep 30' & wait",
             timeoutSeconds: 60,
@@ -229,7 +229,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isAppFocused: false,
             isFocusedPanel: false
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "filter",
             command: #"sed 's/"desktop":true/"desktop":false/; s/"body":"Body"/"body":"Filtered"/'"#,
             timeoutSeconds: 5,
@@ -256,7 +256,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isFocusedPanel: false,
             effects: TerminalNotificationPolicyEffectsPatch(desktop: false)
         )
-        let passthrough = CmuxResolvedNotificationHook(
+        let passthrough = WmuxResolvedNotificationHook(
             id: "passthrough",
             command: "cat",
             timeoutSeconds: 5,
@@ -269,7 +269,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
         XCTAssertTrue(seeded.effects.record)
         XCTAssertTrue(seeded.effects.sound, "only the desktop effect is requested by the flag")
 
-        let restore = CmuxResolvedNotificationHook(
+        let restore = WmuxResolvedNotificationHook(
             id: "restore",
             command: #"sed 's/"desktop":false/"desktop":true/'"#,
             timeoutSeconds: 5,
@@ -279,7 +279,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
         let overridden = try await evaluate(request: request, hooks: [restore]).get()
         XCTAssertTrue(overridden.effects.desktop, "a hook keeps the last word over the flag")
 
-        let unrelated = CmuxResolvedNotificationHook(
+        let unrelated = WmuxResolvedNotificationHook(
             id: "unrelated",
             command: #"printf '{"effects":{"sound":false}}'"#,
             timeoutSeconds: 5,
@@ -316,7 +316,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             ),
             effects: effects
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "feed-filter",
             command: #"sed 's/"desktop":true/"desktop":false/; s/"title":"Permission"/"title":"Filtered"/'"#,
             timeoutSeconds: 5,
@@ -342,7 +342,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isAppFocused: false,
             isFocusedPanel: false
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "partial",
             command: #"printf '{"effects":{"desktop":false},"stop":true}'"#,
             timeoutSeconds: 5,
@@ -381,7 +381,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             ),
             effects: effects
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "partial",
             command: #"printf '{"effects":{"desktop":false}}'"#,
             timeoutSeconds: 5,
@@ -414,7 +414,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
                 focusedPanel: false
             )
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "partial-notification",
             command: #"printf '{"notification":{"title":"Retitled"},"context":{"appFocused":true}}'"#,
             timeoutSeconds: 5,
@@ -446,7 +446,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isAppFocused: false,
             isFocusedPanel: false
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "bad",
             command: "printf nope",
             timeoutSeconds: 5,
@@ -475,7 +475,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isAppFocused: false,
             isFocusedPanel: false
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "slow",
             command: "sleep 2; cat",
             timeoutSeconds: 0.1,
@@ -504,7 +504,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isAppFocused: false,
             isFocusedPanel: false
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "background-stdout",
             command: "sleep 3 & cat",
             timeoutSeconds: 5,
@@ -573,9 +573,9 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
     func testHookCanSuppressSubagentCompletionsOnly() async throws {
         // Override mode: one user hook silences the built-in banner for
         // subagent completions while leaving top-level completions untouched.
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "mute-subagents",
-            command: #"if [ "${CMUX_NOTIFICATION_AGENT_IS_SUBAGENT-0}" = "1" ]; then printf '{"effects":{"desktop":false,"sound":false,"paneFlash":false}}'; fi"#,
+            command: #"if [ "${WMUX_NOTIFICATION_AGENT_IS_SUBAGENT-0}" = "1" ]; then printf '{"effects":{"desktop":false,"sound":false,"paneFlash":false}}'; fi"#,
             timeoutSeconds: 5,
             sourcePath: nil,
             cwd: FileManager.default.temporaryDirectory.path
@@ -610,10 +610,10 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: captureDirectory) }
         let stdinCapture = captureDirectory.appendingPathComponent("stdin.json")
         let envCapture = captureDirectory.appendingPathComponent("env.txt")
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "capture",
             command: "cat > '\(stdinCapture.path)'; "
-                + #"printf '%s|%s|%s|%s' "${CMUX_NOTIFICATION_AGENT_KIND-unset}" "${CMUX_NOTIFICATION_AGENT_CATEGORY-unset}" "${CMUX_NOTIFICATION_AGENT_PENDING-unset}" "${CMUX_NOTIFICATION_AGENT_IS_SUBAGENT-unset}""#
+                + #"printf '%s|%s|%s|%s' "${WMUX_NOTIFICATION_AGENT_KIND-unset}" "${WMUX_NOTIFICATION_AGENT_CATEGORY-unset}" "${WMUX_NOTIFICATION_AGENT_PENDING-unset}" "${WMUX_NOTIFICATION_AGENT_IS_SUBAGENT-unset}""#
                 + " > '\(envCapture.path)'",
             timeoutSeconds: 5,
             sourcePath: nil,
@@ -649,7 +649,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             pending: false,
             isSubagent: true
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "forge-agent",
             command: #"printf '{"agent":{"kind":"forged","category":"needs-permission","pending":true,"isSubagent":false},"effects":{"desktop":false}}'"#,
             timeoutSeconds: 5,
@@ -670,10 +670,10 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: captureDirectory) }
         let stdinCapture = captureDirectory.appendingPathComponent("stdin.json")
         let envCapture = captureDirectory.appendingPathComponent("env.txt")
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "capture-legacy",
             command: "cat > '\(stdinCapture.path)'; "
-                + #"printf '%s' "${CMUX_NOTIFICATION_AGENT_KIND-unset}""#
+                + #"printf '%s' "${WMUX_NOTIFICATION_AGENT_KIND-unset}""#
                 + " > '\(envCapture.path)'",
             timeoutSeconds: 5,
             sourcePath: nil,
@@ -711,7 +711,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isFocusedPanel: false,
             soundContext: context
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "inherit-context",
             command: #"printf '{"effects":{"desktop":false}}'"#,
             timeoutSeconds: 5,
@@ -737,7 +737,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isFocusedPanel: false,
             soundContext: context
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "mismatched-context",
             command: #"printf '{"context":{"soundContext":{"agentID":"codex","alertType":"errorStalled"}}}'"#,
             timeoutSeconds: 5,
@@ -763,7 +763,7 @@ final class TerminalNotificationPolicyEngineTests: XCTestCase {
             isFocusedPanel: false,
             soundContext: context
         )
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "clear-context",
             command: #"printf '{"context":{"soundContext":null}}'"#,
             timeoutSeconds: 5,
@@ -1781,7 +1781,7 @@ final class NotificationDockBadgeTests: XCTestCase {
         AppFocusState.overrideIsFocused = true
         defaults.set("none", forKey: NotificationSoundSettings.key)
         defaults.set(
-            "printf '%s\\n%s\\n%s' \"$CMUX_NOTIFICATION_TITLE\" \"$CMUX_NOTIFICATION_SUBTITLE\" \"$CMUX_NOTIFICATION_BODY\" > '\(commandOutputURL.path)'",
+            "printf '%s\\n%s\\n%s' \"$WMUX_NOTIFICATION_TITLE\" \"$WMUX_NOTIFICATION_SUBTITLE\" \"$WMUX_NOTIFICATION_BODY\" > '\(commandOutputURL.path)'",
             forKey: NotificationSoundSettings.customCommandKey
         )
 

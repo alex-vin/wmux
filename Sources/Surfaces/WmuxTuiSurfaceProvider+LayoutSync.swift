@@ -1,11 +1,11 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
 /// Writes a native workspace arrangement to the machine, one revision-fenced step at a time.
 @MainActor
-extension CmuxTuiSurfaceProvider: SurfaceWorkspaceLayoutSyncing {
+extension WmuxTuiSurfaceProvider: SurfaceWorkspaceLayoutSyncing {
     /// Enough for a full rearrangement of a large workspace; a plan that has not
     /// converged by then is fighting a concurrent writer and yields to it.
     static let layoutSyncStepLimit = 64
@@ -30,10 +30,10 @@ extension CmuxTuiSurfaceProvider: SurfaceWorkspaceLayoutSyncing {
                 }
                 let data = try await link.run(arguments: CloudTuiRequests.snapshotArguments(socketPath: connected.socketPath))
                 guard let snapshot = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      CmuxTuiSnapshotParser.authoritativeGraphIsValid(snapshot) else {
+                      WmuxTuiSnapshotParser.authoritativeGraphIsValid(snapshot) else {
                     throw ProviderError.invalidSnapshot(machineID)
                 }
-                let revision = CmuxTuiSnapshotParser.resourceRevision(from: snapshot)
+                let revision = WmuxTuiSnapshotParser.resourceRevision(from: snapshot)
                 let step = CloudLayoutSyncPlanner(
                     snapshot: snapshot, workspaceID: remoteWorkspaceID, desired: desired, scratchTabIDs: Set(scratch.keys)
                 ).step
@@ -50,7 +50,7 @@ extension CmuxTuiSurfaceProvider: SurfaceWorkspaceLayoutSyncing {
                     request = CloudTuiRequests.paneCreate(
                         paneID: paneID, direction: SurfaceSplitDirection.right.rawValue, command: [],
                         revision: revision.flatMap { UInt64($0) },
-                        key: "cmux-cloud-layout-\(UUID().uuidString.lowercased())", correlationKey: nil
+                        key: "wmux-cloud-layout-\(UUID().uuidString.lowercased())", correlationKey: nil
                     )
                 case .closeScratch(let tabID, let terminalID):
                     scratch[tabID] = nil
@@ -98,7 +98,7 @@ extension CmuxTuiSurfaceProvider: SurfaceWorkspaceLayoutSyncing {
             do {
                 let response = try await link.run(arguments: request)
                 if let object = try? JSONSerialization.jsonObject(with: response) as? [String: Any],
-                   let created = CmuxTuiSnapshotParser.createdTerminal(fromRunResult: object),
+                   let created = WmuxTuiSnapshotParser.createdTerminal(fromRunResult: object),
                    let tabID = created.tabID {
                     return (tabID, created.terminalID)
                 }

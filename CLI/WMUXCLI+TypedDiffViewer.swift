@@ -45,7 +45,7 @@ extension WMUXCLI {
             if let resolved = try? resolvedDiffBranchBase(base, in: repo) {
                 groups = [[
                     "id": "suggested",
-                    "label": CMUXDiffViewerLocalization.string(
+                    "label": WMUXDiffViewerLocalization.string(
                         "diffViewer.refGroup.suggested",
                         defaultValue: "Suggested"
                     ),

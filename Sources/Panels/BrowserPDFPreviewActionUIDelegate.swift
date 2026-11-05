@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 import WebKit
 
@@ -23,7 +23,7 @@ class BrowserPDFPreviewActionUIDelegate: NSObject, WKUIDelegate {
             #endif
             return
         }
-        guard let downloadDelegate = (webView as? CmuxWebView)?.cmuxDownloadDelegate as? BrowserDownloadDelegate else {
+        guard let downloadDelegate = (webView as? WmuxWebView)?.cmuxDownloadDelegate as? BrowserDownloadDelegate else {
             #if DEBUG
             cmuxDebugLog("browser.pdfPreview.save stage=rejectMissingDelegate")
             #endif

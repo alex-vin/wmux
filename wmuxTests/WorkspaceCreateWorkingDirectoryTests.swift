@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -30,12 +30,12 @@ import Testing
         let manager = TabManager()
         let initialWorkspaceIDs = Set(manager.tabs.map(\.id))
         let operationID = UUID()
-        let initialCommand = "codex \"${CMUX_TASK_PROMPT}\""
+        let initialCommand = "codex \"${WMUX_TASK_PROMPT}\""
         let params: [String: Any] = [
             "operation_id": operationID.uuidString,
             "title": "Idempotent Task",
             "initial_command": initialCommand,
-            "initial_env": ["CMUX_TASK_PROMPT": "Fix the composer"],
+            "initial_env": ["WMUX_TASK_PROMPT": "Fix the composer"],
         ]
         let cache = Self.makeCache()
 
@@ -64,11 +64,11 @@ import Testing
     @Test func initialAgentCommandLaunchesThroughLoginShellWithShimPath() throws {
         let manager = TabManager()
         let initialWorkspaceIDs = Set(manager.tabs.map(\.id))
-        let initialCommand = "claude -- \"$CMUX_TASK_PROMPT\""
+        let initialCommand = "claude -- \"$WMUX_TASK_PROMPT\""
 
         _ = TerminalController.shared.v2WorkspaceCreate(params: [
             "initial_command": initialCommand,
-            "initial_env": ["CMUX_TASK_PROMPT": "Fix the composer"],
+            "initial_env": ["WMUX_TASK_PROMPT": "Fix the composer"],
         ], tabManager: manager)
 
         let created = try #require(manager.tabs.first { !initialWorkspaceIDs.contains($0.id) })
@@ -78,7 +78,7 @@ import Testing
         #expect(launchedCommand != initialCommand)
         #expect(launchedCommand.contains("-lc"))
         #expect(launchedCommand.contains(initialCommand))
-        #expect(launchedCommand.contains("CMUX_CLAUDE_WRAPPER_SHIM_ROOT"))
+        #expect(launchedCommand.contains("WMUX_CLAUDE_WRAPPER_SHIM_ROOT"))
     }
 
     @Test func initialAgentCommandPreservesSurroundingWhitespaceThroughTerminalStartup() throws {
@@ -155,10 +155,10 @@ import Testing
 
         _ = TerminalController.shared.v2WorkspaceCreate(params: [
             "initial_env": [
-                "CMUX_SOCKET_PATH\u{0}x": "spoofed",
+                "WMUX_SOCKET_PATH\u{0}x": "spoofed",
                 "BAD=KEY": "value",
                 "NUL_VALUE": "a\u{0}b",
-                "CMUX_TASK_PROMPT": "",
+                "WMUX_TASK_PROMPT": "",
                 "GOOD": "value",
             ],
         ], tabManager: manager)
@@ -166,7 +166,7 @@ import Testing
         let created = try #require(manager.tabs.first { !initialWorkspaceIDs.contains($0.id) })
         let panel = try #require(created.panels.values.compactMap { $0 as? TerminalPanel }.first)
         #expect(panel.surface.respawnInitialEnvironmentOverrides == [
-            "CMUX_TASK_PROMPT": "",
+            "WMUX_TASK_PROMPT": "",
             "GOOD": "value",
         ])
     }

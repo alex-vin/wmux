@@ -1,11 +1,11 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxCommandPalette
-import CmuxFoundation
-import CmuxNotifications
+import WmuxAppKitSupportUI
+import WmuxCommandPalette
+import WmuxFoundation
+import WmuxNotifications
 import SwiftUI
-import CmuxSettings
-import CmuxWorkspaces
+import WmuxSettings
+import WmuxWorkspaces
 
 extension VerticalTabsSidebar {
     func sidebarWorkspaceGroupTableConfiguration(

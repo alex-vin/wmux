@@ -1,6 +1,6 @@
 import AppKit
-import CmuxNotifications
-import CmuxSettings
+import WmuxNotifications
+import WmuxSettings
 import Darwin
 import Foundation
 
@@ -22,7 +22,7 @@ struct TerminalNotificationPolicyContext: Codable, Sendable, Equatable {
     var soundContext: NotificationSoundOverrideContext? = nil
 }
 
-/// The delivery effects model lives in `CmuxNotifications`; these names keep
+/// The delivery effects model lives in `WmuxNotifications`; these names keep
 /// the app's call sites and hook envelope encoding unchanged.
 typealias TerminalNotificationPolicyEffects = NotificationPolicyEffects
 typealias TerminalNotificationPolicyEffectsPatch = NotificationPolicyEffectsPatch
@@ -247,7 +247,7 @@ enum TerminalNotificationPolicyEngine {
     #endif
     nonisolated static func evaluate(
         request: TerminalNotificationPolicyRequest,
-        hooks: [CmuxResolvedNotificationHook]
+        hooks: [WmuxResolvedNotificationHook]
     ) async -> Result<TerminalNotificationPolicyEnvelope, TerminalNotificationPolicyFailure> {
         let initialEnvelope = TerminalNotificationPolicyEnvelope(
             notification: TerminalNotificationPolicyPayload(
@@ -280,7 +280,7 @@ enum TerminalNotificationPolicyEngine {
     #endif
     nonisolated static func evaluate(
         envelope initialEnvelope: TerminalNotificationPolicyEnvelope,
-        hooks: [CmuxResolvedNotificationHook]
+        hooks: [WmuxResolvedNotificationHook]
     ) async -> Result<TerminalNotificationPolicyEnvelope, TerminalNotificationPolicyFailure> {
         guard !hooks.isEmpty else {
             return .success(initialEnvelope)
@@ -305,7 +305,7 @@ enum TerminalNotificationPolicyEngine {
     }
 
     private static func run(
-        hook: CmuxResolvedNotificationHook,
+        hook: WmuxResolvedNotificationHook,
         envelope: TerminalNotificationPolicyEnvelope
     ) async -> Result<TerminalNotificationPolicyEnvelope, TerminalNotificationPolicyFailure> {
         let inputData: Data
@@ -326,7 +326,7 @@ enum TerminalNotificationPolicyEngine {
     }
 
     fileprivate static func failure(
-        hook: CmuxResolvedNotificationHook,
+        hook: WmuxResolvedNotificationHook,
         message: String
     ) -> TerminalNotificationPolicyFailure {
         TerminalNotificationPolicyFailure(
@@ -340,11 +340,11 @@ enum TerminalNotificationPolicyEngine {
 @MainActor
 enum NotificationPolicyHookAuthorizer {
     static func authorize(
-        _ hooks: [CmuxResolvedNotificationHook],
+        _ hooks: [WmuxResolvedNotificationHook],
         globalConfigPath: String?,
         presentingWindow: NSWindow? = nil
-    ) async -> [CmuxResolvedNotificationHook] {
-        var authorizedHooks: [CmuxResolvedNotificationHook] = []
+    ) async -> [WmuxResolvedNotificationHook] {
+        var authorizedHooks: [WmuxResolvedNotificationHook] = []
         let resolvedPresentingWindow = presentingWindow ?? NSApp.keyWindow ?? NSApp.mainWindow
 
         for hook in hooks {
@@ -352,7 +352,7 @@ enum NotificationPolicyHookAuthorizer {
                 authorizedHooks.append(hook)
                 continue
             }
-            guard !CmuxActionTrust.shared.isTrusted(descriptor) else {
+            guard !WmuxActionTrust.shared.isTrusted(descriptor) else {
                 authorizedHooks.append(hook)
                 continue
             }
@@ -375,13 +375,13 @@ enum NotificationPolicyHookAuthorizer {
     }
 
     private static func authorizeHook(
-        _ hook: CmuxResolvedNotificationHook,
-        descriptor: CmuxActionTrustDescriptor,
+        _ hook: WmuxResolvedNotificationHook,
+        descriptor: WmuxActionTrustDescriptor,
         globalConfigPath: String,
         presentingWindow: NSWindow?
     ) async -> Bool {
         await withCheckedContinuation { continuation in
-            CmuxConfigExecutor.authorizeProjectAutomationIfNeeded(
+            WmuxConfigExecutor.authorizeProjectAutomationIfNeeded(
                 descriptor: descriptor,
                 confirm: false,
                 configSourcePath: hook.sourcePath,
@@ -443,7 +443,7 @@ private final class NotificationHookPipeBuffer: @unchecked Sendable {
 }
 
 private final class NotificationHookProcessRun: @unchecked Sendable {
-    private let hook: CmuxResolvedNotificationHook
+    private let hook: WmuxResolvedNotificationHook
     private let envelope: TerminalNotificationPolicyEnvelope
     private let inputData: Data
     private let maxOutputBytes: Int
@@ -471,7 +471,7 @@ private final class NotificationHookProcessRun: @unchecked Sendable {
     private var didRequestCancellation = false
     private var pendingFailure: TerminalNotificationPolicyFailure?
     init(
-        hook: CmuxResolvedNotificationHook,
+        hook: WmuxResolvedNotificationHook,
         envelope: TerminalNotificationPolicyEnvelope,
         inputData: Data,
         maxOutputBytes: Int
@@ -593,34 +593,34 @@ private final class NotificationHookProcessRun: @unchecked Sendable {
         // inherited values so an absent field reads as unset, never as a
         // stale identity from the app's own environment.
         for key in [
-            "CMUX_NOTIFICATION_AGENT_KIND",
-            "CMUX_NOTIFICATION_AGENT_CATEGORY",
-            "CMUX_NOTIFICATION_AGENT_PENDING",
-            "CMUX_NOTIFICATION_AGENT_IS_SUBAGENT",
+            "WMUX_NOTIFICATION_AGENT_KIND",
+            "WMUX_NOTIFICATION_AGENT_CATEGORY",
+            "WMUX_NOTIFICATION_AGENT_PENDING",
+            "WMUX_NOTIFICATION_AGENT_IS_SUBAGENT",
         ] {
             env.removeValue(forKey: key)
         }
-        env["CMUX_NOTIFICATION_TITLE"] = envelope.notification.title
-        env["CMUX_NOTIFICATION_SUBTITLE"] = envelope.notification.subtitle
-        env["CMUX_NOTIFICATION_BODY"] = envelope.notification.body
-        env["CMUX_NOTIFICATION_WORKSPACE_ID"] = envelope.notification.workspaceId
-        env["CMUX_NOTIFICATION_SURFACE_ID"] = envelope.notification.surfaceId ?? ""
+        env["WMUX_NOTIFICATION_TITLE"] = envelope.notification.title
+        env["WMUX_NOTIFICATION_SUBTITLE"] = envelope.notification.subtitle
+        env["WMUX_NOTIFICATION_BODY"] = envelope.notification.body
+        env["WMUX_NOTIFICATION_WORKSPACE_ID"] = envelope.notification.workspaceId
+        env["WMUX_NOTIFICATION_SURFACE_ID"] = envelope.notification.surfaceId ?? ""
         // `local`, `ssh-relay:<workspace>`, `cloud-vm:<machine>`, or `device-mac:<device>`: lets a hook treat
         // remote-origin title/body as untrusted text (never interpolate into code).
-        env["CMUX_NOTIFICATION_ORIGIN"] = envelope.origin?.value ?? TerminalNotificationOrigin.localWireValue
-        env["CMUX_NOTIFICATION_POLICY_JSON"] = String(data: inputData, encoding: .utf8) ?? ""
+        env["WMUX_NOTIFICATION_ORIGIN"] = envelope.origin?.value ?? TerminalNotificationOrigin.localWireValue
+        env["WMUX_NOTIFICATION_POLICY_JSON"] = String(data: inputData, encoding: .utf8) ?? ""
         if let agent = envelope.agent {
             if let kind = agent.kind {
-                env["CMUX_NOTIFICATION_AGENT_KIND"] = kind
+                env["WMUX_NOTIFICATION_AGENT_KIND"] = kind
             }
             if let category = agent.category {
-                env["CMUX_NOTIFICATION_AGENT_CATEGORY"] = category
+                env["WMUX_NOTIFICATION_AGENT_CATEGORY"] = category
             }
             if let pending = agent.pending {
-                env["CMUX_NOTIFICATION_AGENT_PENDING"] = pending ? "1" : "0"
+                env["WMUX_NOTIFICATION_AGENT_PENDING"] = pending ? "1" : "0"
             }
             if let isSubagent = agent.isSubagent {
-                env["CMUX_NOTIFICATION_AGENT_IS_SUBAGENT"] = isSubagent ? "1" : "0"
+                env["WMUX_NOTIFICATION_AGENT_IS_SUBAGENT"] = isSubagent ? "1" : "0"
             }
         }
         return env.map { "\($0.key)=\($0.value)" }

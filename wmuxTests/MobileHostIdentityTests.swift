@@ -1,10 +1,10 @@
-import CmuxCloud
-import CMUXMobileCore
-import CmuxSettings
+import WmuxCloud
+import WMUXMobileCore
+import WmuxSettings
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -26,7 +26,7 @@ struct MobileHostIdentityTests {
             bundleIdentifier: "com.cmuxterm.app.staging"
         ) == "staging")
         #expect(MobileHostIdentity.instanceTag(
-            environment: ["CMUX_TAG": "future-one"],
+            environment: ["WMUX_TAG": "future-one"],
             bundleIdentifier: "com.cmuxterm.app.debug.future-one"
         ) == "future-one")
     }
@@ -127,13 +127,13 @@ struct MobileHostIdentityTests {
     }
 
     @Test func authenticatedStatusIncludesAuthoritativeInstanceTag() {
-        let previousTag = ProcessInfo.processInfo.environment["CMUX_TAG"]
-        setenv("CMUX_TAG", "future-one", 1)
+        let previousTag = ProcessInfo.processInfo.environment["WMUX_TAG"]
+        setenv("WMUX_TAG", "future-one", 1)
         defer {
             if let previousTag {
-                setenv("CMUX_TAG", previousTag, 1)
+                setenv("WMUX_TAG", previousTag, 1)
             } else {
-                unsetenv("CMUX_TAG")
+                unsetenv("WMUX_TAG")
             }
         }
 
@@ -214,18 +214,18 @@ struct MobileHostIdentityTests {
     #if DEBUG
     @Test func debugSuppressionAlsoHidesAuthenticatedPhoneCapabilities() throws {
         let previous = ProcessInfo.processInfo.environment[
-            "CMUX_DEBUG_SUPPRESS_MOBILE_CAPS"
+            "WMUX_DEBUG_SUPPRESS_MOBILE_CAPS"
         ]
         setenv(
-            "CMUX_DEBUG_SUPPRESS_MOBILE_CAPS",
+            "WMUX_DEBUG_SUPPRESS_MOBILE_CAPS",
             MobileHostService.phonePushStatusCapability,
             1
         )
         defer {
             if let previous {
-                setenv("CMUX_DEBUG_SUPPRESS_MOBILE_CAPS", previous, 1)
+                setenv("WMUX_DEBUG_SUPPRESS_MOBILE_CAPS", previous, 1)
             } else {
-                unsetenv("CMUX_DEBUG_SUPPRESS_MOBILE_CAPS")
+                unsetenv("WMUX_DEBUG_SUPPRESS_MOBILE_CAPS")
             }
         }
 
@@ -324,13 +324,13 @@ struct MobileHostIdentityTests {
         let key = SettingCatalog().mobile.iOSPairingDisplayName.userDefaultsKey
         defaults.set("Desk Mac", forKey: key)
 
-        let previousTag = ProcessInfo.processInfo.environment["CMUX_TAG"]
-        setenv("CMUX_TAG", "future-one", 1)
+        let previousTag = ProcessInfo.processInfo.environment["WMUX_TAG"]
+        setenv("WMUX_TAG", "future-one", 1)
         defer {
             if let previousTag {
-                setenv("CMUX_TAG", previousTag, 1)
+                setenv("WMUX_TAG", previousTag, 1)
             } else {
-                unsetenv("CMUX_TAG")
+                unsetenv("WMUX_TAG")
             }
         }
 

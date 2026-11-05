@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 
@@ -34,8 +34,8 @@ extension AgentHibernationController {
         processGroupProvider: @escaping @Sendable (pid_t) -> pid_t = {
             getpgid($0)
         },
-        processArgumentsProvider: @escaping @Sendable (Int) -> CmuxTopProcessArguments? = {
-            CmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
+        processArgumentsProvider: @escaping @Sendable (Int) -> WmuxTopProcessArguments? = {
+            WmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
         },
         processTTYDeviceProvider: @escaping @Sendable (pid_t) -> Int64? = {
             agentLiveProcessIdentity(pid: $0)?.ttyDevice

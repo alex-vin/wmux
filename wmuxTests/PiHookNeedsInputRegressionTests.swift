@@ -1,6 +1,6 @@
 import XCTest
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -164,7 +164,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             context: context,
             agent: "pi",
             subcommand: "approval-response",
-            standardInput: #"{"session_id":"\#(sessionId)","turn_id":"pi-idle-dialog-id","cwd":"\#(context.root.path)","hook_event_name":"ApprovalResponse","cmux_pi_idle_dialog":true}"#,
+            standardInput: #"{"session_id":"\#(sessionId)","turn_id":"pi-idle-dialog-id","cwd":"\#(context.root.path)","hook_event_name":"ApprovalResponse","wmux_pi_idle_dialog":true}"#,
             extraEnvironment: launchEnvironment
         )
         XCTAssertEqual(resolution.status, 0, resolution.stderr)

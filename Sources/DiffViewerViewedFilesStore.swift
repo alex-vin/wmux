@@ -59,7 +59,7 @@ final class DiffViewerViewedFilesStore: @unchecked Sendable {
     ) -> URL? {
         guard !isRunningUnderAutomatedTests, let appSupportDirectory else { return nil }
         return appSupportDirectory
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("diff-viewer", isDirectory: true)
             .appendingPathComponent("viewed", isDirectory: true)
     }

@@ -1,13 +1,13 @@
 import AppKit
-import CmuxCloud
-import CmuxTerminal
-import CmuxCore
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxTerminal
+import WmuxCore
+import WmuxSurfaceCatalogModel
 import GhosttyKit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

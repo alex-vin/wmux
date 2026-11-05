@@ -1,8 +1,8 @@
 import AppKit
-import CmuxControlSocket
-import CmuxSidebar
+import WmuxControlSocket
+import WmuxSidebar
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// The two richer running states an agent hook can report through
 /// `set_status --work=`: running through subagents, and waiting on a

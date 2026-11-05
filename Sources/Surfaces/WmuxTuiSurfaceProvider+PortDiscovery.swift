@@ -1,8 +1,8 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Re-read only this machine's metadata, fencing deletion, replacement, account changes, and newer summaries.
     func refreshPortMetadata() async throws {
         guard isRegisteredInCatalog() else { throw CancellationError() }

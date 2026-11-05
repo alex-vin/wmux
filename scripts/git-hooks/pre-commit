@@ -1,7 +1,7 @@
 #!/bin/bash
 # cmux pre-commit hook
 # Installed by ./scripts/setup.sh as a clone-local copy outside the checkout.
-# Normalizes cmux.xcodeproj/project.pbxproj when staged so Xcode's
+# Normalizes wmux.xcodeproj/project.pbxproj when staged so Xcode's
 # nondeterministic section reordering never reaches a commit.
 set -euo pipefail
 
@@ -20,7 +20,7 @@ if [[ ! -f "$REGISTRY_VALIDATOR" || ! -f "$PBX_NORMALIZER" ]]; then
 fi
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-PBXPROJ="cmux.xcodeproj/project.pbxproj"
+PBXPROJ="wmux.xcodeproj/project.pbxproj"
 
 cd "$REPO_ROOT"
 

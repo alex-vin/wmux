@@ -1,12 +1,12 @@
 import AppKit
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Combine
 import SQLite3
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -97,7 +97,7 @@ struct SessionIndexViewTests {
 
         #expect(
             entry.copyResumeCommand
-                == posixShWrappedForTest("env CLAUDE_CONFIG_DIR='\(configDir.path)' CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1 CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" --resume claude-session-123")
+                == posixShWrappedForTest("env CLAUDE_CONFIG_DIR='\(configDir.path)' WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1 WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" --resume claude-session-123")
         )
     }
 
@@ -130,7 +130,7 @@ struct SessionIndexViewTests {
 
         #expect(
             entry.copyResumeCommand
-                == posixShWrappedForTest("env CLAUDE_CONFIG_DIR='\(configDir.path)' CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1 CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" --resume claude-session-123")
+                == posixShWrappedForTest("env CLAUDE_CONFIG_DIR='\(configDir.path)' WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1 WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" --resume claude-session-123")
         )
     }
 

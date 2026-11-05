@@ -1,6 +1,6 @@
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxSurfaceCatalogModel
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxSurfaceCatalogModel
 import AppKit
 import Foundation
 

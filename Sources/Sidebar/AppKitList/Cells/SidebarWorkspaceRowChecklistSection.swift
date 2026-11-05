@@ -1,5 +1,5 @@
 import AppKit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import SwiftUI
 
 /// Pure-AppKit parity port of the legacy `SidebarWorkspaceChecklistSection`:

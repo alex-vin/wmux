@@ -1,6 +1,6 @@
 import Bonsplit
 import Foundation
-import CmuxWorkspaces
+import WmuxWorkspaces
 
 extension Workspace {
     func customSidebarSessionSnapshot(for panel: any Panel) -> SessionCustomSidebarPanelSnapshot? {
@@ -79,7 +79,7 @@ extension Workspace {
     ) -> CustomSidebarPanel? {
         guard !isRetiredFromOwningTabManager else { return nil }
         let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let fileURL = CmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) else {
+        guard let fileURL = WmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) else {
             return nil
         }
         let shouldFocusNewTab = focus ?? (bonsplitController.focusedPaneId == paneId)
@@ -138,7 +138,7 @@ extension Workspace {
     ) -> CustomSidebarPanel? {
         guard !isRetiredFromOwningTabManager else { return nil }
         let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let fileURL = CmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) else {
+        guard let fileURL = WmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) else {
             return nil
         }
         guard admitsSplitSpacePreflight(splitting: paneId, orientation: orientation) else { return nil }

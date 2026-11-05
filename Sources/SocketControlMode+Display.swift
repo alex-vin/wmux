@@ -1,7 +1,7 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
-// `SocketControlMode` lives in CmuxSettings (a value type with no UI concerns).
+// `SocketControlMode` lives in WmuxSettings (a value type with no UI concerns).
 // Identifiable is a presentation concern used by SwiftUI ForEach/Picker in this target,
 // so the conformance is added retroactively here rather than in the package.
 extension SocketControlMode: @retroactive Identifiable {
@@ -18,7 +18,7 @@ extension SocketControlMode {
         case .off:
             return String(localized: "socketControl.off.name", defaultValue: "Off")
         case .cmuxOnly:
-            return String(localized: "socketControl.cmuxOnly.name", defaultValue: "cmux processes only")
+            return String(localized: "socketControl.cmuxOnly.name", defaultValue: "wmux processes only")
         case .automation:
             return String(localized: "socketControl.automation.name", defaultValue: "Automation mode")
         case .password:

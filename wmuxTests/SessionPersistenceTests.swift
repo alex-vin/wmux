@@ -1,14 +1,14 @@
-import CMUXAgentLaunch
-import CmuxCore
-import CmuxFoundation
-import CmuxWorkspaces
+import WMUXAgentLaunch
+import WmuxCore
+import WmuxFoundation
+import WmuxWorkspaces
 import Darwin
 import XCTest
-import CmuxTerminal
-import CmuxSidebar
+import WmuxTerminal
+import WmuxSidebar
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -2222,7 +2222,7 @@ final class SessionPersistenceTests: XCTestCase {
 final class SocketListenerAcceptPolicyTests: XCTestCase {
     func testClaudeResumeCommandRoutesThroughWrapperInsteadOfCapturedRealBinary() {
         // The captured launch executable is the real claude binary
-        // (CMUX_AGENT_LAUNCH_EXECUTABLE). Resuming with it directly bypasses
+        // (WMUX_AGENT_LAUNCH_EXECUTABLE). Resuming with it directly bypasses
         // cmux's `claude` wrapper, which is what injects the hooks, so resumed
         // sessions silently lost SessionStart/Stop/Notification. Resume must use
         // the bare `claude` wrapper. https://github.com/manaflow-ai/cmux/issues/5427
@@ -2250,10 +2250,10 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         XCTAssertEqual(
             snapshot.resumeCommand,
             "cd -- '/tmp/cmux project' 2>/dev/null || [ ! -d '/tmp/cmux project' ] && /bin/sh -c "
-                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/tmp/claude config' 'CMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'a22293b7-bcef-4707-8439-2f538c8517a4' '--model' 'sonnet' '--permission-mode' 'auto'")
+                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/tmp/claude config' 'WMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'a22293b7-bcef-4707-8439-2f538c8517a4' '--model' 'sonnet' '--permission-mode' 'auto'")
         )
         // Preserve the selected binary for the wrapper without invoking it directly.
-        XCTAssertTrue(snapshot.resumeCommand?.contains("CMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude") == true)
+        XCTAssertTrue(snapshot.resumeCommand?.contains("WMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude") == true)
         XCTAssertFalse(snapshot.resumeCommand?.contains("&& '/opt/Claude Code/bin/claude'") ?? true)
     }
 
@@ -2292,7 +2292,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
             ),
             command
         )
-        XCTAssertTrue(command.contains("CMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude"), command)
+        XCTAssertTrue(command.contains("WMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude"), command)
         XCTAssertFalse(command.contains("cmux claude-hook session-start"), command)
         XCTAssertFalse(command.contains("old-session"), command)
     }
@@ -2348,13 +2348,13 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         set -- "$@"
         for arg in "$@"; do
           if [[ "$arg" == "--resume" || "$arg" == "-r" ]]; then
-            set -- --settings CMUX_HOOKS_JSON "$@"
+            set -- --settings WMUX_HOOKS_JSON "$@"
             break
           fi
         done
         printf 'wrapper %s\\n' "$*" > \(shellQuotedForTest(recordURL.path))
         """)
-        // Per-surface shim that cmux installs and points CMUX_CLAUDE_WRAPPER_SHIM at.
+        // Per-surface shim that cmux installs and points WMUX_CLAUDE_WRAPPER_SHIM at.
         try writeExecutable(shimURL, """
         #!/usr/bin/env bash
         exec \(shellQuotedForTest(wrapperURL.path)) "$@"
@@ -2399,8 +2399,8 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         process.executableURL = zshURL
         process.arguments = ["-lic", resumeCommand]
         var environment = ["HOME": userHome.path, "ZDOTDIR": userHome.path]
-        // CMUX_CLAUDE_WRAPPER_SHIM is a managed terminal env var inherited by the -lic shell.
-        environment["CMUX_CLAUDE_WRAPPER_SHIM"] = shimURL.path
+        // WMUX_CLAUDE_WRAPPER_SHIM is a managed terminal env var inherited by the -lic shell.
+        environment["WMUX_CLAUDE_WRAPPER_SHIM"] = shimURL.path
         process.environment = environment
         process.standardInput = FileHandle.nullDevice
         process.standardOutput = FileHandle.nullDevice
@@ -2536,7 +2536,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
     /// `testResumeLauncherScriptDispatchesNushellThroughBinSh`.)
     func testClaudeResumeCommandExecutesThroughWrapperInsideNushellTypedInput() throws {
         let nuURL = [
-            ProcessInfo.processInfo.environment["CMUX_TEST_NU_BIN"],
+            ProcessInfo.processInfo.environment["WMUX_TEST_NU_BIN"],
             "/opt/homebrew/bin/nu",
             "/usr/local/bin/nu",
             "/usr/bin/nu",
@@ -2643,7 +2643,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
             "HOME": sandbox.homeURL.path,
             "SHELL": fakeNuURL.path,
             "PATH": "\(sandbox.realBinDirectoryURL.path):/usr/bin:/bin",
-            "CMUX_CLAUDE_WRAPPER_SHIM": sandbox.shimURL.path,
+            "WMUX_CLAUDE_WRAPPER_SHIM": sandbox.shimURL.path,
         ]
         let scriptStderr = Pipe()
         process.standardInput = FileHandle.nullDevice
@@ -2668,7 +2668,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         )
     }
 
-    /// Regression for the stale-shim fallback: `CMUX_CLAUDE_WRAPPER_SHIM` can outlive
+    /// Regression for the stale-shim fallback: `WMUX_CLAUDE_WRAPPER_SHIM` can outlive
     /// its file (macOS reaps idle temporary-directory contents after ~3 days), and bare
     /// `${VAR:-claude}` parameter expansion would exec the dead path and hard-fail
     /// resume with "No such file or directory" — worse than the pre-#5639 behavior,
@@ -2701,7 +2701,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
             sandbox: sandbox,
             environmentOverrides: [
                 "ZDOTDIR": sandbox.homeURL.path,
-                "CMUX_CLAUDE_WRAPPER_SHIM": reapedShimPath
+                "WMUX_CLAUDE_WRAPPER_SHIM": reapedShimPath
             ]
         )
         XCTAssertTrue(
@@ -2730,7 +2730,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
     /// Builds the hermetic wrapper/shim/real-claude sandbox shared by the non-POSIX
     /// restore-launcher regression tests: a recording stand-in for `cmux-claude-wrapper`
     /// (re-injects the hook `--settings` on `--resume`, as the real wrapper does), the
-    /// per-surface shim that `CMUX_CLAUDE_WRAPPER_SHIM` points at, and a hook-less "real"
+    /// per-surface shim that `WMUX_CLAUDE_WRAPPER_SHIM` points at, and a hook-less "real"
     /// claude that records when the wrapper was bypassed.
     private func makeClaudeResumeWrapperShimSandbox() throws -> ClaudeResumeWrapperShimSandbox {
         let fileManager = FileManager.default
@@ -2758,7 +2758,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         set -- "$@"
         for arg in "$@"; do
           if [[ "$arg" == "--resume" || "$arg" == "-r" ]]; then
-            set -- --settings CMUX_HOOKS_JSON "$@"
+            set -- --settings WMUX_HOOKS_JSON "$@"
             break
           fi
         done
@@ -2809,7 +2809,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
     /// Runs `resumeCommand` through the given shell exactly as the restore launcher's
     /// dispatch line does, with only the managed env the launcher guarantees (`HOME` for
-    /// profile sourcing, `CMUX_CLAUDE_WRAPPER_SHIM` from the managed terminal env).
+    /// profile sourcing, `WMUX_CLAUDE_WRAPPER_SHIM` from the managed terminal env).
     private func runClaudeResumeCommand(
         _ resumeCommand: String,
         shellURL: URL,
@@ -2822,7 +2822,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         process.arguments = arguments + [resumeCommand]
         var environment = [
             "HOME": sandbox.homeURL.path,
-            "CMUX_CLAUDE_WRAPPER_SHIM": sandbox.shimURL.path
+            "WMUX_CLAUDE_WRAPPER_SHIM": sandbox.shimURL.path
         ]
         for (key, value) in environmentOverrides {
             environment[key] = value
@@ -3064,8 +3064,8 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
             ),
             []
         )
-        XCTAssertFalse(try XCTUnwrap(snapshot.resumeCommand).contains("CMUX_AGENT_RESTORE_LAUNCH"))
-        XCTAssertFalse(try XCTUnwrap(snapshot.forkStartupInput()).contains("CMUX_AGENT_RESTORE_LAUNCH"))
+        XCTAssertFalse(try XCTUnwrap(snapshot.resumeCommand).contains("WMUX_AGENT_RESTORE_LAUNCH"))
+        XCTAssertFalse(try XCTUnwrap(snapshot.forkStartupInput()).contains("WMUX_AGENT_RESTORE_LAUNCH"))
     }
 
     func testRestorableAgentRestoreVerbSupportsEveryKindAndIdentifier() throws {
@@ -3219,7 +3219,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         XCTAssertEqual(
             snapshot.resumeCommand,
             "cd -- '/Users/dev/fun' 2>/dev/null || [ ! -d '/Users/dev/fun' ] && /bin/sh -c "
-                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/Users/dev/.codex-accounts/claude/_p1775010019397' 'CMUX_CUSTOM_CLAUDE_PATH=/Users/dev/.local/bin/claude' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' '24ec0052-450c-4914-b1dd-2ee80d4bc84b' '--dangerously-load-development-channels' 'server:custom-dev-channel' '--dangerously-skip-permissions'")
+                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/Users/dev/.codex-accounts/claude/_p1775010019397' 'WMUX_CUSTOM_CLAUDE_PATH=/Users/dev/.local/bin/claude' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' '24ec0052-450c-4914-b1dd-2ee80d4bc84b' '--dangerously-load-development-channels' 'server:custom-dev-channel' '--dangerously-skip-permissions'")
         )
     }
 
@@ -3607,12 +3607,12 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         XCTAssertEqual(
             claude.forkCommand,
             "cd -- '/Users/dev/fun' 2>/dev/null || [ ! -d '/Users/dev/fun' ] && /bin/sh -c "
-                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/Users/dev/.codex-accounts/claude/_p1775010019397' 'CMUX_CUSTOM_CLAUDE_PATH=/Users/dev/.local/bin/claude' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' '24ec0052-450c-4914-b1dd-2ee80d4bc84b' '--fork-session' '--dangerously-load-development-channels' 'server:custom-dev-channel' '--dangerously-skip-permissions'")
+                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/Users/dev/.codex-accounts/claude/_p1775010019397' 'WMUX_CUSTOM_CLAUDE_PATH=/Users/dev/.local/bin/claude' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' '24ec0052-450c-4914-b1dd-2ee80d4bc84b' '--fork-session' '--dangerously-load-development-channels' 'server:custom-dev-channel' '--dangerously-skip-permissions'")
         )
         XCTAssertEqual(
             claudeFork.forkCommand,
             "cd -- '/Users/dev/fun' 2>/dev/null || [ ! -d '/Users/dev/fun' ] && /bin/sh -c "
-                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/Users/dev/.codex-accounts/claude/_p1775010019397' 'CMUX_CUSTOM_CLAUDE_PATH=/Users/dev/.local/bin/claude' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-fork-child' '--fork-session' '--model' 'sonnet' '--dangerously-skip-permissions'")
+                + shellQuotedForTest("'env' 'CLAUDE_CONFIG_DIR=/Users/dev/.codex-accounts/claude/_p1775010019397' 'WMUX_CUSTOM_CLAUDE_PATH=/Users/dev/.local/bin/claude' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=CLAUDE_CONFIG_DIR' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-fork-child' '--fork-session' '--model' 'sonnet' '--dangerously-skip-permissions'")
         )
         XCTAssertEqual(
             codex.forkCommand,
@@ -4056,7 +4056,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         XCTAssertEqual(
             RestorableAgentSessionIndex.openCodeWorkingDirectoryForProcess(
                 arguments: ["opencode", "--session", "known-session"],
-                environment: ["CMUX_AGENT_LAUNCH_CWD": "/tmp/hook-cwd", "PWD": "/tmp/shell-cwd"]
+                environment: ["WMUX_AGENT_LAUNCH_CWD": "/tmp/hook-cwd", "PWD": "/tmp/shell-cwd"]
             ),
             "/tmp/hook-cwd"
         )
@@ -4244,7 +4244,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
                 ],
                 workingDirectory: "/tmp/team repo",
                 environment: [
-                    "CMUX_CUSTOM_CLAUDE_PATH": "/opt/Claude Code/bin/claude",
+                    "WMUX_CUSTOM_CLAUDE_PATH": "/opt/Claude Code/bin/claude",
                     "PATH": "/opt/Claude Code/bin:/usr/bin"
                 ],
                 capturedAt: 123,
@@ -4254,7 +4254,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "cd -- '/tmp/team repo' 2>/dev/null || [ ! -d '/tmp/team repo' ] && 'env' 'CMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude' '/Applications/cmux.app/Contents/Resources/bin/cmux' 'claude-teams' '--resume' 'claude-team-session' '--teammate-mode' 'auto' '--model' 'sonnet' '--remote-control-session-name-prefix' 'cmux-team' '--permission-mode' 'auto'"
+            "cd -- '/tmp/team repo' 2>/dev/null || [ ! -d '/tmp/team repo' ] && 'env' 'WMUX_CUSTOM_CLAUDE_PATH=/opt/Claude Code/bin/claude' '/Applications/cmux.app/Contents/Resources/bin/cmux' 'claude-teams' '--resume' 'claude-team-session' '--teammate-mode' 'auto' '--model' 'sonnet' '--remote-control-session-name-prefix' 'cmux-team' '--permission-mode' 'auto'"
         )
     }
 
@@ -4286,7 +4286,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--max-old-space-size=4096' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-debug' '--debug' 'api,mcp' '--model' 'sonnet'")
+            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--max-old-space-size=4096' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-debug' '--debug' 'api,mcp' '--model' 'sonnet'")
         )
     }
 
@@ -4314,7 +4314,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "/bin/sh -c " + shellQuotedForTest("'env' 'ANTHROPIC_BASE_URL=https://api.example.test' 'ANTHROPIC_MODEL=' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=ANTHROPIC_BASE_URL,ANTHROPIC_MODEL' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-env'")
+            "/bin/sh -c " + shellQuotedForTest("'env' 'ANTHROPIC_BASE_URL=https://api.example.test' 'ANTHROPIC_MODEL=' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1' 'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=ANTHROPIC_BASE_URL,ANTHROPIC_MODEL' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-env'")
         )
         XCTAssertFalse(snapshot.resumeCommand?.contains("ANTHROPIC_AUTH_TOKEN") ?? true)
     }
@@ -4339,7 +4339,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--trace-warnings' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-node-options' '--model' 'sonnet'")
+            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--trace-warnings' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-node-options' '--model' 'sonnet'")
         )
     }
 
@@ -4363,7 +4363,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--trace-warnings --require=\"/Users/a b/tools/hook.cjs\"' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-node-options-space'")
+            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--trace-warnings --require=\"/Users/a b/tools/hook.cjs\"' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-node-options-space'")
         )
     }
 
@@ -4387,7 +4387,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "/bin/sh -c " + shellQuotedForTest("\"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-empty-node-options' '--model' 'sonnet'")
+            "/bin/sh -c " + shellQuotedForTest("\"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-empty-node-options' '--model' 'sonnet'")
         )
     }
 
@@ -4411,7 +4411,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--trace-warnings' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-quoted-node-options' '--model' 'sonnet'")
+            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--trace-warnings' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-quoted-node-options' '--model' 'sonnet'")
         )
     }
 
@@ -4435,7 +4435,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
 
         XCTAssertEqual(
             snapshot.resumeCommand,
-            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--require=\"/Users/a b/lib/user \\\"preload\\\".cjs\"' \"$([ -x \"${CMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$CMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-quoted-separate-node-options' '--model' 'sonnet'")
+            "/bin/sh -c " + shellQuotedForTest("'env' 'NODE_OPTIONS=--require=\"/Users/a b/lib/user \\\"preload\\\".cjs\"' \"$([ -x \"${WMUX_CLAUDE_WRAPPER_SHIM:-}\" ] && printf '%s' \"$WMUX_CLAUDE_WRAPPER_SHIM\" || printf claude)\" '--resume' 'claude-session-quoted-separate-node-options' '--model' 'sonnet'")
         )
     }
 
@@ -4667,7 +4667,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 RestorableAgentSessionIndex.PanelKey(workspaceId: workspaceId, panelId: panelId): (
                     snapshot: detectedSnapshot,
@@ -4735,7 +4735,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 RestorableAgentSessionIndex.PanelKey(workspaceId: workspaceId, panelId: panelId): (
                     snapshot: detectedSnapshot,
@@ -4756,9 +4756,9 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
         let panelId = UUID()
         let processId = 1_739_392_001
         let panelKey = RestorableAgentSessionIndex.PanelKey(workspaceId: workspaceId, panelId: panelId)
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: processId,
                     parentPID: 1,
                     name: "agy",
@@ -4778,7 +4778,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
             sampledAt: Date(timeIntervalSince1970: 0),
             includesProcessDetails: true
         )
-        let registry = CmuxVaultAgentRegistry(registrations: [.builtInAntigravity])
+        let registry = WmuxVaultAgentRegistry(registrations: [.builtInAntigravity])
 
         func detectedSnapshot(arguments: [String]) -> SessionRestorableAgentSnapshot? {
             RestorableAgentSessionIndex.processDetectedSnapshots(
@@ -4788,7 +4788,7 @@ final class SocketListenerAcceptPolicyTests: XCTestCase {
                 capturedAt: 42,
                 processArgumentsProvider: { requestedProcessId in
                     guard requestedProcessId == processId else { return nil }
-                    return CmuxTopProcessArguments(
+                    return WmuxTopProcessArguments(
                         arguments: arguments,
                         environment: ["PWD": "/tmp/antigravity repo"]
                     )
@@ -5037,7 +5037,7 @@ extension SessionPersistenceTests {
         let fakeCodex = bin.appendingPathComponent("codex", isDirectory: false)
         try """
         #!/bin/zsh
-        print -r -- "$PWD|$*" > "$CMUX_FAKE_CODEX_OUTPUT"
+        print -r -- "$PWD|$*" > "$WMUX_FAKE_CODEX_OUTPUT"
         """.write(to: fakeCodex, atomically: true, encoding: .utf8)
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCodex.path)
 
@@ -5059,7 +5059,7 @@ extension SessionPersistenceTests {
         process.arguments = ["-lc", startupInput]
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(bin.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_FAKE_CODEX_OUTPUT"] = outputURL.path
+        environment["WMUX_FAKE_CODEX_OUTPUT"] = outputURL.path
         process.environment = environment
         let stderr = Pipe()
         process.standardError = stderr
@@ -7645,7 +7645,7 @@ extension SessionPersistenceTests {
             processName: "ssh",
             processPath: "/usr/bin/ssh",
             arguments: ["ssh", "tinybox"],
-            environment: ["CMUX_SSH_PTY_SESSION_ID": "ssh-managed"]
+            environment: ["WMUX_SSH_PTY_SESSION_ID": "ssh-managed"]
         )
 
         XCTAssertNil(binding)
@@ -7702,7 +7702,7 @@ extension SessionPersistenceTests {
     func testPlainSSHProcessDetectedBindingFallsBackToPaneTTYWhenScopeIsMissing() throws {
         let workspaceID = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
         let panelID = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
-        let process = CmuxTopProcessInfo(
+        let process = WmuxTopProcessInfo(
             pid: 4242,
             parentPID: 1,
             name: "ssh",
@@ -7718,7 +7718,7 @@ extension SessionPersistenceTests {
             virtualBytes: 1,
             threadCount: 1
         )
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [process],
             sampledAt: Date(timeIntervalSince1970: 1_777_777_777),
             includesProcessDetails: true
@@ -7733,7 +7733,7 @@ extension SessionPersistenceTests {
             capturedAt: 1_777_777_777,
             ttyDeviceBindings: [key: 9876],
             processArgumentsProvider: { _ in
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: ["/usr/bin/ssh", "tinybox"],
                     environment: [:]
                 )

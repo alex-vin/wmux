@@ -1,11 +1,11 @@
 import Bonsplit
 import Foundation
 import Testing
-import CMUXAgentLaunch
-import CmuxTerminalCore
+import WMUXAgentLaunch
+import WmuxTerminalCore
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -38,14 +38,14 @@ struct WorkspacePromptSubmitTests {
     }
 
     @Test func testPromptSubmitReorderPublishesWorkspaceOrderEvent() throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         let manager = TabManager()
         let first = manager.tabs[0]
         let second = manager.addWorkspace(select: false, placementOverride: .end)
         let third = manager.addWorkspace(select: false, placementOverride: .end)
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
 
         let outcome = try #require(
             manager.handlePromptSubmit(
@@ -56,7 +56,7 @@ struct WorkspacePromptSubmitTests {
         )
 
         #expect(outcome.reordered)
-        let events = CmuxEventBus.shared.retainedSnapshot()
+        let events = WmuxEventBus.shared.retainedSnapshot()
         #expect(events.compactMap { $0["name"] as? String } == ["workspace.prompt.submitted", "workspace.reordered"])
         let reorder = try #require(events.last)
         #expect(reorder["workspace_id"] as? String == third.id.uuidString)
@@ -157,7 +157,7 @@ struct WorkspacePromptSubmitTests {
     @Test func testBlankPromptSubmitDoesNotRecordTimestampOrPublishEvent() throws {
         let manager = TabManager()
         let second = manager.addWorkspace(select: false, placementOverride: .end)
-        let sequenceBeforeSubmit = CmuxEventBus.shared.latestSequence
+        let sequenceBeforeSubmit = WmuxEventBus.shared.latestSequence
 
         let outcome = try #require(
             manager.handlePromptSubmit(
@@ -171,7 +171,7 @@ struct WorkspacePromptSubmitTests {
         #expect(!outcome.reordered)
         #expect(second.latestConversationMessage == nil)
         #expect(second.latestSubmittedAt == nil)
-        #expect(CmuxEventBus.shared.latestSequence == sequenceBeforeSubmit)
+        #expect(WmuxEventBus.shared.latestSequence == sequenceBeforeSubmit)
     }
 
     @Test func testFeedPromptSubmitEventExtractsToolInputMessage() throws {
@@ -231,12 +231,12 @@ struct WorkspacePromptSubmitTests {
     }
 
     @Test func testPromptSubmitEventPublishesTheSubmittedLengthOverThePreviewLength() throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         let manager = TabManager()
         let workspace = manager.tabs[0]
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
 
         let truncated = String(repeating: "x", count: 239) + "\u{2026}"
         _ = try #require(
@@ -248,7 +248,7 @@ struct WorkspacePromptSubmitTests {
             )
         )
 
-        let events = CmuxEventBus.shared.retainedSnapshot()
+        let events = WmuxEventBus.shared.retainedSnapshot()
         let submitted = try #require(
             events.first { $0["name"] as? String == "workspace.prompt.submitted" }
         )
@@ -259,12 +259,12 @@ struct WorkspacePromptSubmitTests {
     }
 
     @Test func testPromptSubmitWithoutASubmittedLengthStillCountsTheMessage() throws {
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         let manager = TabManager()
         let workspace = manager.tabs[0]
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
 
         _ = try #require(
             manager.handlePromptSubmit(
@@ -274,7 +274,7 @@ struct WorkspacePromptSubmitTests {
             )
         )
 
-        let events = CmuxEventBus.shared.retainedSnapshot()
+        let events = WmuxEventBus.shared.retainedSnapshot()
         let submitted = try #require(
             events.first { $0["name"] as? String == "workspace.prompt.submitted" }
         )
@@ -531,7 +531,7 @@ struct WorkspacePromptSubmitTests {
         #expect(workspace.latestSubmittedMessage == nil)
     }
 
-    // The hook payload's `CMUX_SURFACE_ID` is already a panel id in the
+    // The hook payload's `WMUX_SURFACE_ID` is already a panel id in the
     // unsplit case, so the resolver's first branch has to accept it as-is.
     @Test func testPromptSubmitWithPanelIdSurfaceIdRecordsPanelPrompt() throws {
         let manager = TabManager()

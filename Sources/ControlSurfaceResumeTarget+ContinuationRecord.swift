@@ -1,5 +1,5 @@
-import CMUXAgentLaunch
-import CmuxControlSocket
+import WMUXAgentLaunch
+import WmuxControlSocket
 import Foundation
 
 extension TerminalController {

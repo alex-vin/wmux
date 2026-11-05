@@ -1,8 +1,8 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -124,7 +124,7 @@ struct CloudSidebarRenameReconciliationTests {
         // Cross the daemon serialization boundary too, not just a local display copy.
         let bytes = try JSONSerialization.data(withJSONObject: try #require(graph.snapshotObject()))
         let object = try #require(JSONSerialization.jsonObject(with: bytes) as? [String: Any])
-        fixture.install(try #require(CmuxTuiSnapshotParser.state(fromSnapshot: object, machine: fixture.machine)))
+        fixture.install(try #require(WmuxTuiSnapshotParser.state(fromSnapshot: object, machine: fixture.machine)))
         fixture.catalog.record(SurfaceProjection(resource: fixture.resourceID, workspaceID: restored.id,
             panelID: restoredPanel, remoteWorkspaceID: "ws_main", remoteTabID: "tab_main"))
         fixture.reconcile()

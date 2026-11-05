@@ -129,10 +129,10 @@ struct RemoteShellCWDRelayTests {
             """,
             extraEnvironment: [
                 "PATH": "\(binDir.path):/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": "127.0.0.1:64011",
-                "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
-                "CMUX_TAB_ID": "22222222-2222-2222-2222-222222222222",
-                "CMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_SOCKET_PATH": "127.0.0.1:64011",
+                "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+                "WMUX_TAB_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
             ]
         )
 
@@ -178,10 +178,10 @@ struct RemoteShellCWDRelayTests {
             """,
             extraEnvironment: [
                 "PATH": "\(binDir.path):/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": "127.0.0.1:64011",
-                "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
-                "CMUX_TAB_ID": "22222222-2222-2222-2222-222222222222",
-                "CMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_SOCKET_PATH": "127.0.0.1:64011",
+                "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+                "WMUX_TAB_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
             ]
         )
 
@@ -227,9 +227,9 @@ struct RemoteShellCWDRelayTests {
             "SHELL": "/bin/zsh",
             "USER": NSUserName(),
             "ZDOTDIR": cmuxZdotdir.path,
-            "CMUX_ZSH_ZDOTDIR": userZdotdir.path,
-            "CMUX_SHELL_INTEGRATION": "1",
-            "CMUX_SHELL_INTEGRATION_DIR": cmuxZdotdir.path,
+            "WMUX_ZSH_ZDOTDIR": userZdotdir.path,
+            "WMUX_SHELL_INTEGRATION": "1",
+            "WMUX_SHELL_INTEGRATION_DIR": cmuxZdotdir.path,
             "GHOSTTY_RESOURCES_DIR": ghosttyResources.path,
         ]
         for (key, value) in extraEnvironment {

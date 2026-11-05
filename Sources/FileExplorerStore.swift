@@ -1,5 +1,5 @@
-import CmuxCloud
-import CmuxFoundation
+import WmuxCloud
+import WmuxFoundation
 import AppKit
 import Combine
 import Foundation
@@ -1847,7 +1847,7 @@ final class FileExplorerStore: ObservableObject {
 
     private static func remotePreviewCacheURL(displayTarget: String, remotePath: String) -> URL {
         let cacheRoot = FileManager.default.temporaryDirectory
-            .appendingPathComponent("cmux-remote-file-previews", isDirectory: true)
+            .appendingPathComponent("wmux-remote-file-previews", isDirectory: true)
         let target = sanitizedCacheComponent(displayTarget)
         let remote = sanitizedCacheComponent(remotePath)
         let basename = URL(fileURLWithPath: remotePath).lastPathComponent

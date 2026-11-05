@@ -1,5 +1,5 @@
 import Darwin
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import SQLite3
 import XCTest
 
@@ -182,7 +182,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
 
         let routingEnvironment = [
-            "CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
+            "WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
             "SUBROUTER_CODEX_ACCOUNT_ID": "team-codex-1",
             "SUBROUTER_CODEX_BASE_URL": "https://router.example.test/v1",
             "SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
@@ -204,11 +204,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         let publishedEnvironment = try XCTUnwrap(binding["environment"] as? [String: String])
         for (key, value) in routingEnvironment
             where key != "SUBROUTER_CODEX_RESUME_COMMAND"
-                && key != "CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND" {
+                && key != "WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND" {
             XCTAssertEqual(publishedEnvironment[key], value, key)
         }
         XCTAssertNil(publishedEnvironment["SUBROUTER_CODEX_RESUME_COMMAND"])
-        XCTAssertNil(publishedEnvironment["CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND"])
+        XCTAssertNil(publishedEnvironment["WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND"])
     }
 
     func testCodexTUISessionCanRebindAnOlderVerifiedTUICheckpoint() throws {
@@ -514,15 +514,15 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment.removeValue(forKey: "CODEX_HOME")
         }
         environment["PWD"] = fixture.root.path
-        environment["CMUX_SOCKET_PATH"] = fixture.socketPath
-        environment["CMUX_WORKSPACE_ID"] = fixture.workspaceID
-        environment["CMUX_SURFACE_ID"] = fixture.surfaceID
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = fixture.root.path
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "codex"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated(launchArguments)
-        environment["CMUX_AGENT_LAUNCH_CWD"] = fixture.root.path
+        environment["WMUX_SOCKET_PATH"] = fixture.socketPath
+        environment["WMUX_WORKSPACE_ID"] = fixture.workspaceID
+        environment["WMUX_SURFACE_ID"] = fixture.surfaceID
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = fixture.root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "codex"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated(launchArguments)
+        environment["WMUX_AGENT_LAUNCH_CWD"] = fixture.root.path
         for (key, value) in additionalEnvironment {
             environment[key] = value
         }

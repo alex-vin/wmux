@@ -1,11 +1,11 @@
 import AppKit
 import Foundation
-import CmuxFoundation
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxTerminal
+import WmuxTerminalCore
 import GhosttyKit
-import CmuxSettings
-import struct CmuxSettings.AgentIntegrationSettingsStore
+import WmuxSettings
+import struct WmuxSettings.AgentIntegrationSettingsStore
 
 private enum GhosttyLinkFilterAPI {
     // Xcode 26.6's Clang importer omits this declaration even though the
@@ -19,7 +19,7 @@ private enum GhosttyLinkFilterAPI {
     )
 }
 
-// The app-side conformances and bridges injected into the CmuxTerminal
+// The app-side conformances and bridges injected into the WmuxTerminal
 // package through `GhosttyApp.terminalSurfaceRuntimeDependencies`. Each type
 // here carries behavior verbatim from the legacy god-file reach-up it
 // replaces; this file is intended composition-root residue.
@@ -62,7 +62,7 @@ struct TerminalSurfaceViewFactory: TerminalSurfaceViewProviding {
 /// `SidebarWorkspaceDetailDefaults`, and `TerminalController`'s socket path).
 @MainActor
 final class TerminalSurfaceSpawnPolicyBridge: TerminalSurfaceSpawnPolicyProviding {
-    private let computerUseConfigStore = JSONConfigStore(fileURL: CmuxConfigLocation().userConfigFile)
+    private let computerUseConfigStore = JSONConfigStore(fileURL: WmuxConfigLocation().userConfigFile)
     private let computerUseEnabledKey = SettingCatalog().computerUse.enabled
 
     func currentSpawnPolicy() -> TerminalSurfaceSpawnPolicy {
@@ -179,7 +179,7 @@ final class TerminalOutputByteTeeBridge: TerminalByteTeeBinding {
         let teeContext = Unmanaged.passRetained(TerminalOutputTeeContext(
             workspaceID: workspaceID,
             surfaceID: surfaceID,
-            agentDefinitions: CmuxTaskManagerCodingAgentDefinition.builtIns,
+            agentDefinitions: WmuxTaskManagerCodingAgentDefinition.builtIns,
             scrollbackCheckpointFlags: scrollbackCheckpointActivity
                 .register(surfaceID: surfaceID)
         ))
@@ -267,7 +267,7 @@ extension TerminalSurface {
         id: UUID = UUID(),
         tabId: UUID,
         context: ghostty_surface_context_e,
-        configTemplate: CmuxSurfaceConfigTemplate?,
+        configTemplate: WmuxSurfaceConfigTemplate?,
         workingDirectory: String? = nil,
         portOrdinal: Int = 0,
         initialCommand: String? = nil,

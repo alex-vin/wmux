@@ -1,9 +1,9 @@
 import Foundation
 import Testing
-@testable import CmuxControlSocket
-import CmuxSettings
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+@testable import WmuxControlSocket
+import WmuxSettings
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -67,7 +67,7 @@ extension SocketACLReloadRegressionTests {
 
         resetSocketDefaults(defaults, unmanagedMode: .password)
         try contents.write(to: configURL, atomically: true, encoding: .utf8)
-        _ = CmuxSettingsFileStore(
+        _ = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -98,7 +98,7 @@ extension SocketACLReloadRegressionTests {
 
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try writeConfig(mode: SocketControlMode.password.rawValue, to: configURL)
-        let store = CmuxSettingsFileStore(
+        let store = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -130,7 +130,7 @@ extension SocketACLReloadRegressionTests {
 
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try writeConfig(mode: mode.rawValue, to: configURL)
-        _ = CmuxSettingsFileStore(
+        _ = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -139,7 +139,7 @@ extension SocketACLReloadRegressionTests {
         #expect(defaults.string(forKey: SocketControlSettings.appStorageKey) == mode.rawValue)
 
         try FileManager.default.removeItem(at: configURL)
-        _ = CmuxSettingsFileStore(
+        _ = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -148,7 +148,7 @@ extension SocketACLReloadRegressionTests {
 
         #expect(defaults.string(forKey: SocketControlSettings.appStorageKey) == mode.rawValue)
 
-        _ = CmuxSettingsFileStore(
+        _ = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -176,7 +176,7 @@ extension SocketACLReloadRegressionTests {
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try passwordStore.savePassword("preserved-secret")
         try writeConfig(mode: SocketControlMode.password.rawValue, to: configURL)
-        _ = CmuxSettingsFileStore(
+        _ = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -186,7 +186,7 @@ extension SocketACLReloadRegressionTests {
 
         try FileManager.default.removeItem(at: configURL)
         for _ in 0..<2 {
-            _ = CmuxSettingsFileStore(
+            _ = WmuxSettingsFileStore(
                 primaryPath: configURL.path,
                 fallbackPath: nil,
                 additionalFallbackPaths: [],
@@ -207,7 +207,7 @@ extension SocketACLReloadRegressionTests {
         """
         let fallback = try #require(source.data(using: .utf16LittleEndian))
 
-        let materialized = CmuxSettingsFileStore.materializeBootstrapSocketPolicy(
+        let materialized = WmuxSettingsFileStore.materializeBootstrapSocketPolicy(
             in: fallback,
             imported: .string(SocketControlMode.cmuxOnly.rawValue)
         )
@@ -235,7 +235,7 @@ extension SocketACLReloadRegressionTests {
 
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try writeConfig(mode: SocketControlMode.cmuxOnly.rawValue, to: configURL)
-        let store = CmuxSettingsFileStore(
+        let store = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -262,7 +262,7 @@ extension SocketACLReloadRegressionTests {
 
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try writeConfig(mode: "unrestricted-invalid-mode", to: configURL)
-        _ = CmuxSettingsFileStore(
+        _ = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -285,7 +285,7 @@ extension SocketACLReloadRegressionTests {
 
         resetSocketDefaults(defaults, unmanagedMode: .off)
         try "{}".write(to: configURL, atomically: true, encoding: .utf8)
-        let store = CmuxSettingsFileStore(
+        let store = WmuxSettingsFileStore(
             primaryPath: configURL.path,
             fallbackPath: nil,
             additionalFallbackPaths: [],
@@ -314,7 +314,7 @@ extension SocketACLReloadRegressionTests {
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try writeConfig(mode: SocketControlMode.cmuxOnly.rawValue, to: primaryURL)
         try writeConfig(mode: SocketControlMode.allowAll.rawValue, to: fallbackURL)
-        let store = CmuxSettingsFileStore(
+        let store = WmuxSettingsFileStore(
             primaryPath: primaryURL.path,
             fallbackPath: fallbackURL.path,
             additionalFallbackPaths: [],
@@ -343,7 +343,7 @@ extension SocketACLReloadRegressionTests {
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try writeConfig(mode: SocketControlMode.allowAll.rawValue, to: primaryURL)
         try writeConfig(mode: SocketControlMode.cmuxOnly.rawValue, to: fallbackURL)
-        let store = CmuxSettingsFileStore(
+        let store = WmuxSettingsFileStore(
             primaryPath: primaryURL.path,
             fallbackPath: fallbackURL.path,
             additionalFallbackPaths: [],
@@ -375,7 +375,7 @@ extension SocketACLReloadRegressionTests {
         resetSocketDefaults(defaults, unmanagedMode: .allowAll)
         try writeConfig(mode: SocketControlMode.allowAll.rawValue, to: primaryURL)
         try writeConfig(mode: SocketControlMode.off.rawValue, to: fallbackURL)
-        let store = CmuxSettingsFileStore(
+        let store = WmuxSettingsFileStore(
             primaryPath: primaryURL.path,
             fallbackPath: fallbackURL.path,
             additionalFallbackPaths: [],
@@ -434,11 +434,11 @@ extension SocketACLReloadRegressionTests {
 
     @Test func socketPathMarkersKeepLegacyExternalClientDiscoveryLive() throws {
         let fileManager = FileManager.default
-        let currentDirectory = CmuxStateDirectory.url(
+        let currentDirectory = WmuxStateDirectory.url(
             homeDirectory: fileManager.homeDirectoryForCurrentUser
         )
         let legacyDirectory = try #require(
-            CmuxStateDirectory.legacyApplicationSupportURL(fileManager: fileManager)
+            WmuxStateDirectory.legacyApplicationSupportURL(fileManager: fileManager)
         )
         let markerPaths = SocketPathMarkerStore(
             bundleIdentifier: "com.cmuxterm.app",

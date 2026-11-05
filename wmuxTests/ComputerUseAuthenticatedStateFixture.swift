@@ -1,4 +1,4 @@
-#if canImport(CmuxComputerUse)
+#if canImport(WmuxComputerUse)
 import CryptoKit
 import Foundation
 

@@ -289,12 +289,12 @@ struct CLIWorkspaceRefResolutionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
-        environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
-        environment.removeValue(forKey: "CMUX_WINDOW_ID")
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
+        environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
+        environment.removeValue(forKey: "WMUX_WINDOW_ID")
 
         let result = Self.runProcess(
             executablePath: try Self.bundledCLIPath(),

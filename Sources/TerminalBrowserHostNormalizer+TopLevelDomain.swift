@@ -1,5 +1,5 @@
-import CmuxBrowser
-import CmuxTerminalCore
+import WmuxBrowser
+import WmuxTerminalCore
 
 extension TerminalBrowserHostNormalizer {
     /// Terminal text without a scheme is a web host only under a real

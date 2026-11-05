@@ -1,12 +1,12 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-import CmuxWorkspaces
+import WmuxWorkspaces
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -120,7 +120,7 @@ struct CloudPortOpenRegressionTests {
     }
 
     private func discoveredPort(_ number: Int, in workspace: SurfaceRemoteWorkspace? = nil) -> SurfaceResource {
-        var resource = CmuxTuiSnapshotParser.portBrowser(
+        var resource = WmuxTuiSnapshotParser.portBrowser(
             machine: machine,
             port: number,
             directURL: "http://10.0.0.7:\(number)"
@@ -188,14 +188,14 @@ struct CloudPortOpenRegressionTests {
                 "status": "running",
             ]],
         ]
-        let parsed = CmuxTuiSnapshotParser.terminals(fromSnapshot: snapshot, machine: machine)
+        let parsed = WmuxTuiSnapshotParser.terminals(fromSnapshot: snapshot, machine: machine)
         #expect(parsed.count == 1)
         #expect(parsed.first?.id.key == "browser_http_tab")
         #expect(parsed.first?.port == 8000)
         #expect(parsed.first?.remoteWorkspaces.map(\.id) == [workspace.id])
 
-        let merged = CmuxTuiSurfaceProvider.mergeSnapshotResources(
-            pool: [CmuxTuiSnapshotParser.portBrowser(
+        let merged = WmuxTuiSurfaceProvider.mergeSnapshotResources(
+            pool: [WmuxTuiSnapshotParser.portBrowser(
                 machine: machine,
                 port: 8000,
                 directURL: "http://10.0.0.7:8000"
@@ -210,7 +210,7 @@ struct CloudPortOpenRegressionTests {
         #expect(port.remoteViews?.map(\.tabID) == ["tab_port"])
         #expect(merged.contains { $0.id.key == "browser_http_tab" } == false)
 
-        let loopbackOnly = CmuxTuiSurfaceProvider.mergeSnapshotResources(
+        let loopbackOnly = WmuxTuiSurfaceProvider.mergeSnapshotResources(
             pool: [],
             parsed: parsed,
             privateAddress: "10.0.0.7"
@@ -238,7 +238,7 @@ struct CloudPortOpenRegressionTests {
 
         // A complete snapshot with no browser view retires the old workspace
         // membership but keeps the listening port in the machine pool.
-        let cleared = CmuxTuiSurfaceProvider.mergeSnapshotResources(
+        let cleared = WmuxTuiSurfaceProvider.mergeSnapshotResources(
             pool: [port],
             parsed: [],
             privateAddress: "10.0.0.7"
@@ -256,7 +256,7 @@ struct CloudPortOpenRegressionTests {
             SurfaceRemoteView(tabID: "tab_port_8000", workspace: workspace),
             SurfaceRemoteView(tabID: "tab_port_second", workspace: workspace),
         ]
-        let merged = CmuxTuiSurfaceProvider.mergeSnapshotResources(
+        let merged = WmuxTuiSurfaceProvider.mergeSnapshotResources(
             pool: [first],
             parsed: [first, second],
             privateAddress: "10.0.0.7"
@@ -279,14 +279,14 @@ struct CloudPortOpenRegressionTests {
         let scan = VMExecResult(exitCode: 0, stdout: bindings, stderr: "")
         // #13196 (178d35e5da) scoped the RFB/noVNC range to machines whose
         // display catalog owns it; SSH and the daemon are always filtered.
-        #expect(CmuxTuiSurfaceProvider.ports(
+        #expect(WmuxTuiSurfaceProvider.ports(
             from: scan,
             privateAddress: "10.16.179.6",
             displayPortsOwned: true
         ) == [3000])
         // Without a desktop, 5901 and 6901 are ordinary listeners; the browser
         // proxy reaches the loopback-only 5901 on guest loopback.
-        #expect(CmuxTuiSurfaceProvider.ports(
+        #expect(WmuxTuiSurfaceProvider.ports(
             from: scan,
             privateAddress: "10.16.179.6"
         ) == [3000, 5901, 6901])
@@ -295,7 +295,7 @@ struct CloudPortOpenRegressionTests {
     @Test("Loopback services remain discoverable independently of private-address metadata")
     func loopbackDiscoveryIsIndependentOfAddress() {
         let listing = "State Recv-Q Send-Q Local Address:Port Peer Address:Port\nLISTEN 0 128 127.0.0.1:8000 0.0.0.0:*\n"
-        #expect(CmuxTuiSurfaceProvider.ports(
+        #expect(WmuxTuiSurfaceProvider.ports(
             from: VMExecResult(exitCode: 0, stdout: listing, stderr: ""),
             privateAddress: nil
         ) == [8000])
@@ -303,8 +303,8 @@ struct CloudPortOpenRegressionTests {
 
     @Test("Unavailable scans retain ports while an authoritative empty scan retires them")
     func portScanCompletenessControlsRefresh() throws {
-        #expect(CmuxTuiSurfaceProvider.ports(from: VMExecResult(exitCode: 127, stdout: "", stderr: "ss unavailable")) == nil)
-        #expect(CmuxTuiSurfaceProvider.ports(from: VMExecResult(
+        #expect(WmuxTuiSurfaceProvider.ports(from: VMExecResult(exitCode: 127, stdout: "", stderr: "ss unavailable")) == nil)
+        #expect(WmuxTuiSurfaceProvider.ports(from: VMExecResult(
             exitCode: 0,
             stdout: "State Recv-Q Send-Q Local Address:Port Peer Address:Port\n",
             stderr: ""
@@ -315,11 +315,11 @@ struct CloudPortOpenRegressionTests {
         LISTEN 0 128 0.0.0.0:9000 0.0.0.0:*
         LISTEN 0 128 [::1]:9100 [::]:*
         """
-        #expect(CmuxTuiSurfaceProvider.ports(
+        #expect(WmuxTuiSurfaceProvider.ports(
             from: VMExecResult(exitCode: 0, stdout: bindings, stderr: ""),
             privateAddress: "10.0.0.7"
         ) == [8000, 9000])
-        #expect(CmuxTuiSurfaceProvider.ports(
+        #expect(WmuxTuiSurfaceProvider.ports(
             from: VMExecResult(
                 exitCode: 0,
                 stdout: "State Recv-Q Send-Q Local Address:Port Peer Address:Port\nLISTEN 0 128 [::ffff:127.0.0.1]:9200 [::]:*\n",
@@ -328,7 +328,7 @@ struct CloudPortOpenRegressionTests {
             privateAddress: "10.0.0.7"
         ) == [9200], "the browser proxy opens the service on guest loopback")
         let previous = [discoveredPort(8000, in: workspace)]
-        let retained = CmuxTuiSurfaceProvider.portResources(
+        let retained = WmuxTuiSurfaceProvider.portResources(
             machine: machine,
             scannedPorts: nil,
             previousResources: previous,
@@ -337,20 +337,20 @@ struct CloudPortOpenRegressionTests {
         #expect(retained.map(\.id) == [previous[0].id])
         #expect(retained.first?.url == "http://10.0.0.7:8000")
         let staleSSH = discoveredPort(22)
-        let retainedWithStaleSSH = CmuxTuiSurfaceProvider.portResources(
+        let retainedWithStaleSSH = WmuxTuiSurfaceProvider.portResources(
             machine: machine,
             scannedPorts: nil,
             previousResources: [staleSSH, previous[0]],
             privateAddress: "10.0.0.7"
         )
         #expect(retainedWithStaleSSH.map(\.id) == [previous[0].id], "an unavailable refresh must not resurrect a cached SSH listener")
-        #expect(CmuxTuiSurfaceProvider.portResources(
+        #expect(WmuxTuiSurfaceProvider.portResources(
             machine: machine,
             scannedPorts: [],
             previousResources: previous,
             privateAddress: "10.0.0.7"
         ).isEmpty)
-        let refreshed = CmuxTuiSurfaceProvider.portResources(
+        let refreshed = WmuxTuiSurfaceProvider.portResources(
             machine: machine,
             scannedPorts: [9000, 8000, 9000],
             previousResources: previous,
@@ -361,13 +361,13 @@ struct CloudPortOpenRegressionTests {
         #expect(refreshed.first?.remoteWorkspace == workspace, "refresh keeps the owning workspace metadata")
         var inconsistent = discoveredPort(8000)
         inconsistent.port = 9000
-        #expect(CmuxTuiSurfaceProvider.portResources(
+        #expect(WmuxTuiSurfaceProvider.portResources(
             machine: machine,
             scannedPorts: [8000],
             previousResources: [inconsistent],
             privateAddress: "10.0.0.7"
         ).first?.port == 8000, "the canonical id owns the port number")
-        #expect(CmuxTuiSurfaceProvider.portResources(
+        #expect(WmuxTuiSurfaceProvider.portResources(
             machine: machine,
             scannedPorts: [8000],
             previousResources: refreshed,

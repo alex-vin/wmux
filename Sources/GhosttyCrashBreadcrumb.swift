@@ -219,12 +219,12 @@ enum GhosttyCrashBreadcrumb {
                 fileURLWithPath: (xdgStateHome as NSString).expandingTildeInPath,
                 isDirectory: true
             )
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
         } else {
             stateRoot = homeDirectory
                 .appendingPathComponent(".local", isDirectory: true)
                 .appendingPathComponent("state", isDirectory: true)
-                .appendingPathComponent("cmux", isDirectory: true)
+                .appendingPathComponent("wmux", isDirectory: true)
         }
 
         return stateRoot
@@ -234,7 +234,7 @@ enum GhosttyCrashBreadcrumb {
     }
 
     private static func sessionLifecycleScope(environment: [String: String]) -> String {
-        let rawBundleIdentifier = environment["CMUX_BUNDLE_ID"]
+        let rawBundleIdentifier = environment["WMUX_BUNDLE_ID"]
             ?? Bundle.main.bundleIdentifier
             ?? fallbackBundleIdentifier
         let trimmedBundleIdentifier = rawBundleIdentifier.trimmingCharacters(in: .whitespacesAndNewlines)

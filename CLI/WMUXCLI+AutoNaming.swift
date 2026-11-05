@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 // Auto-naming engine: pure, dependency-injected logic for naming workspaces
@@ -96,7 +96,7 @@ struct AutoNamingEnvironmentPolicy: Sendable {
 
     func summarizerEnvironment(from env: [String: String]) -> [String: String] {
         env.filter { key, _ in
-            if key.hasPrefix("CMUX_") { return false }
+            if key.hasPrefix("WMUX_") { return false }
             if Self.scrubbedExactKeys.contains(key) { return false }
             return true
         }

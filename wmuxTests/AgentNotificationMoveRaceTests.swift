@@ -1,11 +1,11 @@
 import AppKit
-import CMUXAgentLaunch
-import CmuxControlSocket
-import CmuxSettings
+import WMUXAgentLaunch
+import WmuxControlSocket
+import WmuxSettings
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -54,7 +54,7 @@ struct AgentNotificationRegressionTests {
             try #"{"notifications":{"hooks":[{"id":"move-race","command":\#(encodedCommand ?? "\"cat\"")\#(timeoutJSON)}]}}"#
                 .write(to: configURL, atomically: true, encoding: .utf8)
         }
-        let configStore = CmuxConfigStore(
+        let configStore = WmuxConfigStore(
             globalConfigPath: configURL.path,
             startFileWatchers: false
         )

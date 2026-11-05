@@ -22,8 +22,8 @@ final class SplitPaneBackgroundUITests: SettingsUITestCase {
     func testSplitDownNeverPaintsSourceTextInsideNewPane() throws {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += settingsLaunchArguments
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-split-bg-\(UUID().uuidString.prefix(8))"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-split-bg-\(UUID().uuidString.prefix(8))"
         launchAndActivate(app)
         defer { app.terminate() }
 

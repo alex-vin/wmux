@@ -1,7 +1,7 @@
-import CmuxBrowser
-import CmuxSettings
-import CmuxSidebar
-import CmuxSidebarGit
+import WmuxBrowser
+import WmuxSettings
+import WmuxSidebar
+import WmuxSidebarGit
 import Foundation
 
 // Keep the portable settings skill's source fallback aware of catalog-owned
@@ -25,13 +25,13 @@ private enum SettingsJSONPathFallbackCatalog {
     ]
 }
 
-typealias RightSidebarWidthSettings = CmuxSettings.RightSidebarWidthSettings
+typealias RightSidebarWidthSettings = WmuxSettings.RightSidebarWidthSettings
 
-enum CmuxJSONFontSettings {
+enum WmuxJSONFontSettings {
     static let sidebarPath = "sidebar.fontSize"
     static let surfaceTabBarPath = "surfaceTabBar.fontSize"
-    static let sidebarUserDefaultsKey = "cmux.settings.sidebarFontSize"
-    static let surfaceTabBarUserDefaultsKey = "cmux.settings.surfaceTabBarFontSize"
+    static let sidebarUserDefaultsKey = "wmux.settings.sidebarFontSize"
+    static let surfaceTabBarUserDefaultsKey = "wmux.settings.surfaceTabBarFontSize"
 }
 
 enum SidebarWorkspaceDetailDefaults {

@@ -1,11 +1,11 @@
 import Darwin
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
-import CmuxCloud
+import WmuxCloud
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -64,10 +64,10 @@ struct SSHRemoteCommandCLIIntegrationTests {
             onListenerClosed: {}
         )
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_SOCKET_PATH"] = socketPath
 
         let result = Harness.runProcess(
             executablePath: cliPath,
@@ -358,11 +358,11 @@ struct SSHRemoteCommandCLIIntegrationTests {
         )
 
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["HOME"] = homeURL.path
         environment["CFFIXED_USER_HOME"] = homeURL.path
         environment["XDG_CONFIG_HOME"] = homeURL.appendingPathComponent("config").path

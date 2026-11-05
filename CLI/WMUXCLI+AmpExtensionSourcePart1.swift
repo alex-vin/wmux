@@ -66,7 +66,7 @@ function resolveExecutable(name: string): string {
 }
 
 function hasCmuxTarget(): boolean {
-  return Boolean(process.env.CMUX_SURFACE_ID || process.env.CMUX_WORKSPACE_ID);
+  return Boolean(process.env.WMUX_SURFACE_ID || process.env.WMUX_WORKSPACE_ID);
 }
 
 function isExecutableFile(candidate: string): boolean {
@@ -80,7 +80,7 @@ function isExecutableFile(candidate: string): boolean {
 }
 
 function cmuxBin(): string {
-  const override = firstString(process.env.CMUX_AMP_CMUX_BIN);
+  const override = firstString(process.env.WMUX_AMP_CMUX_BIN);
   if (override) {
     if (isExecutableFile(override)) return override;
     // Preserve command-name overrides (for example `wmux`) by resolving them
@@ -90,7 +90,7 @@ function cmuxBin(): string {
       if (resolved !== override) return resolved;
     }
   }
-  const bundled = firstString(process.env.CMUX_BUNDLED_CLI_PATH);
+  const bundled = firstString(process.env.WMUX_BUNDLED_CLI_PATH);
   if (bundled && isExecutableFile(bundled)) return bundled;
   return resolveExecutable("wmux");
 }
@@ -146,13 +146,13 @@ function base64NulSeparated(values: string[]): string {
 function hookEnvironment(cwd: string): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env };
   delete env.AMP_API_KEY;
-  env.CMUX_AMP_PID ||= String(process.pid);
-  if (!env.CMUX_AGENT_LAUNCH_ARGV_B64) {
+  env.WMUX_AMP_PID ||= String(process.pid);
+  if (!env.WMUX_AGENT_LAUNCH_ARGV_B64) {
     const argv = normalizedLaunchArgv();
-    env.CMUX_AGENT_LAUNCH_KIND = "amp";
-    env.CMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("amp");
-    env.CMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
-    env.CMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
+    env.WMUX_AGENT_LAUNCH_KIND = "amp";
+    env.WMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("amp");
+    env.WMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
+    env.WMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
   }
   return env;
 }
@@ -173,7 +173,7 @@ function sendHook(
   cwd: string,
   extra: Record<string, unknown> = {},
 ): void {
-  if (process.env.CMUX_AMP_HOOKS_DISABLED === "1") return;
+  if (process.env.WMUX_AMP_HOOKS_DISABLED === "1") return;
   if (!hasCmuxTarget() || !sessionId) return;
   const payload: Record<string, unknown> = {
     session_id: sessionId,
@@ -184,7 +184,7 @@ function sendHook(
   };
   try {
     const child = spawn(cmuxBin(), ["hooks", "enqueue", "amp", subcommand], {
-      env: { ...hookEnvironment(cwd), CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
+      env: { ...hookEnvironment(cwd), WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
       stdio: ["pipe", "ignore", "ignore"],
       detached: true,
     });
@@ -217,12 +217,12 @@ const PRESENTATION = {
 } as const satisfies Record<string, AmpStatusPresentation>;
 
 function workspaceArgs(): string[] {
-  const workspace = process.env.CMUX_WORKSPACE_ID;
+  const workspace = process.env.WMUX_WORKSPACE_ID;
   return workspace ? ["--workspace", workspace] : [];
 }
 
 function runCmux(args: string[]): void {
-  if (process.env.CMUX_AMP_HOOKS_DISABLED === "1" || !hasCmuxTarget()) return;
+  if (process.env.WMUX_AMP_HOOKS_DISABLED === "1" || !hasCmuxTarget()) return;
   const env: NodeJS.ProcessEnv = { ...process.env };
   delete env.AMP_API_KEY;
   try {

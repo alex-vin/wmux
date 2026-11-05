@@ -1,18 +1,18 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxPanes
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxWorkspaces
-import CmuxTestSupport
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxPanes
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxWorkspaces
+import WmuxTestSupport
 import SwiftUI
 import Observation
 import Darwin
 import Bonsplit
 import UniformTypeIdentifiers
-import CmuxTerminal
+import WmuxTerminal
 struct wmuxApp: App {
     /// App-owned settings graph, injected into each SwiftUI hosting root.
     private let settingsRuntime: SettingsRuntime
@@ -49,7 +49,7 @@ struct wmuxApp: App {
         // is assigned after the saved language override below, because
         // it owns localized search-index text for the process lifetime.
         let settingsCatalog = SettingCatalog()
-        let configFileURL = CmuxConfigLocation().userConfigFile
+        let configFileURL = WmuxConfigLocation().userConfigFile
         // Relocate a pre-existing socket password out of the legacy
         // Application Support directory before any store reads it. The CLI reads
         // this file on every agent hook, and a cross-identity reach into
@@ -66,13 +66,13 @@ struct wmuxApp: App {
         // and the listener share one source of truth.
         let secretBaseDirectory = SocketControlPasswordStore.defaultPasswordFileURL(fileManager: .default)?
             .deletingLastPathComponent()
-            ?? CmuxStateDirectory.url(homeDirectory: FileManager.default.homeDirectoryForCurrentUser)
+            ?? WmuxStateDirectory.url(homeDirectory: FileManager.default.homeDirectoryForCurrentUser)
         let secretStore = SecretFileStore(baseDirectory: secretBaseDirectory)
 
         // Lift any plaintext socket-control password out of `cmux.json` into the
         // secure store, then scrub it from the config. This runs here, in the App
         // initializer, on purpose: it completes before the managed-config layer
-        // (`CmuxSettingsFileStore`, loaded later during app launch) reads the
+        // (`WmuxSettingsFileStore`, loaded later during app launch) reads the
         // file, so removing the key can never be misread as a removed managed
         // override that would trigger a restore. The secure file the migration
         // writes is the same one both the Settings UI (via `secretStore`) and the
@@ -210,7 +210,7 @@ struct wmuxApp: App {
         Self.applyAppearance(startupAppearance, duringLaunch: true)
         StartupBreadcrumbLog.append("app.init.appearance.applied", fields: ["mode": startupAppearance.rawValue])
         let defaults = UserDefaults.standard
-        CmuxExtensionSidebarSelection.clearStaleTemplatePreviewSelection(defaults: defaults)
+        WmuxExtensionSidebarSelection.clearStaleTemplatePreviewSelection(defaults: defaults)
         TerminalController.shared.prepareControlHandleRegistryForLaunch(defaults: defaults)
         let workspaceCustomizationStore = WorkspaceCustomizationStore(
             defaults: defaults
@@ -295,7 +295,7 @@ struct wmuxApp: App {
         }
         migrateSidebarAppearanceDefaultsIfNeeded(defaults: defaults)
         MinimalModeTitlebarDebugSettings.migrateLegacyKeysIfNeeded(defaults: defaults)
-        CmuxExtensionSidebarSelection.migrateLegacyDefaultsKeyIfNeeded(defaults: defaults)
+        WmuxExtensionSidebarSelection.migrateLegacyDefaultsKeyIfNeeded(defaults: defaults)
         StartupBreadcrumbLog.append("app.init.sidebarDefaults.migrated")
 
         // UI tests need AppDelegate wiring even if SwiftUI appearance callbacks are skipped.
@@ -327,20 +327,20 @@ struct wmuxApp: App {
     /// Builds the host-owned resolver used by Settings UI shortcut models.
     /// Dynamic right-sidebar defaults depend on app state and must not be
     /// installed into the settings package as process-global mutable state.
-    private static func makeShortcutDefaultResolver() -> CmuxSettings.ShortcutDefaultResolver {
-        CmuxSettings.ShortcutDefaultResolver { action in
+    private static func makeShortcutDefaultResolver() -> WmuxSettings.ShortcutDefaultResolver {
+        WmuxSettings.ShortcutDefaultResolver { action in
             guard let mode = RightSidebarMode.allCases.first(where: {
                 $0.shortcutAction?.rawValue == action.rawValue
             }) else { return .useBuiltIn }
             guard let digit = RightSidebarMode.positionalDigit(for: mode) else {
                 return .stroke(nil)
             }
-            return .stroke(CmuxSettings.ShortcutStroke(key: String(digit), control: true))
+            return .stroke(WmuxSettings.ShortcutStroke(key: String(digit), control: true))
         }
     }
 
     private static func terminateForMissingLaunchTag() -> Never {
-        let message = "error: refusing to launch untagged cmux DEV; start with ./scripts/reload.sh --tag <name> (or set CMUX_TAG for test harnesses)"
+        let message = "error: refusing to launch untagged cmux DEV; start with ./scripts/reload.sh --tag <name> (or set WMUX_TAG for test harnesses)"
         fputs("\(message)\n", stderr)
         fflush(stderr)
         NSLog("%@", message)
@@ -493,7 +493,7 @@ struct wmuxApp: App {
                 .cmuxAppearanceColorScheme(appearanceMode)
                 .onAppear {
 #if DEBUG
-                    if ProcessInfo.processInfo.environment["CMUX_UI_TEST_MODE"] == "1" {
+                    if ProcessInfo.processInfo.environment["WMUX_UI_TEST_MODE"] == "1" {
                         AppDelegate.shared?.updateLog.append("ui test: wmuxApp onAppear")
                     }
 #endif
@@ -734,7 +734,7 @@ struct wmuxApp: App {
                     }
                 }
 
-                if CmuxFeatureFlags.shared.isSimulatorEnabled {
+                if WmuxFeatureFlags.shared.isSimulatorEnabled {
                     Button(String(localized: "menu.file.newSimulatorPane", defaultValue: "New Simulator Pane")) {
                         performNewSimulatorPaneFromMenu()
                     }
@@ -1495,7 +1495,7 @@ private struct MainWindowBootstrapView: View {
         Color.clear
             .frame(width: 1, height: 1)
             .background(WindowAccessor { window in
-                window.identifier = NSUserInterfaceItemIdentifier("cmux.bootstrap")
+                window.identifier = NSUserInterfaceItemIdentifier("wmux.bootstrap")
                 window.isRestorable = false
                 window.orderOut(nil)
                 let windowIdentifier = ObjectIdentifier(window)
@@ -1510,46 +1510,46 @@ private struct MainWindowBootstrapView: View {
     }
 }
 private let cmuxAuxiliaryWindowIdentifiers: Set<String> = [
-    "cmux.newMachine",
-    "cmux.settings",
-    "cmux.about",
-    "cmux.cloud.welcome",
-    "cmux.licenses",
-    "cmux.browser-popup",
-    "cmux.browserProfilePopoverDebug",
-    "cmux.configEditor",
-    "cmux.computerUse.onboarding",
-    "cmux.defaultTerminalRegistrationError",
-    "cmux.featureFlags",
-    "cmux.feedButtonStyleDebug",
-    "cmux.feedPreview",
-    "cmux.feedTextEditorDebug",
-    "cmux.fileExplorerStyleDebug",
-    "cmux.folderDragIcon",
-    "cmux.pdfPreviewChromeDebug",
-    "cmux.proBadgeDebug",
-    "cmux.recentlyClosedHistory",
-    "cmux.tabBarBackdropLab",
-    "cmux.taskManager",
-    "cmux.aboutTitlebarDebug",
-    "cmux.debugWindowControls",
-    "cmux.browserImportHintDebug",
-    "cmux.extensionSidebarInspector",
-    "cmux.sidebarDebug",
-    "cmux.menubarDebug",
-    "cmux.spinnerGallery",
-    "cmux.cloudTreeStyleGallery",
-    "cmux.cloudSidebarDebugLab",
-    "cmux.backgroundDebug",
-    "cmux.startupAppearanceDebug",
-    "cmux.bonsplitTabBarDebug",
-    "cmux.titlebarLayoutDebug",
-    "cmux.devWindowDisplay",
-    "cmux.mobilePairingWindow",
-    "cmux.sidebarFooterIconBalanceDebug",
-    "cmux.cloudPaneCreationFailure.card",
-    "cmux.cloudCreateTeam",
-    "cmux.sudo.approval",
+    "wmux.newMachine",
+    "wmux.settings",
+    "wmux.about",
+    "wmux.cloud.welcome",
+    "wmux.licenses",
+    "wmux.browser-popup",
+    "wmux.browserProfilePopoverDebug",
+    "wmux.configEditor",
+    "wmux.computerUse.onboarding",
+    "wmux.defaultTerminalRegistrationError",
+    "wmux.featureFlags",
+    "wmux.feedButtonStyleDebug",
+    "wmux.feedPreview",
+    "wmux.feedTextEditorDebug",
+    "wmux.fileExplorerStyleDebug",
+    "wmux.folderDragIcon",
+    "wmux.pdfPreviewChromeDebug",
+    "wmux.proBadgeDebug",
+    "wmux.recentlyClosedHistory",
+    "wmux.tabBarBackdropLab",
+    "wmux.taskManager",
+    "wmux.aboutTitlebarDebug",
+    "wmux.debugWindowControls",
+    "wmux.browserImportHintDebug",
+    "wmux.extensionSidebarInspector",
+    "wmux.sidebarDebug",
+    "wmux.menubarDebug",
+    "wmux.spinnerGallery",
+    "wmux.cloudTreeStyleGallery",
+    "wmux.cloudSidebarDebugLab",
+    "wmux.backgroundDebug",
+    "wmux.startupAppearanceDebug",
+    "wmux.bonsplitTabBarDebug",
+    "wmux.titlebarLayoutDebug",
+    "wmux.devWindowDisplay",
+    "wmux.mobilePairingWindow",
+    "wmux.sidebarFooterIconBalanceDebug",
+    "wmux.cloudPaneCreationFailure.card",
+    "wmux.cloudCreateTeam",
+    "wmux.sudo.approval",
 ]
 
 /// Returns whether the given window should handle the standard close shortcut
@@ -1648,7 +1648,7 @@ private final class DebugWindowControlsWindowController: ReleasingWindowControll
         window.titleVisibility = .visible
         window.titlebarAppearsTransparent = false
         window.isMovableByWindowBackground = true
-        window.identifier = NSUserInterfaceItemIdentifier("cmux.debugWindowControls")
+        window.identifier = NSUserInterfaceItemIdentifier("wmux.debugWindowControls")
         window.center()
         window.contentView = NSHostingView(rootView: DebugWindowControlsView())
         AppDelegate.shared?.applyWindowDecorations(to: window)
@@ -1840,14 +1840,14 @@ enum AppIconSettings {
     private static var liveEnvironmentProvider: () -> Environment = { .live() }
 
     private static func isRunningUnderXCTest(_ env: [String: String] = ProcessInfo.processInfo.environment) -> Bool {
-        if env["CMUX_TEST_PROCESS"] == "1" { return true }
+        if env["WMUX_TEST_PROCESS"] == "1" { return true }
         if env["XCTestConfigurationFilePath"] != nil { return true }
         if env["XCTestBundlePath"] != nil { return true }
         if env["XCTestSessionIdentifier"] != nil { return true }
         if env["XCInjectBundle"] != nil { return true }
         if env["XCInjectBundleInto"] != nil { return true }
         if env["DYLD_INSERT_LIBRARIES"]?.contains("libXCTest") == true { return true }
-        if env.keys.contains(where: { $0.hasPrefix("CMUX_UI_TEST_") }) { return true }
+        if env.keys.contains(where: { $0.hasPrefix("WMUX_UI_TEST_") }) { return true }
         return false
     }
 

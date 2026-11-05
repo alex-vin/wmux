@@ -1,5 +1,5 @@
-import CMUXAuthCore
-import CmuxAuthRuntime
+import WMUXAuthCore
+import WmuxAuthRuntime
 import Foundation
 
 /// Holds only the revalidation token probe; coherent token reads remain available.
@@ -33,11 +33,11 @@ actor CloudReadIdentityAuthClient: AuthClient {
     func resolvedAccessToken(forceRefresh: Bool) async throws -> String? { accountID.map { "fixture-access-\($0)" } }
     func refreshToken() async -> String? { accountID.map { "fixture-refresh-\($0)" } }
     func forceRefreshAccessToken() async -> String? { accountID.map { "fixture-access-\($0)" } }
-    func currentUser(throwOnMissing: Bool) async throws -> CMUXAuthUser? {
-        accountID.map { CMUXAuthUser(id: $0, primaryEmail: "\($0)@example.test", displayName: "Fixture") }
+    func currentUser(throwOnMissing: Bool) async throws -> WMUXAuthUser? {
+        accountID.map { WMUXAuthUser(id: $0, primaryEmail: "\($0)@example.test", displayName: "Fixture") }
     }
-    func listTeams() async throws -> [CMUXAuthTeam] {
-        [CMUXAuthTeam(id: "selected", displayName: "Selected")]
+    func listTeams() async throws -> [WMUXAuthTeam] {
+        [WMUXAuthTeam(id: "selected", displayName: "Selected")]
     }
     func setSelectedTeam(id: String?) async throws {}
     func sendMagicLinkEmail(email: String, callbackURL: String) async throws -> String { "fixture" }

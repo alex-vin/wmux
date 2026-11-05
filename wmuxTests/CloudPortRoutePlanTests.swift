@@ -1,11 +1,11 @@
-import CmuxCloudBannerCore
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloudBannerCore
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -17,13 +17,13 @@ struct CloudPortRoutePlanTests {
 
     @Test("A port open uses the private address without starting forwarding")
     func privateAddressIsDefault() {
-        let resource = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000)
+        let resource = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000)
         #expect(CloudPortRoutePlan.plan(resource: resource, privateAddress: "10.0.0.7") == .privateDirect(remoteURL: "http://10.0.0.7:3000"))
     }
 
     @Test("Missing private addresses never fall back to a public or local forward")
     func noAutomaticFallback() {
-        let resource = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000)
+        let resource = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000)
         guard case .unsupported = CloudPortRoutePlan.plan(resource: resource, privateAddress: nil) else {
             Issue.record("A missing private address must show connection guidance")
             return
@@ -124,12 +124,12 @@ struct CloudPortRoutePlanTests {
     func desktopForwardWorksWithoutVPN() async throws {
         var wakes = 0
         var starts = 0
-        let model = makeModel(port: CmuxTuiSnapshotParser.desktopPort, wake: { wakes += 1 }, forward: { _ in
+        let model = makeModel(port: WmuxTuiSnapshotParser.desktopPort, wake: { wakes += 1 }, forward: { _ in
             starts += 1
             return 46_901
         }, route: .loopback)
         let page = CloudBrowserAccessState()
-        let remote = URL(string: CmuxTuiSurfaceProvider.privateDesktopURL(privateAddress: "10.0.0.7"))!
+        let remote = URL(string: WmuxTuiSurfaceProvider.privateDesktopURL(privateAddress: "10.0.0.7"))!
         page.configure(model: model, url: remote)
         model.connect()
 
@@ -513,7 +513,7 @@ struct CloudPortRoutePlanTests {
         defer { live.tearDown() }
         let catalog = SurfaceCatalog(live: live)
         let links = CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil })
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: "vm-userspace", provider: "freestyle", status: "running", image: "fixture", createdAt: 0, base: nil, addressIPv4: "10.16.0.7"),
             links: links,
             catalog: catalog

@@ -1,9 +1,9 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -17,7 +17,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-exited-agent-resume-\(UUID().uuidString)", isDirectory: true)
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let environment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let environment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         defer { try? fileManager.removeItem(at: root) }
 
         let defaultsName = "cmux-exited-agent-resume-\(UUID().uuidString)"
@@ -40,7 +40,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let agentIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: environment,
             processArgumentsProvider: { _ in nil },
@@ -85,7 +85,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-newer-agent-binding-resume-\(UUID().uuidString)", isDirectory: true)
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let environment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let environment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         defer { try? fileManager.removeItem(at: root) }
 
         let defaultsName = "cmux-newer-agent-binding-resume-\(UUID().uuidString)"
@@ -108,7 +108,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let exitedIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: environment,
             processArgumentsProvider: { _ in nil },
@@ -148,7 +148,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-live-runtime-agent-resume-\(UUID().uuidString)", isDirectory: true)
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let environment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let environment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         defer { try? fileManager.removeItem(at: root) }
 
         let defaultsName = "cmux-live-runtime-agent-resume-\(UUID().uuidString)"
@@ -171,7 +171,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let exitedIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: environment,
             processArgumentsProvider: { _ in nil },
@@ -255,7 +255,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-cached-running-agent-resume-\(UUID().uuidString)", isDirectory: true)
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let environment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let environment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         defer { try? fileManager.removeItem(at: root) }
 
         let defaultsName = "cmux-cached-running-agent-resume-\(UUID().uuidString)"
@@ -283,7 +283,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let agentIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: environment,
             processArgumentsProvider: { processID in
@@ -332,7 +332,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("cmux-agent-liveness-fingerprint-\(UUID().uuidString)", isDirectory: true)
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let environment = ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+        let environment = ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         defer { try? fileManager.removeItem(at: root) }
 
         let manager = TabManager()
@@ -356,7 +356,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let runningIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: environment,
             processArgumentsProvider: { processID in
@@ -370,7 +370,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
         let exitedIndex = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             environment: environment,
             processArgumentsProvider: { _ in nil },
@@ -409,13 +409,13 @@ struct SurfaceResumeExitedAgentLivenessTests {
     private func codexProcessArguments(
         workspaceID: UUID,
         panelID: UUID
-    ) -> CmuxTopProcessArguments {
-        CmuxTopProcessArguments(
+    ) -> WmuxTopProcessArguments {
+        WmuxTopProcessArguments(
             arguments: ["/usr/local/bin/codex"],
             environment: [
-                "CMUX_AGENT_LAUNCH_KIND": "codex",
-                "CMUX_WORKSPACE_ID": workspaceID.uuidString,
-                "CMUX_SURFACE_ID": panelID.uuidString,
+                "WMUX_AGENT_LAUNCH_KIND": "codex",
+                "WMUX_WORKSPACE_ID": workspaceID.uuidString,
+                "WMUX_SURFACE_ID": panelID.uuidString,
             ]
         )
     }
@@ -429,7 +429,7 @@ struct SurfaceResumeExitedAgentLivenessTests {
     ) throws {
         let storeURL = RestorableAgentKind.codex.hookStoreFileURL(
             homeDirectory: root.path,
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": root.appendingPathComponent("hook-state").path]
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": root.appendingPathComponent("hook-state").path]
         )
         try fileManager.createDirectory(at: storeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         let transcriptURL = root.appendingPathComponent(".codex/sessions/rollout-\(sessionID).jsonl")

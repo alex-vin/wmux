@@ -1,7 +1,7 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import Observation
-import CmuxSidebar
+import WmuxSidebar
 import SwiftUI
 
 /// Owns a mode bar tab drag. Inside the bar the real tab follows the pointer
@@ -288,7 +288,7 @@ private struct RightSidebarModeBarDragPreview: View {
     var body: some View {
         HStack(spacing: 4) {
             // ImageRenderer cannot capture the NSViewRepresentable used by
-            // CmuxSystemSymbolImage. Supply its materialized bitmap instead.
+            // WmuxSystemSymbolImage. Supply its materialized bitmap instead.
             if let image = RenderableSystemSymbol.configuredAppKitImage(
                 systemName: mode.symbolName,
                 pointSize: GlobalFontMagnification.scaledSize(

@@ -40,7 +40,7 @@ extension WMUXCLI {
 
     /// Uses the existing CLI bundle and language lookup for workflow prose.
     static func workflowText(_ key: String, _ defaultValue: String) -> String {
-        CMUXDiffViewerLocalization.string(key, defaultValue: defaultValue)
+        WMUXDiffViewerLocalization.string(key, defaultValue: defaultValue)
     }
 
     private static let workflowSavedLayoutSteps: [(label: String, command: String)] = [

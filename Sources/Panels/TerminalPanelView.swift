@@ -2,11 +2,11 @@ import SwiftUI
 import Foundation
 import AppKit
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxTestSupport
-import CmuxTerminal
-import CmuxFoundation
-import CmuxSettings
+import WmuxAppKitSupportUI
+import WmuxTestSupport
+import WmuxTerminal
+import WmuxFoundation
+import WmuxSettings
 
 /// View for rendering a terminal panel
 struct TerminalPanelView: View {
@@ -313,9 +313,9 @@ private struct AgentHibernationPlaceholderView: View {
                     .controlSize(.small)
                     .accessibilityIdentifier("AgentHibernationTerminationRecoveryProgress")
             case .hibernated:
-                CmuxSystemSymbolImage(magnified: "pause.circle", pointSize: 34, weight: .regular, tint: .secondary)
+                WmuxSystemSymbolImage(magnified: "pause.circle", pointSize: 34, weight: .regular, tint: .secondary)
             case .failed:
-                CmuxSystemSymbolImage(
+                WmuxSystemSymbolImage(
                     magnified: "exclamationmark.triangle",
                     pointSize: 34,
                     weight: .regular,
@@ -383,7 +383,7 @@ private struct TerminalViewportGeometryReporter: ViewModifier {
 @MainActor
 private func recordTerminalViewportGeometryForUITest(proxy: GeometryProxy, panel: TerminalPanel) {
     let env = ProcessInfo.processInfo.environment
-    guard env["CMUX_UI_TEST_TERMINAL_VIEWPORT_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
+    guard env["WMUX_UI_TEST_TERMINAL_VIEWPORT_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
         return
     }
 
@@ -399,7 +399,7 @@ private func recordTerminalViewportGeometryForUITest(proxy: GeometryProxy, panel
         hostedFrameInContent = .zero
     }
 
-    _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "CMUX_UI_TEST_TERMINAL_VIEWPORT_PATH") { payload in
+    _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "WMUX_UI_TEST_TERMINAL_VIEWPORT_PATH") { payload in
         payload["terminalViewportPanelId"] = panel.id.uuidString
         payload["terminalViewportPanelWidth"] = terminalViewportFormat(proxy.size.width)
         payload["terminalViewportPanelHeight"] = terminalViewportFormat(proxy.size.height)

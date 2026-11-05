@@ -2,9 +2,9 @@
 // parsing and Google's own export endpoints, fetched in the signed-in session.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
-  const { URL, URLSearchParams } = root.CmuxBrowserRepl.core;
+  const { URL, URLSearchParams } = root.WmuxBrowserRepl.core;
 
   // Formats Google's export endpoint serves per file kind.
   const FORMATS = {

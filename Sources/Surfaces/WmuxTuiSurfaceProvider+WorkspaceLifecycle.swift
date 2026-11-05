@@ -1,8 +1,8 @@
-import CmuxCloudTui
+import WmuxCloudTui
 import Foundation
 
 @MainActor
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Runs one close-family command, reconnecting and retrying once when the attempt
     /// died with the link. Close verbs are idempotent, so the retry is safe.
     func runCloseCommand(_ arguments: (_ socketPath: String) -> CloudTuiRequest) async throws -> Data {

@@ -1,17 +1,17 @@
 import AppKit
 import Carbon.HIToolbox
-import CmuxTerminal
+import WmuxTerminal
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 /// Regression coverage for https://github.com/manaflow-ai/cmux/issues/5887.
 ///
-/// `NSWindow.cmux_performKeyEquivalent(with:)` force-dispatches certain key
+/// `NSWindow.wmux_performKeyEquivalent(with:)` force-dispatches certain key
 /// events straight into the focused responder's `keyDown(with:)`. When the
 /// responder does not consume the key, AppKit can route the very same event
 /// back into `performKeyEquivalent` while the first dispatch is still on the
@@ -231,7 +231,7 @@ struct WindowKeyDownReplayGuardTests {
     }
 
     /// Option+A producing printable text ("å"). The printable-Option-text
-    /// bypass in `cmux_performKeyEquivalent` force-dispatches this into the
+    /// bypass in `wmux_performKeyEquivalent` force-dispatches this into the
     /// first responder's `keyDown`, which is the unguarded dispatch the
     /// https://github.com/manaflow-ai/cmux/issues/5887 crash looped through.
     private func makeOptionTextKeyDownEvent(

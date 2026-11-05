@@ -215,7 +215,7 @@ final class SessionAutosaveCoordinator {
 
     private func finish(source: String, generation: UInt64) async {
 #if DEBUG
-        let timingStart = CmuxTypingTiming.start()
+        let timingStart = WmuxTypingTiming.start()
         let phaseStart = ProcessInfo.processInfo.systemUptime
         var loadMs: Double = 0
         var fingerprintMs: Double = 0
@@ -225,7 +225,7 @@ final class SessionAutosaveCoordinator {
                 activeAttempt = nil
             }
             let totalMs = (ProcessInfo.processInfo.systemUptime - phaseStart) * 1000.0
-            CmuxTypingTiming.logBreakdown(
+            WmuxTypingTiming.logBreakdown(
                 path: "session.autosaveTick.phase",
                 totalMs: totalMs,
                 thresholdMs: 2.0,
@@ -236,7 +236,7 @@ final class SessionAutosaveCoordinator {
                 ],
                 extra: "source=\(source)"
             )
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "session.autosaveTick",
                 startedAt: timingStart,
                 extra: "source=\(source)"

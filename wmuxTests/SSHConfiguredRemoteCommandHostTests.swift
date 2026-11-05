@@ -1,11 +1,11 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -75,9 +75,9 @@ struct SSHConfiguredRemoteCommandHostTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = processSupport.runProcess(
             executablePath: cliPath,
@@ -164,9 +164,9 @@ struct SSHConfiguredRemoteCommandHostTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         var arguments = [
             "ssh",
@@ -181,7 +181,7 @@ struct SSHConfiguredRemoteCommandHostTests {
         // builds for sessions without a TTY.
         arguments += [
             "--ssh-option", "RemoteCommand=printf explicit-fallback",
-            "--ssh-option", "CmuxTestInvalidOption=yes",
+            "--ssh-option", "WmuxTestInvalidOption=yes",
             "--ssh-option", "RequestTTY no",
             "cmux-config-unavailable-host",
         ]
@@ -213,7 +213,7 @@ struct SSHConfiguredRemoteCommandHostTests {
             : startupCommand
         #expect(startupArtifact.contains("RemoteCommand=printf explicit-fallback"), "\(startupArtifact)")
         #expect(!startupArtifact.contains("ssh-pty-attach"), "\(startupArtifact)")
-        #expect(!startupArtifact.contains("cmux_mosh"), "\(startupArtifact)")
+        #expect(!startupArtifact.contains("wmux_mosh"), "\(startupArtifact)")
         let configureParams = try #require(
             requests.first { $0["method"] as? String == "workspace.remote.configure" }?["params"]
                 as? [String: Any]
@@ -275,9 +275,9 @@ struct SSHConfiguredRemoteCommandHostTests {
         }
 
         var captureEnvironment = ProcessInfo.processInfo.environment
-        captureEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        captureEnvironment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        captureEnvironment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        captureEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        captureEnvironment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        captureEnvironment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let captureResult = processSupport.runProcess(
             executablePath: cliPath,
@@ -414,7 +414,7 @@ struct SSHConfiguredRemoteCommandHostTests {
         )
         #expect(!command.contains("-$$"), Comment(rawValue: command))
         #expect(
-            command.contains("--lifecycle-id \"$cmux_ssh_attach_lifecycle_id\""),
+            command.contains("--lifecycle-id \"$wmux_ssh_attach_lifecycle_id\""),
             Comment(rawValue: command)
         )
         #expect(command.contains("ssh-session-end --lifecycle-only"), Comment(rawValue: command))

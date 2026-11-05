@@ -1,8 +1,8 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider: SurfaceLayoutTerminalCreating {
+extension WmuxTuiSurfaceProvider: SurfaceLayoutTerminalCreating {
     /// Uses the exact source view, not daemon focus, so a local split and the
     /// Cloud tree acquire the same pane/tab relationship in one remote mutation.
     func createTerminal(nearTabID: String, splitDirection: SurfaceSplitDirection?) async throws -> SurfaceResource {

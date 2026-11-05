@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import Foundation
 
@@ -7,9 +7,9 @@ import Foundation
 @MainActor
 final class NewWorkspaceContextMenuActionBox: NSObject {
     let windowId: UUID
-    let action: CmuxResolvedConfigAction
+    let action: WmuxResolvedConfigAction
 
-    init(windowId: UUID, action: CmuxResolvedConfigAction) {
+    init(windowId: UUID, action: WmuxResolvedConfigAction) {
         self.windowId = windowId
         self.action = action
     }
@@ -74,7 +74,7 @@ extension AppDelegate {
 
     func makeNewWorkspaceContextMenu(
         context: MainWindowContext,
-        cmuxConfigStore: CmuxConfigStore,
+        cmuxConfigStore: WmuxConfigStore,
         isAuthenticated: Bool? = nil
     ) -> NSMenu? {
         let isAuthenticated = isAuthenticated ?? (AppDelegate.shared?.auth?.accountFlow.isAuthenticated == true)
@@ -104,7 +104,7 @@ extension AppDelegate {
     /// opens (not at config load) so flag and setting flips apply at once.
     /// Mirrors the command palette's gates for the same actions.
     static func isBuiltInActionAvailableInNewWorkspaceMenu(
-        _ action: CmuxSurfaceTabBarBuiltInAction,
+        _ action: WmuxSurfaceTabBarBuiltInAction,
         isAuthenticated: Bool? = nil
     ) -> Bool {
         switch action {
@@ -115,7 +115,7 @@ extension AppDelegate {
         case .newBrowser, .newAgentChat:
             return BrowserAvailabilitySettings.isEnabled()
         case .newSimulator:
-            return CmuxFeatureFlags.shared.isSimulatorEnabled
+            return WmuxFeatureFlags.shared.isSimulatorEnabled
         case .mobileConnect:
             return !MobileRemoteControlPolicy.isDisabled
         case .newWorkspace, .newTerminal, .splitRight, .splitDown,
@@ -129,13 +129,13 @@ extension AppDelegate {
     }
 
     private func resolvedBuiltInNewAgentChatAction(
-        cmuxConfigStore: CmuxConfigStore
-    ) -> CmuxResolvedConfigAction? {
+        cmuxConfigStore: WmuxConfigStore
+    ) -> WmuxResolvedConfigAction? {
         // Agent chat opens a browser surface; hide it when browser surfaces
         // are disabled, matching the command palette's browserDisabled gate.
-        guard CmuxFeatureFlags.shared.isAgentChatUIEnabled else { return nil }
+        guard WmuxFeatureFlags.shared.isAgentChatUIEnabled else { return nil }
         guard BrowserAvailabilitySettings.isEnabled() else { return nil }
-        let actionID = CmuxSurfaceTabBarBuiltInAction.newAgentChat.configID
+        let actionID = WmuxSurfaceTabBarBuiltInAction.newAgentChat.configID
         let action = cmuxConfigStore.resolvedAction(id: actionID)
             ?? .builtIn(.newAgentChat)
         guard shouldAppendBuiltInNewAgentChatMenuItem(
@@ -149,9 +149,9 @@ extension AppDelegate {
     }
 
     private func shouldAppendBuiltInNewAgentChatMenuItem(
-        _ action: CmuxResolvedConfigAction,
+        _ action: WmuxResolvedConfigAction,
         actionID: String,
-        cmuxConfigStore: CmuxConfigStore
+        cmuxConfigStore: WmuxConfigStore
     ) -> Bool {
         if action.newWorkspaceMenu == false { return false }
         let configuredActionIDs = Set(cmuxConfigStore.newWorkspaceContextMenuItems.compactMap { item -> String? in

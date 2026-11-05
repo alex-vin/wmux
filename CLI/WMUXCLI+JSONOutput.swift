@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 extension WMUXCLI {
@@ -107,7 +107,7 @@ extension WMUXCLI {
     private func isPrivateSubrouterRoutingKey(_ key: String, routed: Bool) -> Bool {
         key.hasPrefix("SUBROUTER_CODEX_")
             || key == SubrouterCodexResumeRouting.launchBoundEnvironmentKey
-            || (routed && key == "CMUX_CUSTOM_CODEX_PATH")
+            || (routed && key == "WMUX_CUSTOM_CODEX_PATH")
     }
 
     func jsonString(_ object: Any, prettyPrinted: Bool = true) -> String {

@@ -37,7 +37,7 @@ import XCTest
 ///   - New Workspace Placement (app.newWorkspacePlacement): only
 ///     observable after creating ≥2 workspaces and inspecting sidebar
 ///     order; requires workspace scaffolding the fresh UI-test launch
-///     does not have (CMUX_UI_TEST_MODE skips session restore).
+///     does not have (WMUX_UI_TEST_MODE skips session restore).
 ///   - Keep Workspace Open When Closing Last Surface
 ///     (closeWorkspaceOnLastSurfaceShortcut): only observable by closing
 ///     the last surface of a real workspace and checking whether the
@@ -119,7 +119,7 @@ final class SettingsAppBehaviorUITests: SettingsUITestCase {
             "-AppleTextDirection", rightToLeft ? "YES" : "NO",
             "-NSForceRightToLeftWritingDirection", rightToLeft ? "YES" : "NO",
         ]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
         launchAndActivate(app)
         defer { app.terminate() }
         // Open Settings after launch activation so the main window cannot

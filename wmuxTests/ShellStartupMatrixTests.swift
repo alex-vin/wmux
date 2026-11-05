@@ -1,9 +1,9 @@
 import Foundation
 import Testing
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -27,7 +27,7 @@ struct ShellStartupMatrixTests {
         )
 
         expectTrue(
-            script.contains("${CMUX_SHELL_INTEGRATION_DIR:-$HOME/.cmux/relay/64123.shell}/.bashrc"),
+            script.contains("${WMUX_SHELL_INTEGRATION_DIR:-$HOME/.cmux/relay/64123.shell}/.bashrc"),
             script
         )
     }
@@ -53,9 +53,9 @@ struct ShellStartupMatrixTests {
 
         expectEqual(command, nil)
         expectEqual(environment["ZDOTDIR"], integrationDir)
-        expectEqual(environment["CMUX_ZSH_ZDOTDIR"], "/Users/example/.zsh")
-        expectEqual(environment["CMUX_LOAD_GHOSTTY_ZSH_INTEGRATION"], "1")
-        expectTrue(protectedKeys.isSuperset(of: ["ZDOTDIR", "CMUX_ZSH_ZDOTDIR", "CMUX_LOAD_GHOSTTY_ZSH_INTEGRATION"]))
+        expectEqual(environment["WMUX_ZSH_ZDOTDIR"], "/Users/example/.zsh")
+        expectEqual(environment["WMUX_LOAD_GHOSTTY_ZSH_INTEGRATION"], "1")
+        expectTrue(protectedKeys.isSuperset(of: ["ZDOTDIR", "WMUX_ZSH_ZDOTDIR", "WMUX_LOAD_GHOSTTY_ZSH_INTEGRATION"]))
     }
 
     @Test
@@ -77,8 +77,8 @@ struct ShellStartupMatrixTests {
             protectedKeys: &protectedKeys
         )
 
-        expectEqual(environment["CMUX_ZSH_ZDOTDIR"], nil)
-        expectFalse(protectedKeys.contains("CMUX_ZSH_ZDOTDIR"))
+        expectEqual(environment["WMUX_ZSH_ZDOTDIR"], nil)
+        expectFalse(protectedKeys.contains("WMUX_ZSH_ZDOTDIR"))
     }
 
     @Test
@@ -98,17 +98,17 @@ struct ShellStartupMatrixTests {
                 return """
                 # comment
 
-                export CMUX_TEST=1
+                export WMUX_TEST=1
                    # indented comment
                 cmux-test-command
                 """
             }
         )
 
-        expectEqual(environment["CMUX_LOAD_GHOSTTY_BASH_INTEGRATION"], nil)
-        expectEqual(environment["PROMPT_COMMAND"], "export CMUX_TEST=1\ncmux-test-command")
+        expectEqual(environment["WMUX_LOAD_GHOSTTY_BASH_INTEGRATION"], nil)
+        expectEqual(environment["PROMPT_COMMAND"], "export WMUX_TEST=1\ncmux-test-command")
         expectTrue(protectedKeys.contains("PROMPT_COMMAND"))
-        expectFalse(protectedKeys.contains("CMUX_LOAD_GHOSTTY_BASH_INTEGRATION"))
+        expectFalse(protectedKeys.contains("WMUX_LOAD_GHOSTTY_BASH_INTEGRATION"))
     }
 
     @Test
@@ -130,8 +130,8 @@ struct ShellStartupMatrixTests {
 
         expectEqual(command, TerminalSurface.managedFishShellCommand(shell: shell))
         expectEqual(environment["XDG_CONFIG_HOME"], "/Users/example/.config")
-        expectEqual(environment["CMUX_FISH_INTEGRATION_FILE"], "\(integrationDir)/fish/config.fish")
-        expectEqual(environment["CMUX_FISH_USER_CONFIG_ALREADY_LOADED"], "1")
+        expectEqual(environment["WMUX_FISH_INTEGRATION_FILE"], "\(integrationDir)/fish/config.fish")
+        expectEqual(environment["WMUX_FISH_USER_CONFIG_ALREADY_LOADED"], "1")
     }
 
     @Test
@@ -269,7 +269,7 @@ struct ShellStartupMatrixTests {
     @Test(arguments: [
         RemoteShellCase(name: "zsh", expectedArgs: "-il"),
         RemoteShellCase(name: "bash", expectedArgs: "--rcfile"),
-        RemoteShellCase(name: "fish", expectedArgs: "-il --init-command source \"$CMUX_FISH_INTEGRATION_FILE\""),
+        RemoteShellCase(name: "fish", expectedArgs: "-il --init-command source \"$WMUX_FISH_INTEGRATION_FILE\""),
         RemoteShellCase(name: "sh", expectedArgs: "-i"),
         RemoteShellCase(name: "dash", expectedArgs: "-i"),
         RemoteShellCase(name: "ksh", expectedArgs: "-i"),
@@ -283,24 +283,24 @@ struct ShellStartupMatrixTests {
         expectFalse(result.process.timedOut, result.process.stderr)
         expectTrue(result.capture.contains("ARGS=\(shellCase.expectedArgs)"), result.capture)
         expectTrue(result.capture.contains("PATH=\(result.home.path)/.cmux/bin:"), result.capture)
-        expectTrue(result.capture.contains("CMUX_SOCKET_PATH=127.0.0.1:64123"), result.capture)
+        expectTrue(result.capture.contains("WMUX_SOCKET_PATH=127.0.0.1:64123"), result.capture)
         expectTrue(result.capture.contains("GHOSTTY_SHELL_FEATURES=existing-feature,ssh-env,ssh-terminfo"), result.capture)
         expectTrue(result.capture.contains("PERSISTENT_PTY_EXEC_USED=yes"), result.capture)
 
         switch shellCase.name {
         case "zsh":
             expectTrue(result.capture.contains("ZDOTDIR=\(result.home.path)/.cmux/relay/64123.shell"), result.capture)
-            expectTrue(result.capture.contains("CMUX_REAL_ZDOTDIR=\(result.home.path)/user-zdotdir"), result.capture)
+            expectTrue(result.capture.contains("WMUX_REAL_ZDOTDIR=\(result.home.path)/user-zdotdir"), result.capture)
             expectTrue(result.capture.contains("ZSH_INTEGRATION_HAS_MARKER=yes"), result.capture)
         case "bash":
             expectTrue(result.capture.contains("BASH_INTEGRATION_HAS_MARKER=yes"), result.capture)
         case "fish":
-            expectTrue(result.capture.contains("CMUX_FISH_INTEGRATION_FILE=\(result.home.path)/.cmux/relay/64123.shell/fish/config.fish"), result.capture)
-            expectTrue(result.capture.contains("CMUX_FISH_USER_CONFIG_ALREADY_LOADED=1"), result.capture)
+            expectTrue(result.capture.contains("WMUX_FISH_INTEGRATION_FILE=\(result.home.path)/.cmux/relay/64123.shell/fish/config.fish"), result.capture)
+            expectTrue(result.capture.contains("WMUX_FISH_USER_CONFIG_ALREADY_LOADED=1"), result.capture)
             expectTrue(result.capture.contains("FISH_HAS_MARKER=yes"), result.capture)
         default:
-            expectTrue(result.capture.contains("CMUX_FISH_INTEGRATION_FILE=\n"), result.capture)
-            expectTrue(result.capture.contains("CMUX_REAL_ZDOTDIR=\n"), result.capture)
+            expectTrue(result.capture.contains("WMUX_FISH_INTEGRATION_FILE=\n"), result.capture)
+            expectTrue(result.capture.contains("WMUX_REAL_ZDOTDIR=\n"), result.capture)
         }
     }
 
@@ -341,7 +341,7 @@ struct ShellStartupMatrixTests {
         }
 
         let shellDir = home.appendingPathComponent(".cmux/relay/64123.shell")
-        let install = (["cmux_shell_dir=\"\(shellDir.path)\""]
+        let install = (["wmux_shell_dir=\"\(shellDir.path)\""]
             + RemoteInteractiveShellBootstrapBuilder.claudeWrapperInstallLines)
             .joined(separator: "\n")
         let wrapper = shellDir.appendingPathComponent("bin/cmux-claude-wrapper").path
@@ -522,7 +522,7 @@ struct ShellStartupMatrixTests {
             "PATH=/usr/bin:/bin:/usr/sbin:/sbin",
             "TERM=xterm-256color",
             "XDG_CONFIG_HOME=\(home.appendingPathComponent(".config").path)",
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER=\(persistentPTYExecHelper.path)",
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER=\(persistentPTYExecHelper.path)",
             "/bin/sh",
             "-c",
             script,
@@ -623,7 +623,7 @@ struct ShellStartupMatrixTests {
             terminfoSource: terminfoSource
         )
         let script = lines.joined(separator: "\n")
-            + "\nprintf 'CMUX_TERMINFO_TEST_TERM=%s\\n' \"$TERM\"\n"
+            + "\nprintf 'WMUX_TERMINFO_TEST_TERM=%s\\n' \"$TERM\"\n"
 
         // Isolate the terminfo search path so the host's real `xterm-ghostty`
         // entry can't be found: ncurses consults $TERMINFO, then $HOME/.terminfo,
@@ -646,7 +646,7 @@ struct ShellStartupMatrixTests {
         expectEqual(result.status, 0, result.stderr)
         expectFalse(result.timedOut, result.stderr)
         expectTrue(
-            result.stdout.contains("CMUX_TERMINFO_TEST_TERM=xterm-ghostty"),
+            result.stdout.contains("WMUX_TERMINFO_TEST_TERM=xterm-ghostty"),
             "remote bootstrap did not install xterm-ghostty terminfo before "
                 + "choosing TERM (stdout: \(result.stdout))"
         )
@@ -701,9 +701,9 @@ struct ShellStartupMatrixTests {
                 "GHOSTTY_SHELL_FEATURES": "existing-feature"
             ]),
             initialCommand: initialCommand,
-            bundledZshIntegration: "cmux_zsh_marker=1",
-            bundledBashIntegration: "cmux_bash_marker=1",
-            bundledFishIntegration: "set -gx CMUX_FISH_MARKER 1",
+            bundledZshIntegration: "wmux_zsh_marker=1",
+            bundledBashIntegration: "wmux_bash_marker=1",
+            bundledFishIntegration: "set -gx WMUX_FISH_MARKER 1",
             protectsFromHangup: true
         )
         if let workspaceID {
@@ -719,13 +719,13 @@ struct ShellStartupMatrixTests {
             "TERM=xterm-256color",
             "USER=\(NSUserName())",
             "ZDOTDIR=\(home.path)/user-zdotdir",
-            "CMUX_CAPTURE_PATH=\(capturePath.path)",
+            "WMUX_CAPTURE_PATH=\(capturePath.path)",
         ]
         if injectPersistentPTYExecHelper {
-            arguments.append("CMUX_PERSISTENT_PTY_EXEC_HELPER=\(persistentPTYExecHelper.path)")
+            arguments.append("WMUX_PERSISTENT_PTY_EXEC_HELPER=\(persistentPTYExecHelper.path)")
         }
         if let bootstrapTTY {
-            arguments.append("CMUX_BOOTSTRAP_TTY=\(bootstrapTTY)")
+            arguments.append("WMUX_BOOTSTRAP_TTY=\(bootstrapTTY)")
         }
         arguments += [
             "/bin/sh",
@@ -756,21 +756,21 @@ struct ShellStartupMatrixTests {
         {
           printf 'ARGS=%s\\n' "$*"
           printf 'PATH=%s\\n' "$PATH"
-          printf 'CMUX_SOCKET_PATH=%s\\n' "$CMUX_SOCKET_PATH"
+          printf 'WMUX_SOCKET_PATH=%s\\n' "$WMUX_SOCKET_PATH"
           printf 'GHOSTTY_SHELL_FEATURES=%s\\n' "$GHOSTTY_SHELL_FEATURES"
-          printf 'CMUX_SHELL_INTEGRATION_DIR=%s\\n' "$CMUX_SHELL_INTEGRATION_DIR"
+          printf 'WMUX_SHELL_INTEGRATION_DIR=%s\\n' "$WMUX_SHELL_INTEGRATION_DIR"
           printf 'ZDOTDIR=%s\\n' "$ZDOTDIR"
-          printf 'CMUX_REAL_ZDOTDIR=%s\\n' "$CMUX_REAL_ZDOTDIR"
-          printf 'CMUX_FISH_INTEGRATION_FILE=%s\\n' "$CMUX_FISH_INTEGRATION_FILE"
-          printf 'CMUX_FISH_USER_CONFIG_ALREADY_LOADED=%s\\n' "$CMUX_FISH_USER_CONFIG_ALREADY_LOADED"
-          printf 'PERSISTENT_PTY_EXEC_USED=%s\\n' "$CMUX_TEST_PERSISTENT_PTY_EXEC_USED"
-          if [ -r "$CMUX_SHELL_INTEGRATION_DIR/cmux-zsh-integration.zsh" ] && grep -q 'cmux_zsh_marker=1' "$CMUX_SHELL_INTEGRATION_DIR/cmux-zsh-integration.zsh"; then
+          printf 'WMUX_REAL_ZDOTDIR=%s\\n' "$WMUX_REAL_ZDOTDIR"
+          printf 'WMUX_FISH_INTEGRATION_FILE=%s\\n' "$WMUX_FISH_INTEGRATION_FILE"
+          printf 'WMUX_FISH_USER_CONFIG_ALREADY_LOADED=%s\\n' "$WMUX_FISH_USER_CONFIG_ALREADY_LOADED"
+          printf 'PERSISTENT_PTY_EXEC_USED=%s\\n' "$WMUX_TEST_PERSISTENT_PTY_EXEC_USED"
+          if [ -r "$WMUX_SHELL_INTEGRATION_DIR/cmux-zsh-integration.zsh" ] && grep -q 'wmux_zsh_marker=1' "$WMUX_SHELL_INTEGRATION_DIR/cmux-zsh-integration.zsh"; then
             printf 'ZSH_INTEGRATION_HAS_MARKER=yes\\n'
           fi
-          if [ -r "$CMUX_SHELL_INTEGRATION_DIR/cmux-bash-integration.bash" ] && grep -q 'cmux_bash_marker=1' "$CMUX_SHELL_INTEGRATION_DIR/cmux-bash-integration.bash"; then
+          if [ -r "$WMUX_SHELL_INTEGRATION_DIR/cmux-bash-integration.bash" ] && grep -q 'wmux_bash_marker=1' "$WMUX_SHELL_INTEGRATION_DIR/cmux-bash-integration.bash"; then
             printf 'BASH_INTEGRATION_HAS_MARKER=yes\\n'
           fi
-          if [ -r "$CMUX_FISH_INTEGRATION_FILE" ] && grep -q 'CMUX_FISH_MARKER' "$CMUX_FISH_INTEGRATION_FILE"; then
+          if [ -r "$WMUX_FISH_INTEGRATION_FILE" ] && grep -q 'WMUX_FISH_MARKER' "$WMUX_FISH_INTEGRATION_FILE"; then
             printf 'FISH_HAS_MARKER=yes\\n'
           fi
         } > "\(capturePath.path)"
@@ -789,7 +789,7 @@ struct ShellStartupMatrixTests {
         shift
         [ "${1:-}" = "$executable" ] || exit 2
         shift
-        export CMUX_TEST_PERSISTENT_PTY_EXEC_USED=yes
+        export WMUX_TEST_PERSISTENT_PTY_EXEC_USED=yes
         exec "$executable" "$@"
         """
         .write(to: url, atomically: true, encoding: .utf8)

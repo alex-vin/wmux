@@ -1,8 +1,8 @@
 import AppKit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -306,7 +306,7 @@ private final class SettingsNavigationTargetRecorder: NSObject {
 }
 
 /// Counts settings sidebar-toggle request posts on the main actor. Uses the
-/// raw notification name (the stable contract with CmuxSettingsUI's
+/// raw notification name (the stable contract with WmuxSettingsUI's
 /// `SettingsWindowRoot.sidebarToggleRequestName`) so the test target does not
 /// depend on package-symbol visibility, which differs across toolchains.
 @MainActor

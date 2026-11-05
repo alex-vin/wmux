@@ -1,12 +1,12 @@
-#if canImport(CmuxComputerUse)
-@testable import CmuxComputerUse
+#if canImport(WmuxComputerUse)
+@testable import WmuxComputerUse
 import AppKit
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -44,7 +44,7 @@ extension ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "permission-replacement"],
+            environment: ["WMUX_TAG": "permission-replacement"],
             authenticationToken: "permission-test-token"
         )
         let runtime = ComputerUseRuntimeService(

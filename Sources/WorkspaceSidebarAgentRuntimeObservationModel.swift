@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Observation

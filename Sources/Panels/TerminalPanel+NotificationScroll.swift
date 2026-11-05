@@ -1,5 +1,5 @@
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 
 @MainActor
 extension TerminalPanel {

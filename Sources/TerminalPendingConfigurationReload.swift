@@ -1,4 +1,4 @@
-import CmuxTerminalCore
+import WmuxTerminalCore
 
 /// Coalesced request waiting to replace Ghostty's runtime configuration.
 ///

@@ -1,10 +1,10 @@
 import XCTest
 import AppKit
 import ObjectiveC.runtime
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1750,7 +1750,7 @@ final class GhosttyKeyEquivalentRegressionTests: XCTestCase {
             """
         ]
         process.environment = [
-            "CMUX_TEST_FORCE_KEYBOARD_RESET": "1"
+            "WMUX_TEST_FORCE_KEYBOARD_RESET": "1"
         ]
         let output = Pipe()
         process.standardOutput = output
@@ -1890,7 +1890,7 @@ final class GhosttyKeyEquivalentRegressionTests: XCTestCase {
 
     func testStaleKittyKeyboardAfterClearHistoryDoesNotEncodePlainLetterAsCSIU() async throws {
         try await AppContextSerialGate.withExclusiveAppContext {
-            let captureMarker = "CMUX_KBD_HEX_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+            let captureMarker = "WMUX_KBD_HEX_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
             let scriptURL = FileManager.default.temporaryDirectory
                 .appendingPathComponent("cmux-kbd-capture-\(UUID().uuidString).py")
             let readyURL = scriptURL.appendingPathExtension("ready")

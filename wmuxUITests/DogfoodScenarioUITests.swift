@@ -48,12 +48,12 @@ final class DogfoodScenarioUITests: XCTestCase {
     }
 
     func testRunScenario() throws {
-        guard let encoded = ProcessInfo.processInfo.environment["CMUX_DOGFOOD_SCENARIO_B64"],
+        guard let encoded = ProcessInfo.processInfo.environment["WMUX_DOGFOOD_SCENARIO_B64"],
               !encoded.isEmpty else {
             throw XCTSkip("No dogfood scenario; dispatch with scripts/run-e2e.sh --scenario <file>")
         }
         guard let data = Data(base64Encoded: encoded, options: .ignoreUnknownCharacters) else {
-            XCTFail("CMUX_DOGFOOD_SCENARIO_B64 is not base64")
+            XCTFail("WMUX_DOGFOOD_SCENARIO_B64 is not base64")
             return
         }
         let scenario = try DogfoodScenario.decode(data)
@@ -68,13 +68,13 @@ final class DogfoodScenarioUITests: XCTestCase {
         ] + scenario.launchArguments
         // The environment overrides beat the settings file and defaults; on
         // the first live tour the launch argument alone left the socket off.
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
         if let path = ProcessInfo.processInfo.environment["PATH"], !path.isEmpty {
             app.launchEnvironment["PATH"] = path
         }

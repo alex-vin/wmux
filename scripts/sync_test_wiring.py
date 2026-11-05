@@ -16,7 +16,7 @@ from typing import Iterable
 ID_PATTERN = r"[A-Za-z0-9]+"
 DIRECT_SOURCE_TREE = "<group>"
 TARGET_NAME = "cmuxTests"
-PROJECT_RELATIVE_PATH = Path("cmux.xcodeproj/project.pbxproj")
+PROJECT_RELATIVE_PATH = Path("wmux.xcodeproj/project.pbxproj")
 TESTS_RELATIVE_PATH = Path("cmuxTests")
 
 

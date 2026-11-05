@@ -1,10 +1,10 @@
-import CMUXAgentLaunch
-import CmuxAgentChat
+import WMUXAgentLaunch
+import WmuxAgentChat
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -56,10 +56,10 @@ struct SessionEntryResumeLaunchTests {
 
     @Test("Registered Vault agents use structured restore argv")
     func registeredAgentUsesStructuredRestore() throws {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "my-agent",
             name: "My Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "my-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "my-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "{{executable}} --session {{sessionId}} --profile fast",
             cwd: .preserve
@@ -96,10 +96,10 @@ struct SessionEntryResumeLaunchTests {
 
     @Test("Unencodable custom Vault kinds use the explicit legacy strategy")
     func unencodableCustomKindUsesLegacyFallback() throws {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "legacy agent",
             name: "Legacy Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "legacy-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "legacy-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "{{executable}} --session {{sessionId}}",
             cwd: .preserve

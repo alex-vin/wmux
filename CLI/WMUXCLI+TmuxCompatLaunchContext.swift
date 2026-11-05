@@ -58,8 +58,8 @@ extension WMUXCLI {
         // closed before opening the socket. In particular, never borrow system-wide focus
         // from `system.identify`: a command started in Terminal.app must not target an
         // unrelated cmux surface merely because that surface happens to be focused.
-        let ownWorkspace = normalizedTmuxTarget(processEnvironment["CMUX_WORKSPACE_ID"])
-        let ownSurface = normalizedTmuxTarget(processEnvironment["CMUX_SURFACE_ID"])
+        let ownWorkspace = normalizedTmuxTarget(processEnvironment["WMUX_WORKSPACE_ID"])
+        let ownSurface = normalizedTmuxTarget(processEnvironment["WMUX_SURFACE_ID"])
         guard let ownSurface else { return nil }
 
         let socketPath = try tmuxCompatResolvedSocketPath(processEnvironment: processEnvironment)
@@ -184,27 +184,27 @@ extension WMUXCLI {
     ) -> [String: String] {
         var environment = processEnvironment
         if let launchContext {
-            environment["CMUX_WORKSPACE_ID"] = launchContext.workspaceId
-            environment["CMUX_TAB_ID"] = launchContext.workspaceId
+            environment["WMUX_WORKSPACE_ID"] = launchContext.workspaceId
+            environment["WMUX_TAB_ID"] = launchContext.workspaceId
             if let surfaceId = launchContext.surfaceId {
-                environment["CMUX_SURFACE_ID"] = surfaceId
-                environment["CMUX_PANEL_ID"] = surfaceId
+                environment["WMUX_SURFACE_ID"] = surfaceId
+                environment["WMUX_PANEL_ID"] = surfaceId
             } else {
-                environment.removeValue(forKey: "CMUX_SURFACE_ID")
-                environment.removeValue(forKey: "CMUX_PANEL_ID")
+                environment.removeValue(forKey: "WMUX_SURFACE_ID")
+                environment.removeValue(forKey: "WMUX_PANEL_ID")
             }
             if let paneId = launchContext.paneId {
-                environment["CMUX_PANE_ID"] = paneId
+                environment["WMUX_PANE_ID"] = paneId
             } else {
-                environment.removeValue(forKey: "CMUX_PANE_ID")
+                environment.removeValue(forKey: "WMUX_PANE_ID")
             }
         } else {
             for key in [
-                "CMUX_WORKSPACE_ID",
-                "CMUX_SURFACE_ID",
-                "CMUX_PANEL_ID",
-                "CMUX_TAB_ID",
-                "CMUX_PANE_ID",
+                "WMUX_WORKSPACE_ID",
+                "WMUX_SURFACE_ID",
+                "WMUX_PANEL_ID",
+                "WMUX_TAB_ID",
+                "WMUX_PANE_ID",
             ] {
                 environment.removeValue(forKey: key)
             }
@@ -224,8 +224,8 @@ extension WMUXCLI {
         let script = """
         #!/usr/bin/env bash
         set -euo pipefail
-        if [[ -n "${CMUX_CLAUDE_TEAMS_CMUX_BIN:-}" ]]; then
-          exec "$CMUX_CLAUDE_TEAMS_CMUX_BIN" __tmux-compat "$@"
+        if [[ -n "${WMUX_CLAUDE_TEAMS_CMUX_BIN:-}" ]]; then
+          exec "$WMUX_CLAUDE_TEAMS_CMUX_BIN" __tmux-compat "$@"
         fi
 
         # This shim lives in a persistent per-surface PATH directory. Outside the
@@ -309,8 +309,8 @@ extension WMUXCLI {
         // so the toggle disables session tracking without disabling Teams (#17571).
         // Claude shim keys are ignored here: the app exports none for this surface,
         // so any present were inherited from a parent cmux surface.
-        if processEnvironment["CMUX_CLAUDE_INTEGRATION_DISABLED"] == "1" {
-            guard let rawRoot = normalizedTmuxTarget(processEnvironment["CMUX_AGENT_COMMAND_SHIM_ROOT"]),
+        if processEnvironment["WMUX_CLAUDE_INTEGRATION_DISABLED"] == "1" {
+            guard let rawRoot = normalizedTmuxTarget(processEnvironment["WMUX_AGENT_COMMAND_SHIM_ROOT"]),
                   let managedRoot = claudeTeamsManagedShimRoot(
                       rawRoot: rawRoot,
                       surfaceId: surfaceId,
@@ -321,8 +321,8 @@ extension WMUXCLI {
             return ClaudeTeamsShimPlan(directory: managedRoot, managedClaudeWrapperURL: nil)
         }
 
-        guard let rawRoot = normalizedTmuxTarget(processEnvironment["CMUX_CLAUDE_WRAPPER_SHIM_ROOT"]),
-              let rawClaudeShim = normalizedTmuxTarget(processEnvironment["CMUX_CLAUDE_WRAPPER_SHIM"]) else {
+        guard let rawRoot = normalizedTmuxTarget(processEnvironment["WMUX_CLAUDE_WRAPPER_SHIM_ROOT"]),
+              let rawClaudeShim = normalizedTmuxTarget(processEnvironment["WMUX_CLAUDE_WRAPPER_SHIM"]) else {
             return nil
         }
         let claudeShim = URL(fileURLWithPath: rawClaudeShim, isDirectory: false).standardizedFileURL

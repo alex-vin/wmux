@@ -1,6 +1,6 @@
 import AppKit
-import CmuxSettings
-import CmuxTerminal
+import WmuxSettings
+import WmuxTerminal
 import WebKit
 
 struct ShortcutEventFocusContext {
@@ -98,8 +98,8 @@ struct ShortcutEventAlternateScreenCache {
 }
 
 extension Notification.Name {
-    static let debugBrowserReloadShortcutInvoked = Notification.Name("cmux.debugBrowserReloadShortcutInvoked")
-    static let debugBrowserHardReloadShortcutInvoked = Notification.Name("cmux.debugBrowserHardReloadShortcutInvoked")
+    static let debugBrowserReloadShortcutInvoked = Notification.Name("wmux.debugBrowserReloadShortcutInvoked")
+    static let debugBrowserHardReloadShortcutInvoked = Notification.Name("wmux.debugBrowserHardReloadShortcutInvoked")
 }
 
 extension AppDelegate {

@@ -1,15 +1,15 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 /// The command family sharing surface-selector and restore-record semantics.
-enum CMUXCLIContinuationVerb: String, Sendable {
+enum WMUXCLIContinuationVerb: String, Sendable {
     case restore
     case fork
 
     var commandName: String { rawValue }
 }
 
-enum CMUXCLIContinuationErrorKind: Sendable, Equatable {
+enum WMUXCLIContinuationErrorKind: Sendable, Equatable {
     case checkpointNotFound
     case surfaceUsage
     case positionalUsage
@@ -27,7 +27,7 @@ extension WMUXCLI {
         client: SocketClient,
         processEnvironment: [String: String]
     ) async throws {
-        if command == CMUXCLIContinuationVerb.fork.commandName {
+        if command == WMUXCLIContinuationVerb.fork.commandName {
             try await runForkCommand(
                 commandArgs: commandArgs,
                 client: client,
@@ -48,7 +48,7 @@ extension WMUXCLI {
         error: Error
     ) -> CLIError {
         let detail = String(reflecting: error)
-        if command == CMUXCLIContinuationVerb.fork.commandName {
+        if command == WMUXCLIContinuationVerb.fork.commandName {
             return loggedForkError(
                 .socketNotReady,
                 stage: "socket.startup",
@@ -68,7 +68,7 @@ extension WMUXCLI {
     /// Parses the selector grammar shared by `cmux restore` and `cmux fork`.
     func continuationSelector(
         _ arguments: [String],
-        verb: CMUXCLIContinuationVerb
+        verb: WMUXCLIContinuationVerb
     ) throws -> RestoreSelector {
         if arguments == ["--surface"] {
             return RestoreSelector(
@@ -116,8 +116,8 @@ extension WMUXCLI {
 
     /// Returns the localized parser error for one continuation verb.
     func continuationUsageError(
-        _ kind: CMUXCLIContinuationErrorKind,
-        verb: CMUXCLIContinuationVerb
+        _ kind: WMUXCLIContinuationErrorKind,
+        verb: WMUXCLIContinuationVerb
     ) -> CLIError {
         switch (verb, kind) {
         case (.restore, .checkpointNotFound):
@@ -203,8 +203,8 @@ extension WMUXCLI {
 
     /// Logs a continuation failure while selecting the command-specific localized message.
     func loggedContinuationError(
-        _ kind: CMUXCLIContinuationErrorKind,
-        verb: CMUXCLIContinuationVerb,
+        _ kind: WMUXCLIContinuationErrorKind,
+        verb: WMUXCLIContinuationVerb,
         stage: String,
         detail: String = "none",
         errorCode: Int32? = nil
@@ -229,7 +229,7 @@ extension WMUXCLI {
         for selector: RestoreSelector,
         client: SocketClient,
         processEnvironment: [String: String],
-        verb: CMUXCLIContinuationVerb
+        verb: WMUXCLIContinuationVerb
     ) throws -> String {
         if let surface = selector.surface {
             let surfaceID: String?
@@ -298,7 +298,7 @@ extension WMUXCLI {
     func continuationSurfaceResumePayload(
         surfaceID: String,
         client: SocketClient,
-        verb: CMUXCLIContinuationVerb,
+        verb: WMUXCLIContinuationVerb,
         deadline: Date? = nil
     ) throws -> [String: Any] {
         do {
@@ -339,7 +339,7 @@ extension WMUXCLI {
         _ record: RestoreRecord,
         surfaceID: String,
         processEnvironment: [String: String],
-        verb: CMUXCLIContinuationVerb
+        verb: WMUXCLIContinuationVerb
     ) async throws -> RestoreRecord {
         guard record.kind == "hermes-agent",
               let checkpointID = record.checkpointID,

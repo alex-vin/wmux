@@ -1,5 +1,5 @@
-import CmuxSettings
-import CmuxNotifications
+import WmuxSettings
+import WmuxNotifications
 import Foundation
 
 /// Applies agent notification policy and publishes accepted events through the shared mutation bus.

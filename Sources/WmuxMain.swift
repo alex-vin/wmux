@@ -1,5 +1,5 @@
 import Bonsplit
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import SwiftUI
 
@@ -15,7 +15,7 @@ import SwiftUI
 /// - the interpreter worker (stage-1 fallback path) runs before any
 ///   AppKit/SwiftUI setup.
 @main
-enum CmuxMain {
+enum WmuxMain {
     /// Raises inherited descriptor limits before receipt writing or worker routing.
     static func main() {
         // First: nothing may read preferences before an app-host test process
@@ -35,7 +35,7 @@ enum CmuxMain {
             AppHostProcessReceipt.writeIfRequired()
         },
         routeWorkers: () -> Void = {
-            CmuxWorkerEntrypoint(arguments: CommandLine.arguments).runIfRequested()
+            WmuxWorkerEntrypoint(arguments: CommandLine.arguments).runIfRequested()
         },
         preloadSigningSecret: () -> Void = {
             SurfaceResumeApprovalStore.preloadSigningSecret()

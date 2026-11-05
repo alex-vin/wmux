@@ -1,6 +1,6 @@
 import AVFoundation
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 import Foundation
 import os
 

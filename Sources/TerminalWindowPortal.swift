@@ -1,11 +1,11 @@
 import AppKit
-import CMUXMobileCore
+import WMUXMobileCore
 import ObjectiveC
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxTerminal
-import CmuxTerminalCore
-import CmuxControlSocket
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxTerminal
+import WmuxTerminalCore
+import WmuxControlSocket
 import Bonsplit
 
 private var cmuxWindowTerminalPortalKey: UInt8 = 0
@@ -681,15 +681,15 @@ private final class PaneSwapSelectionOverlayView: NSView {
 
         drawHighlight(
             frame: sourceFrame,
-            color: (AppDelegate.shared?.accentColor ?? CmuxAccentColor()).nsColor(for: effectiveAppearance),
-            title: CmuxPaneSwapStrings().source,
+            color: (AppDelegate.shared?.accentColor ?? WmuxAccentColor()).nsColor(for: effectiveAppearance),
+            title: WmuxPaneSwapStrings().source,
             dirtyRect: dirtyRect
         )
         if let targetFrame {
             drawHighlight(
                 frame: targetFrame,
                 color: .systemGreen,
-                title: CmuxPaneSwapStrings().swapHere,
+                title: WmuxPaneSwapStrings().swapHere,
                 dirtyRect: dirtyRect
             )
         }
@@ -823,7 +823,7 @@ final class WindowTerminalPortal: NSObject {
     private static let minimumRevealWidth: CGFloat = 24
     private static let minimumRevealHeight: CGFloat = 18
     private static let transientRecoveryRetryBudget: Int = 12
-#if CMUX_ISSUE_483_PORTAL_RECOVERY
+#if WMUX_ISSUE_483_PORTAL_RECOVERY
     private static let transientRecoveryEnabled = true
 #else
     private static let transientRecoveryEnabled = false
@@ -3461,5 +3461,5 @@ extension Notification.Name {
     /// end path so every drag-end route (tracker, legacy gesture, failsafe)
     /// reaches observers.
     static let cmuxInteractiveGeometryResizeDidEnd =
-        Notification.Name("cmux.interactiveGeometryResizeDidEnd")
+        Notification.Name("wmux.interactiveGeometryResizeDidEnd")
 }

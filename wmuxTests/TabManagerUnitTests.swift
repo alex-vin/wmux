@@ -1,5 +1,5 @@
 import XCTest
-import CmuxCore
+import WmuxCore
 import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
@@ -7,14 +7,14 @@ import WebKit
 import ObjectiveC.runtime
 import Bonsplit
 import UserNotifications
-import CmuxGit
-import CmuxSidebarGit
-import CmuxSidebar
-import CmuxTerminal
-import CmuxSettings
+import WmuxGit
+import WmuxSidebarGit
+import WmuxSidebar
+import WmuxTerminal
+import WmuxSettings
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1075,8 +1075,8 @@ final class TabManagerWorkspaceOwnershipTests: XCTestCase {
 @MainActor
 final class TabManagerPullRequestProbeTests: XCTestCase {
 
-    // Pure pull-request selection/policy tests moved to the CmuxGit package
-    // (CmuxGitTests.PullRequestProbeServiceTests) with the extraction.
+    // Pure pull-request selection/policy tests moved to the WmuxGit package
+    // (WmuxGitTests.PullRequestProbeServiceTests) with the extraction.
 
     func testTrackedWorkspaceGitMetadataPollCandidatesIncludeMainAndMasterPanels() throws {
         let manager = TabManager()
@@ -1442,8 +1442,8 @@ final class TabManagerPullRequestProbeTests: XCTestCase {
     }
 
     // testResolvedCommandPathFallsBackOutsideAppPATH moved to
-    // CmuxProcessTests.resolvesCommandViaFallbackDirectoryOutsidePath when the
-    // command runner was extracted into the CmuxProcess package.
+    // WmuxProcessTests.resolvesCommandViaFallbackDirectoryOutsidePath when the
+    // command runner was extracted into the WmuxProcess package.
 
     func testPeriodicWorkspaceGitMetadataRefreshClearsStalePullRequestAfterBranchReset() throws {
         let fileManager = FileManager.default
@@ -3521,16 +3521,16 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
         }
 
         workspace.applyCustomLayout(
-            .split(CmuxSplitDefinition(
+            .split(WmuxSplitDefinition(
                 direction: .horizontal,
                 split: 0.2,
                 children: [
-                    .pane(CmuxPaneDefinition(surfaces: [
-                        CmuxSurfaceDefinition(type: .terminal, name: "Terminal A"),
-                        CmuxSurfaceDefinition(type: .terminal, name: "Terminal B")
+                    .pane(WmuxPaneDefinition(surfaces: [
+                        WmuxSurfaceDefinition(type: .terminal, name: "Terminal A"),
+                        WmuxSurfaceDefinition(type: .terminal, name: "Terminal B")
                     ])),
-                    .pane(CmuxPaneDefinition(surfaces: [
-                        CmuxSurfaceDefinition(type: .browser, name: "Browser", url: "https://example.com")
+                    .pane(WmuxPaneDefinition(surfaces: [
+                        WmuxSurfaceDefinition(type: .browser, name: "Browser", url: "https://example.com")
                     ]))
                 ]
             )),
@@ -3561,22 +3561,22 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
         }
 
         workspace.applyCustomLayout(
-            .split(CmuxSplitDefinition(
+            .split(WmuxSplitDefinition(
                 direction: .horizontal,
                 split: 0.2,
                 children: [
-                    .pane(CmuxPaneDefinition(surfaces: [
-                        CmuxSurfaceDefinition(type: .terminal, name: "Left")
+                    .pane(WmuxPaneDefinition(surfaces: [
+                        WmuxSurfaceDefinition(type: .terminal, name: "Left")
                     ])),
-                    .split(CmuxSplitDefinition(
+                    .split(WmuxSplitDefinition(
                         direction: .horizontal,
                         split: 0.8,
                         children: [
-                            .pane(CmuxPaneDefinition(surfaces: [
-                                CmuxSurfaceDefinition(type: .terminal, name: "Middle")
+                            .pane(WmuxPaneDefinition(surfaces: [
+                                WmuxSurfaceDefinition(type: .terminal, name: "Middle")
                             ])),
-                            .pane(CmuxPaneDefinition(surfaces: [
-                                CmuxSurfaceDefinition(type: .browser, name: "Right", url: "https://example.com")
+                            .pane(WmuxPaneDefinition(surfaces: [
+                                WmuxSurfaceDefinition(type: .browser, name: "Right", url: "https://example.com")
                             ]))
                         ]
                     ))
@@ -3606,24 +3606,24 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
         }
 
         workspace.applyCustomLayout(
-            .split(CmuxSplitDefinition(
+            .split(WmuxSplitDefinition(
                 direction: .horizontal,
                 split: 0.2,
                 children: [
-                    .split(CmuxSplitDefinition(
+                    .split(WmuxSplitDefinition(
                         direction: .vertical,
                         split: 0.8,
                         children: [
-                            .pane(CmuxPaneDefinition(surfaces: [
-                                CmuxSurfaceDefinition(type: .terminal, name: "Top Terminal")
+                            .pane(WmuxPaneDefinition(surfaces: [
+                                WmuxSurfaceDefinition(type: .terminal, name: "Top Terminal")
                             ])),
-                            .pane(CmuxPaneDefinition(surfaces: [
-                                CmuxSurfaceDefinition(type: .terminal, name: "Bottom Terminal")
+                            .pane(WmuxPaneDefinition(surfaces: [
+                                WmuxSurfaceDefinition(type: .terminal, name: "Bottom Terminal")
                             ]))
                         ]
                     )),
-                    .pane(CmuxPaneDefinition(surfaces: [
-                        CmuxSurfaceDefinition(type: .browser, name: "Browser", url: "https://example.com")
+                    .pane(WmuxPaneDefinition(surfaces: [
+                        WmuxSurfaceDefinition(type: .browser, name: "Browser", url: "https://example.com")
                     ]))
                 ]
             )),
@@ -3651,33 +3651,33 @@ final class TabManagerEqualizeSplitsTests: XCTestCase {
         }
 
         workspace.applyCustomLayout(
-            .split(CmuxSplitDefinition(
+            .split(WmuxSplitDefinition(
                 direction: .horizontal,
                 split: 0.2,
                 children: [
-                    .split(CmuxSplitDefinition(
+                    .split(WmuxSplitDefinition(
                         direction: .vertical,
                         split: 0.8,
                         children: [
-                            .split(CmuxSplitDefinition(
+                            .split(WmuxSplitDefinition(
                                 direction: .horizontal,
                                 split: 0.8,
                                 children: [
-                                    .pane(CmuxPaneDefinition(surfaces: [
-                                        CmuxSurfaceDefinition(type: .terminal, name: "Top Left")
+                                    .pane(WmuxPaneDefinition(surfaces: [
+                                        WmuxSurfaceDefinition(type: .terminal, name: "Top Left")
                                     ])),
-                                    .pane(CmuxPaneDefinition(surfaces: [
-                                        CmuxSurfaceDefinition(type: .terminal, name: "Top Right")
+                                    .pane(WmuxPaneDefinition(surfaces: [
+                                        WmuxSurfaceDefinition(type: .terminal, name: "Top Right")
                                     ]))
                                 ]
                             )),
-                            .pane(CmuxPaneDefinition(surfaces: [
-                                CmuxSurfaceDefinition(type: .terminal, name: "Bottom")
+                            .pane(WmuxPaneDefinition(surfaces: [
+                                WmuxSurfaceDefinition(type: .terminal, name: "Bottom")
                             ]))
                         ]
                     )),
-                    .pane(CmuxPaneDefinition(surfaces: [
-                        CmuxSurfaceDefinition(type: .browser, name: "Browser", url: "https://example.com")
+                    .pane(WmuxPaneDefinition(surfaces: [
+                        WmuxSurfaceDefinition(type: .browser, name: "Browser", url: "https://example.com")
                     ]))
                 ]
             )),

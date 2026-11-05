@@ -1,6 +1,6 @@
 import AppKit
 import CoreGraphics
-import CmuxWindowing
+import WmuxWindowing
 import Foundation
 
 // CoreGraphics requires a C callback; this trampoline only forwards to AppDelegate on the main queue.
@@ -181,7 +181,7 @@ extension AppDelegate {
         // below because their frame is owned by AppKit's Space machinery.
         let mainWindows = mainWindowsForVisibilityController()
         for window in mainWindows {
-            guard let window = window as? CmuxMainWindow else { continue }
+            guard let window = window as? WmuxMainWindow else { continue }
             // AppKit owns inactive-Space placement while it restores a display
             // topology. Setting a frame on those windows moves them onto the
             // currently visible Space instead of letting macOS restore them.
@@ -209,7 +209,7 @@ extension AppDelegate {
         // Keep inactive-Space windows out of the fit pass for the same reason:
         // the reconciler applies frames even when reachability needed no fix.
         let activeSpaceWindows = mainWindows.filter { window in
-            guard let window = window as? CmuxMainWindow else { return false }
+            guard let window = window as? WmuxMainWindow else { return false }
             return Self.shouldReconcileWindowAfterScreenChange(
                 isOnActiveSpace: window.isOnActiveSpace
             )
@@ -239,7 +239,7 @@ extension AppDelegate {
         displays: (available: [SessionDisplayGeometry], fallback: SessionDisplayGeometry?)
     ) {
         for window in mainWindowsForVisibilityController() {
-            guard let window = window as? CmuxMainWindow else { continue }
+            guard let window = window as? WmuxMainWindow else { continue }
             guard !window.styleMask.contains(.fullScreen) else { continue }
             guard Self.shouldReconcileWindowAfterScreenChange(
                 isOnActiveSpace: window.isOnActiveSpace

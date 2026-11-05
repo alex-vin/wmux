@@ -2,8 +2,8 @@ import AppKit
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -133,7 +133,7 @@ struct SidebarEmptyAreaNewWorkspaceActionTests {
 
     @MainActor
     private struct ConfigFixture {
-        let store: CmuxConfigStore
+        let store: WmuxConfigStore
         private let root: URL
 
         init(globalJSON: String) throws {
@@ -144,7 +144,7 @@ struct SidebarEmptyAreaNewWorkspaceActionTests {
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
             let globalConfigURL = root.appendingPathComponent("cmux.json")
             try globalJSON.write(to: globalConfigURL, atomically: true, encoding: .utf8)
-            let store = CmuxConfigStore(
+            let store = WmuxConfigStore(
                 globalConfigPath: globalConfigURL.path,
                 localConfigPath: nil,
                 startFileWatchers: false

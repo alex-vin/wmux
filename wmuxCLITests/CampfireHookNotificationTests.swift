@@ -173,10 +173,10 @@ struct CampfireHookNotificationTests {
         arguments: [String]? = nil
     ) -> [String: String] {
         [
-            "CMUX_AGENT_LAUNCH_KIND": kind,
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": executable,
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(arguments ?? [executable]),
+            "WMUX_AGENT_LAUNCH_KIND": kind,
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": executable,
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(arguments ?? [executable]),
         ]
     }
 
@@ -191,11 +191,11 @@ struct CampfireHookNotificationTests {
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": context.root.path,
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": context.workspaceId,
-            "CMUX_SURFACE_ID": context.surfaceId,
-            "CMUX_AGENT_HOOK_STATE_DIR": context.root.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": context.workspaceId,
+            "WMUX_SURFACE_ID": context.surfaceId,
+            "WMUX_AGENT_HOOK_STATE_DIR": context.root.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         environment.merge(extraEnvironment, uniquingKeysWith: { _, new in new })
 

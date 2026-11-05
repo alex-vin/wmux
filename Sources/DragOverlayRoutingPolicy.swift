@@ -1,7 +1,7 @@
 import AppKit
 import Bonsplit
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 
 enum FileDropResolvedBehavior: Equatable {
     case text

@@ -140,14 +140,14 @@ extension WMUXCLI {
             }
             baseParams["max_output"] = value
         }
-        // `--workspace` must exist. `CMUX_WORKSPACE_ID` is only a hint: it can
+        // `--workspace` must exist. `WMUX_WORKSPACE_ID` is only a hint: it can
         // come from another cmux instance, so the app falls back to the
         // focused workspace when it does not know the id.
         if let workspaceOption, !workspaceOption.isEmpty {
             if let workspace = try normalizeWorkspaceHandle(workspaceOption, client: client) {
                 baseParams["workspace_id"] = workspace
             }
-        } else if let caller = ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"]?
+        } else if let caller = ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
             UUID(uuidString: caller) != nil {
             baseParams["caller_workspace_id"] = caller
@@ -333,10 +333,10 @@ extension WMUXCLI {
     }
 
     /// The guide shipped with the runtime (`browser-repl/guide.md` in the
-    /// enclosing app, or `CMUX_BROWSER_REPL_RUNTIME_DIR`), else the built-in text.
+    /// enclosing app, or `WMUX_BROWSER_REPL_RUNTIME_DIR`), else the built-in text.
     static func browserReplGuideText() -> String {
         var directories: [URL] = []
-        if let override = ProcessInfo.processInfo.environment["CMUX_BROWSER_REPL_RUNTIME_DIR"], !override.isEmpty {
+        if let override = ProcessInfo.processInfo.environment["WMUX_BROWSER_REPL_RUNTIME_DIR"], !override.isEmpty {
             directories.append(URL(fileURLWithPath: override, isDirectory: true))
         }
         if let app = CLIExecutableLocator.enclosingAppBundle(), let resources = app.resourceURL {

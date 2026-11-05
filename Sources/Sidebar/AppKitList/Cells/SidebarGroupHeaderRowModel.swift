@@ -1,6 +1,6 @@
 import AppKit
 import CoreGraphics
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import SwiftUI
 
@@ -43,7 +43,7 @@ struct SidebarGroupHeaderRowModel: Equatable, Hashable {
     let shortcutHintYOffset: Double
     let fontScale: CGFloat
     let globalFontMagnificationPercent: Int
-    let cwdContextMenuItems: [CmuxResolvedConfigContextMenuItem]
+    let cwdContextMenuItems: [WmuxResolvedConfigContextMenuItem]
     let rowSpacing: CGFloat
     let isFirstRow: Bool
     let isBeingDragged: Bool
@@ -54,7 +54,7 @@ struct SidebarGroupHeaderRowModel: Equatable, Hashable {
     /// Notification Badge color setting; nil falls back to the cmux accent.
     let notificationBadgeColorHex: String?
     /// Resolved cmux accent for the badge fallback and drop indicators.
-    var accentColor = CmuxAccentColor()
+    var accentColor = WmuxAccentColor()
 }
 
 /// Behavior bundle for one group header row; recreated per apply and excluded
@@ -64,7 +64,7 @@ struct SidebarGroupHeaderRowActions {
     let onToggleCollapsed: () -> Void
     let onFocusAnchor: (NSEvent.ModifierFlags) -> Void
     let onTapPlus: () -> Void
-    let onRunResolvedItem: (CmuxResolvedConfigMenuAction) -> Void
+    let onRunResolvedItem: (WmuxResolvedConfigMenuAction) -> Void
     let onRename: () -> Void
     let onTogglePinned: () -> Void
     let onMarkRead: () -> Void

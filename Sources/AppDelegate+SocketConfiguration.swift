@@ -1,5 +1,5 @@
-import CmuxControlSocket
-import CmuxSettings
+import WmuxControlSocket
+import WmuxSettings
 import Foundation
 
 extension AppDelegate {
@@ -13,7 +13,7 @@ extension AppDelegate {
 
     private func resolvedSocketListenerConfiguration() -> SocketControlServerConfiguration {
         return SocketControlServerConfiguration(
-            accessMode: CmuxSettingsFileStore.liveSocketAccessMode(),
+            accessMode: WmuxSettingsFileStore.liveSocketAccessMode(),
             preferredSocketPath: SocketControlSettings.socketPath()
         )
     }

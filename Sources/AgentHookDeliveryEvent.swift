@@ -1,5 +1,5 @@
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 /// An immutable non-decision hook accepted before downstream delivery begins.
 struct AgentHookDeliveryEvent: Sendable {
@@ -29,17 +29,17 @@ struct AgentHookDeliveryEvent: Sendable {
 
     private static let allowedHookDataEnvironmentKeys: Set<String> = Set([
         "PWD",
-        "CMUX_AGENT_HOOK_STATE_DIR", "CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
+        "WMUX_AGENT_HOOK_STATE_DIR", "WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
         AgentHookDeliveryPolicy.routeSnapshotEnvironmentKey,
-        "CMUX_AGENT_LAUNCH_ARGV_B64", "CMUX_AGENT_LAUNCH_CWD",
-        "CMUX_AGENT_LAUNCH_EXECUTABLE", "CMUX_AGENT_LAUNCH_KIND",
-        "CMUX_AGENT_MANAGED_SUBAGENT", "CMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
-        "CMUX_SURFACE_ID", "CMUX_WORKSPACE_ID",
+        "WMUX_AGENT_LAUNCH_ARGV_B64", "WMUX_AGENT_LAUNCH_CWD",
+        "WMUX_AGENT_LAUNCH_EXECUTABLE", "WMUX_AGENT_LAUNCH_KIND",
+        "WMUX_AGENT_MANAGED_SUBAGENT", "WMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
+        "WMUX_SURFACE_ID", "WMUX_WORKSPACE_ID",
     ]).union(SubrouterClaudeResumeRouting.hookCapturedEnvironmentKeys)
 
     private static let optionalLaunchEnvironmentKeys: Set<String> = Set([
-        "CMUX_AGENT_LAUNCH_ARGV_B64", "CMUX_AGENT_LAUNCH_CWD",
-        "CMUX_AGENT_LAUNCH_EXECUTABLE", "CMUX_AGENT_LAUNCH_KIND",
+        "WMUX_AGENT_LAUNCH_ARGV_B64", "WMUX_AGENT_LAUNCH_CWD",
+        "WMUX_AGENT_LAUNCH_EXECUTABLE", "WMUX_AGENT_LAUNCH_KIND",
     ]).union(SubrouterClaudeResumeRouting.hookCapturedEnvironmentKeys)
 
     let agent: String
@@ -123,7 +123,7 @@ struct AgentHookDeliveryEvent: Sendable {
 
     /// Builds a relay-backed session event for an agent the Mac observes
     /// through a remote daemon's agent roster instead of a hook call (the
-    /// cmux-tui path of `cmux ssh`).
+    /// wmux-tui path of `cmux ssh`).
     ///
     /// The route is the local pane showing the remote terminal. A mirrored
     /// `session-end` suppresses the hook CLI's visible cleanup (status row,
@@ -139,11 +139,11 @@ struct AgentHookDeliveryEvent: Sendable {
         deliverySocketPath: String
     ) -> Self? {
         var environment = [
-            "CMUX_WORKSPACE_ID": workspaceID.uuidString,
-            "CMUX_SURFACE_ID": surfaceID.uuidString,
+            "WMUX_WORKSPACE_ID": workspaceID.uuidString,
+            "WMUX_SURFACE_ID": surfaceID.uuidString,
         ]
         if subcommand == "session-end" {
-            environment["CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] = "1"
+            environment["WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] = "1"
         }
         return Self(
             params: [
@@ -215,7 +215,7 @@ struct AgentHookDeliveryEvent: Sendable {
         socketPath: String,
         environment: [String: String]
     ) -> String {
-        if let surfaceID = environment["CMUX_SURFACE_ID"], !surfaceID.isEmpty {
+        if let surfaceID = environment["WMUX_SURFACE_ID"], !surfaceID.isEmpty {
             return "\(socketPath)\0surface\0\(surfaceID)"
         }
         let pidKey = AgentHookDeliveryPolicy().pidEnvironmentVariable(agentName: agent)
@@ -337,8 +337,8 @@ extension TerminalController {
         // Relay alias rewriting has already converted these IDs to local UUIDs.
         // When they still identify a live panel, they are stronger evidence than
         // a portable TTY and avoid any registry search.
-        if let rawWorkspaceID = environment["CMUX_WORKSPACE_ID"],
-           let rawSurfaceID = environment["CMUX_SURFACE_ID"],
+        if let rawWorkspaceID = environment["WMUX_WORKSPACE_ID"],
+           let rawSurfaceID = environment["WMUX_SURFACE_ID"],
            rawSurfaceID.utf8.count <= 64,
            !rawSurfaceID.contains("\0"),
            let surfaceID = UUID(uuidString: rawSurfaceID),
@@ -370,8 +370,8 @@ extension TerminalController {
             return params
         }
 
-        environment["CMUX_WORKSPACE_ID"] = binding.workspaceId.uuidString
-        environment["CMUX_SURFACE_ID"] = binding.surfaceId.uuidString
+        environment["WMUX_WORKSPACE_ID"] = binding.workspaceId.uuidString
+        environment["WMUX_SURFACE_ID"] = binding.surfaceId.uuidString
         var resolved = params
         resolved["environment"] = environment
         return resolved

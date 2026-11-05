@@ -1,8 +1,8 @@
-import CmuxCloud
+import WmuxCloud
 import Bonsplit
-import CmuxCore
-import CmuxSettings
-import CmuxSurfaceCatalogModel
+import WmuxCore
+import WmuxSettings
+import WmuxSurfaceCatalogModel
 import Foundation
 
 extension Workspace {

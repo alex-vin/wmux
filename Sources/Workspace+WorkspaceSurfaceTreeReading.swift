@@ -1,6 +1,6 @@
 import Bonsplit
-import CmuxPanes
-import CmuxWorkspaces
+import WmuxPanes
+import WmuxWorkspaces
 import Foundation
 
 /// `Workspace` is the tree-reading host for its `WorkspaceSurfaceListModel`.

@@ -1,4 +1,4 @@
-import CmuxAgentChat
+import WmuxAgentChat
 import Foundation
 
 /// The searchable text of one agent session, read incrementally from its

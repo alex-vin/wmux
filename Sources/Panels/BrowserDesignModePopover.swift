@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import SwiftUI
 
 /// Cursor-style floating composer card for Design Mode.

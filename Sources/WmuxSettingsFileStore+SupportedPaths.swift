@@ -1,9 +1,9 @@
-import CmuxSettings
-import CmuxSidebar
-import CmuxSidebarGit
+import WmuxSettings
+import WmuxSidebar
+import WmuxSidebarGit
 import Foundation
 
-extension CmuxSettingsFileStore {
+extension WmuxSettingsFileStore {
     // Keep this in sync with the parser below and the web schema/docs. Settings UI rows
     // validate against this set so new persisted settings need an explicit cmux.json review.
     static let supportedSettingsJSONPaths: Set<String> = [
@@ -60,7 +60,7 @@ extension CmuxSettingsFileStore {
         "sleepyMode.customLogo",
         "sleepyMode.customBackground",
         "terminal.adaptiveDefaultTheme",
-        CmuxJSONFontSettings.surfaceTabBarPath,
+        WmuxJSONFontSettings.surfaceTabBarPath,
         "terminal.showScrollBar",
         "terminal.scrollSpeed",
         "terminal.copyOnSelect",
@@ -115,7 +115,7 @@ extension CmuxSettingsFileStore {
         "notifications.agentTurnComplete",
         "notifications.agentIdleReminder",
         "sidebar.hideAllDetails",
-        CmuxJSONFontSettings.sidebarPath,
+        WmuxJSONFontSettings.sidebarPath,
         "sidebar.wrapWorkspaceTitles",
         "sidebar.showWorkspaceDescription",
         "sidebar.workspaceDescriptionColor",

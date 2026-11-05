@@ -50,11 +50,11 @@ struct CLIJumpToLastPromptTests {
             return methods
         }
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["LANG"] = "en_US.UTF-8"
         environment["LC_ALL"] = "en_US.UTF-8"
         let result = CLIHookProcessRunner.run(

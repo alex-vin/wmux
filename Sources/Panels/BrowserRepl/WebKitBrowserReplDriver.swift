@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Network
 import UniformTypeIdentifiers
 import WebKit
@@ -1661,8 +1661,8 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
     /// Runs `body` with the panel's web view in a window. A hidden pane's web
     /// view has none, so it borrows the offscreen render host for the call.
     @MainActor
-    private func withWindow<T>(_ panel: BrowserPanel, _ body: @escaping @MainActor (CmuxWebView, NSWindow) async throws -> T) async throws -> T {
-        guard let webView = panel.webView as? CmuxWebView else {
+    private func withWindow<T>(_ panel: BrowserPanel, _ body: @escaping @MainActor (WmuxWebView, NSWindow) async throws -> T) async throws -> T {
+        guard let webView = panel.webView as? WmuxWebView else {
             throw Self.error("unsupported", "This tab does not accept native input")
         }
         if let window = webView.window {
@@ -1738,7 +1738,7 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
         at css: CGPoint,
         clickCount: Int,
         flags: NSEvent.ModifierFlags,
-        webView: CmuxWebView,
+        webView: WmuxWebView,
         window: NSWindow,
         attachment: BrowserReplTabAttachment
     ) async throws {
@@ -1823,7 +1823,7 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
     /// it has, enter the web view as the drop destination.
     @MainActor
     private func startDropIfDragBegan(
-        webView: CmuxWebView,
+        webView: WmuxWebView,
         window: NSWindow,
         location: NSPoint,
         attachment: BrowserReplTabAttachment
@@ -1913,7 +1913,7 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
     private func performClipboardCommandWithoutWebKit(
         _ command: String,
         attachment: BrowserReplTabAttachment,
-        webView: CmuxWebView
+        webView: WmuxWebView
     ) async throws {
         switch command {
         case "copy:", "cut:":
@@ -1981,15 +1981,15 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
     /// "ended".
     @MainActor
     private func webContentEndsOnlySessionTabs(_ webView: WKWebView, creator: String, sessionTabs: Set<UUID>) -> Bool {
-        guard let pid = CmuxWebContentProcessIdentifier.pid(for: webView) else { return true }
+        guard let pid = WmuxWebContentProcessIdentifier.pid(for: webView) else { return true }
         for (other, _) in allBrowserPanels() {
-            if other.webView !== webView, CmuxWebContentProcessIdentifier.pid(for: other.webView) == pid,
+            if other.webView !== webView, WmuxWebContentProcessIdentifier.pid(for: other.webView) == pid,
                !sessionTabs.contains(other.id),
                BrowserReplTabAttachments.shared.attachment(for: other.id)?.creatorSessionID != creator {
                 return false
             }
             for popup in other.floatingPopupWebViews where popup !== webView {
-                if CmuxWebContentProcessIdentifier.pid(for: popup) == pid { return false }
+                if WmuxWebContentProcessIdentifier.pid(for: popup) == pid { return false }
             }
         }
         return true
@@ -2005,7 +2005,7 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
     /// (`BrowserReplPasteboardRedirect`), so nothing it does later reaches
     /// the system clipboard. Only tabs a session created run these.
     @MainActor
-    private func performEditingCommand(_ command: String, panel: BrowserPanel, webView: CmuxWebView) async throws {
+    private func performEditingCommand(_ command: String, panel: BrowserPanel, webView: WmuxWebView) async throws {
         let attachment = attachment(panel)
         switch command {
         case "copy:", "cut:", "paste:":
@@ -2254,7 +2254,7 @@ final class WebKitBrowserReplDriver: BrowserReplDriver, @unchecked Sendable {
         var urls: [URL]?
         if params["cancel"] as? Bool != true {
             let directory = FileManager.default.temporaryDirectory
-                .appendingPathComponent("cmux-repl-upload-\(UUID().uuidString)", isDirectory: true)
+                .appendingPathComponent("wmux-repl-upload-\(UUID().uuidString)", isDirectory: true)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             fileChooserDirectories.append(directory)
             urls = try (params["files"] as? [[String: Any]] ?? []).map { file in

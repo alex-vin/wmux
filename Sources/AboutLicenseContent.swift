@@ -62,7 +62,7 @@ struct AboutLicenseContent {
         correspondingSourceURL(
             version: bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
             bundleIdentifier: bundle.bundleIdentifier,
-            commit: bundle.object(forInfoDictionaryKey: "CMUXCommit") as? String
+            commit: bundle.object(forInfoDictionaryKey: "WMUXCommit") as? String
         )
     }
 

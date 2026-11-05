@@ -1,5 +1,5 @@
 import XCTest
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 
 extension CLINotifyProcessIntegrationRegressionTests {
@@ -16,11 +16,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "kill -\"${CMUX_TEST_SIGNAL:?}\" \"${CMUX_SSH_STARTUP_PID:-$PPID}\"",
+            "kill -\"${WMUX_TEST_SIGNAL:?}\" \"${WMUX_SSH_STARTUP_PID:-$PPID}\"",
             "sleep 0.1",
             "exit 0",
         ])
@@ -40,12 +40,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
             var environment = ProcessInfo.processInfo.environment
             environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-            environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-            environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-            environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-            environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-            environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-            environment["CMUX_TEST_SIGNAL"] = signal
+            environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+            environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+            environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+            environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+            environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+            environment["WMUX_TEST_SIGNAL"] = signal
 
             let result = runProcess(
                 executablePath: "/bin/sh",
@@ -82,17 +82,17 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "trap 'printf \"%s\\n\" child-hup >> \"${CMUX_TEST_CHILD_SIGNAL_LOG}\"; exit 0' HUP",
-            "trap 'printf \"%s\\n\" child-int >> \"${CMUX_TEST_CHILD_SIGNAL_LOG}\"; exit 0' INT",
-            "trap 'printf \"%s\\n\" child-term >> \"${CMUX_TEST_CHILD_SIGNAL_LOG}\"; exit 0' TERM",
-            "printf '%s\\n' child-started >> \"${CMUX_TEST_CHILD_SIGNAL_LOG}\"",
-            "kill -\"${CMUX_TEST_SIGNAL:?}\" \"${CMUX_SSH_STARTUP_PID:-$PPID}\"",
+            "trap 'printf \"%s\\n\" child-hup >> \"${WMUX_TEST_CHILD_SIGNAL_LOG}\"; exit 0' HUP",
+            "trap 'printf \"%s\\n\" child-int >> \"${WMUX_TEST_CHILD_SIGNAL_LOG}\"; exit 0' INT",
+            "trap 'printf \"%s\\n\" child-term >> \"${WMUX_TEST_CHILD_SIGNAL_LOG}\"; exit 0' TERM",
+            "printf '%s\\n' child-started >> \"${WMUX_TEST_CHILD_SIGNAL_LOG}\"",
+            "kill -\"${WMUX_TEST_SIGNAL:?}\" \"${WMUX_SSH_STARTUP_PID:-$PPID}\"",
             "sleep 0.2",
-            "printf '%s\\n' child-completed >> \"${CMUX_TEST_CHILD_SIGNAL_LOG}\"",
+            "printf '%s\\n' child-completed >> \"${WMUX_TEST_CHILD_SIGNAL_LOG}\"",
             "exit 0",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
@@ -112,13 +112,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
             )
             var environment = ProcessInfo.processInfo.environment
             environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-            environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-            environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-            environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-            environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-            environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-            environment["CMUX_TEST_CHILD_SIGNAL_LOG"] = childSignalLog.path
-            environment["CMUX_TEST_SIGNAL"] = signal
+            environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+            environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+            environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+            environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+            environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+            environment["WMUX_TEST_CHILD_SIGNAL_LOG"] = childSignalLog.path
+            environment["WMUX_TEST_SIGNAL"] = signal
 
             let result = runProcess(
                 executablePath: "/bin/sh",
@@ -171,18 +171,18 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
             "count=0",
-            "if [ -r \"${CMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\"); fi",
+            "if [ -r \"${WMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\"); fi",
             "count=$((count + 1))",
-            "printf '%s\\n' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s\\n' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "if [ \"$count\" -eq 1 ]; then exit 255; fi",
             "exit 0",
         ])
-        try writeShellFile(at: fakeSleep, lines: ["#!/bin/sh", "printf '%s\\n' \"$1\" >> \"${CMUX_TEST_SLEEP_LOG}\""])
+        try writeShellFile(at: fakeSleep, lines: ["#!/bin/sh", "printf '%s\\n' \"$1\" >> \"${WMUX_TEST_SLEEP_LOG}\""])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeSSH.path)
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeSleep.path)
@@ -192,14 +192,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_SLEEP_LOG"] = sleepLog.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_SLEEP_LOG"] = sleepLog.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
 
         let result = runProcess(executablePath: "/bin/sh", arguments: ["-c", startupCommand], environment: environment, timeout: 5)
 
@@ -247,7 +247,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_CLI_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_CLI_LOG}\"",
             "case \"$*\" in",
             "  *'rpc workspace.remote.terminal_session_launching '*) exit 1 ;;",
             "  *) exit 0 ;;",
@@ -255,7 +255,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SSH_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SSH_LOG}\"",
             "exit 0",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
@@ -266,14 +266,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TERMINAL_LIFECYCLE_ID"] =
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TERMINAL_LIFECYCLE_ID"] =
             "33333333-3333-3333-3333-333333333333"
-        environment["CMUX_TEST_CLI_LOG"] = cliLog.path
-        environment["CMUX_TEST_SSH_LOG"] = sshLog.path
+        environment["WMUX_TEST_CLI_LOG"] = cliLog.path
+        environment["WMUX_TEST_SSH_LOG"] = sshLog.path
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -318,7 +318,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_CLI_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_CLI_LOG}\"",
             "case \"$*\" in",
             "  *'rpc workspace.remote.terminal_session_launching '*)",
             "    kill -TERM \"$PPID\"",
@@ -329,7 +329,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' ssh-started >> \"${CMUX_TEST_SSH_LOG}\"",
+            "printf '%s\\n' ssh-started >> \"${WMUX_TEST_SSH_LOG}\"",
             "exit 0",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
@@ -340,14 +340,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TERMINAL_LIFECYCLE_ID"] =
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TERMINAL_LIFECYCLE_ID"] =
             "33333333-3333-3333-3333-333333333333"
-        environment["CMUX_TEST_CLI_LOG"] = cliLog.path
-        environment["CMUX_TEST_SSH_LOG"] = sshLog.path
+        environment["WMUX_TEST_CLI_LOG"] = cliLog.path
+        environment["WMUX_TEST_SSH_LOG"] = sshLog.path
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -392,28 +392,28 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_LOCAL_CLI_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_LOCAL_CLI_LOG}\"",
             "exit 0",
         ])
         try writeShellFile(at: remoteCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_REMOTE_CLI_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_REMOTE_CLI_LOG}\"",
             "case \"$*\" in",
             "  *'rpc workspace.remote.terminal_session_connected '*)",
-            "    cmux_test_attempt=0",
-            "    if [ -r \"${CMUX_TEST_READINESS_ATTEMPT_LOG}\" ]; then",
-            "      cmux_test_attempt=$(cat \"${CMUX_TEST_READINESS_ATTEMPT_LOG}\")",
+            "    wmux_test_attempt=0",
+            "    if [ -r \"${WMUX_TEST_READINESS_ATTEMPT_LOG}\" ]; then",
+            "      wmux_test_attempt=$(cat \"${WMUX_TEST_READINESS_ATTEMPT_LOG}\")",
             "    fi",
-            "    cmux_test_attempt=$((cmux_test_attempt + 1))",
-            "    printf '%s\\n' \"$cmux_test_attempt\" > \"${CMUX_TEST_READINESS_ATTEMPT_LOG}\"",
-            "    if [ \"$cmux_test_attempt\" -eq 1 ]; then exit 1; fi",
+            "    wmux_test_attempt=$((wmux_test_attempt + 1))",
+            "    printf '%s\\n' \"$wmux_test_attempt\" > \"${WMUX_TEST_READINESS_ATTEMPT_LOG}\"",
+            "    if [ \"$wmux_test_attempt\" -eq 1 ]; then exit 1; fi",
             "    ;;",
             "esac",
             "exit 0",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "cmux_test_remote_command=",
+            "wmux_test_remote_command=",
             "while [ \"$#\" -gt 0 ]; do",
             "  case \"$1\" in",
             "    -G)",
@@ -422,13 +422,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "      ;;",
             "    -o)",
             "      case \"$2\" in",
-            "        RemoteCommand=none|remotecommand=none) cmux_test_remote_command=none ;;",
-            "        RemoteCommand=*|remotecommand=*) cmux_test_remote_command=\"${2#*=}\" ;;",
+            "        RemoteCommand=none|remotecommand=none) wmux_test_remote_command=none ;;",
+            "        RemoteCommand=*|remotecommand=*) wmux_test_remote_command=\"${2#*=}\" ;;",
             "      esac",
             "      shift 2",
             "      ;;",
             "    -oRemoteCommand=*|-oremotecommand=*)",
-            "      cmux_test_remote_command=\"${1#*=}\"",
+            "      wmux_test_remote_command=\"${1#*=}\"",
             "      shift",
             "      ;;",
             "    -p|-i|-l|-F|-E|-e|-b|-c|-D|-I|-J|-L|-m|-Q|-R|-S|-W|-w|-B)",
@@ -438,10 +438,10 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "    *) shift; break ;;",
             "  esac",
             "done",
-            "if [ \"$cmux_test_remote_command\" = none ]; then",
+            "if [ \"$wmux_test_remote_command\" = none ]; then",
             "  cat >/dev/null 2>&1 || true",
-            "elif [ -n \"$cmux_test_remote_command\" ]; then",
-            "  /bin/sh -c \"$cmux_test_remote_command\" >/dev/null 2>&1 || true",
+            "elif [ -n \"$wmux_test_remote_command\" ]; then",
+            "  /bin/sh -c \"$wmux_test_remote_command\" >/dev/null 2>&1 || true",
             "fi",
             "exit 0",
         ])
@@ -463,15 +463,15 @@ extension CLINotifyProcessIntegrationRegressionTests {
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
         environment["HOME"] = home.path
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TERMINAL_LIFECYCLE_ID"] =
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TERMINAL_LIFECYCLE_ID"] =
             "33333333-3333-3333-3333-333333333333"
-        environment["CMUX_TEST_LOCAL_CLI_LOG"] = localCLILog.path
-        environment["CMUX_TEST_REMOTE_CLI_LOG"] = remoteCLILog.path
-        environment["CMUX_TEST_READINESS_ATTEMPT_LOG"] =
+        environment["WMUX_TEST_LOCAL_CLI_LOG"] = localCLILog.path
+        environment["WMUX_TEST_REMOTE_CLI_LOG"] = remoteCLILog.path
+        environment["WMUX_TEST_READINESS_ATTEMPT_LOG"] =
             readinessAttemptLog.path
 
         let result = runProcess(
@@ -526,15 +526,15 @@ extension CLINotifyProcessIntegrationRegressionTests {
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "cmux_test_remote_command=",
-            "for cmux_test_arg in \"$@\"; do",
-            "  if [ \"$cmux_test_arg\" = '-G' ]; then",
+            "wmux_test_remote_command=",
+            "for wmux_test_arg in \"$@\"; do",
+            "  if [ \"$wmux_test_arg\" = '-G' ]; then",
             "    printf '%s\\n' 'controlpath none'",
             "    exit 0",
             "  fi",
-            "  cmux_test_remote_command=\"$cmux_test_arg\"",
+            "  wmux_test_remote_command=\"$wmux_test_arg\"",
             "done",
-            "PATH=/usr/bin:/bin HOME=\"${CMUX_TEST_REMOTE_HOME}\" /bin/sh -c \"$cmux_test_remote_command\"",
+            "PATH=/usr/bin:/bin HOME=\"${WMUX_TEST_REMOTE_HOME}\" /bin/sh -c \"$wmux_test_remote_command\"",
         ])
         for executable in [fakeCLI, fakeSSH] {
             try fileManager.setAttributes(
@@ -547,21 +547,21 @@ extension CLINotifyProcessIntegrationRegressionTests {
             replacingSystemSSHWith: fakeSSH,
             remoteCommandArguments: [
                 "touch",
-                "\"$CMUX_TEST_RAW_COMMAND_LOG\"",
+                "\"$WMUX_TEST_RAW_COMMAND_LOG\"",
             ]
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TERMINAL_LIFECYCLE_ID"] =
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TERMINAL_LIFECYCLE_ID"] =
             "33333333-3333-3333-3333-333333333333"
-        environment["CMUX_TEST_REMOTE_HOME"] = remoteHome.path
-        environment["CMUX_TEST_RAW_COMMAND_LOG"] = commandLog.path
-        environment["CMUX_SSH_RECONNECT_LIMIT"] = "1"
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_TEST_REMOTE_HOME"] = remoteHome.path
+        environment["WMUX_TEST_RAW_COMMAND_LOG"] = commandLog.path
+        environment["WMUX_SSH_RECONNECT_LIMIT"] = "1"
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -602,25 +602,25 @@ extension CLINotifyProcessIntegrationRegressionTests {
         ])
         try writeShellFile(at: stagedRemoteCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' readiness >> \"${CMUX_TEST_RAW_EVENT_LOG}\"",
+            "printf '%s\\n' readiness >> \"${WMUX_TEST_RAW_EVENT_LOG}\"",
             "exit 0",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "cmux_test_remote_command=",
-            "for cmux_test_arg in \"$@\"; do",
-            "  if [ \"$cmux_test_arg\" = '-G' ]; then",
+            "wmux_test_remote_command=",
+            "for wmux_test_arg in \"$@\"; do",
+            "  if [ \"$wmux_test_arg\" = '-G' ]; then",
             "    printf '%s\\n' 'controlpath none'",
             "    exit 0",
             "  fi",
-            "  cmux_test_remote_command=\"$cmux_test_arg\"",
+            "  wmux_test_remote_command=\"$wmux_test_arg\"",
             "done",
             "(",
             "  /bin/sleep 0.2",
-            "  /bin/cp \"${CMUX_TEST_STAGED_REMOTE_CLI}\" \"${CMUX_TEST_REMOTE_CLI}\"",
-            "  /bin/chmod 700 \"${CMUX_TEST_REMOTE_CLI}\"",
+            "  /bin/cp \"${WMUX_TEST_STAGED_REMOTE_CLI}\" \"${WMUX_TEST_REMOTE_CLI}\"",
+            "  /bin/chmod 700 \"${WMUX_TEST_REMOTE_CLI}\"",
             ") </dev/null >/dev/null 2>&1 &",
-            "PATH=/usr/bin:/bin HOME=\"${CMUX_TEST_REMOTE_HOME}\" /bin/sh -c \"$cmux_test_remote_command\"",
+            "PATH=/usr/bin:/bin HOME=\"${WMUX_TEST_REMOTE_HOME}\" /bin/sh -c \"$wmux_test_remote_command\"",
         ])
         for executable in [fakeCLI, fakeSSH, stagedRemoteCLI] {
             try fileManager.setAttributes(
@@ -630,9 +630,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         let rawCommand = """
-        echo user-start >> "$CMUX_TEST_RAW_EVENT_LOG"
+        echo user-start >> "$WMUX_TEST_RAW_EVENT_LOG"
         /bin/sleep 1
-        echo user-end >> "$CMUX_TEST_RAW_EVENT_LOG"
+        echo user-end >> "$WMUX_TEST_RAW_EVENT_LOG"
         """
         let startupCommand = try generatedSSHStartupCommand(
             replacingSystemSSHWith: fakeSSH,
@@ -644,18 +644,18 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TERMINAL_LIFECYCLE_ID"] =
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TERMINAL_LIFECYCLE_ID"] =
             "33333333-3333-3333-3333-333333333333"
-        environment["CMUX_TEST_REMOTE_HOME"] = remoteHome.path
-        environment["CMUX_TEST_STAGED_REMOTE_CLI"] = stagedRemoteCLI.path
-        environment["CMUX_TEST_REMOTE_CLI"] = remoteCLI.path
-        environment["CMUX_TEST_RAW_EVENT_LOG"] = eventLog.path
-        environment["CMUX_SSH_RECONNECT_LIMIT"] = "1"
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_TEST_REMOTE_HOME"] = remoteHome.path
+        environment["WMUX_TEST_STAGED_REMOTE_CLI"] = stagedRemoteCLI.path
+        environment["WMUX_TEST_REMOTE_CLI"] = remoteCLI.path
+        environment["WMUX_TEST_RAW_EVENT_LOG"] = eventLog.path
+        environment["WMUX_SSH_RECONNECT_LIMIT"] = "1"
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -692,7 +692,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_CLI_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_CLI_LOG}\"",
             "exit 0",
         ])
         try writeShellFile(at: fakeSSH, lines: [
@@ -706,7 +706,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "  printf '%s\\n' '  --experimental-remote-ip=(local|remote|proxy)'",
             "  exit 0",
             "fi",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_MOSH_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_MOSH_LOG}\"",
             "exit 71",
         ])
         for executable in [fakeCLI, fakeSSH, fakeMosh] {
@@ -723,14 +723,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TERMINAL_LIFECYCLE_ID"] =
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TERMINAL_LIFECYCLE_ID"] =
             "33333333-3333-3333-3333-333333333333"
-        environment["CMUX_TEST_CLI_LOG"] = cliLog.path
-        environment["CMUX_TEST_MOSH_LOG"] = moshLog.path
+        environment["WMUX_TEST_CLI_LOG"] = cliLog.path
+        environment["WMUX_TEST_MOSH_LOG"] = moshLog.path
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -786,14 +786,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SSH_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SSH_LOG}\"",
             "for arg in \"$@\"; do",
             "  if [ \"$arg\" = '-G' ]; then",
-            "    printf 'controlpath %s\\n' \"${CMUX_TEST_CONTROL_PATH}\"",
+            "    printf 'controlpath %s\\n' \"${WMUX_TEST_CONTROL_PATH}\"",
             "    exit 0",
             "  fi",
             "done",
@@ -804,8 +804,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "  fi",
             "  previous_arg=\"$arg\"",
             "done",
-            "if [ -e \"${CMUX_TEST_CONTROL_PATH}\" ]; then",
-            "  printf 'ControlSocket %s already exists, disabling multiplexing\\n' \"${CMUX_TEST_CONTROL_PATH}\" >&2",
+            "if [ -e \"${WMUX_TEST_CONTROL_PATH}\" ]; then",
+            "  printf 'ControlSocket %s already exists, disabling multiplexing\\n' \"${WMUX_TEST_CONTROL_PATH}\" >&2",
             "  exit 99",
             "fi",
             "exit 0",
@@ -823,14 +823,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_CONTROL_PATH"] = staleControlPath.path
-        environment["CMUX_TEST_SESSION_END_LOG"] = root.appendingPathComponent("ssh-session-end.log").path
-        environment["CMUX_TEST_SSH_LOG"] = logFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_CONTROL_PATH"] = staleControlPath.path
+        environment["WMUX_TEST_SESSION_END_LOG"] = root.appendingPathComponent("ssh-session-end.log").path
+        environment["WMUX_TEST_SSH_LOG"] = logFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -864,21 +864,21 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
             "count=0",
-            "if [ -r \"${CMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\"); fi",
+            "if [ -r \"${WMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\"); fi",
             "count=$((count + 1))",
-            "printf '%s\\n' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s\\n' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "exit 255",
         ])
         // Exercise the production backoff selection without spending wall time
         // in its timer. Zero is normalized to the safe two-second default.
         try writeShellFile(at: fakeSleep, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$1\" >> \"${CMUX_TEST_SLEEP_LOG}\"",
+            "printf '%s\\n' \"$1\" >> \"${WMUX_TEST_SLEEP_LOG}\"",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeSleep.path)
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
@@ -889,16 +889,16 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_SLEEP_LOG"] = sleepLog.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
-        environment["CMUX_SSH_RECONNECT_LIMIT"] = "2"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_SLEEP_LOG"] = sleepLog.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_SSH_RECONNECT_LIMIT"] = "2"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let child = try StreamingChildProcess(
             executablePath: "/bin/sh",
@@ -944,14 +944,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
             "count=0",
-            "if [ -r \"${CMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\"); fi",
+            "if [ -r \"${WMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\"); fi",
             "count=$((count + 1))",
-            "printf '%s\\n' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s\\n' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "exit 1",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
@@ -962,14 +962,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let child = try StreamingChildProcess(
             executablePath: "/bin/sh",
@@ -1010,7 +1010,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
@@ -1024,13 +1024,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let child = try StreamingChildProcess(
             executablePath: "/bin/sh",
@@ -1085,23 +1085,23 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
             "count=0",
-            "if [ -r \"${CMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\"); fi",
+            "if [ -r \"${WMUX_TEST_ATTEMPT_FILE}\" ]; then count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\"); fi",
             "count=$((count + 1))",
-            "printf '%s\\n' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s\\n' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "exit 255",
         ])
         // Signal from the timer itself so the test reaches backoff before
         // cancellation. The timer remains alive until the supervisor reaps it.
         try writeShellFile(at: fakeSleep, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$1\" >> \"${CMUX_TEST_SLEEP_LOG}\"",
-            "printf '%s\\n' \"$$\" > \"${CMUX_TEST_SLEEP_PID_FILE}\"",
-            "kill -TERM \"${CMUX_SSH_STARTUP_PID:?}\"",
+            "printf '%s\\n' \"$1\" >> \"${WMUX_TEST_SLEEP_LOG}\"",
+            "printf '%s\\n' \"$$\" > \"${WMUX_TEST_SLEEP_PID_FILE}\"",
+            "kill -TERM \"${WMUX_SSH_STARTUP_PID:?}\"",
             "exec /bin/sleep 30",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeSleep.path)
@@ -1113,16 +1113,16 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_SLEEP_LOG"] = sleepLog.path
-        environment["CMUX_TEST_SLEEP_PID_FILE"] = sleepPIDFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
-        environment["CMUX_SSH_RECONNECT_LIMIT"] = "2"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_SLEEP_LOG"] = sleepLog.path
+        environment["WMUX_TEST_SLEEP_PID_FILE"] = sleepPIDFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
+        environment["WMUX_SSH_RECONNECT_LIMIT"] = "2"
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -1166,7 +1166,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
@@ -1180,13 +1180,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let child = try StreamingChildProcess(
             executablePath: "/bin/sh",
@@ -1230,14 +1230,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         // Fake ssh reads one line from stdin and records it so the test can
         // verify the wrapper's stdin reached the backgrounded ssh process.
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
             "IFS= read -r line || line='<EOF>'",
-            "printf '%s\\n' \"$line\" > \"${CMUX_TEST_STDIN_LOG}\"",
+            "printf '%s\\n' \"$line\" > \"${WMUX_TEST_STDIN_LOG}\"",
             "exit 0",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
@@ -1248,13 +1248,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = sessionEndLog.path
-        environment["CMUX_TEST_STDIN_LOG"] = stdinCapture.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = sessionEndLog.path
+        environment["WMUX_TEST_STDIN_LOG"] = stdinCapture.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -1289,11 +1289,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         try writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG}\"",
         ])
         try writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' ssh >> \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s\\n' ssh >> \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "exit 0",
         ])
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCLI.path)
@@ -1304,17 +1304,17 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = sessionEndLog.path
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = sessionEndLog.path
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
         // The wrapper's own deferred-signal state must start empty. An
         // inherited value would retire the session with 130 before ssh runs.
-        environment["CMUX_SSH_PENDING_SIGNAL"] = "130"
-        environment["CMUX_SSH_PENDING_SIGNAL_NAME"] = "INT"
+        environment["WMUX_SSH_PENDING_SIGNAL"] = "130"
+        environment["WMUX_SSH_PENDING_SIGNAL_NAME"] = "INT"
 
         let result = runProcess(
             executablePath: "/bin/sh",
@@ -1402,9 +1402,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         var arguments = [
             "ssh",
@@ -1525,9 +1525,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,

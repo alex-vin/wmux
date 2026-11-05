@@ -1,12 +1,11 @@
 import AppKit
-import CmuxNotifications
-import CmuxUpdater
+import WmuxNotifications
 import Observation
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -62,9 +61,9 @@ struct SidebarSnapshotOwnerTests {
         let suiteName = "SidebarSnapshotOwnerTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
-        defaults.set(CmuxExtensionSidebarSelection.defaultProviderId, forKey: CmuxExtensionSidebarSelection.defaultsKey)
-        let flags = CmuxFeatureFlags(defaults: defaults, remoteFlagValueProvider: { _ in nil })
-        flags.setOverride(appKit, for: CmuxFeatureFlags.appKitSidebarListFlag)
+        defaults.set(WmuxExtensionSidebarSelection.defaultProviderId, forKey: WmuxExtensionSidebarSelection.defaultsKey)
+        let flags = WmuxFeatureFlags(defaults: defaults, remoteFlagValueProvider: { _ in nil })
+        flags.setOverride(appKit, for: WmuxFeatureFlags.appKitSidebarListFlag)
         let cache = SidebarRowSnapshotCache()
         let manager = TabManager(autoWelcomeIfNeeded: false)
         let initialCoalescing = WindowTerminalPortal.usesCoalescedAnchorFailsafe
@@ -86,7 +85,7 @@ struct SidebarSnapshotOwnerTests {
             workspaceSnapshotCache: cache
         )
         .environmentObject(manager)
-        .environmentObject(CmuxConfigStore())
+        .environmentObject(WmuxConfigStore())
         .environmentObject(TerminalNotificationStore.shared)
         .environmentObject(SidebarState())
         .environmentObject(SidebarSelectionState())

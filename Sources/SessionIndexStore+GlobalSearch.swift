@@ -1,5 +1,5 @@
 import Foundation
-import CmuxAgentSessionStore
+import WmuxAgentSessionStore
 
 // MARK: - Global (cross-agent) session search for the recency "All" view and
 // the `cmux vault search` socket surface.

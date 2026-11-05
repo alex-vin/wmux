@@ -1,12 +1,12 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 import Observation
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Combine
 import AppKit
 import Bonsplit
-import CmuxTerminal
-import CmuxWorkspaces
+import WmuxTerminal
+import WmuxWorkspaces
 import GhosttyKit
 
 /// TerminalPanel wraps an existing TerminalSurface and conforms to the Panel protocol.
@@ -194,7 +194,7 @@ final class TerminalPanel: Panel, ObservableObject {
         id: UUID = UUID(),
         workspaceId: UUID,
         context: ghostty_surface_context_e = GHOSTTY_SURFACE_CONTEXT_SPLIT,
-        configTemplate: CmuxSurfaceConfigTemplate? = nil,
+        configTemplate: WmuxSurfaceConfigTemplate? = nil,
         workingDirectory: String? = nil,
         portOrdinal: Int = 0,
         initialCommand: String? = nil,
@@ -235,7 +235,7 @@ final class TerminalPanel: Panel, ObservableObject {
     }
 
     private static func startsAtOwnedPrompt(
-        configTemplate: CmuxSurfaceConfigTemplate?,
+        configTemplate: WmuxSurfaceConfigTemplate?,
         initialCommand: String?,
         tmuxStartCommand: String?,
         initialInput: String?

@@ -1,9 +1,9 @@
 import AppKit
-import CmuxWindowing
+import WmuxWindowing
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -197,13 +197,13 @@ struct AppDelegateOversizedFrameRestoreTests {
         let display = CGRect(x: 0, y: 0, width: 1_512, height: 982)
         let runaway = CGRect(x: -12_000, y: 120, width: 12_400, height: 700)
 
-        let capped = CmuxMainWindow.frameByCappingOversizedDimensions(
+        let capped = WmuxMainWindow.frameByCappingOversizedDimensions(
             runaway,
             displayFrames: [(frame: display, visibleFrame: display)]
         )
 
         #expect(capped.width == display.width)
-        #expect(CmuxMainWindow.isTitlebarReachable(frame: capped, visibleFrame: display))
+        #expect(WmuxMainWindow.isTitlebarReachable(frame: capped, visibleFrame: display))
     }
 
     @Test
@@ -211,13 +211,13 @@ struct AppDelegateOversizedFrameRestoreTests {
         let display = CGRect(x: 0, y: 0, width: 1_512, height: 982)
         let runaway = CGRect(x: 100, y: -9_000, width: 900, height: 9_500)
 
-        let capped = CmuxMainWindow.frameByCappingOversizedDimensions(
+        let capped = WmuxMainWindow.frameByCappingOversizedDimensions(
             runaway,
             displayFrames: [(frame: display, visibleFrame: display)]
         )
 
         #expect(capped.height == display.height)
-        #expect(CmuxMainWindow.isTitlebarReachable(frame: capped, visibleFrame: display))
+        #expect(WmuxMainWindow.isTitlebarReachable(frame: capped, visibleFrame: display))
     }
 
     @Test
@@ -226,13 +226,13 @@ struct AppDelegateOversizedFrameRestoreTests {
         let visible = CGRect(x: 0, y: 0, width: 1_512, height: 944)
         let runaway = CGRect(x: 100, y: 500, width: 900, height: 9_500)
 
-        let capped = CmuxMainWindow.frameByCappingOversizedDimensions(
+        let capped = WmuxMainWindow.frameByCappingOversizedDimensions(
             runaway,
             displayFrames: [(frame: physical, visibleFrame: visible)]
         )
 
         #expect(capped.height == physical.height)
-        #expect(CmuxMainWindow.isTitlebarReachable(frame: capped, visibleFrame: visible))
+        #expect(WmuxMainWindow.isTitlebarReachable(frame: capped, visibleFrame: visible))
     }
 
     @Test
@@ -250,11 +250,11 @@ struct AppDelegateOversizedFrameRestoreTests {
         let partial = CGRect(x: -300, y: 120, width: 900, height: 700)
         let spanning = CGRect(x: 1_000, y: 100, width: 2_000, height: 700)
 
-        #expect(CmuxMainWindow.frameByCappingOversizedDimensions(
+        #expect(WmuxMainWindow.frameByCappingOversizedDimensions(
             partial,
             displayFrames: displays
         ) == partial)
-        #expect(CmuxMainWindow.frameByCappingOversizedDimensions(
+        #expect(WmuxMainWindow.frameByCappingOversizedDimensions(
             spanning,
             displayFrames: displays
         ) == spanning)

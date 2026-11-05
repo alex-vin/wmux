@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// The existing persisted word-wrap preference, shared by settings and editors.

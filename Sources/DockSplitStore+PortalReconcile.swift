@@ -1,4 +1,4 @@
-import CmuxBrowser
+import WmuxBrowser
 import AppKit
 
 /// Event-driven follow-up state for the Dock portal reconciler.

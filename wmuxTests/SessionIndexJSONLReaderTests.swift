@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -200,7 +200,7 @@ struct SessionIndexJSONLReaderTests {
         history.append(0x0a)
         try history.write(to: url)
 
-        var registration = CmuxVaultAgentRegistration.builtInAntigravity
+        var registration = WmuxVaultAgentRegistration.builtInAntigravity
         registration.sessionDirectory = root.path
         let initialEntries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -282,7 +282,7 @@ struct SessionIndexJSONLReaderTests {
         """
         try Data(history.utf8).write(to: url)
 
-        var registration = CmuxVaultAgentRegistration.builtInAntigravity
+        var registration = WmuxVaultAgentRegistration.builtInAntigravity
         registration.sessionDirectory = root.path
         let entries = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,
@@ -312,7 +312,7 @@ struct SessionIndexJSONLReaderTests {
         }.joined(separator: "\n") + "\n"
         try Data(history.utf8).write(to: url)
 
-        var registration = CmuxVaultAgentRegistration.builtInAntigravity
+        var registration = WmuxVaultAgentRegistration.builtInAntigravity
         registration.sessionDirectory = root.path
         let firstPage = await SessionIndexStore.loadRegisteredAgentEntries(
             registration: registration,

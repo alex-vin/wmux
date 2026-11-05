@@ -1,13 +1,13 @@
-@testable import CmuxFoundation
+@testable import WmuxFoundation
 import AppKit
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
-import CmuxWorkspaces
+import WmuxWorkspaces
 import SQLite3
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -190,7 +190,7 @@ struct HermesFirstClassSupportTests {
             sessionId: corruptSessionID,
             workingDirectory: workingDirectory,
             launchCommand: launchCommand,
-            registration: CmuxVaultAgentRegistration.builtInHermes
+            registration: WmuxVaultAgentRegistration.builtInHermes
         )
         let corruptBinding = SurfaceResumeBindingSnapshot(
             name: "Hermes Agent",
@@ -231,7 +231,7 @@ struct HermesFirstClassSupportTests {
             sessionId: recoveredSessionID,
             workingDirectory: workingDirectory,
             launchCommand: launchCommand,
-            registration: CmuxVaultAgentRegistration.builtInHermes
+            registration: WmuxVaultAgentRegistration.builtInHermes
         )
 
         let repaired = Workspace.repairedLegacyHermesSessionPanelSnapshot(
@@ -317,7 +317,7 @@ struct HermesFirstClassSupportTests {
             workingDirectory: workingDirectory,
             environment: [
                 "HERMES_HOME": fixture.hermesHome.path,
-                "CMUX_AGENT_HOOK_STATE_DIR": fixture.root
+                "WMUX_AGENT_HOOK_STATE_DIR": fixture.root
                     .appendingPathComponent(".cmuxterm", isDirectory: true).path,
             ],
             capturedAt: 100,
@@ -456,7 +456,7 @@ struct HermesFirstClassSupportTests {
             fixture: fixture,
             processes: [hermesProcess(pid: 9_520, workspaceID: fixture.workspaceID, panelID: fixture.panelID)],
             argumentsByPID: [
-                9_520: CmuxTopProcessArguments(
+                9_520: WmuxTopProcessArguments(
                     arguments: [fixture.hermesExecutable, "--tui"],
                     environment: hermesEnvironment(fixture)
                 ),
@@ -482,11 +482,11 @@ struct HermesFirstClassSupportTests {
                 capturedAt: nil,
                 source: "process"
             ),
-            registration: CmuxVaultAgentRegistration.builtInHermes
+            registration: WmuxVaultAgentRegistration.builtInHermes
         )
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [executable, "--tui"],
-            environment: ["CMUX_AGENT_LAUNCH_KIND": "hermes-agent"]
+            environment: ["WMUX_AGENT_LAUNCH_KIND": "hermes-agent"]
         )
 
         #expect(
@@ -513,7 +513,7 @@ struct HermesFirstClassSupportTests {
             path: pythonExecutable
         )
 
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [pythonExecutable, hermesEntrypoint, "--resume", "python-session", "--tui"],
             environment: hermesEnvironment(fixture)
         )
@@ -549,7 +549,7 @@ struct HermesFirstClassSupportTests {
             name: "Python",
             path: pythonExecutable
         )
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [
                 pythonExecutable,
                 unrelatedEntrypoint,
@@ -564,7 +564,7 @@ struct HermesFirstClassSupportTests {
             arguments: liveProcess.arguments,
             environment: liveProcess.environment
         )
-        let registration = CmuxVaultAgentRegistration.builtInHermes
+        let registration = WmuxVaultAgentRegistration.builtInHermes
 
         #expect(registration.detect.matches(observed) == false)
         let detected = try detectedHermesSnapshots(
@@ -588,7 +588,7 @@ struct HermesFirstClassSupportTests {
             ],
             environment: [:]
         )
-        let registration = CmuxVaultAgentRegistration.builtInHermes
+        let registration = WmuxVaultAgentRegistration.builtInHermes
 
         #expect(registration.detect.matches(observed))
         #expect(registration.detect.usesAlternateMatchWithoutPrimaryMatch(observed))
@@ -620,7 +620,7 @@ struct HermesFirstClassSupportTests {
             name: "Python",
             path: pythonExecutable
         )
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [pythonExecutable, hermesEntrypoint, command],
             environment: hermesEnvironment(fixture)
         )
@@ -630,7 +630,7 @@ struct HermesFirstClassSupportTests {
             arguments: liveProcess.arguments,
             environment: liveProcess.environment
         )
-        let registration = CmuxVaultAgentRegistration.builtInHermes
+        let registration = WmuxVaultAgentRegistration.builtInHermes
 
         #expect(registration.detect.matches(observed))
         #expect(registration.processDetectedSnapshotIsRestorable(for: observed) == false)
@@ -663,7 +663,7 @@ struct HermesFirstClassSupportTests {
             workspaceID: fixture.workspaceID,
             panelID: fixture.panelID
         )
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [fixture.hermesExecutable] + arguments,
             environment: hermesEnvironment(fixture)
         )
@@ -673,7 +673,7 @@ struct HermesFirstClassSupportTests {
             arguments: liveProcess.arguments,
             environment: liveProcess.environment
         )
-        let registration = CmuxVaultAgentRegistration.builtInHermes
+        let registration = WmuxVaultAgentRegistration.builtInHermes
 
         #expect(registration.detect.matches(observed))
         #expect(registration.processDetectedSnapshotIsRestorable(for: observed) == false)
@@ -705,11 +705,11 @@ struct HermesFirstClassSupportTests {
             executablePath: fixture.hermesExecutable,
             arguments: [fixture.hermesExecutable, "--tui"]
         )
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [pythonExecutable, hermesEntrypoint, "--tui"],
             environment: hermesEnvironment(fixture).merging([
-                "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                "WMUX_SURFACE_ID": fixture.panelID.uuidString,
             ]) { _, incoming in incoming }
         )
 
@@ -775,12 +775,12 @@ struct HermesFirstClassSupportTests {
             runtimeStatus: "idle",
             agentLifecycle: "idle"
         )
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [pythonExecutable, hermesConsoleScript, "--tui", "--resume", sessionID],
             environment: hermesEnvironment(fixture).merging([
-                "CMUX_AGENT_LAUNCH_KIND": "hermes-agent",
-                "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                "WMUX_AGENT_LAUNCH_KIND": "hermes-agent",
+                "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                "WMUX_SURFACE_ID": fixture.panelID.uuidString,
             ]) { _, incoming in incoming }
         )
         let process = hermesProcess(
@@ -878,11 +878,11 @@ struct HermesFirstClassSupportTests {
             executablePath: fixture.hermesExecutable,
             arguments: [fixture.hermesExecutable, "--tui"]
         )
-        let liveProcess = CmuxTopProcessArguments(
+        let liveProcess = WmuxTopProcessArguments(
             arguments: [fixture.hermesExecutable, "--tui"],
             environment: hermesEnvironment(fixture).merging([
-                "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                "WMUX_SURFACE_ID": fixture.panelID.uuidString,
             ]) { _, incoming in incoming }
         )
 
@@ -921,11 +921,11 @@ struct HermesFirstClassSupportTests {
             fixture: fixture,
             processID: processID,
             identity: identity,
-            liveProcess: CmuxTopProcessArguments(
+            liveProcess: WmuxTopProcessArguments(
                 arguments: [fixture.hermesExecutable, "--resume", "cached-session"],
                 environment: hermesEnvironment(fixture).merging([
-                    "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                    "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                    "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                    "WMUX_SURFACE_ID": fixture.panelID.uuidString,
                 ]) { _, incoming in incoming }
             )
         )
@@ -966,11 +966,11 @@ struct HermesFirstClassSupportTests {
             fixture: fixture,
             processID: processID,
             identity: identity,
-            liveProcess: CmuxTopProcessArguments(
+            liveProcess: WmuxTopProcessArguments(
                 arguments: [fixture.hermesExecutable, "--resume", "watchdog-session"],
                 environment: hermesEnvironment(fixture).merging([
-                    "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                    "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                    "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                    "WMUX_SURFACE_ID": fixture.panelID.uuidString,
                 ]) { _, incoming in incoming }
             )
         )
@@ -1056,7 +1056,7 @@ struct HermesFirstClassSupportTests {
             fixture: fixture,
             processes: [hermesProcess(pid: 9_521, workspaceID: fixture.workspaceID, panelID: fixture.panelID)],
             argumentsByPID: [
-                9_521: CmuxTopProcessArguments(
+                9_521: WmuxTopProcessArguments(
                     arguments: processArguments,
                     environment: hermesEnvironment(fixture)
                 ),
@@ -1081,7 +1081,7 @@ struct HermesFirstClassSupportTests {
             fixture: fixture,
             processes: [hermesProcess(pid: 9_522, workspaceID: fixture.workspaceID, panelID: fixture.panelID)],
             argumentsByPID: [
-                9_522: CmuxTopProcessArguments(
+                9_522: WmuxTopProcessArguments(
                     arguments: [fixture.hermesExecutable],
                     environment: hermesEnvironment(fixture)
                 ),
@@ -1100,7 +1100,7 @@ struct HermesFirstClassSupportTests {
             hermesProcess(pid: 9_523, workspaceID: fixture.workspaceID, panelID: fixture.panelID),
             hermesProcess(pid: 9_524, workspaceID: fixture.workspaceID, panelID: secondPanelID),
         ]
-        let launch = CmuxTopProcessArguments(
+        let launch = WmuxTopProcessArguments(
             arguments: [fixture.hermesExecutable],
             environment: hermesEnvironment(fixture)
         )
@@ -1127,11 +1127,11 @@ struct HermesFirstClassSupportTests {
                 hermesProcess(pid: 9_526, workspaceID: fixture.workspaceID, panelID: fixture.panelID),
             ],
             argumentsByPID: [
-                9_525: CmuxTopProcessArguments(
+                9_525: WmuxTopProcessArguments(
                     arguments: [fixture.hermesExecutable, "--resume", "explicit-session"],
                     environment: hermesEnvironment(fixture)
                 ),
-                9_526: CmuxTopProcessArguments(
+                9_526: WmuxTopProcessArguments(
                     arguments: [fixture.hermesExecutable],
                     environment: hermesEnvironment(fixture)
                 ),
@@ -1293,7 +1293,7 @@ struct HermesFirstClassSupportTests {
             executablePath: "/bin/sh",
             arguments: ["-c", resumeCommand],
             environment: [
-                "CMUX_HERMES_AGENT_WRAPPER_SHIM": managedWrapper.path,
+                "WMUX_HERMES_AGENT_WRAPPER_SHIM": managedWrapper.path,
                 "PATH": "\(binDirectory.path):/usr/bin:/bin",
             ]
         )
@@ -1356,7 +1356,7 @@ struct HermesFirstClassSupportTests {
         #expect(section.icon == .agent(.hermesAgent))
         #expect(section.entries.map(\.sessionId) == ["visible-session"])
         #expect(SessionAgent.hermesAgent.assetName == "AgentIcons/HermesAgent")
-        #expect(CmuxVaultAgentRegistration.builtInHermes.iconAssetName == "AgentIcons/HermesAgent")
+        #expect(WmuxVaultAgentRegistration.builtInHermes.iconAssetName == "AgentIcons/HermesAgent")
     }
 
     @Test("Hermes loads the official desktop icon from the compiled asset catalog")
@@ -1379,26 +1379,26 @@ struct HermesFirstClassSupportTests {
     func userDetectorTakesPrecedence() throws {
         let fixture = try makeFixture { [StateRow("built-in-session", cwd: $0.path)] }
         defer { try? FileManager.default.removeItem(at: fixture.root) }
-        let builtInRegistry = CmuxVaultAgentRegistry.load(
+        let builtInRegistry = WmuxVaultAgentRegistry.load(
             homeDirectory: fixture.root.path,
             environment: ["HOME": fixture.root.path],
             fileManager: .default
         )
         let builtInHermes = try #require(builtInRegistry.registration(id: "hermes-agent"))
-        let custom = CmuxVaultAgentRegistration(
+        let custom = WmuxVaultAgentRegistration(
             id: "team-hermes",
             name: "Team Hermes",
-            detect: CmuxVaultAgentDetectRule(processNames: ["hermes"]),
+            detect: WmuxVaultAgentDetectRule(processNames: ["hermes"]),
             sessionIdSource: .argvOption("--team-session"),
             resumeCommand: "{{executable}} --team-session {{sessionId}}"
         )
-        let registry = CmuxVaultAgentRegistry(registrations: [builtInHermes, custom])
+        let registry = WmuxVaultAgentRegistry(registrations: [builtInHermes, custom])
         let process = hermesProcess(pid: 9_525, workspaceID: fixture.workspaceID, panelID: fixture.panelID)
 
         let detected = RestorableAgentSessionIndex.processDetectedSnapshots(
             registry: registry,
             fileManager: .default,
-            processSnapshot: CmuxTopProcessSnapshot(
+            processSnapshot: WmuxTopProcessSnapshot(
                 processes: [process],
                 sampledAt: Date(timeIntervalSince1970: 0),
                 includesProcessDetails: true
@@ -1406,7 +1406,7 @@ struct HermesFirstClassSupportTests {
             capturedAt: 42,
             processArgumentsProvider: { pid in
                 guard pid == process.pid else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: [fixture.hermesExecutable, "--team-session", "team-session-1"],
                     environment: self.hermesEnvironment(fixture)
                 )
@@ -1429,7 +1429,7 @@ struct HermesFirstClassSupportTests {
         let socketPath = root.appendingPathComponent("cmux-debug-hermes-first-class.sock").path
         let cliPath = try BundledCLITestSupport.bundledCLIPath(for: HermesFirstClassBundleToken.self)
         let allowlistURL = hermesHome.appendingPathComponent("shell-hooks-allowlist.json")
-        let legacyCommand = #"sh -c 'cmux_cli=cmux; "$cmux_cli" hooks hermes-agent prompt-submit'"#
+        let legacyCommand = #"sh -c 'wmux_cli=cmux; "$wmux_cli" hooks hermes-agent prompt-submit'"#
         let userCommand = "echo user-owned Hermes hook"
         let existingAllowlist = try JSONSerialization.data(
             withJSONObject: [
@@ -1457,9 +1457,9 @@ struct HermesFirstClassSupportTests {
                 "HOME": root.path,
                 "HERMES_HOME": hermesHome.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_BUNDLED_CLI_PATH": pinnedCLI.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_BUNDLED_CLI_PATH": pinnedCLI.path,
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -1487,13 +1487,13 @@ struct HermesFirstClassSupportTests {
         #expect(cmuxCommands.allSatisfy { !$0.contains("cmux-hermes-agent-hook-v2") })
         #expect(cmuxCommands.allSatisfy { !$0.contains(pinnedCLI.path) })
         #expect(cmuxCommands.allSatisfy { !$0.contains(socketPath) })
-        #expect(cmuxCommands.allSatisfy { $0.contains("CMUX_BUNDLED_CLI_PATH") })
-        #expect(cmuxCommands.allSatisfy { $0.contains("CMUX_SOCKET_PATH") })
+        #expect(cmuxCommands.allSatisfy { $0.contains("WMUX_BUNDLED_CLI_PATH") })
+        #expect(cmuxCommands.allSatisfy { $0.contains("WMUX_SOCKET_PATH") })
         #expect(!config.contains("cmux-hermes-agent-hook-v2"))
         #expect(!config.contains(pinnedCLI.path))
         #expect(!config.contains(socketPath))
-        #expect(config.contains("CMUX_BUNDLED_CLI_PATH"))
-        #expect(config.contains("CMUX_SOCKET_PATH"))
+        #expect(config.contains("WMUX_BUNDLED_CLI_PATH"))
+        #expect(config.contains("WMUX_SOCKET_PATH"))
     }
 
     @Test("Hermes hook install creates a fresh home without a pinned cmux target")
@@ -1513,7 +1513,7 @@ struct HermesFirstClassSupportTests {
                 "HOME": root.path,
                 "HERMES_HOME": hermesHome.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -1522,8 +1522,8 @@ struct HermesFirstClassSupportTests {
         #expect(FileManager.default.fileExists(atPath: allowlistURL.path))
         #expect(FileManager.default.fileExists(atPath: allowlistLockURL.path))
         let config = try String(contentsOf: configURL, encoding: .utf8)
-        #expect(config.contains("CMUX_BUNDLED_CLI_PATH"))
-        #expect(config.contains("CMUX_SOCKET_PATH"))
+        #expect(config.contains("WMUX_BUNDLED_CLI_PATH"))
+        #expect(config.contains("WMUX_SOCKET_PATH"))
     }
 
     @Test("Hermes hook install reports directory creation failures accurately")
@@ -1540,7 +1540,7 @@ struct HermesFirstClassSupportTests {
                 "HOME": root.path,
                 "HERMES_HOME": blockedHermesHome,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -1573,15 +1573,15 @@ struct HermesFirstClassSupportTests {
                 "HERMES_HOME": hermesHome.path,
                 "GROK_HOME": grokHome.path,
                 "PATH": "\(binDirectory.path):/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
         #expect(result.status == 0, Comment(rawValue: result.output))
         #expect(result.output.contains("grok"))
         #expect(result.output.contains("Open a cmux workspace and run this command again."))
-        #expect(!result.output.contains("CMUX_SOCKET_PATH"))
-        #expect(!result.output.contains("CMUX_TAG"))
+        #expect(!result.output.contains("WMUX_SOCKET_PATH"))
+        #expect(!result.output.contains("WMUX_TAG"))
         #expect(result.output.contains("hermes-agent:"))
         #expect(FileManager.default.fileExists(
             atPath: hermesHome.appendingPathComponent("config.yaml", isDirectory: false).path
@@ -1623,10 +1623,10 @@ struct HermesFirstClassSupportTests {
 
     private func detectedHermesSnapshots(
         fixture: Fixture,
-        processes: [CmuxTopProcessInfo],
-        argumentsByPID: [Int: CmuxTopProcessArguments]
+        processes: [WmuxTopProcessInfo],
+        argumentsByPID: [Int: WmuxTopProcessArguments]
     ) throws -> [RestorableAgentSessionIndex.PanelKey: RestorableAgentSessionIndex.ProcessDetectedSnapshotEntry] {
-        let registry = CmuxVaultAgentRegistry.load(
+        let registry = WmuxVaultAgentRegistry.load(
             homeDirectory: fixture.root.path,
             environment: ["HOME": fixture.root.path],
             fileManager: .default
@@ -1635,7 +1635,7 @@ struct HermesFirstClassSupportTests {
         return RestorableAgentSessionIndex.processDetectedSnapshots(
             registry: registry,
             fileManager: .default,
-            processSnapshot: CmuxTopProcessSnapshot(
+            processSnapshot: WmuxTopProcessSnapshot(
                 processes: processes,
                 sampledAt: Date(timeIntervalSince1970: 0),
                 includesProcessDetails: true
@@ -1651,8 +1651,8 @@ struct HermesFirstClassSupportTests {
         panelID: UUID,
         name: String = "hermes",
         path: String = "/usr/local/bin/hermes"
-    ) -> CmuxTopProcessInfo {
-        CmuxTopProcessInfo(
+    ) -> WmuxTopProcessInfo {
+        WmuxTopProcessInfo(
             pid: pid,
             parentPID: 1,
             name: name,
@@ -1673,7 +1673,7 @@ struct HermesFirstClassSupportTests {
     private func hermesEnvironment(_ fixture: Fixture) -> [String: String] {
         [
             "HERMES_HOME": fixture.hermesHome.path,
-            "CMUX_AGENT_LAUNCH_CWD": fixture.repo.path,
+            "WMUX_AGENT_LAUNCH_CWD": fixture.repo.path,
             "PWD": fixture.repo.path,
         ]
     }
@@ -1759,8 +1759,8 @@ struct HermesFirstClassSupportTests {
     /// process on the machine exits mid-scan, which fails these lifecycle loads
     /// closed on a busy CI runner and has nothing to do with Hermes.
     private func fixtureProcessSnapshotService()
-        -> ProcessSnapshotService<CmuxTopProcessCapture, CmuxTopProcessFields> {
-        let sampler = CmuxTopProcessSampler(reader: HermesFixtureProcessReader())
+        -> ProcessSnapshotService<WmuxTopProcessCapture, WmuxTopProcessFields> {
+        let sampler = WmuxTopProcessSampler(reader: HermesFixtureProcessReader())
         return ProcessSnapshotService(
             capture: { try sampler.capture() },
             enrich: { try sampler.enrich($0, fields: $1) }
@@ -1771,9 +1771,9 @@ struct HermesFirstClassSupportTests {
         fixture: Fixture,
         processID: Int,
         identity: AgentPIDProcessIdentity,
-        liveProcess: CmuxTopProcessArguments
+        liveProcess: WmuxTopProcessArguments
     ) throws -> RestorableAgentSessionIndex {
-        let registry = CmuxVaultAgentRegistry.load(
+        let registry = WmuxVaultAgentRegistry.load(
             homeDirectory: fixture.root.path,
             environment: ["HOME": fixture.root.path],
             fileManager: .default
@@ -1888,7 +1888,7 @@ struct HermesFirstClassSupportTests {
 
 private final class HermesFirstClassBundleToken {}
 /// Enumerates no processes, completely. No live PID, argv or environment is read.
-private struct HermesFixtureProcessReader: CmuxTopProcessReading {
+private struct HermesFixtureProcessReader: WmuxTopProcessReading {
     func enumerate() -> DarwinProcessListing {
         DarwinProcessListing(processes: [], isComplete: true, missingProcessCount: 0)
     }
@@ -1896,8 +1896,8 @@ private struct HermesFixtureProcessReader: CmuxTopProcessReading {
     func resourceUsage(for pid: Int) -> rusage_info_v4? { nil }
     func processName(pid: Int, fallback: String) -> String { fallback }
     func processPath(pid: Int) -> String? { nil }
-    func scope(for pid: Int, key: CmuxTopProcessScopeCacheKey) -> CmuxTopProcessScope? { nil }
-    func matches(pid: Int, key: CmuxTopProcessScopeCacheKey) -> Bool { false }
+    func scope(for pid: Int, key: WmuxTopProcessScopeCacheKey) -> WmuxTopProcessScope? { nil }
+    func matches(pid: Int, key: WmuxTopProcessScopeCacheKey) -> Bool { false }
     func processHasExited(pid: Int) -> Bool { false }
 }
 

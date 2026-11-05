@@ -5,14 +5,14 @@
 // on and the page fetches the caption URL the player requested.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
-  const { URL, URLSearchParams } = root.CmuxBrowserRepl.core;
+  const { URL, URLSearchParams } = root.WmuxBrowserRepl.core;
   const ORIGIN = "https://www.youtube.com";
   // Caption URLs come from page data and are fetched with the session's
   // cookies: only https on YouTube's caption hosts (api.js, shared with
   // page.exportContent). Page functions get the host list as an argument.
-  const { youtubeCaptionURL: captionURL, YOUTUBE_CAPTION_HOSTS: CAPTION_HOSTS } = root.CmuxBrowserRepl.api;
+  const { youtubeCaptionURL: captionURL, YOUTUBE_CAPTION_HOSTS: CAPTION_HOSTS } = root.WmuxBrowserRepl.api;
 
   function videoId(input, name) {
     const s = String(input || "").trim();

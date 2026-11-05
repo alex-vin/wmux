@@ -1,8 +1,8 @@
-import CmuxCloud
-import CmuxCore
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCore
+import WmuxSurfaceCatalogModel
 import Foundation
-/// A collection of resources that travels as one drag or one "open all": a cmux-tui
+/// A collection of resources that travels as one drag or one "open all": a wmux-tui
 /// workspace on a machine, or a local workspace (the panes it projects). The canonical
 /// payload is typed placements. `resources` and the group workspace id remain as derived
 /// compatibility views for older callers and persisted drag records.
@@ -234,7 +234,7 @@ extension SurfaceCatalog {
                     .reserveCloudTerminalPane(machine: machine, at: destination, focus: focus)
             },
             attach: { reservation, resource, remoteTabID in
-                guard let provider = SurfaceCatalog.shared.provider(for: resource.machine) as? CmuxTuiSurfaceProvider else {
+                guard let provider = SurfaceCatalog.shared.provider(for: resource.machine) as? WmuxTuiSurfaceProvider else {
                     Workspace.liveWorkspace(id: reservation.workspaceID)?
                         .failReservedCloudTerminalPane(reservation, error: SurfaceCatalogError.noProvider(resource.machine))
                     return

@@ -1,11 +1,11 @@
 import AppKit
 import Bonsplit
 import Combine
-import CmuxFoundation
-import CmuxNotifications
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxTestSupport
+import WmuxFoundation
+import WmuxNotifications
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxTestSupport
 import Observation
 import SwiftUI
 
@@ -335,7 +335,7 @@ private final class DetachedNotificationsPopoverDelegate: NSObject, NSPopoverDel
 }
 
 extension Notification.Name {
-    static let cmuxNotificationsPopoverVisibilityDidChange = Notification.Name("cmux.notificationsPopoverVisibilityDidChange")
+    static let cmuxNotificationsPopoverVisibilityDidChange = Notification.Name("wmux.notificationsPopoverVisibilityDidChange")
 }
 
 private enum NotificationsPopoverVisibilityUserInfoKey {
@@ -1387,7 +1387,7 @@ private struct TitlebarControlSymbol: View {
     @Environment(\.titlebarControlForegroundOpacity) private var foregroundOpacity
 
     var body: some View {
-        CmuxSystemSymbolImage(
+        WmuxSystemSymbolImage(
             systemName: systemName,
             pointSize: config.iconSize,
             weight: TitlebarControlIconStyle.weight,
@@ -1554,7 +1554,7 @@ struct HiddenTitlebarSidebarControlsView: View {
                 }
                 #if DEBUG
                 TitlebarChromeUITestRecorder.recordTrafficLightFrames(window: window)
-                _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
+                _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
                     payload["minimalSidebarHostWindowNumber"] = String(nextWindowNumber)
                     payload["minimalSidebarHostPinned"] = String(
                         isHoveringHost || nextHoveringWindowChrome || popoverVisibilityState.isShown(in: nextWindowNumber)
@@ -1648,7 +1648,7 @@ struct HiddenTitlebarSidebarControlsView: View {
         .onReceive(MinimalModeSidebarChromeHoverState.shared.$hoveredWindowNumber) { hoveredWindowNumber in
             isHoveringWindowChrome = hostWindowNumber == hoveredWindowNumber
             #if DEBUG
-            _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
+            _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
                 payload["minimalSidebarObservedHoverWindowNumber"] = hoveredWindowNumber.map(String.init) ?? "nil"
                 payload["minimalSidebarObservedHostWindowNumber"] = hostWindowNumber.map(String.init) ?? "nil"
                 payload["minimalSidebarObservedPinned"] = String(shouldPinControls)
@@ -1861,10 +1861,10 @@ private struct PassthroughHoverTrackingView: NSViewRepresentable {
 
         private func recordFrameForUITest() {
             #if DEBUG
-            guard ProcessInfo.processInfo.environment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" else { return }
+            guard ProcessInfo.processInfo.environment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" else { return }
             guard window != nil else { return }
             let frameInWindow = convert(bounds, to: nil)
-            _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
+            _ = UITestCaptureSink().mutateJSONObjectIfConfigured(envKey: "WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH") { payload in
                 payload["minimalSidebarHostFrameInWindow"] = NSStringFromRect(frameInWindow)
             }
             #endif
@@ -2351,9 +2351,9 @@ private struct NotificationsPopoverView: View {
     let onDismiss: () -> Void
     let onOpenPhoneForwarding: () -> Void
 
-    @AppStorage("cmux.notifications.popover.width")
+    @AppStorage("wmux.notifications.popover.width")
     private var savedWidth: Double = Double(NotificationsPopoverMetrics.defaultWidth)
-    @AppStorage("cmux.notifications.popover.height")
+    @AppStorage("wmux.notifications.popover.height")
     private var savedHeight: Double = Double(NotificationsPopoverMetrics.defaultHeight)
 
     // Live size while the user drags the resize handle. We avoid writing through @AppStorage
@@ -2478,7 +2478,7 @@ private struct NotificationsPopoverView: View {
             Spacer()
             Button(action: jumpToLatestUnread) {
                 HStack(spacing: 5) {
-                    CmuxSystemSymbolImage(
+                    WmuxSystemSymbolImage(
                         systemName: "arrow.down.to.line",
                         pointSize: 10,
                         weight: .semibold,
@@ -2541,7 +2541,7 @@ private struct NotificationsPopoverView: View {
     private var phoneForwardingEntry: some View {
         Button(action: onOpenPhoneForwarding) {
             HStack(spacing: 8) {
-                CmuxSystemSymbolImage(systemName: "iphone", pointSize: 12, weight: .medium, tint: .secondary)
+                WmuxSystemSymbolImage(systemName: "iphone", pointSize: 12, weight: .medium, tint: .secondary)
                 Text(
                     String(
                         localized: "notifications.forwardToPhone.title",
@@ -2550,7 +2550,7 @@ private struct NotificationsPopoverView: View {
                 )
                 .cmuxFont(size: 12, weight: .medium)
                 Spacer()
-                CmuxSystemSymbolImage(systemName: "chevron.right", pointSize: 9, weight: .semibold, tint: .secondary)
+                WmuxSystemSymbolImage(systemName: "chevron.right", pointSize: 9, weight: .semibold, tint: .secondary)
             }
             .contentShape(Rectangle())
             .padding(.horizontal, 14)
@@ -2686,7 +2686,7 @@ private struct NotificationsPopoverView: View {
 
     private func emptyState(systemImage: String, title: String, subtitle: String?) -> some View {
         VStack(spacing: 10) {
-            CmuxSystemSymbolImage(systemName: systemImage, pointSize: 30, weight: .light, tint: .secondary.opacity(0.7))
+            WmuxSystemSymbolImage(systemName: systemImage, pointSize: 30, weight: .light, tint: .secondary.opacity(0.7))
             Text(title)
                 .cmuxFont(size: 14, weight: .medium)
                 .foregroundColor(.primary)
@@ -2742,7 +2742,7 @@ final class UpdateTitlebarAccessoryController {
     private var observers: [NSObjectProtocol] = []
     private var pendingAttachRetries: [ObjectIdentifier: Int] = [:]
     private var startupScanWorkItems: [DispatchWorkItem] = []
-    private let controlsIdentifier = NSUserInterfaceItemIdentifier("cmux.titlebarControls")
+    private let controlsIdentifier = NSUserInterfaceItemIdentifier("wmux.titlebarControls")
     private let controlsControllers = NSHashTable<TitlebarControlsAccessoryViewController>.weakObjects()
     private var lastKnownPresentationMode: WorkspacePresentationModeSettings.Mode = WorkspacePresentationModeSettings.mode()
     private var detachedNotificationsPopover: NSPopover?
@@ -2946,7 +2946,7 @@ final class UpdateTitlebarAccessoryController {
 
 #if DEBUG
         let env = ProcessInfo.processInfo.environment
-        if env["CMUX_UI_TEST_MODE"] == "1" {
+        if env["WMUX_UI_TEST_MODE"] == "1" {
             let ident = window.identifier?.rawValue ?? "<nil>"
             updateLog.append("removed titlebar accessories from window id=\(ident)")
         }
@@ -2954,7 +2954,7 @@ final class UpdateTitlebarAccessoryController {
     }
 
     private func isSettingsWindow(_ window: NSWindow) -> Bool {
-        if window.identifier?.rawValue == "cmux.settings" {
+        if window.identifier?.rawValue == "wmux.settings" {
             return true
         }
         return window.title == "Settings"
@@ -2962,7 +2962,7 @@ final class UpdateTitlebarAccessoryController {
 
     private func isMainTerminalWindow(_ window: NSWindow) -> Bool {
         guard let raw = window.identifier?.rawValue else { return false }
-        return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+        return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
     }
 
     private func canAccessTitlebarAccessories(on window: NSWindow) -> Bool {

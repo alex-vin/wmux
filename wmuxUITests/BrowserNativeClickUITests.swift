@@ -9,11 +9,11 @@ final class BrowserNativeClickUITests: XCTestCase {
         let app = XCUIApplication.cmuxTestApplication()
         let launchTag = "native-click-\(UUID().uuidString.prefix(8))"
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
-        app.launchEnvironment["CMUX_TAG"] = launchTag
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DISABLE_REMOTE_SUGGESTIONS"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_BROWSER_URL"] = Self.fixtureURL.absoluteString
+        app.launchEnvironment["WMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DISABLE_REMOTE_SUGGESTIONS"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_BROWSER_URL"] = Self.fixtureURL.absoluteString
         app.launch()
         addTeardownBlock { app.terminate() }
 

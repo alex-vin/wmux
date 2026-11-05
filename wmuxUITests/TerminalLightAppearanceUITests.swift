@@ -19,8 +19,8 @@ final class TerminalLightAppearanceUITests: SettingsUITestCase {
         app.launchArguments += settingsLaunchArguments
         app.launchEnvironment["CFFIXED_USER_HOME"] = home.path
         app.launchEnvironment["XDG_CONFIG_HOME"] = home.appendingPathComponent(".config").path
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-tests-light-\(UUID().uuidString.prefix(8))"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-tests-light-\(UUID().uuidString.prefix(8))"
         launchAndActivate(app)
         defer { app.terminate() }
 

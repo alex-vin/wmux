@@ -1,8 +1,8 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 
 /// Placement rename writes share the provider revision/receipt fence for user and agent calls.
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Rename one placement-local daemon tab. This is the canonical path used by a
     /// cloud-tree workspace row and by a local pane that remembers its remote tab id.
     func renameRemoteTab(id: String, name: String) async throws {

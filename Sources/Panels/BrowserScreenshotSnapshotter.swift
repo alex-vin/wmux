@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxFoundation
+import WmuxBrowser
+import WmuxFoundation
 import WebKit
 
 enum BrowserScreenshotCaptureBounds {
@@ -979,7 +979,7 @@ enum BrowserScreenshotWebViewSnapshotter {
     }
 
     private static func viewportSnapshotRenderer(for webView: WKWebView) -> BrowserViewportSnapshotRenderer? {
-        guard let viewport = (webView as? CmuxWebView)?.browserViewportModel?.viewport else {
+        guard let viewport = (webView as? WmuxWebView)?.browserViewportModel?.viewport else {
             return nil
         }
         return BrowserViewportSnapshotRenderer(

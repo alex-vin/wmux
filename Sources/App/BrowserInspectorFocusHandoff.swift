@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 
 @MainActor
 extension AppDelegate {
-    func browserInspectorOwningWebView(for responder: NSResponder?, in window: NSWindow, event: NSEvent?) -> CmuxWebView? {
+    func browserInspectorOwningWebView(for responder: NSResponder?, in window: NSWindow, event: NSEvent?) -> WmuxWebView? {
         guard cmuxIsLikelyWebInspectorResponder(responder) else { return nil }
         guard let event,
               WindowInputRoutingContext(event: event).allowsFirstResponderHitTesting,
@@ -12,14 +12,14 @@ extension AppDelegate {
             return nil
         }
         if let webView = BrowserWindowPortalRegistry.webViewAtWindowPoint(event.locationInWindow, in: window)
-            as? CmuxWebView {
+            as? WmuxWebView {
             return webView
         }
         guard let responder else { return nil }
         guard let browserPanel = browserPanelOwningInspectorResponder(responder) else {
             return nil
         }
-        return browserPanel.webView as? CmuxWebView
+        return browserPanel.webView as? WmuxWebView
     }
 
     func postBrowserInspectorClickIntentIfNeeded(for responder: NSResponder?, in window: NSWindow, event: NSEvent?) {

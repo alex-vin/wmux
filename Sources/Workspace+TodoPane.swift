@@ -1,5 +1,5 @@
 import Bonsplit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Foundation
 
 /// Workspace todo pane factory: creates the `WorkspaceTodoPanel` surface and

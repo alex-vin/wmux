@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -12,7 +12,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let sessionID = "24ec0052-450c-4914-b1dd-2ee80d4bc84b"
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 101,
@@ -40,23 +40,23 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
             processArgumentsAndEnvironment: { pid in
                 switch pid {
                 case 101:
-                    CmuxTopProcessArguments(
+                    WmuxTopProcessArguments(
                         arguments: [
                             "node",
                             "/Users/example/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js",
                         ],
                         environment: [
-                            "CMUX_AGENT_LAUNCH_KIND": "claude",
+                            "WMUX_AGENT_LAUNCH_KIND": "claude",
                             "CLAUDE_CODE_SESSION_ID": sessionID,
-                            "CMUX_AGENT_LAUNCH_CWD": "/Users/example/project",
+                            "WMUX_AGENT_LAUNCH_CWD": "/Users/example/project",
                         ]
                     )
                 case 202:
-                    CmuxTopProcessArguments(
+                    WmuxTopProcessArguments(
                         arguments: ["claude"],
                         environment: [
                             "CLAUDE_CODE_SESSION_ID": sessionID,
-                            "CMUX_AGENT_LAUNCH_CWD": "/Users/example/project",
+                            "WMUX_AGENT_LAUNCH_CWD": "/Users/example/project",
                         ]
                     )
                 default:
@@ -76,7 +76,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let sessionID = "24ec0052-450c-4914-b1dd-2ee80d4bc84b"
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 101,
@@ -103,18 +103,18 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
             includesProcessDetails: true
         )
 
-        let details: (Int) -> CmuxTopProcessArguments? = { pid in
+        let details: (Int) -> WmuxTopProcessArguments? = { pid in
             switch pid {
             case 101:
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: ["claude"],
                     environment: ["CLAUDE_CODE_SESSION_ID": sessionID]
                 )
             case 202:
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: ["git", "status"],
                     environment: [
-                        "CMUX_AGENT_LAUNCH_KIND": "claude",
+                        "WMUX_AGENT_LAUNCH_KIND": "claude",
                         "CLAUDE_CODE_SESSION_ID": sessionID,
                     ]
                 )
@@ -147,7 +147,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let sessionID = "24ec0052-450c-4914-b1dd-2ee80d4bc84b"
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 101,
@@ -173,18 +173,18 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
             sampledAt: Date(timeIntervalSince1970: 124),
             includesProcessDetails: true
         )
-        let details: (Int) -> CmuxTopProcessArguments? = { pid in
+        let details: (Int) -> WmuxTopProcessArguments? = { pid in
             switch pid {
             case 101:
-                CmuxTopProcessArguments(arguments: ["-zsh"], environment: [:])
+                WmuxTopProcessArguments(arguments: ["-zsh"], environment: [:])
             case 202:
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: [
                         "node",
                         "/Users/example/.cmux-agent-wrapper/subrouter.js",
                     ],
                     environment: [
-                        "CMUX_AGENT_LAUNCH_KIND": "claude",
+                        "WMUX_AGENT_LAUNCH_KIND": "claude",
                         "CLAUDE_CODE_SESSION_ID": sessionID,
                     ]
                 )
@@ -217,7 +217,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let sessionID = "24ec0052-450c-4914-b1dd-2ee80d4bc84b"
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 101,
@@ -243,15 +243,15 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
             sampledAt: Date(timeIntervalSince1970: 125),
             includesProcessDetails: true
         )
-        let details: (Int) -> CmuxTopProcessArguments? = { pid in
+        let details: (Int) -> WmuxTopProcessArguments? = { pid in
             switch pid {
             case 101:
-                CmuxTopProcessArguments(arguments: ["-zsh"], environment: [:])
+                WmuxTopProcessArguments(arguments: ["-zsh"], environment: [:])
             case 202:
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: ["node", "server.js"],
                     environment: [
-                        "CMUX_AGENT_LAUNCH_KIND": "claude",
+                        "WMUX_AGENT_LAUNCH_KIND": "claude",
                         "CLAUDE_CODE_SESSION_ID": sessionID,
                     ]
                 )
@@ -282,18 +282,18 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         let surfaceID = UUID()
         let parentSessionID = "24ec0052-450c-4914-b1dd-2ee80d4bc84b"
         let pendingSessionID = AgentChatSessionRegistry.pendingClaudeSessionID(surfaceID: surfaceID.uuidString)
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(pid: 303, parentPID: 101, name: "claude", path: "/opt/homebrew/bin/claude", workspaceID: workspaceID, surfaceID: surfaceID),
             ],
             sampledAt: Date(timeIntervalSince1970: 303),
             includesProcessDetails: true
         )
-        let details: (Int) -> CmuxTopProcessArguments? = { pid in
+        let details: (Int) -> WmuxTopProcessArguments? = { pid in
             guard pid == 303 else { return nil }
-            return CmuxTopProcessArguments(
+            return WmuxTopProcessArguments(
                 arguments: ["claude", "--resume", parentSessionID, "--fork-session=true"],
-                environment: ["CLAUDE_CODE_SESSION_ID": parentSessionID, "CMUX_AGENT_LAUNCH_CWD": "/Users/example/project"]
+                environment: ["CLAUDE_CODE_SESSION_ID": parentSessionID, "WMUX_AGENT_LAUNCH_CWD": "/Users/example/project"]
             )
         }
 
@@ -327,7 +327,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let sessionID = "1258bb73-b1b8-469e-910a-61266f4dfc44"
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 96441,
@@ -341,9 +341,9 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
             sampledAt: Date(timeIntervalSince1970: 1258),
             includesProcessDetails: true
         )
-        let details: (Int) -> CmuxTopProcessArguments? = { pid in
+        let details: (Int) -> WmuxTopProcessArguments? = { pid in
             guard pid == 96441 else { return nil }
-            return CmuxTopProcessArguments(
+            return WmuxTopProcessArguments(
                 arguments: ["claude.exe"],
                 environment: [
                     "CLAUDE_CODE_SESSION_ID": sessionID,
@@ -379,7 +379,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
     @Test func mobileChatObserverCreatesPendingClaudeExeWhenSessionIdentityIsUnavailable() throws {
         let workspaceID = UUID()
         let surfaceID = UUID()
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 54045,
@@ -414,7 +414,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         let workspaceID = UUID()
         let surfaceID = UUID()
         let detailReads = LockedCounter()
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 topProcess(
                     pid: 7001,
@@ -435,7 +435,7 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
                 in: snapshot,
                 processArgumentsAndEnvironment: { _ in
                     detailReads.increment()
-                    return CmuxTopProcessArguments(arguments: ["claude.exe"], environment: [:])
+                    return WmuxTopProcessArguments(arguments: ["claude.exe"], environment: [:])
                 },
                 codexRolloutPaths: { _ in [] }
             )
@@ -456,8 +456,8 @@ struct AgentChatSessionRegistryObservationReviewRegressionTests {
         surfaceID: UUID,
         processGroupID: Int? = nil,
         terminalProcessGroupID: Int? = nil
-    ) -> CmuxTopProcessInfo {
-        CmuxTopProcessInfo(
+    ) -> WmuxTopProcessInfo {
+        WmuxTopProcessInfo(
             pid: pid,
             parentPID: parentPID,
             name: name,

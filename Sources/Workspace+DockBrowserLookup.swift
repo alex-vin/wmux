@@ -1,7 +1,7 @@
 import AppKit
-import CmuxBrowser
-import CmuxCore
-import CmuxPanes
+import WmuxBrowser
+import WmuxCore
+import WmuxPanes
 import WebKit
 
 extension Workspace {

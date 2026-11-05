@@ -1,6 +1,6 @@
 import AppKit
-import CmuxCommandPalette
-import CmuxPanes
+import WmuxCommandPalette
+import WmuxPanes
 
 extension ContentView {
     func paneSizingContributions(

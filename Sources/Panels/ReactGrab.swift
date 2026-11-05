@@ -1,4 +1,4 @@
-import CmuxBrowser
+import WmuxBrowser
 import CryptoKit
 import Foundation
 import WebKit

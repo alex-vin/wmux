@@ -162,10 +162,10 @@ final class GotoSplitCycleUITests: XCTestCase {
         app.launchEnvironment["CFFIXED_USER_HOME"] = isolatedHome.path
         app.launchEnvironment["XDG_CONFIG_HOME"] =
             isolatedHome.appendingPathComponent(".config", isDirectory: true).path
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_PATH"] = dataPath
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_LAYOUT"] = "three_pane_terminal"
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_USE_GHOSTTY_CONFIG"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_PATH"] = dataPath
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_LAYOUT"] = "three_pane_terminal"
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_USE_GHOSTTY_CONFIG"] = "1"
         launchAndEnsureForeground(app)
 
         return (app, {

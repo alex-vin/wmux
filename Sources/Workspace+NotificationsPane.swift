@@ -1,5 +1,5 @@
 import Bonsplit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Foundation
 
 /// Notification-pane creation and the shared one-per-workspace open path.

@@ -1,5 +1,5 @@
-import CmuxCommandPalette
-import CmuxSettings
+import WmuxCommandPalette
+import WmuxSettings
 
 extension KeyboardShortcutSettings.Action {
     var allowsBareFirstStroke: Bool {

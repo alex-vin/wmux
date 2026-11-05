@@ -1,10 +1,10 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 enum TelemetrySettings {
     // Launch-frozen telemetry enablement: read once at process start so settings
     // changes apply on next restart. The persisted key, default, and read logic
-    // live in `CmuxSettings` (`AppCatalogSection().sendAnonymousTelemetry`) as the
+    // live in `WmuxSettings` (`AppCatalogSection().sendAnonymousTelemetry`) as the
     // single source of truth; this anchor only freezes that read for the lifetime
     // of the launch.
     static let enabledForCurrentLaunch = resolveEnabled(

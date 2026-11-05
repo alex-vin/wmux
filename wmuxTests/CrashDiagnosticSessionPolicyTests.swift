@@ -1,11 +1,11 @@
 import AppKit
-import CmuxWorkspaces
+import WmuxWorkspaces
 import Foundation
 import Testing
 import UniformTypeIdentifiers
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -519,7 +519,7 @@ struct CrashDiagnosticSessionPolicyTests {
     func sessionLaunchSentinelClassifiesAndClearsUncleanRuns() throws {
         let homeDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("cmux-session-launch-state-\(UUID().uuidString)", isDirectory: true)
-        let environment = ["CMUX_BUNDLE_ID": "com.cmux.tests.sentinel"]
+        let environment = ["WMUX_BUNDLE_ID": "com.cmux.tests.sentinel"]
         defer { try? FileManager.default.removeItem(at: homeDirectory) }
 
         #expect(

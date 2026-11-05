@@ -1,12 +1,11 @@
 import AppKit
-import CmuxExtensionSidebarExamples
-import CmuxFoundation
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxSidebarProviderKit
+import WmuxFoundation
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxSidebarProviderKit
 import Foundation
 
-enum CmuxExtensionSidebarSelection {
+enum WmuxExtensionSidebarSelection {
     @MainActor
     private static var inMemoryTemplatePreview: (providerId: String, source: String)?
 
@@ -16,9 +15,9 @@ enum CmuxExtensionSidebarSelection {
     static let defaultsKey = "cmuxExtensionSidebarProviderId"
     static let legacyDefaultsKey = "cmuxExtensionSidebar.providerId"
     static let selectedExtensionNameDefaultsKey = "cmuxExtensionSidebar.selectedExtensionName"
-    static let defaultProviderId = CmuxSidebarProviderDescriptor.defaultWorkspacesID
-    static let conversationSidebarProviderId = "cmux.sidebar.conversations"
-    static let hostedExtensionsProviderId = "cmux.sidebar.extensions"
+    static let defaultProviderId = WmuxSidebarProviderDescriptor.defaultWorkspacesID
+    static let conversationSidebarProviderId = "wmux.sidebar.conversations"
+    static let hostedExtensionsProviderId = "wmux.sidebar.extensions"
 
     /// Synchronous read of the experimental Extensions flag for the on-demand
     /// AppKit/static paths (the toggle menu, the command-palette builder, the
@@ -40,15 +39,15 @@ enum CmuxExtensionSidebarSelection {
         return Bool.decodeFromUserDefaults(UserDefaults.standard.object(forKey: key.userDefaultsKey)) ?? key.defaultValue
     }
 
-    static var providers: [any CmuxSidebarProvider] {
-        SidebarExamples.providers
+    static var providers: [any WmuxSidebarProvider] {
+        []
     }
 
     // MARK: - Custom sidebars (beta)
 
     /// Provider-id prefix for user/agent-authored custom sidebars. The
     /// suffix after the prefix is the sidebar's file base name.
-    static let customSidebarProviderPrefix = "cmux.sidebar.custom."
+    static let customSidebarProviderPrefix = "wmux.sidebar.custom."
 
     /// Synchronous read of the Conversations sidebar gate: the local beta
     /// opt-in and the remote release flag must both be on.
@@ -60,8 +59,8 @@ enum CmuxExtensionSidebarSelection {
         // The beta toggle is intentionally subordinate to the remote release
         // gate. This keeps the picker and persisted selection recoverable while
         // allowing PostHog to roll the feature out or kill it without shipping.
-        let releaseEnabled = CmuxFeatureFlags.offMainEffectiveValue(
-            for: CmuxFeatureFlags.conversationSidebarFlag
+        let releaseEnabled = WmuxFeatureFlags.offMainEffectiveValue(
+            for: WmuxFeatureFlags.conversationSidebarFlag
         )
         return localOptIn && releaseEnabled
     }
@@ -94,7 +93,7 @@ enum CmuxExtensionSidebarSelection {
     /// One provider descriptor per `<name>.swift`/`<name>.json` file in the
     /// sidebars directory (`.swift` preferred when both exist), titled by the
     /// file's base name.
-    static var customSidebarDescriptors: [CmuxSidebarProviderDescriptor] {
+    static var customSidebarDescriptors: [WmuxSidebarProviderDescriptor] {
         guard !ManagedDevicePolicy().isEnforced(.disableCustomSidebars) else { return [] }
         guard let entries = try? FileManager.default.contentsOfDirectory(
             at: customSidebarsDirectory,
@@ -118,10 +117,10 @@ enum CmuxExtensionSidebarSelection {
             extensionByName[name] = ext
         }
         return extensionByName.keys.sorted().map { name in
-            CmuxSidebarProviderDescriptor(
+            WmuxSidebarProviderDescriptor(
                 id: customSidebarProviderPrefix + name,
-                title: CmuxSidebarProviderLocalizedText(key: "sidebar.provider.custom.\(name)", defaultValue: name),
-                subtitle: CmuxSidebarProviderLocalizedText(
+                title: WmuxSidebarProviderLocalizedText(key: "sidebar.provider.custom.\(name)", defaultValue: name),
+                subtitle: WmuxSidebarProviderLocalizedText(
                     key: "sidebar.provider.custom.subtitle",
                     defaultValue: String(localized: "sidebar.provider.custom.subtitle", defaultValue: "Custom sidebar")
                 ),
@@ -154,14 +153,14 @@ enum CmuxExtensionSidebarSelection {
     }
 
     /// Picker descriptor for the built-in Conversations sidebar.
-    static var conversationSidebarDescriptor: CmuxSidebarProviderDescriptor {
-        CmuxSidebarProviderDescriptor(
+    static var conversationSidebarDescriptor: WmuxSidebarProviderDescriptor {
+        WmuxSidebarProviderDescriptor(
             id: conversationSidebarProviderId,
-            title: CmuxSidebarProviderLocalizedText(
+            title: WmuxSidebarProviderLocalizedText(
                 key: "sidebar.provider.conversations.title",
                 defaultValue: "Conversations"
             ),
-            subtitle: CmuxSidebarProviderLocalizedText(
+            subtitle: WmuxSidebarProviderLocalizedText(
                 key: "sidebar.provider.conversations.subtitle",
                 defaultValue: "Coding-agent sessions"
             ),
@@ -175,7 +174,7 @@ enum CmuxExtensionSidebarSelection {
     /// Servers, Last Prompt, Super Compact, Browser Stack). These ship
     /// independently of the experimental Extensions feature, so they stay in
     /// the switcher menu regardless of the beta flag.
-    static var builtInDescriptors: [CmuxSidebarProviderDescriptor] {
+    static var builtInDescriptors: [WmuxSidebarProviderDescriptor] {
         [.defaultWorkspaces] + providers.map { $0.descriptor }
     }
 
@@ -183,7 +182,7 @@ enum CmuxExtensionSidebarSelection {
     /// extension entry belongs to the experimental Extensions feature, so it is
     /// only offered while that beta is enabled; the built-in views are always
     /// offered.
-    static var descriptors: [CmuxSidebarProviderDescriptor] {
+    static var descriptors: [WmuxSidebarProviderDescriptor] {
         var result = builtInDescriptors
         if conversationSidebarEnabled {
             result.insert(conversationSidebarDescriptor, at: min(1, result.count))
@@ -196,22 +195,22 @@ enum CmuxExtensionSidebarSelection {
     /// Every descriptor that can ever be selected, ignoring feature gates. Used
     /// to register command-palette handlers so a runtime flag flip always has a
     /// handler to invoke; what is *shown* uses ``descriptors``.
-    static var allDescriptors: [CmuxSidebarProviderDescriptor] {
+    static var allDescriptors: [WmuxSidebarProviderDescriptor] {
         [.defaultWorkspaces, conversationSidebarDescriptor]
             + providers.map { $0.descriptor }
             + [hostedExtensionsDescriptor]
             + customSidebarDescriptors
     }
 
-    static var hostedExtensionsDescriptor: CmuxSidebarProviderDescriptor {
+    static var hostedExtensionsDescriptor: WmuxSidebarProviderDescriptor {
         let selectedName = UserDefaults.standard.string(forKey: selectedExtensionNameDefaultsKey)?.nilIfEmpty
-        return CmuxSidebarProviderDescriptor(
+        return WmuxSidebarProviderDescriptor(
             id: hostedExtensionsProviderId,
-            title: CmuxSidebarProviderLocalizedText(
+            title: WmuxSidebarProviderLocalizedText(
                 key: "sidebar.provider.extensions.title",
                 defaultValue: selectedName ?? String(localized: "sidebar.provider.extensions.title", defaultValue: "Extension Sidebar")
             ),
-            subtitle: CmuxSidebarProviderLocalizedText(
+            subtitle: WmuxSidebarProviderLocalizedText(
                 key: "sidebar.provider.extensions.subtitle",
                 defaultValue: selectedName == nil
                     ? String(localized: "sidebar.provider.extensions.subtitle", defaultValue: "Custom sidebar")
@@ -222,7 +221,7 @@ enum CmuxExtensionSidebarSelection {
         )
     }
 
-    static func descriptor(for providerId: String) -> CmuxSidebarProviderDescriptor {
+    static func descriptor(for providerId: String) -> WmuxSidebarProviderDescriptor {
         descriptors.first { $0.id == providerId } ?? .defaultWorkspaces
     }
 
@@ -254,7 +253,7 @@ enum CmuxExtensionSidebarSelection {
         return provider(for: id) == nil
     }
 
-    static func provider(for providerId: String) -> (any CmuxSidebarProvider)? {
+    static func provider(for providerId: String) -> (any WmuxSidebarProvider)? {
         providers.first { $0.descriptor.id == providerId }
     }
 
@@ -291,11 +290,11 @@ enum CmuxExtensionSidebarSelection {
         )
     }
 
-    static func localizedTitle(for descriptor: CmuxSidebarProviderDescriptor) -> String {
+    static func localizedTitle(for descriptor: WmuxSidebarProviderDescriptor) -> String {
         localizedText(descriptor.title)
     }
 
-    static func localizedText(_ text: CmuxSidebarProviderLocalizedText) -> String {
+    static func localizedText(_ text: WmuxSidebarProviderLocalizedText) -> String {
         NSLocalizedString(
             text.key,
             tableName: "Localizable",
@@ -370,11 +369,11 @@ enum CmuxExtensionSidebarSelection {
         for descriptor in descriptors {
             let item = NSMenuItem(
                 title: localizedTitle(for: descriptor),
-                action: #selector(CmuxExtensionSidebarMenuTarget.selectProvider(_:)),
+                action: #selector(WmuxExtensionSidebarMenuTarget.selectProvider(_:)),
                 keyEquivalent: ""
             )
             item.representedObject = descriptor.id
-            item.target = CmuxExtensionSidebarMenuTarget.shared
+            item.target = WmuxExtensionSidebarMenuTarget.shared
             item.state = selectedProviderId == descriptor.id ? .on : .off
             item.image = NSImage(systemSymbolName: descriptor.systemImageName, accessibilityDescription: nil)
             menu.addItem(item)
@@ -383,10 +382,10 @@ enum CmuxExtensionSidebarSelection {
             menu.addItem(.separator())
             let templatesItem = NSMenuItem(
                 title: String(localized: "sidebar.menu.browseTemplates", defaultValue: "Browse Sidebar Templates…"),
-                action: #selector(CmuxExtensionSidebarMenuTarget.browseTemplates),
+                action: #selector(WmuxExtensionSidebarMenuTarget.browseTemplates),
                 keyEquivalent: ""
             )
-            templatesItem.target = CmuxExtensionSidebarMenuTarget.shared
+            templatesItem.target = WmuxExtensionSidebarMenuTarget.shared
             menu.addItem(templatesItem)
         }
         menu.popUp(
@@ -398,15 +397,15 @@ enum CmuxExtensionSidebarSelection {
 }
 
 @MainActor
-private final class CmuxExtensionSidebarMenuTarget: NSObject {
-    static let shared = CmuxExtensionSidebarMenuTarget()
+private final class WmuxExtensionSidebarMenuTarget: NSObject {
+    static let shared = WmuxExtensionSidebarMenuTarget()
 
     @objc func selectProvider(_ sender: NSMenuItem) {
         guard let providerId = sender.representedObject as? String else { return }
-        CmuxExtensionSidebarSelection.setProviderId(providerId)
+        WmuxExtensionSidebarSelection.setProviderId(providerId)
     }
 
     @objc func browseTemplates() {
-        CmuxExtensionSidebarSelection.browseTemplates()
+        WmuxExtensionSidebarSelection.browseTemplates()
     }
 }

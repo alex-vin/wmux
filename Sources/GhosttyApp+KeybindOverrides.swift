@@ -14,7 +14,7 @@ extension GhosttyApp {
             triggers.map { "keybind = \($0)=unbind" }.joined(separator: "\n")
                 + "\n" + Self.numberedWorkspaceGhosttyUnbinds,
             into: config,
-            prefix: "cmux-host-keybind-defaults",
+            prefix: "wmux-host-keybind-defaults",
             logLabel: "host keybind defaults"
         )
     }
@@ -36,8 +36,8 @@ extension GhosttyApp {
             \(Self.numberedWorkspaceGhosttyUnbinds)
             """,
             into: config,
-            prefix: "cmux-owned-keybind-overrides",
-            logLabel: "cmux-owned keybind overrides"
+            prefix: "wmux-owned-keybind-overrides",
+            logLabel: "wmux-owned keybind overrides"
         )
     }
 

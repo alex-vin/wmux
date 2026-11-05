@@ -1,22 +1,22 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 
-/// The app's ``CmuxWebViewHost``: forwards each call to the current
+/// The app's ``WmuxWebViewHost``: forwards each call to the current
 /// `AppDelegate.shared` (tests swap it per case), keyboard shortcut settings,
-/// and the terminal pasteboard service, which is what `CmuxWebView` called
-/// directly before it moved into CmuxBrowser.
+/// and the terminal pasteboard service, which is what `WmuxWebView` called
+/// directly before it moved into WmuxBrowser.
 @MainActor
-final class CmuxWebViewAppHost: CmuxWebViewHost {
+final class WmuxWebViewAppHost: WmuxWebViewHost {
     /// Stateless: every call reads `AppDelegate.shared` when it runs, so construction needs no isolation.
     nonisolated init() {}
 
-    func makeDiffViewerNavigationKeyRouter() -> any CmuxWebViewNavigationKeyRouting {
+    func makeDiffViewerNavigationKeyRouter() -> any WmuxWebViewNavigationKeyRouting {
         DiffViewerNavigationKeyRouterAdapter()
     }
 
-    func diffViewerEditableFocusMessageHandler() -> CmuxWebViewScriptMessageHandlerRegistration {
-        CmuxWebViewScriptMessageHandlerRegistration(
+    func diffViewerEditableFocusMessageHandler() -> WmuxWebViewScriptMessageHandlerRegistration {
+        WmuxWebViewScriptMessageHandlerRegistration(
             handler: DiffViewerEditableFocusMessageHandler.shared,
             name: DiffViewerEditableFocusMessageHandler.name,
             contentWorld: DiffViewerEditableFocusMessageHandler.contentWorld
@@ -25,7 +25,7 @@ final class CmuxWebViewAppHost: CmuxWebViewHost {
 
     func handleBrowserFocusModeKeyEvent(
         _ event: NSEvent,
-        webView: CmuxWebView,
+        webView: WmuxWebView,
         source: String
     ) -> BrowserFocusModeKeyDecision? {
         AppDelegate.shared?.handleBrowserFocusModeKeyEvent(event, webView: webView, source: source)
@@ -39,15 +39,15 @@ final class CmuxWebViewAppHost: CmuxWebViewHost {
         AppDelegate.shared?.handleBrowserSurfaceKeyEquivalentBeforeMainMenu(event)
     }
 
-    func browserFocusModeContextMenuState(for webView: CmuxWebView) -> (isActive: Bool, canToggle: Bool)? {
+    func browserFocusModeContextMenuState(for webView: WmuxWebView) -> (isActive: Bool, canToggle: Bool)? {
         AppDelegate.shared?.browserFocusModeContextMenuState(for: webView)
     }
 
-    func toggleBrowserFocusModeFromContextMenu(for webView: CmuxWebView) -> Bool? {
+    func toggleBrowserFocusModeFromContextMenu(for webView: WmuxWebView) -> Bool? {
         AppDelegate.shared?.toggleBrowserFocusModeFromContextMenu(for: webView)
     }
 
-    func appendScreenshotContextMenuItems(to menu: NSMenu, for webView: CmuxWebView) {
+    func appendScreenshotContextMenuItems(to menu: NSMenu, for webView: WmuxWebView) {
         webView.appendScreenshotContextMenuItems(to: menu)
     }
 
@@ -61,7 +61,7 @@ final class CmuxWebViewAppHost: CmuxWebViewHost {
     func routesFindShortcutToWebContentFirst(
         _ event: NSEvent,
         responder: NSResponder?,
-        owningWebView: CmuxWebView?
+        owningWebView: WmuxWebView?
     ) -> Bool {
         shouldRouteBrowserFindCommandEquivalentThroughWebContentFirst(
             event,
@@ -100,13 +100,13 @@ final class CmuxWebViewAppHost: CmuxWebViewHost {
         of pasteboard: NSPasteboard,
         with items: [NSPasteboardItem],
         expectedChangeCount: Int
-    ) async -> CmuxWebViewPasteboardWriteOutcome {
+    ) async -> WmuxWebViewPasteboardWriteOutcome {
         let result = await GhosttyApp.terminalPasteboard.replaceContentsAndWait(
             of: pasteboard,
             with: items,
             expectedChangeCount: expectedChangeCount
         )
-        return CmuxWebViewPasteboardWriteOutcome(
+        return WmuxWebViewPasteboardWriteOutcome(
             conditionNotMet: result.status == .conditionNotMet,
             didWrite: result.didWrite
         )
@@ -114,7 +114,7 @@ final class CmuxWebViewAppHost: CmuxWebViewHost {
 
     func typingTimingStart() -> TimeInterval? {
 #if DEBUG
-        return CmuxTypingTiming.start()
+        return WmuxTypingTiming.start()
 #else
         return nil
 #endif
@@ -127,15 +127,15 @@ final class CmuxWebViewAppHost: CmuxWebViewHost {
         extra: String?
     ) {
 #if DEBUG
-        CmuxTypingTiming.logDuration(path: path, startedAt: startedAt, event: event, extra: extra)
+        WmuxTypingTiming.logDuration(path: path, startedAt: startedAt, event: event, extra: extra)
 #endif
     }
 }
 
 /// Adapts the app's shortcut-settings-driven ``ViewerNavigationKeyRouter`` to
-/// the diff viewer router `CmuxWebView` asks its host for.
+/// the diff viewer router `WmuxWebView` asks its host for.
 @MainActor
-private final class DiffViewerNavigationKeyRouterAdapter: CmuxWebViewNavigationKeyRouting {
+private final class DiffViewerNavigationKeyRouterAdapter: WmuxWebViewNavigationKeyRouting {
     private let router = ViewerNavigationKeyRouter(actions: [
         .diffViewerScrollDown, .diffViewerScrollUp,
         .diffViewerScrollHalfPageDown, .diffViewerScrollHalfPageUp,
@@ -151,12 +151,12 @@ private final class DiffViewerNavigationKeyRouterAdapter: CmuxWebViewNavigationK
 
     func handle(
         _ event: NSEvent,
-        perform: (CmuxWebViewNavigationKeyAction) -> Void
+        perform: (WmuxWebViewNavigationKeyAction) -> Void
     ) -> Bool {
         router.handle(event, isAllowed: { action, event in
             AppDelegate.shared?.shortcutWhenClauseAllows(action: action, event: event) ?? true
         }, perform: { action in
-            perform(CmuxWebViewNavigationKeyAction(
+            perform(WmuxWebViewNavigationKeyAction(
                 rawValue: action.rawValue,
                 opensFileSearch: action == .diffViewerOpenFileSearch
             ))

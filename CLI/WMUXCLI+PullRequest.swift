@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 /// Explicit PR handoff from a script into the existing sidebar presentation.
@@ -61,7 +61,7 @@ extension WMUXCLI {
                 let response = try client.sendV2(method: "system.identify", params: ["caller": ["workspace_id": id]])
                 let caller = response["caller"] as? [String: Any]
                 guard Self.pullRequestWindowIDsEqual(caller?["window_id"] as? String, windowID) else {
-                    throw CLIError(message: CMUXDiffViewerLocalization.string(
+                    throw CLIError(message: WMUXDiffViewerLocalization.string(
                         "cli.pr.error.workspaceMissing",
                         defaultValue: "Workspace not found; run wmux list-workspaces and retry with --workspace."
                     ))
@@ -79,7 +79,7 @@ extension WMUXCLI {
             }
         }
         if let ttyWorkspace { return ttyWorkspace }
-        if windowID == nil, let raw = ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"],
+        if windowID == nil, let raw = ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"],
            !raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return try resolveWorkspaceId(raw, client: client)
         }
@@ -140,7 +140,7 @@ extension WMUXCLI {
     }
 
     private func pullRequestAmbiguousWorkspaceError() -> CLIError {
-        CLIError(message: CMUXDiffViewerLocalization.string(
+        CLIError(message: WMUXDiffViewerLocalization.string(
             "cli.pr.error.ambiguousWorkspace",
             defaultValue: "wmux pr: could not identify the caller workspace; run it inside a wmux terminal or pass --workspace <id|ref|index>"
         ))
@@ -271,7 +271,7 @@ extension WMUXCLI {
         )
         let root = (result.stdout ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         guard !result.timedOut, result.exitStatus == 0, result.executionError == nil, !root.isEmpty else {
-            throw CLIError(message: CMUXDiffViewerLocalization.string(
+            throw CLIError(message: WMUXDiffViewerLocalization.string(
                 "cli.pr.error.notRepository",
                 defaultValue: "wmux pr requires a git repository in the current directory"
             ))
@@ -283,7 +283,7 @@ extension WMUXCLI {
         let numberToken = selector.hasPrefix("#") ? String(selector.dropFirst()) : selector
         let inputURL = pullRequestURL(selector)
         guard inputURL != nil || (Int(numberToken).map { $0 > 0 } == true && numberToken.allSatisfy(\.isNumber)) else {
-            throw CLIError(message: CMUXDiffViewerLocalization.string(
+            throw CLIError(message: WMUXDiffViewerLocalization.string(
                 "cli.pr.error.invalidSelector",
                 defaultValue: "wmux pr expects a pull-request URL or a positive pull-request number"
             ))
@@ -302,7 +302,7 @@ extension WMUXCLI {
         let requestedRepository = inputURL?.repository ?? repository
         let allowedRepositories = Set([repository, parentRepository].compactMap { $0?.lowercased() })
         if !allowedRepositories.contains(requestedRepository.lowercased()) {
-            throw CLIError(message: CMUXDiffViewerLocalization.string(
+            throw CLIError(message: WMUXDiffViewerLocalization.string(
                 "cli.pr.error.repositoryMismatch",
                 defaultValue: "wmux pr: the pull request does not belong to the detected repository"
             ))
@@ -341,7 +341,7 @@ extension WMUXCLI {
             directory: directory, executable: "gh", arguments: arguments, timeout: 15
         )
         guard !result.timedOut, result.exitStatus == 0, result.executionError == nil else {
-            throw CLIError(message: CMUXDiffViewerLocalization.string(
+            throw CLIError(message: WMUXDiffViewerLocalization.string(
                 "cli.pr.error.lookupFailed",
                 defaultValue: "wmux pr could not resolve the pull request; check authentication and try again"
             ))
@@ -354,13 +354,13 @@ extension WMUXCLI {
     }
 
     private func pullRequestMalformedMetadataError() -> CLIError {
-        CLIError(message: CMUXDiffViewerLocalization.string(
+        CLIError(message: WMUXDiffViewerLocalization.string(
             "cli.pr.error.lookupMalformed",
             defaultValue: "wmux pr received invalid pull-request information"
         ))
     }
 
-    static let pullRequestUsage = CMUXDiffViewerLocalization.string(
+    static let pullRequestUsage = WMUXDiffViewerLocalization.string(
         "cli.pr.usage",
         defaultValue: """
         Usage: wmux pr <url|number> [--workspace <id|ref|index>] [--window <id|ref|index>]

@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxSyntaxHighlighting
+import WmuxFoundation
+import WmuxSyntaxHighlighting
 
 /// Applies Highlightr token colors onto a TextKit 1 `NSTextStorage` in place.
 ///

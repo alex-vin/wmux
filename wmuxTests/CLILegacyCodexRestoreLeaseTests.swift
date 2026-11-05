@@ -9,7 +9,7 @@ struct CLILegacyCodexRestoreLeaseTests {
         ("custom-agent", "legacy-mode", false, false)
     ])
     func legacyLaunchHoldsLease(kind: String, mode: String, plannerFallback: Bool, expectsLease: Bool) throws {
-        let runner = CMUXCLIErrorOutputRegressionTests()
+        let runner = WMUXCLIErrorOutputRegressionTests()
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("cmux-legacy-lease-\(UUID().uuidString)")
         let home = root.appendingPathComponent("account")
         let sessions = home.appendingPathComponent("sessions")
@@ -60,7 +60,7 @@ struct CLILegacyCodexRestoreLeaseTests {
             arguments: ["restore", "--surface", UUID().uuidString, kind, session],
             environment: [
                 "HOME": root.path, "CFFIXED_USER_HOME": root.path, "PATH": "/usr/bin:/bin",
-                "CMUX_SOCKET_PATH": socket, "CMUX_CLI_SENTRY_DISABLED": "1", "SHELL": "/bin/sh"
+                "WMUX_SOCKET_PATH": socket, "WMUX_CLI_SENTRY_DISABLED": "1", "SHELL": "/bin/sh"
             ],
             timeout: 15
         )

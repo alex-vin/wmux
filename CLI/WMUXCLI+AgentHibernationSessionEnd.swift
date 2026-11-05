@@ -1,5 +1,5 @@
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
 struct ClaudeHookProcessGeneration: Codable, Equatable {
     let pid: Int
@@ -100,7 +100,7 @@ extension WMUXCLI {
         environment: [String: String]
     ) -> Bool {
         guard let sessionID = parsedInput.sessionId ?? mappedSession?.sessionId,
-              let rawPID = environment["CMUX_CLAUDE_PID"],
+              let rawPID = environment["WMUX_CLAUDE_PID"],
               let pid = Int(rawPID),
               let processIdentity = mappedSession?.processIdentity(for: pid) else {
             return false

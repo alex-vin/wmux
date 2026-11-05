@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 /// The resolved color shared by pane flashes and unread notification rings.
@@ -14,12 +14,12 @@ import SwiftUI
 struct WorkspaceAttentionColor: Hashable, Sendable {
     private let rgb: UInt32?
     /// The resolved cmux accent used when no valid color is configured.
-    private let accent: CmuxAccentColor
+    private let accent: WmuxAccentColor
     private let themeForegroundHex: String?
     private let useThemeForeground: Bool
     init(
         configuredHex: String?,
-        accent: CmuxAccentColor = CmuxAccentColor(),
+        accent: WmuxAccentColor = WmuxAccentColor(),
         themeForeground: NSColor? = nil,
         useThemeForeground: Bool = false
     ) {

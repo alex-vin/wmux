@@ -1,10 +1,10 @@
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import Observation
 import SwiftUI
 
-struct CmuxTaskManagerView: View {
-    @Bindable var model: CmuxTaskManagerModel
+struct WmuxTaskManagerView: View {
+    @Bindable var model: WmuxTaskManagerModel
 
     var body: some View {
         // Outer view observes the model so the toolbar/summary/sort
@@ -21,14 +21,14 @@ struct CmuxTaskManagerView: View {
             Divider()
             tableHeader
             Divider()
-            CmuxTaskManagerListView(
+            WmuxTaskManagerListView(
                 errorMessage: model.errorMessage,
                 isInitialLoading: model.isInitialLoading,
                 rows: model.sortedRows,
                 agentRows: model.sortedAgentRows,
                 aggregateRows: model.sortedAggregateRows,
                 childMemoryRows: model.sortedChildMemoryRows,
-                actions: CmuxTaskManagerRowActions.bound(to: model)
+                actions: WmuxTaskManagerRowActions.bound(to: model)
             )
         }
         .frame(minWidth: 820, minHeight: 480)
@@ -73,20 +73,20 @@ struct CmuxTaskManagerView: View {
         HStack(spacing: 24) {
             metric(
                 title: String(localized: "taskManager.summary.cpu", defaultValue: "CPU"),
-                value: CmuxTaskManagerFormat.cpu(model.snapshot.total.cpuPercent)
+                value: WmuxTaskManagerFormat.cpu(model.snapshot.total.cpuPercent)
             )
             metric(
                 title: String(localized: "taskManager.summary.memory", defaultValue: "Memory"),
-                value: CmuxTaskManagerFormat.bytes(model.snapshot.total.memoryBytes)
+                value: WmuxTaskManagerFormat.bytes(model.snapshot.total.memoryBytes)
             )
             if let memoryDiagnostic = model.snapshot.memoryDiagnostic {
                 metric(
                     title: String(localized: "taskManager.summary.appFootprint", defaultValue: "App Footprint"),
-                    value: CmuxTaskManagerFormat.bytes(memoryDiagnostic.appFootprintBytes)
+                    value: WmuxTaskManagerFormat.bytes(memoryDiagnostic.appFootprintBytes)
                 )
                 metric(
                     title: String(localized: "taskManager.summary.childRSS", defaultValue: "Child RSS"),
-                    value: CmuxTaskManagerFormat.bytes(memoryDiagnostic.childRSSBytes)
+                    value: WmuxTaskManagerFormat.bytes(memoryDiagnostic.childRSSBytes)
                 )
             }
             metric(
@@ -149,7 +149,7 @@ struct CmuxTaskManagerView: View {
 
     private func sortHeader(
         title: String,
-        column: CmuxTaskManagerSortOrder.Column,
+        column: WmuxTaskManagerSortOrder.Column,
         width: CGFloat? = nil,
         maxWidth: CGFloat? = nil,
         alignment: Alignment
@@ -172,10 +172,10 @@ struct CmuxTaskManagerView: View {
         .accessibilityLabel(title)
     }
 
-    private func sortIndicator(for column: CmuxTaskManagerSortOrder.Column) -> some View {
+    private func sortIndicator(for column: WmuxTaskManagerSortOrder.Column) -> some View {
         let isActive = model.sortOrder.column == column
         let imageName = model.sortOrder.direction == .ascending ? "chevron.up" : "chevron.down"
-        return CmuxSystemSymbolImage(magnified: imageName, pointSize: 8, weight: .bold, tint: isActive ? .primary : .secondary)
+        return WmuxSystemSymbolImage(magnified: imageName, pointSize: 8, weight: .bold, tint: isActive ? .primary : .secondary)
             .opacity(isActive ? 1 : 0)
             .frame(width: 8)
             .accessibilityHidden(true)
@@ -183,19 +183,19 @@ struct CmuxTaskManagerView: View {
 }
 
 /// Closure bundle handed down to row views so they never reference the
-/// `@Observable` `CmuxTaskManagerModel`. Matches the
+/// `@Observable` `WmuxTaskManagerModel`. Matches the
 /// `IndexSectionActions` / `SectionGapActions` reference pattern in
 /// `Sources/SessionIndexView.swift`. See repo/CLAUDE.md
 /// "Snapshot boundary for list subtrees" rule and issues #2586 / #4529.
-struct CmuxTaskManagerRowActions {
-    let viewWorkspace: @MainActor (CmuxTaskManagerRow) -> Void
-    let viewTerminal: @MainActor (CmuxTaskManagerRow) -> Void
-    let killProcess: @MainActor (CmuxTaskManagerRow) -> Void
-    let activate: @MainActor (CmuxTaskManagerRow) -> Void
+struct WmuxTaskManagerRowActions {
+    let viewWorkspace: @MainActor (WmuxTaskManagerRow) -> Void
+    let viewTerminal: @MainActor (WmuxTaskManagerRow) -> Void
+    let killProcess: @MainActor (WmuxTaskManagerRow) -> Void
+    let activate: @MainActor (WmuxTaskManagerRow) -> Void
 
     @MainActor
-    static func bound(to model: CmuxTaskManagerModel) -> CmuxTaskManagerRowActions {
-        CmuxTaskManagerRowActions(
+    static func bound(to model: WmuxTaskManagerModel) -> WmuxTaskManagerRowActions {
+        WmuxTaskManagerRowActions(
             viewWorkspace: { row in model.viewWorkspace(for: row) },
             viewTerminal: { row in model.viewTerminal(for: row) },
             killProcess: { row in model.killProcess(for: row) },
@@ -206,28 +206,28 @@ struct CmuxTaskManagerRowActions {
 
 /// Lazy list subtree. Receives value-typed row arrays plus a closure
 /// action bundle so SwiftUI can prove rows never observe the
-/// `CmuxTaskManagerModel`. Combined with the `Equatable` conformance on
-/// `CmuxTaskManagerRowView`, this stops the 3 s refresh timer from
+/// `WmuxTaskManagerModel`. Combined with the `Equatable` conformance on
+/// `WmuxTaskManagerRowView`, this stops the 3 s refresh timer from
 /// invalidating every row on every tick.
-struct CmuxTaskManagerListView: View {
+struct WmuxTaskManagerListView: View {
     let errorMessage: String?
     let isInitialLoading: Bool
-    let rows: [CmuxTaskManagerRow]
-    let agentRows: [CmuxTaskManagerRow]
-    let aggregateRows: [CmuxTaskManagerRow]
-    let childMemoryRows: [CmuxTaskManagerRow]
-    let actions: CmuxTaskManagerRowActions
+    let rows: [WmuxTaskManagerRow]
+    let agentRows: [WmuxTaskManagerRow]
+    let aggregateRows: [WmuxTaskManagerRow]
+    let childMemoryRows: [WmuxTaskManagerRow]
+    let actions: WmuxTaskManagerRowActions
 
     var body: some View {
         if let errorMessage {
-            CmuxTaskManagerMessageView(
+            WmuxTaskManagerMessageView(
                 title: String(localized: "taskManager.error.title", defaultValue: "Unable to load resource usage"),
                 detail: errorMessage
             )
         } else if isInitialLoading {
-            CmuxTaskManagerLoadingView()
+            WmuxTaskManagerLoadingView()
         } else if rows.isEmpty && agentRows.isEmpty && aggregateRows.isEmpty && childMemoryRows.isEmpty {
-            CmuxTaskManagerMessageView(
+            WmuxTaskManagerMessageView(
                 title: String(localized: "taskManager.empty.title", defaultValue: "No resource usage"),
                 detail: String(localized: "taskManager.empty.detail", defaultValue: "Open a workspace, terminal, or browser surface to see it here.")
             )
@@ -235,11 +235,11 @@ struct CmuxTaskManagerListView: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     if !agentRows.isEmpty {
-                        CmuxTaskManagerSectionHeaderView(
+                        WmuxTaskManagerSectionHeaderView(
                             title: String(localized: "taskManager.section.codingAgents", defaultValue: "Coding Agents")
                         ).equatable()
                         ForEach(agentRows) { row in
-                            CmuxTaskManagerRowView(
+                            WmuxTaskManagerRowView(
                                 row: row,
                                 onViewWorkspace: {},
                                 onViewTerminal: {},
@@ -251,11 +251,11 @@ struct CmuxTaskManagerListView: View {
                         }
                     }
                     if !aggregateRows.isEmpty {
-                        CmuxTaskManagerSectionHeaderView(
+                        WmuxTaskManagerSectionHeaderView(
                             title: String(localized: "taskManager.section.programTotals", defaultValue: "Program Totals")
                         ).equatable()
                         ForEach(aggregateRows) { row in
-                            CmuxTaskManagerRowView(
+                            WmuxTaskManagerRowView(
                                 row: row,
                                 onViewWorkspace: {},
                                 onViewTerminal: {},
@@ -267,11 +267,11 @@ struct CmuxTaskManagerListView: View {
                         }
                     }
                     if !childMemoryRows.isEmpty {
-                        CmuxTaskManagerSectionHeaderView(
+                        WmuxTaskManagerSectionHeaderView(
                             title: String(localized: "taskManager.section.childProcessRSS", defaultValue: "Child Process RSS")
                         ).equatable()
                         ForEach(childMemoryRows) { row in
-                            CmuxTaskManagerRowView(
+                            WmuxTaskManagerRowView(
                                 row: row,
                                 onViewWorkspace: { actions.viewWorkspace(row) },
                                 onViewTerminal: { actions.viewTerminal(row) },
@@ -283,12 +283,12 @@ struct CmuxTaskManagerListView: View {
                         }
                     }
                     if !rows.isEmpty && (!agentRows.isEmpty || !aggregateRows.isEmpty || !childMemoryRows.isEmpty) {
-                        CmuxTaskManagerSectionHeaderView(
+                        WmuxTaskManagerSectionHeaderView(
                             title: String(localized: "taskManager.section.hierarchy", defaultValue: "Hierarchy")
                         ).equatable()
                     }
                     ForEach(rows) { row in
-                        CmuxTaskManagerRowView(
+                        WmuxTaskManagerRowView(
                             row: row,
                             onViewWorkspace: { actions.viewWorkspace(row) },
                             onViewTerminal: { actions.viewTerminal(row) },
@@ -304,10 +304,10 @@ struct CmuxTaskManagerListView: View {
     }
 }
 
-private struct CmuxTaskManagerSectionHeaderView: View, Equatable {
+private struct WmuxTaskManagerSectionHeaderView: View, Equatable {
     let title: String
 
-    static func == (lhs: CmuxTaskManagerSectionHeaderView, rhs: CmuxTaskManagerSectionHeaderView) -> Bool {
+    static func == (lhs: WmuxTaskManagerSectionHeaderView, rhs: WmuxTaskManagerSectionHeaderView) -> Bool {
         lhs.title == rhs.title
     }
 
@@ -322,7 +322,7 @@ private struct CmuxTaskManagerSectionHeaderView: View, Equatable {
     }
 }
 
-private struct CmuxTaskManagerLoadingView: View {
+private struct WmuxTaskManagerLoadingView: View {
     var body: some View {
         VStack(spacing: 10) {
             ProgressView()
@@ -337,7 +337,7 @@ private struct CmuxTaskManagerLoadingView: View {
     }
 }
 
-private struct CmuxTaskManagerMessageView: View {
+private struct WmuxTaskManagerMessageView: View {
     let title: String
     let detail: String
 
@@ -364,14 +364,14 @@ private struct CmuxTaskManagerMessageView: View {
 /// model above the snapshot boundary) but their identity changes every
 /// render. Comparing closure identity would defeat the optimization
 /// and re-introduce the 0.64.8 memory leak (issue #4529).
-struct CmuxTaskManagerRowView: View, Equatable {
-    let row: CmuxTaskManagerRow
+struct WmuxTaskManagerRowView: View, Equatable {
+    let row: WmuxTaskManagerRow
     let onViewWorkspace: @MainActor () -> Void
     let onViewTerminal: @MainActor () -> Void
     let onKillProcess: @MainActor () -> Void
     let onActivate: @MainActor () -> Void
 
-    static func == (lhs: CmuxTaskManagerRowView, rhs: CmuxTaskManagerRowView) -> Bool {
+    static func == (lhs: WmuxTaskManagerRowView, rhs: WmuxTaskManagerRowView) -> Bool {
         // Closures excluded on purpose: the parent rebuilds the action
         // bundle on every render tick, but the row payload is what
         // actually drives visible state. Comparing closure identity
@@ -448,9 +448,9 @@ struct CmuxTaskManagerRowView: View, Equatable {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text(CmuxTaskManagerFormat.cpu(row.resources.cpuPercent))
+            Text(WmuxTaskManagerFormat.cpu(row.resources.cpuPercent))
                 .frame(width: 82, alignment: .trailing)
-            Text(CmuxTaskManagerFormat.bytes(row.resources.memoryBytes))
+            Text(WmuxTaskManagerFormat.bytes(row.resources.memoryBytes))
                 .frame(width: 96, alignment: .trailing)
             Text("\(row.resources.processCount)")
                 .frame(width: 70, alignment: .trailing)
@@ -466,13 +466,13 @@ struct CmuxTaskManagerRowView: View, Equatable {
     @ViewBuilder
     private var rowIcon: some View {
         if let agentAssetName = row.agentAssetName {
-            CmuxResolvedIconImage(request: CmuxResolvedIconRequest(
+            WmuxResolvedIconImage(request: WmuxResolvedIconRequest(
                 source: .asset(name: agentAssetName, bundle: .main),
                 size: NSSize(width: 14, height: 14)
             ))
             .frame(width: 14, height: 14)
         } else {
-            CmuxSystemSymbolImage(magnified: row.kind.systemImage, pointSize: 12, tint: row.kind.tint)
+            WmuxSystemSymbolImage(magnified: row.kind.systemImage, pointSize: 12, tint: row.kind.tint)
                 .frame(width: 14)
         }
     }

@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -83,7 +83,7 @@ struct BrowserPanelSessionRestoreTests {
 
         #expect(panel.chromeVisibility == .visible)
         let expectedURL = try #require(
-            CmuxDiffViewerURLSchemeHandler.diffViewerURL(
+            WmuxDiffViewerURLSchemeHandler.diffViewerURL(
                 token: token,
                 requestPath: requestPath
             )

@@ -1,33 +1,33 @@
 import Foundation
 
 /// Describes whether a memory group has one common owner, several owners, or incomplete attribution.
-enum CmuxTaskManagerMemoryGroupAttribution: Sendable {
-    case common(CmuxTaskManagerMemoryAttribution)
+enum WmuxTaskManagerMemoryGroupAttribution: Sendable {
+    case common(WmuxTaskManagerMemoryAttribution)
     case multiple(workspaceCount: Int, ownerCount: Int)
     case partial(attributedProcessCount: Int, unattributedProcessCount: Int)
     case unattributed
 
     init?(_ payload: [String: Any]) {
-        guard let kind = CmuxTaskManagerMemoryDiagnostic.string(payload["kind"]) else {
+        guard let kind = WmuxTaskManagerMemoryDiagnostic.string(payload["kind"]) else {
             return nil
         }
         switch kind {
         case "common":
-            guard let owner = CmuxTaskManagerMemoryAttribution(payload["owner"] as? [String: Any]) else {
+            guard let owner = WmuxTaskManagerMemoryAttribution(payload["owner"] as? [String: Any]) else {
                 return nil
             }
             self = .common(owner)
         case "multiple":
             self = .multiple(
-                workspaceCount: CmuxTaskManagerMemoryDiagnostic.int(payload["workspace_count"]) ?? 0,
-                ownerCount: CmuxTaskManagerMemoryDiagnostic.int(payload["owner_count"]) ?? 0
+                workspaceCount: WmuxTaskManagerMemoryDiagnostic.int(payload["workspace_count"]) ?? 0,
+                ownerCount: WmuxTaskManagerMemoryDiagnostic.int(payload["owner_count"]) ?? 0
             )
         case "partial":
             self = .partial(
-                attributedProcessCount: CmuxTaskManagerMemoryDiagnostic.int(
+                attributedProcessCount: WmuxTaskManagerMemoryDiagnostic.int(
                     payload["attributed_process_count"]
                 ) ?? 0,
-                unattributedProcessCount: CmuxTaskManagerMemoryDiagnostic.int(
+                unattributedProcessCount: WmuxTaskManagerMemoryDiagnostic.int(
                     payload["unattributed_process_count"]
                 ) ?? 0
             )
@@ -38,7 +38,7 @@ enum CmuxTaskManagerMemoryGroupAttribution: Sendable {
         }
     }
 
-    var commonOwner: CmuxTaskManagerMemoryAttribution? {
+    var commonOwner: WmuxTaskManagerMemoryAttribution? {
         guard case .common(let owner) = self else { return nil }
         return owner
     }

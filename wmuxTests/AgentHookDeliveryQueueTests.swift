@@ -1,11 +1,11 @@
 import Darwin
 import Foundation
 import Testing
-import CMUXAgentLaunch
-import CmuxRemoteWorkspace
+import WMUXAgentLaunch
+import WmuxRemoteWorkspace
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -29,7 +29,7 @@ struct AgentHookDeliveryQueueTests {
         let event = try #require(AgentHookDeliveryEvent(params: admitted, deliverySocketPath: "/tmp/cmux-test.sock"))
         #expect(event.relayBacked)
         #expect(event.sessionID == "sess-1")
-        #expect(event.environment == ["CMUX_WORKSPACE_ID": workspaceID, "CMUX_SURFACE_ID": surfaceID])
+        #expect(event.environment == ["WMUX_WORKSPACE_ID": workspaceID, "WMUX_SURFACE_ID": surfaceID])
         #expect(!event.payload.contains("transcript_path"))
     }
 
@@ -785,14 +785,14 @@ struct AgentHookDeliveryQueueTests {
             "subcommand": "permission-request",
             "payload": "{}",
             "socket_path": "/tmp/cmux-test.sock",
-            "environment": ["CMUX_SURFACE_ID": "surface-a"],
+            "environment": ["WMUX_SURFACE_ID": "surface-a"],
         ])
         let unsupportedEnvironment = AgentHookDeliveryEvent(params: [
             "agent": "claude",
             "subcommand": "prompt-submit",
             "payload": "{}",
             "socket_path": "/tmp/cmux-test.sock",
-            "environment": ["CMUX_SOCKET_PASSWORD": "secret"],
+            "environment": ["WMUX_SOCKET_PASSWORD": "secret"],
         ])
         #expect(unsupportedDecision == nil)
         #expect(unsupportedEnvironment == nil)
@@ -803,7 +803,7 @@ struct AgentHookDeliveryQueueTests {
     @Test("Queued Claude hooks carry the routed launch metadata")
     func queuedClaudeHookCarriesRoutedLaunchMetadata() throws {
         let environment = [
-            "CMUX_SURFACE_ID": "surface-a",
+            "WMUX_SURFACE_ID": "surface-a",
             SubrouterClaudeResumeRouting.accountEnvironmentKey: "me@example.com",
             SubrouterClaudeResumeRouting.environmentKey: "sr claude proxy --resume",
             SubrouterClaudeResumeRouting.launchBoundEnvironmentKey: "sr claude proxy --resume",
@@ -855,9 +855,9 @@ struct AgentHookDeliveryQueueTests {
             "relay_backed": true,
             "environment": [
                 "ANTHROPIC_BASE_URL": "https://relay.example.test",
-                "CMUX_AGENT_MANAGED_SUBAGENT": "1",
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_SURFACE_ID": "surface-a",
+                "WMUX_AGENT_MANAGED_SUBAGENT": "1",
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_SURFACE_ID": "surface-a",
             ],
         ]
         let event = try #require(AgentHookDeliveryEvent(
@@ -867,21 +867,21 @@ struct AgentHookDeliveryQueueTests {
         #expect(event.socketPath == "/tmp/cmux-local.sock")
         #expect(event.relayBacked)
         #expect(event.environment["ANTHROPIC_BASE_URL"] == "https://relay.example.test")
-        #expect(event.environment["CMUX_AGENT_MANAGED_SUBAGENT"] == "1")
+        #expect(event.environment["WMUX_AGENT_MANAGED_SUBAGENT"] == "1")
 
         let process = AgentHookDeliveryProcess(executableURLProvider: { nil })
         let environment = process.deliveryEnvironment(
             event: event,
             executableURL: URL(fileURLWithPath: "/bin/true")
         )
-        #expect(environment["CMUX_SOCKET_PATH"] == "/tmp/cmux-local.sock")
-        #expect(environment["CMUX_AGENT_HOOK_RELAY_ORIGIN"] == "1")
-        #expect(environment["CMUX_AGENT_MANAGED_SUBAGENT"] == "1")
-        #expect(environment["CMUX_SURFACE_ID"] == "surface-a")
+        #expect(environment["WMUX_SOCKET_PATH"] == "/tmp/cmux-local.sock")
+        #expect(environment["WMUX_AGENT_HOOK_RELAY_ORIGIN"] == "1")
+        #expect(environment["WMUX_AGENT_MANAGED_SUBAGENT"] == "1")
+        #expect(environment["WMUX_SURFACE_ID"] == "surface-a")
         #expect(environment["ANTHROPIC_BASE_URL"] == nil)
-        #expect(environment["CMUX_CLAUDE_PID"] == nil)
+        #expect(environment["WMUX_CLAUDE_PID"] == nil)
         let relayStateDirectory = try #require(
-            environment["CMUX_AGENT_HOOK_STATE_DIR"]
+            environment["WMUX_AGENT_HOOK_STATE_DIR"]
         )
         let localHome = try #require(environment["HOME"])
         let relayStateRoot = URL(fileURLWithPath: localHome, isDirectory: true)
@@ -897,7 +897,7 @@ struct AgentHookDeliveryQueueTests {
 
         var secondRelayParams = params
         secondRelayParams["environment"] = [
-            "CMUX_SURFACE_ID": "surface-b",
+            "WMUX_SURFACE_ID": "surface-b",
         ]
         let secondRelayEvent = try #require(AgentHookDeliveryEvent(
             params: secondRelayParams,
@@ -908,14 +908,14 @@ struct AgentHookDeliveryQueueTests {
             executableURL: URL(fileURLWithPath: "/bin/true")
         )
         #expect(
-            secondRelayEnvironment["CMUX_AGENT_HOOK_STATE_DIR"] != relayStateDirectory,
+            secondRelayEnvironment["WMUX_AGENT_HOOK_STATE_DIR"] != relayStateDirectory,
             "Separate rewritten relay routes must not share persistent hook state"
         )
 
         var unsafeParams = params
         unsafeParams["environment"] = ["ANTHROPIC_API_KEY": "secret"]
         #expect(AgentHookDeliveryEvent(params: unsafeParams) == nil)
-        unsafeParams["environment"] = ["CMUX_AGENT_HOOK_RELAY_ORIGIN": "1"]
+        unsafeParams["environment"] = ["WMUX_AGENT_HOOK_RELAY_ORIGIN": "1"]
         #expect(AgentHookDeliveryEvent(params: unsafeParams) == nil)
 
         var directParams = params
@@ -926,7 +926,7 @@ struct AgentHookDeliveryQueueTests {
             event: directEvent,
             executableURL: URL(fileURLWithPath: "/bin/true")
         )
-        #expect(directEnvironment["CMUX_AGENT_HOOK_RELAY_ORIGIN"] == nil)
+        #expect(directEnvironment["WMUX_AGENT_HOOK_RELAY_ORIGIN"] == nil)
     }
 
     @Test("Mirrored cmux-tui session hooks replay relay-backed to the local pane")
@@ -950,10 +950,10 @@ struct AgentHookDeliveryQueueTests {
             event: start,
             executableURL: URL(fileURLWithPath: "/bin/true")
         )
-        #expect(startEnvironment["CMUX_WORKSPACE_ID"] == workspaceID.uuidString)
-        #expect(startEnvironment["CMUX_SURFACE_ID"] == surfaceID.uuidString)
-        #expect(startEnvironment["CMUX_AGENT_HOOK_RELAY_ORIGIN"] == "1")
-        #expect(startEnvironment["CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] == nil)
+        #expect(startEnvironment["WMUX_WORKSPACE_ID"] == workspaceID.uuidString)
+        #expect(startEnvironment["WMUX_SURFACE_ID"] == surfaceID.uuidString)
+        #expect(startEnvironment["WMUX_AGENT_HOOK_RELAY_ORIGIN"] == "1")
+        #expect(startEnvironment["WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] == nil)
 
         // Session end keeps the record/journal cleanup but not the visible
         // status and notification cleanup owned by the roster projection.
@@ -969,7 +969,7 @@ struct AgentHookDeliveryQueueTests {
             event: end,
             executableURL: URL(fileURLWithPath: "/bin/true")
         )
-        #expect(endEnvironment["CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] == "1")
+        #expect(endEnvironment["WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] == "1")
         #expect(end.orderingKey == start.orderingKey)
     }
 
@@ -981,17 +981,17 @@ struct AgentHookDeliveryQueueTests {
             "payload": #"{"session_id":"large-launch"}"#,
             "socket_path": "/tmp/cmux-test.sock",
             "environment": [
-                "CMUX_SURFACE_ID": "surface-large-launch",
-                "CMUX_WORKSPACE_ID": "workspace-large-launch",
-                "CMUX_CLAUDE_PID": "8535",
-                "CMUX_AGENT_LAUNCH_ARGV_B64": String(repeating: "a", count: 80 * 1_024),
+                "WMUX_SURFACE_ID": "surface-large-launch",
+                "WMUX_WORKSPACE_ID": "workspace-large-launch",
+                "WMUX_CLAUDE_PID": "8535",
+                "WMUX_AGENT_LAUNCH_ARGV_B64": String(repeating: "a", count: 80 * 1_024),
             ],
         ]))
 
-        #expect(event.environment["CMUX_SURFACE_ID"] == "surface-large-launch")
-        #expect(event.environment["CMUX_WORKSPACE_ID"] == "workspace-large-launch")
-        #expect(event.environment["CMUX_CLAUDE_PID"] == "8535")
-        #expect(event.environment["CMUX_AGENT_LAUNCH_ARGV_B64"] == nil)
+        #expect(event.environment["WMUX_SURFACE_ID"] == "surface-large-launch")
+        #expect(event.environment["WMUX_WORKSPACE_ID"] == "workspace-large-launch")
+        #expect(event.environment["WMUX_CLAUDE_PID"] == "8535")
+        #expect(event.environment["WMUX_AGENT_LAUNCH_ARGV_B64"] == nil)
     }
 
     @Test("Lifecycle delivery retries one downstream process failure")
@@ -1111,14 +1111,14 @@ struct AgentHookDeliveryQueueTests {
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": root.path,
             "TMPDIR": root.path,
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceID,
-            "CMUX_SURFACE_ID": surfaceID,
-            "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_BUNDLED_CLI_PATH": cliPath,
-            "CMUX_CODEX_HOOK_CMUX_BIN": cliPath,
-            "CMUX_CODEX_PID": String(processID),
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceID,
+            "WMUX_SURFACE_ID": surfaceID,
+            "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_BUNDLED_CLI_PATH": cliPath,
+            "WMUX_CODEX_HOOK_CMUX_BIN": cliPath,
+            "WMUX_CODEX_PID": String(processID),
         ]
         let deliveryProcess = AgentHookDeliveryProcess(
             executableURLProvider: { URL(fileURLWithPath: cliPath) },
@@ -1155,10 +1155,10 @@ struct AgentHookDeliveryQueueTests {
             let request = try #require(admissions.last)
             let params = try #require(request["params"] as? [String: Any])
             let admittedEnvironment = try #require(params["environment"] as? [String: String])
-            #expect(admittedEnvironment["CMUX_CODEX_PID"] == String(processID))
-            #expect(admittedEnvironment["CMUX_WORKSPACE_ID"] == workspaceID)
-            #expect(admittedEnvironment["CMUX_SURFACE_ID"] == surfaceID)
-            #expect(admittedEnvironment["CMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] == "1")
+            #expect(admittedEnvironment["WMUX_CODEX_PID"] == String(processID))
+            #expect(admittedEnvironment["WMUX_WORKSPACE_ID"] == workspaceID)
+            #expect(admittedEnvironment["WMUX_SURFACE_ID"] == surfaceID)
+            #expect(admittedEnvironment["WMUX_AGENT_HOOK_ROUTE_SNAPSHOT"] == "1")
 
             let event = try #require(AgentHookDeliveryEvent(params: params))
             #expect(queue.enqueue(event))
@@ -1232,8 +1232,8 @@ struct AgentHookDeliveryQueueTests {
         ])
         let environment = try #require(resolved["environment"] as? [String: String])
 
-        #expect(environment["CMUX_WORKSPACE_ID"] == secondWorkspace.id.uuidString)
-        #expect(environment["CMUX_SURFACE_ID"] == secondSurfaceID.uuidString)
+        #expect(environment["WMUX_WORKSPACE_ID"] == secondWorkspace.id.uuidString)
+        #expect(environment["WMUX_SURFACE_ID"] == secondSurfaceID.uuidString)
     }
 
     private func makeEvent(
@@ -1248,7 +1248,7 @@ struct AgentHookDeliveryQueueTests {
             "payload": payload,
             "socket_path": "/tmp/cmux-test.sock",
             "environment": [
-                "CMUX_SURFACE_ID": surfaceID,
+                "WMUX_SURFACE_ID": surfaceID,
                 agentPIDEnvironmentVariable(agent): "8535",
             ],
         ]))
@@ -1260,7 +1260,7 @@ struct AgentHookDeliveryQueueTests {
             with: "_",
             options: .regularExpression
         )
-        return "CMUX_\(component)_PID"
+        return "WMUX_\(component)_PID"
     }
 }
 

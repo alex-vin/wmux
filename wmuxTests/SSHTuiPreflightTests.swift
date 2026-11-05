@@ -1,11 +1,11 @@
-import CmuxCloud
-import CmuxCore
-import CmuxFoundation
+import WmuxCloud
+import WmuxCore
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

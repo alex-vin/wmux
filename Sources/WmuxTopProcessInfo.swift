@@ -1,8 +1,8 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
-struct CmuxTopProcessInfo: Sendable {
+struct WmuxTopProcessInfo: Sendable {
     let pid: Int
     let processIdentity: AgentPIDProcessIdentity?
     let parentPID: Int
@@ -16,9 +16,9 @@ struct CmuxTopProcessInfo: Sendable {
     let terminalProcessGroupID: Int?
     var cpuPercent: Double
     let memoryBytes: Int64
-    let memorySource: CmuxTopProcessMemorySource
+    let memorySource: WmuxTopProcessMemorySource
     let residentBytes: Int64
-    let residentMemorySource: CmuxTopProcessMemorySource
+    let residentMemorySource: WmuxTopProcessMemorySource
     let virtualBytes: Int64
     let threadCount: Int
 
@@ -36,9 +36,9 @@ struct CmuxTopProcessInfo: Sendable {
         terminalProcessGroupID: Int?,
         cpuPercent: Double,
         memoryBytes: Int64? = nil,
-        memorySource: CmuxTopProcessMemorySource? = nil,
+        memorySource: WmuxTopProcessMemorySource? = nil,
         residentBytes: Int64,
-        residentMemorySource: CmuxTopProcessMemorySource = .residentSize,
+        residentMemorySource: WmuxTopProcessMemorySource = .residentSize,
         virtualBytes: Int64,
         threadCount: Int
     ) {

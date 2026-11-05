@@ -1,5 +1,5 @@
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import OSLog
 
 nonisolated private let codexResumeBindingLogger = Logger(

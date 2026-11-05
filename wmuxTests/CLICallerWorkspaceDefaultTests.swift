@@ -3,13 +3,13 @@ import Foundation
 import Testing
 
 /// Regression coverage for workspace-scoped CLI commands defaulting to the *caller's*
-/// workspace (the `CMUX_WORKSPACE_ID` the app injects into every terminal surface)
+/// workspace (the `WMUX_WORKSPACE_ID` the app injects into every terminal surface)
 /// instead of silently falling back to the focused workspace.
 ///
 /// The regression: `resolveWorkspaceId` treated a missing/blank `--workspace` as
 /// "no handle" and fell through to `workspace.current`, i.e. whatever workspace is
 /// selected in the foreground. The skill-recommended pattern
-/// `--workspace "${CMUX_WORKSPACE_ID:-}"` expands to an empty value whenever a
+/// `--workspace "${WMUX_WORKSPACE_ID:-}"` expands to an empty value whenever a
 /// background agent's environment is thin, so the command would act on the user's
 /// visible workspace rather than the agent's own.
 @Suite(.serialized)
@@ -34,7 +34,7 @@ struct CLICallerWorkspaceDefaultTests {
 
     /// A blank `--workspace` with no caller workspace in the environment must fail closed
     /// (nonzero exit) rather than silently retargeting the focused workspace. This is the
-    /// dangerous case where `--workspace "${CMUX_WORKSPACE_ID:-}"` expands to an empty
+    /// dangerous case where `--workspace "${WMUX_WORKSPACE_ID:-}"` expands to an empty
     /// argument because the caller environment is thin.
     @Test func blankWorkspaceArgWithoutCallerFailsClosed() throws {
         let (requests, result) = try runMarkNotificationRead(
@@ -168,8 +168,8 @@ struct CLICallerWorkspaceDefaultTests {
         }
 
         var environment = cliEnvironment(socketPath: socketPath, callerWorkspaceId: callerWorkspaceId)
-        environment["CMUX_CLI_TTY_NAME"] = "/dev/ttys9999999"
-        environment["CMUX_TTY_NAME"] = "/dev/ttys9999999"
+        environment["WMUX_CLI_TTY_NAME"] = "/dev/ttys9999999"
+        environment["WMUX_TTY_NAME"] = "/dev/ttys9999999"
         environment["TTY"] = "/dev/ttys9999999"
         environment["SSH_TTY"] = "/dev/ttys9999999"
         let cliPath = try Self.bundledCLIPath()
@@ -226,7 +226,7 @@ struct CLICallerWorkspaceDefaultTests {
     /// Drives `mark-notification-read --workspace <argument>` against a mock socket and
     /// returns the recorded JSON-RPC requests plus the process result. The mock answers
     /// `workspace.current` with `focusedWorkspaceId` so that, pre-fix, the command would
-    /// visibly retarget there. Pass `callerWorkspaceId: nil` to omit `CMUX_WORKSPACE_ID`.
+    /// visibly retarget there. Pass `callerWorkspaceId: nil` to omit `WMUX_WORKSPACE_ID`.
     func runMarkNotificationRead(
         workspaceArgument: String,
         focusedWorkspaceId: String,
@@ -277,17 +277,17 @@ struct CLICallerWorkspaceDefaultTests {
 
     func cliEnvironment(socketPath: String, callerWorkspaceId: String?) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         // Clear any ambient caller/window context inherited from the test host's own pane,
         // then set only what this scenario needs.
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
-        environment.removeValue(forKey: "CMUX_WINDOW_ID")
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
+        environment.removeValue(forKey: "WMUX_WINDOW_ID")
         if let callerWorkspaceId {
-            environment["CMUX_WORKSPACE_ID"] = callerWorkspaceId
+            environment["WMUX_WORKSPACE_ID"] = callerWorkspaceId
         } else {
-            environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
+            environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
         }
         return environment
     }

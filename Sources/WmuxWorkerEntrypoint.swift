@@ -1,9 +1,9 @@
-import CmuxSidebarInterpreterClient
-import CmuxSidebarRemoteRender
+import WmuxSidebarInterpreterClient
+import WmuxSidebarRemoteRender
 import Darwin
 
 /// Routes a re-executed cmux process into its requested isolated worker mode.
-struct CmuxWorkerEntrypoint {
+struct WmuxWorkerEntrypoint {
     private let arguments: [String]
 
     /// Creates a worker router for one process argument snapshot.

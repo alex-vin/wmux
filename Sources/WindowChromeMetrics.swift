@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import CoreGraphics
 
 enum WindowChromeMetrics {

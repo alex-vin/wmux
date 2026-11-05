@@ -299,7 +299,7 @@ final class AutomationSocketUITests: XCTestCase {
             "Expected socket ping at \(socketPath). diagnostics=\(loadDiagnostics())"
         )
 
-        let marker = "CMUX_SCREENSHOT_MARKER_9065"
+        let marker = "WMUX_SCREENSHOT_MARKER_9065"
         let markerCommand = """
         i=0; while [ $i -lt 8 ]; do printf '\\033[48;2;245;40;210m%-80s\\033[0m\\n' '\(marker)'; i=$((i+1)); done; tail -f /dev/null
         """
@@ -350,7 +350,7 @@ final class AutomationSocketUITests: XCTestCase {
         <!doctype html>
         <html>
           <body style="margin:0;min-height:100vh;background:rgb(20,220,240)">
-            <h1>CMUX_BROWSER_SCREENSHOT_MARKER_9065</h1>
+            <h1>WMUX_BROWSER_SCREENSHOT_MARKER_9065</h1>
           </body>
         </html>
         """
@@ -578,12 +578,12 @@ final class AutomationSocketUITests: XCTestCase {
     private func configuredApp(mode: String) -> XCUIApplication {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += ["-\(modeKey)", mode]
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
         // Debug launches require a tag outside reload.sh; provide one in UITests so CI
         // does not fail with "Application ... does not have a process ID".
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         return app
     }
 
@@ -593,14 +593,14 @@ final class AutomationSocketUITests: XCTestCase {
             "-AppleLanguages", "(en)",
             "-AppleLocale", "en_US",
         ]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         if let path = ProcessInfo.processInfo.environment["PATH"], !path.isEmpty {
             app.launchEnvironment["PATH"] = path
         }

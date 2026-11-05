@@ -1,6 +1,6 @@
 import Bonsplit
-import CmuxTerminalSharing
-import CmuxTerminalSizing
+import WmuxTerminalSharing
+import WmuxTerminalSizing
 import SwiftUI
 
 /// One participant row of the size panel: a neutral avatar

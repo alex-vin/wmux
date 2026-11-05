@@ -1,7 +1,7 @@
 import Foundation
 
 /// A resolved navigation target, expressed in current-session identifiers.
-enum CmuxNavigationResolution: Equatable {
+enum WmuxNavigationResolution: Equatable {
     case workspace(workspaceId: UUID)
     case pane(workspaceId: UUID, paneId: UUID)
     case surface(workspaceId: UUID, panelId: UUID)

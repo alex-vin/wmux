@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -34,10 +34,10 @@ struct CloudPlacementCoordinatorTests {
         provider: CloudPlacementTestProvider,
         snapshot: [String: Any]
     ) throws -> CloudVMState {
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine))
         catalog.replaceCloudState(
             state,
-            resources: CmuxTuiSnapshotParser.resources(from: state),
+            resources: WmuxTuiSnapshotParser.resources(from: state),
             info: provider.info
         )
         return state
@@ -77,14 +77,14 @@ struct CloudPlacementCoordinatorTests {
             ],
             "terminals": [], "browsers": [], "agents": [],
         ]
-        let inAPI = try #require(CmuxTuiSnapshotParser.projectionTarget(from: snapshot, inWorkspace: "ws_api"))
+        let inAPI = try #require(WmuxTuiSnapshotParser.projectionTarget(from: snapshot, inWorkspace: "ws_api"))
         #expect(inAPI == CloudTuiTerminalProjectionTarget(workspaceID: "ws_api", screenID: "screen_2", paneID: "pane_2", index: 2))
-        #expect(CmuxTuiSnapshotParser.projectionTarget(from: snapshot, inWorkspace: "ws_gone") == nil)
+        #expect(WmuxTuiSnapshotParser.projectionTarget(from: snapshot, inWorkspace: "ws_gone") == nil)
         let data = try JSONSerialization.data(withJSONObject: snapshot)
-        let preferred = try #require(await CmuxTuiSnapshotParser.terminalProjectionTarget(from: data, preferringWorkspace: "ws_api"))
+        let preferred = try #require(await WmuxTuiSnapshotParser.terminalProjectionTarget(from: data, preferringWorkspace: "ws_api"))
         #expect(preferred.target.workspaceID == "ws_api" && preferred.revision == "12")
-        #expect(await CmuxTuiSnapshotParser.terminalProjectionTarget(from: data, preferringWorkspace: "ws_gone") == nil)
-        let fallback = try #require(await CmuxTuiSnapshotParser.terminalProjectionTarget(from: data, preferringWorkspace: nil))
+        #expect(await WmuxTuiSnapshotParser.terminalProjectionTarget(from: data, preferringWorkspace: "ws_gone") == nil)
+        let fallback = try #require(await WmuxTuiSnapshotParser.terminalProjectionTarget(from: data, preferringWorkspace: nil))
         #expect(fallback.target.workspaceID == "ws_main")
 
     }
@@ -125,7 +125,7 @@ struct CloudPlacementCoordinatorTests {
     @Test func aDisplayMovedIntoTheMirroredWorkspaceIsRecordedThereWithoutADaemonCall() async {
         let viewer = UUID(), bound = UUID(), panel = UUID()
         let (catalog, provider) = Self.harness(bound: bound)
-        let display = CmuxTuiSnapshotParser.display(machine: Self.machine)
+        let display = WmuxTuiSnapshotParser.display(machine: Self.machine)
         catalog.replaceResources([display], on: Self.machine)
         catalog.record(SurfaceProjection(resource: display.id, workspaceID: viewer, panelID: panel))
 
@@ -305,11 +305,11 @@ struct CloudPlacementCoordinatorTests {
     @Test func mutationResponseRetainsTheExactTabIdentity() async throws {
         let data = Data(#"{"value":{"id":"tab_new","pane_id":"pane_2","content_kind":"terminal","content_id":"term_1"},"generation":"g","revision":"13","replayed":false}"#.utf8)
         let target = CloudTuiTerminalProjectionTarget(workspaceID: "ws_api", screenID: "screen_2", paneID: "pane_2", index: 0)
-        let placement = try #require(await CmuxTuiSnapshotParser.placedTab(from: data, at: target, terminalID: "term_1"))
+        let placement = try #require(await WmuxTuiSnapshotParser.placedTab(from: data, at: target, terminalID: "term_1"))
         #expect(placement.tabID == "tab_new" && placement.workspaceID == "ws_api")
         #expect(placement.cursor == CloudVMCursor(generation: "g", revision: 13))
-        #expect(await CmuxTuiSnapshotParser.placedTab(from: data, at: target, terminalID: "wrong") == nil)
-        #expect(await CmuxTuiSnapshotParser.placedTab(from: data, at: target, tabID: "wrong") == nil)
+        #expect(await WmuxTuiSnapshotParser.placedTab(from: data, at: target, terminalID: "wrong") == nil)
+        #expect(await WmuxTuiSnapshotParser.placedTab(from: data, at: target, tabID: "wrong") == nil)
     }
 
     @Test func staleSnapshotsCannotUndoAMoveButNewRemoteEditsAreReconciled() async throws {
@@ -323,7 +323,7 @@ struct CloudPlacementCoordinatorTests {
         await catalog.cloudPlacementCoordinator.waitForPendingMutations()
 
         func state(revision: String) throws -> CloudVMState {
-            try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+            try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
                 "cursor": ["generation": "g", "revision": revision],
                 "workspaces": [["id": "ws_main"], ["id": "ws_api"]],
                 "screens": [["id": "screen", "workspace_id": "ws_main"]],
@@ -365,9 +365,9 @@ struct CloudPlacementCoordinatorTests {
     }
 
     @Test func malformedCloseSnapshotsAreDistinctFromAnAlreadyMissingTab() async throws {
-        #expect(await CmuxTuiSnapshotParser.tabPlacement(from: Data("{}".utf8), tabID: "tab_1") == nil)
+        #expect(await WmuxTuiSnapshotParser.tabPlacement(from: Data("{}".utf8), tabID: "tab_1") == nil)
         let empty = Data(#"{"cursor":{"generation":"g","revision":"4"},"workspaces":[],"screens":[],"panes":[],"tabs":[],"terminals":[],"browsers":[],"agents":[]}"#.utf8)
-        let missing = try #require(await CmuxTuiSnapshotParser.tabPlacement(from: empty, tabID: "tab_1"))
+        let missing = try #require(await WmuxTuiSnapshotParser.tabPlacement(from: empty, tabID: "tab_1"))
         #expect(missing.workspaceID == nil && missing.revision == "4")
     }
 
@@ -387,12 +387,12 @@ struct CloudPlacementCoordinatorTests {
         // fresh tab rather than move a stale one.
         catalog.upsert(term, from: provider)
         // The daemon's projection reply is fenced by its mutation cursor
-        // (`CmuxTuiSnapshotParser.placedTab` requires one). When the lane drains it
+        // (`WmuxTuiSnapshotParser.placedTab` requires one). When the lane drains it
         // reconciles against the installed graph above, which predates the new tab;
         // the cursor is what keeps that older graph from clearing the new tab ID.
         provider.projectCursor = CloudVMCursor(generation: "g", revision: 21)
         catalog.record(SurfaceProjection(resource: term.id, workspaceID: viewer, panelID: panel, remoteWorkspaceID: "ws_main", remoteTabID: "tab_gone"))
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: stateSnapshot, machine: Self.machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: stateSnapshot, machine: Self.machine))
         catalog.reconcileCloudRemoteState(machine: Self.machine, state: state, observation: .current)
         catalog.moveProjections(panelID: panel, to: bound)
         await catalog.cloudPlacementCoordinator.waitForPendingMutations()
@@ -422,21 +422,21 @@ struct CloudPlacementCoordinatorTests {
             "panes": [["id": "pane", "screen_id": "screen"]],
             "tabs": [], "terminals": [["id": "term_1"]], "browsers": [], "agents": []
         ]
-        let detached = try #require(await CmuxTuiSnapshotParser.terminalPlacement(from: JSONSerialization.data(withJSONObject: snapshot), terminalID: "term_1"))
+        let detached = try #require(await WmuxTuiSnapshotParser.terminalPlacement(from: JSONSerialization.data(withJSONObject: snapshot), terminalID: "term_1"))
         #expect(detached.placement == nil)
         let tab = ["id": "tab_1", "pane_id": "pane", "content_kind": "terminal", "content_id": "term_1"]
         snapshot["tabs"] = [tab]
-        let existing = try #require(await CmuxTuiSnapshotParser.terminalPlacement(from: JSONSerialization.data(withJSONObject: snapshot), terminalID: "term_1"))
+        let existing = try #require(await WmuxTuiSnapshotParser.terminalPlacement(from: JSONSerialization.data(withJSONObject: snapshot), terminalID: "term_1"))
         #expect(existing.placement?.tabID == "tab_1" && existing.placement?.workspaceID == "ws_main")
         let placement = try #require(existing.placement)
         // The daemon focus moved elsewhere while a reconnect/open was waiting.
         // Attachment keeps this exact tab; a user layout edit may reparent it.
-        #expect(CmuxTuiSurfaceProvider.TerminalPlacementIntent.attachment.retainedPlacement(placement, requestedWorkspaceID: "ws_api") == placement)
-        #expect(CmuxTuiSurfaceProvider.TerminalPlacementIntent.layoutEdit.retainedPlacement(placement, requestedWorkspaceID: "ws_api") == nil)
+        #expect(WmuxTuiSurfaceProvider.TerminalPlacementIntent.attachment.retainedPlacement(placement, requestedWorkspaceID: "ws_api") == placement)
+        #expect(WmuxTuiSurfaceProvider.TerminalPlacementIntent.layoutEdit.retainedPlacement(placement, requestedWorkspaceID: "ws_api") == nil)
         var duplicate = tab
         duplicate["id"] = "tab_2"
         snapshot["tabs"] = [tab, duplicate]
-        #expect(await CmuxTuiSnapshotParser.terminalPlacement(from: try JSONSerialization.data(withJSONObject: snapshot), terminalID: "term_1") == nil)
+        #expect(await WmuxTuiSnapshotParser.terminalPlacement(from: try JSONSerialization.data(withJSONObject: snapshot), terminalID: "term_1") == nil)
     }
 
     @Test func invalidPlacementGraphsAreRejectedBeforeChoosingADestination() async throws {
@@ -448,11 +448,11 @@ struct CloudPlacementCoordinatorTests {
             "panes": [["id": "pane", "screen_id": "screen"]],
             "tabs": [tab, tab], "terminals": [["id": "term_1"]], "browsers": [], "agents": []
         ]
-        #expect(CmuxTuiSnapshotParser.projectionTarget(from: snapshot, inWorkspace: "ws_main") == nil)
-        #expect(await CmuxTuiSnapshotParser.tabPlacement(from: try JSONSerialization.data(withJSONObject: snapshot), tabID: "tab_1") == nil)
+        #expect(WmuxTuiSnapshotParser.projectionTarget(from: snapshot, inWorkspace: "ws_main") == nil)
+        #expect(await WmuxTuiSnapshotParser.tabPlacement(from: try JSONSerialization.data(withJSONObject: snapshot), tabID: "tab_1") == nil)
         snapshot["tabs"] = [tab]
         snapshot["screens"] = [["id": "screen", "workspace_id": "ws_missing"]]
-        #expect(await CmuxTuiSnapshotParser.terminalProjectionTarget(from: try JSONSerialization.data(withJSONObject: snapshot), preferringWorkspace: nil) == nil)
+        #expect(await WmuxTuiSnapshotParser.terminalProjectionTarget(from: try JSONSerialization.data(withJSONObject: snapshot), preferringWorkspace: nil) == nil)
     }
 
     @Test(arguments: [SurfaceProjectionEndReason.replaced, .workspaceTeardown])
@@ -630,7 +630,7 @@ struct CloudPlacementCoordinatorTests {
         _ = try Self.install(catalog, provider: provider, snapshot: stateSnapshot)
         let previous = SurfaceProjection(resource: term.id, workspaceID: bound, panelID: panel, remoteWorkspaceID: "ws_main", remoteTabID: "tab_gone")
         catalog.record(previous)
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: stateSnapshot, machine: Self.machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: stateSnapshot, machine: Self.machine))
         catalog.reconcileCloudRemoteState(machine: Self.machine, state: state, observation: .current)
         #expect(catalog.projection(forPanel: panel)?.remoteTabID == nil)
         #expect(catalog.projection(forPanel: panel)?.remoteWorkspaceID == nil)

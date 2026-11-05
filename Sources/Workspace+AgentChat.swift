@@ -4,7 +4,7 @@ extension Workspace {
     func performSurfaceTabBarNewAgentChatAction(presentingWindow: NSWindow?) {
         guard let owningTabManager else { return }
         _ = AppDelegate.shared?.executeConfiguredCmuxAction(
-            id: CmuxSurfaceTabBarBuiltInAction.newAgentChat.configID,
+            id: WmuxSurfaceTabBarBuiltInAction.newAgentChat.configID,
             tabManager: owningTabManager,
             preferredWindow: presentingWindow
         )

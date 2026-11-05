@@ -1,12 +1,12 @@
-import CMUXAgentLaunch
-import CmuxFoundation
-import CmuxTerminal
+import WMUXAgentLaunch
+import WmuxFoundation
+import WmuxTerminal
 import Foundation
-import CmuxCore
+import WmuxCore
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -762,13 +762,13 @@ final class AgentSessionAutoResumeSettingsTests: XCTestCase {
     ) throws -> RestorableAgentSessionIndex {
         let home = FileManager.default.temporaryDirectory
             .appendingPathComponent("cmux-agent-auto-resume-\(UUID().uuidString)", isDirectory: true)
-        let previousHookStateDir = getenv("CMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
-        setenv("CMUX_AGENT_HOOK_STATE_DIR", home.appendingPathComponent("hook-state", isDirectory: true).path, 1)
+        let previousHookStateDir = getenv("WMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
+        setenv("WMUX_AGENT_HOOK_STATE_DIR", home.appendingPathComponent("hook-state", isDirectory: true).path, 1)
         defer {
             if let previousHookStateDir {
-                setenv("CMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
+                setenv("WMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
             } else {
-                unsetenv("CMUX_AGENT_HOOK_STATE_DIR")
+                unsetenv("WMUX_AGENT_HOOK_STATE_DIR")
             }
         }
         let storeURL = RestorableAgentKind.codex.hookStoreFileURL(homeDirectory: home.path)
@@ -807,7 +807,7 @@ final class AgentSessionAutoResumeSettingsTests: XCTestCase {
         return RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 RestorableAgentSessionIndex.PanelKey(workspaceId: workspaceId, panelId: panelId): (
                     snapshot: SessionRestorableAgentSnapshot(

@@ -1,17 +1,17 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import Bonsplit
-import CmuxBrowser
-import CmuxCore
-import CmuxFoundation
-import CmuxSettings
+import WmuxBrowser
+import WmuxCore
+import WmuxFoundation
+import WmuxSettings
 import ObjectiveC
 import WebKit
 #if canImport(Security)
 import Security
 #endif
 
-/// Hosts a popup `CmuxWebView` in a standalone `NSPanel`, created when a page
+/// Hosts a popup `WmuxWebView` in a standalone `NSPanel`, created when a page
 /// calls `window.open()` (scripted new-window requests).
 ///
 /// Lifecycle:
@@ -24,7 +24,7 @@ final class BrowserPopupWindowController: NSObject, NSWindowDelegate {
 
     static let maxNestingDepth = 3
 
-    let webView: CmuxWebView
+    let webView: WmuxWebView
     private let browserContext: BrowserPopupBrowserContext
     var refusesProxyAuthenticationChallenges: Bool {
         browserContext.refusesProxyAuthenticationChallenges
@@ -68,7 +68,7 @@ final class BrowserPopupWindowController: NSObject, NSWindowDelegate {
         // Create popup web view with WebKit's supplied configuration after
         // overlaying the opener's browser context so OAuth popups keep cmux's
         // shared cookie/storage scope and opener linkage.
-        let webView = CmuxWebView(frame: .zero, configuration: configuration, host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: configuration, host: WmuxWebViewAppHost())
         webView.allowsBackForwardNavigationGestures = true
         if #available(macOS 13.3, *) {
             webView.isInspectable = true
@@ -117,7 +117,7 @@ final class BrowserPopupWindowController: NSObject, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        panel.identifier = NSUserInterfaceItemIdentifier("cmux.browser-popup")
+        panel.identifier = NSUserInterfaceItemIdentifier("wmux.browser-popup")
         panel.level = NSWindow.Level.normal
         panel.hidesOnDeactivate = false
         panel.isReleasedWhenClosed = false
@@ -559,7 +559,7 @@ private final class PopupUIDelegate: BrowserPDFPreviewActionUIDelegate {
             modifierFlags: navigationAction.modifierFlags,
             buttonNumber: navigationAction.buttonNumber,
             popupFeaturesWereSpecified: browserNavigationPopupFeaturesWereSpecified(windowFeatures: windowFeatures),
-            hasRecentMiddleClickIntent: CmuxWebView.hasRecentMiddleClickIntent(for: webView)
+            hasRecentMiddleClickIntent: WmuxWebView.hasRecentMiddleClickIntent(for: webView)
         )
 
         if isScriptedPopup {
@@ -779,7 +779,7 @@ private final class PopupUIDelegate: BrowserPDFPreviewActionUIDelegate {
         ).closure
 
         if let url = navigationAction.request.url,
-           url.scheme == "cmux-browser-action",
+           url.scheme == "wmux-browser-action",
            url.host == "bypass-ssl" {
             decisionHandler(.cancel)
             handleSSLTrustBypassAction(url, in: webView)

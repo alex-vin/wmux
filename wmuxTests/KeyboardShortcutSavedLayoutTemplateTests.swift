@@ -1,21 +1,21 @@
 import XCTest
-import CmuxSettings
-@testable import CmuxSettingsUI
+import WmuxSettings
+@testable import WmuxSettingsUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
-private typealias ShortcutStroke = CmuxSettings.ShortcutStroke
+private typealias ShortcutStroke = WmuxSettings.ShortcutStroke
 
 final class KeyboardShortcutSavedLayoutTemplateTests: XCTestCase {
     func testSaveLayoutTemplateSettingsPackageActionStaysAligned() {
         guard let settingsAction = ShortcutAction(
             rawValue: KeyboardShortcutSettings.Action.saveLayoutTemplate.rawValue
         ) else {
-            XCTFail("Expected CmuxSettings.ShortcutAction for saveLayoutTemplate")
+            XCTFail("Expected WmuxSettings.ShortcutAction for saveLayoutTemplate")
             return
         }
         XCTAssertEqual(settingsAction.defaultStroke, ShortcutStroke(key: "s", command: true, control: true))

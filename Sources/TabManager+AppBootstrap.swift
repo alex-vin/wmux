@@ -1,5 +1,5 @@
-import CmuxRemoteSession
-import CmuxWorkspaces
+import WmuxRemoteSession
+import WmuxWorkspaces
 import Foundation
 
 /// Terminal-free routing owner used before a main window is registered.

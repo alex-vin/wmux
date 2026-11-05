@@ -1,15 +1,15 @@
 import XCTest
-import CmuxBrowser
-import CmuxTerminal
+import WmuxBrowser
+import WmuxTerminal
 import AppKit
 import Carbon.HIToolbox
 import Combine
 import SwiftUI
 import WebKit
-@testable import CmuxSettingsUI
+@testable import WmuxSettingsUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -12360,7 +12360,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
     }
 
     // Regression for https://github.com/manaflow-ai/cmux/issues/9677 in browser
-    // focus mode: the focus-mode branch of CmuxWebView.performKeyEquivalent
+    // focus mode: the focus-mode branch of WmuxWebView.performKeyEquivalent
     // consumes every Command chord after the page declines it, so a resent
     // Cmd+Z must run the web view's own editing undo there instead of being
     // swallowed.
@@ -12775,7 +12775,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
     private func makeBrowserFocusModeHarness(
         file: StaticString = #filePath,
         line: UInt = #line
-    ) -> (windowId: UUID, window: NSWindow, panel: BrowserPanel, webView: CmuxWebView)? {
+    ) -> (windowId: UUID, window: NSWindow, panel: BrowserPanel, webView: WmuxWebView)? {
         guard let appDelegate = AppDelegate.shared else {
             XCTFail("Expected AppDelegate.shared", file: file, line: line)
             return nil
@@ -12788,7 +12788,7 @@ final class AppDelegateShortcutRoutingTests: XCTestCase {
               let browserURL = URL(string: "data:text/html;base64,PGh0bWw+PGJvZHk+Zm9jdXM8L2JvZHk+PC9odG1sPg=="),
               let browserPanelId = manager.openBrowser(inWorkspace: workspace.id, url: browserURL, preferSplitRight: true),
               let browserPanel = manager.selectedWorkspace?.browserPanel(for: browserPanelId) ?? workspace.browserPanel(for: browserPanelId),
-              let webView = browserPanel.webView as? CmuxWebView else {
+              let webView = browserPanel.webView as? WmuxWebView else {
             closeWindow(withId: windowId)
             XCTFail("Expected attached browser focus mode harness", file: file, line: line)
             return nil

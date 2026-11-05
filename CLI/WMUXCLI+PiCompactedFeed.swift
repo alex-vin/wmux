@@ -51,7 +51,7 @@ extension WMUXCLI {
                 retainedKeyCount += 1
             }
         }
-        for key in ["truncated", "cmux_truncated"] {
+        for key in ["truncated", "wmux_truncated"] {
             if let flag = dictionary[key] as? Bool {
                 summary[key] = flag
                 retainedKeyCount += 1
@@ -77,7 +77,7 @@ extension WMUXCLI {
         socketPath: String?,
         socketPassword: String?
     ) throws -> String? {
-        guard let rawCompactedEvents = rawObject["cmux_compacted_terminal_events"] else {
+        guard let rawCompactedEvents = rawObject["wmux_compacted_terminal_events"] else {
             return nil
         }
         guard rawCompactedEvents is [[String: Any]] else {
@@ -313,8 +313,8 @@ extension WMUXCLI {
         let environment = ProcessInfo.processInfo.environment
         return (
             explicitWorkspace,
-            explicitWorkspace ?? environment["CMUX_WORKSPACE_ID"],
-            explicitSurface ?? (explicitWorkspace == nil ? environment["CMUX_SURFACE_ID"] : nil)
+            explicitWorkspace ?? environment["WMUX_WORKSPACE_ID"],
+            explicitSurface ?? (explicitWorkspace == nil ? environment["WMUX_SURFACE_ID"] : nil)
         )
     }
 

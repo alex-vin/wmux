@@ -1,5 +1,5 @@
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 
 @MainActor
 func cmuxCloseFocusedTerminalFindForEscape(event: NSEvent, appDelegate: AppDelegate) -> Bool {

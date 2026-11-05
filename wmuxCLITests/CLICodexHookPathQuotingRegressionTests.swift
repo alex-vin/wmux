@@ -16,15 +16,15 @@ struct CLICodexHookPathQuotingRegressionTests {
         try makeCodexHookExecutableShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
             "cat >/dev/null",
-            "printf '%s\\n' \"$*\" >> \"$CMUX_TEST_HOOK_MARKER\"",
+            "printf '%s\\n' \"$*\" >> \"$WMUX_TEST_HOOK_MARKER\"",
             "echo '{}'",
         ])
 
         var environment = codexHookTestEnvironment(root: root, codexHome: codexHome)
         environment["TMPDIR"] = root.path
-        environment["CMUX_SURFACE_ID"] = "surface-codex-path-space"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_TEST_HOOK_MARKER"] = marker.path
+        environment["WMUX_SURFACE_ID"] = "surface-codex-path-space"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_TEST_HOOK_MARKER"] = marker.path
 
         let emit = runCodexHookProcess(
             executablePath: cliPath,

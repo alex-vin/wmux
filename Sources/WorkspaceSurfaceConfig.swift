@@ -1,13 +1,13 @@
 import Foundation
-import CmuxFoundation
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxTerminalCore
 
-// CmuxSurfaceConfigTemplate and the surface runtime probes moved to
-// CmuxTerminalCore (SurfaceValues/CmuxSurfaceConfigTemplate.swift and
+// WmuxSurfaceConfigTemplate and the surface runtime probes moved to
+// WmuxTerminalCore (SurfaceValues/WmuxSurfaceConfigTemplate.swift and
 // Interop/GhosttySurfaceRuntimeProbe.swift). The legacy free-function names
 // below are shims forwarding existing app callers to the probe.
 
-typealias CmuxSurfaceConfigTemplate = CmuxTerminalCore.CmuxSurfaceConfigTemplate
+typealias WmuxSurfaceConfigTemplate = WmuxTerminalCore.WmuxSurfaceConfigTemplate
 
 func cmuxSurfaceContextName(_ context: ghostty_surface_context_e) -> String {
     GhosttySurfaceRuntimeProbe.contextName(context)
@@ -26,10 +26,10 @@ func cmuxCurrentSurfaceFontSizePoints(_ surface: ghostty_surface_t) -> Float? {
 func cmuxInheritedSurfaceConfig(
     sourceSurface: ghostty_surface_t,
     context: ghostty_surface_context_e
-) -> CmuxSurfaceConfigTemplate {
+) -> WmuxSurfaceConfigTemplate {
     let inherited = ghostty_surface_inherited_config(sourceSurface, context)
     let percent = GlobalFontMagnification.storedPercent
-    var config = CmuxSurfaceConfigTemplate(
+    var config = WmuxSurfaceConfigTemplate(
         cConfig: inherited,
         globalFontMagnificationPercent: percent
     )
@@ -39,7 +39,7 @@ func cmuxInheritedSurfaceConfig(
     let runtimePoints = cmuxCurrentSurfaceFontSizePoints(sourceSurface)
     if let points = runtimePoints {
         config.setFontSize(
-            CmuxSurfaceConfigTemplate.baseFontSize(
+            WmuxSurfaceConfigTemplate.baseFontSize(
                 fromRuntimePoints: points,
                 percent: percent
             ),

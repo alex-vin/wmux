@@ -1,6 +1,6 @@
 import AppKit
-import CmuxSwiftRender
-import CmuxSwiftRenderUI
+import WmuxSwiftRender
+import WmuxSwiftRenderUI
 import Foundation
 
 /// Serial lane for in-process `cmux(...)` sidebar actions. Worker-lane methods
@@ -12,12 +12,12 @@ import Foundation
 private let cmuxSidebarWorkerQueue = DispatchQueue(label: "com.cmux.sidebar-action-worker")
 
 /// Select-burst coalescing lives in ``SidebarSelectCoalescer``
-/// (CmuxSwiftRenderUI), where its FIFO/newest-wins semantics are unit-tested.
+/// (WmuxSwiftRenderUI), where its FIFO/newest-wins semantics are unit-tested.
 private let sidebarSelectCoalescer = SidebarSelectCoalescer()
 
 // The custom-sidebar rendering, interpreter, JSON DSL, resizable split, and
-// the file-watching model now live in the `CmuxSwiftRender` (logic) and
-// `CmuxSwiftRenderUI` (SwiftUI) packages. The app target keeps only the
+// the file-watching model now live in the `WmuxSwiftRender` (logic) and
+// `WmuxSwiftRenderUI` (SwiftUI) packages. The app target keeps only the
 // cmux-coupled action dispatch, the one piece that must reach
 // `TerminalController`, and injects it into the package's view from
 // `ContentView`.

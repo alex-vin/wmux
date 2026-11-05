@@ -1,13 +1,13 @@
-import CMUXMobileCore
-import CMUXAuthCore
-import CmuxIrohTransport
-import CmuxAuthRuntime
-import CmuxSettings
+import WMUXMobileCore
+import WMUXAuthCore
+import WmuxIrohTransport
+import WmuxAuthRuntime
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -265,19 +265,19 @@ struct MobilePairingAuthDeadlineRecoveryTests {
         let suite = "MobilePairingAuthDeadlineRecoveryTests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let session = CMUXAuthSessionCache(keyValueStore: defaults, key: "session")
+        let session = WMUXAuthSessionCache(keyValueStore: defaults, key: "session")
         session.setHasTokens(true)
-        let user = CMUXAuthIdentityStore(keyValueStore: defaults, key: "user")
+        let user = WMUXAuthIdentityStore(keyValueStore: defaults, key: "user")
         try user.save(MobilePairingRecoveryAuthClient.user)
         let client = MobilePairingRecoveryAuthClient()
         let auth = AuthCoordinator(
             client: client,
             sessionCache: session,
             userCache: user,
-            teamSelection: CMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
+            teamSelection: WMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
             anchor: AuthPresentationContextProvider(),
             config: AuthConfig(
-                stack: CMUXAuthConfig(projectId: "fixture", publishableClientKey: "fixture"),
+                stack: WMUXAuthConfig(projectId: "fixture", publishableClientKey: "fixture"),
                 magicLinkCallbackURL: "http://127.0.0.1:1/callback", apiBaseURL: "http://127.0.0.1:1"
             ),
             launch: AuthLaunchOptions(

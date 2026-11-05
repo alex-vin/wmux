@@ -1,10 +1,10 @@
 import AppKit
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -39,7 +39,7 @@ struct StackAccountAvatarViewTests {
         let picture = try #require(StackAccountAvatarImageLoader.circularImage(from: data, pointSize: 22, scale: 2))
         let request = StackAccountAvatarView.hostedRequest(image: picture, size: 22)
         let appearance = try #require(NSAppearance(named: .aqua))
-        let rendered = try #require(CmuxResolvedIconRenderer().image(for: request, appearance: appearance))
+        let rendered = try #require(WmuxResolvedIconRenderer().image(for: request, appearance: appearance))
         let bitmap = try #require(rendered.representations.first as? NSBitmapImageRep)
 
         let center = try #require(bitmap.colorAt(x: bitmap.pixelsWide / 2, y: bitmap.pixelsHigh / 2)?.usingColorSpace(.deviceRGB))

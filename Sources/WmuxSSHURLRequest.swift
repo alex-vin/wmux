@@ -1,7 +1,7 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 
-enum CmuxSSHURLParseError: Error, Equatable {
+enum WmuxSSHURLParseError: Error, Equatable {
     case missingDestination
     case destinationTooLong(maxLength: Int)
     case destinationContainsUnsafeCharacters
@@ -19,10 +19,10 @@ enum CmuxSSHURLParseError: Error, Equatable {
     case multipleLinks
 }
 
-struct CmuxSSHURLRequest: Equatable {
+struct WmuxSSHURLRequest: Equatable {
     static let maxDestinationLength = 256
     static let maxTitleLength = 160
-    static let supportedSchemes: Set<String> = ["cmux", "cmux-nightly", "cmux-rc", "cmux-dev"]
+    static let supportedSchemes: Set<String> = ["wmux", "wmux-nightly", "wmux-rc", "wmux-dev"]
     static var activeSupportedSchemes: Set<String> {
         [AuthEnvironment.callbackScheme.lowercased()]
     }
@@ -57,7 +57,7 @@ struct CmuxSSHURLRequest: Equatable {
     }
 
     func cliPreview(socketPath: String?) -> String {
-        var parts = ["cmux"]
+        var parts = ["wmux"]
         if let socketPath, !socketPath.isEmpty {
             parts += ["--socket", socketPath]
         }
@@ -81,7 +81,7 @@ struct CmuxSSHURLRequest: Equatable {
     static func parse(
         _ url: URL,
         supportedSchemes: Set<String> = activeSupportedSchemes
-    ) -> Result<CmuxSSHURLRequest?, CmuxSSHURLParseError> {
+    ) -> Result<WmuxSSHURLRequest?, WmuxSSHURLParseError> {
         if isStandardSSHURLScheme(url.scheme) {
             return parseStandardSSHURL(url)
         }
@@ -190,7 +190,7 @@ struct CmuxSSHURLRequest: Equatable {
         }
 
         return .success(
-            CmuxSSHURLRequest(
+            WmuxSSHURLRequest(
                 originalURL: url,
                 destination: destination,
                 port: parsedPort,
@@ -205,7 +205,7 @@ struct CmuxSSHURLRequest: Equatable {
         scheme?.lowercased() == "ssh"
     }
 
-    private static func parseStandardSSHURL(_ url: URL) -> Result<CmuxSSHURLRequest?, CmuxSSHURLParseError> {
+    private static func parseStandardSSHURL(_ url: URL) -> Result<WmuxSSHURLRequest?, WmuxSSHURLParseError> {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return .failure(.missingDestination)
         }
@@ -293,7 +293,7 @@ struct CmuxSSHURLRequest: Equatable {
         }
 
         return .success(
-            CmuxSSHURLRequest(
+            WmuxSSHURLRequest(
                 originalURL: url,
                 destination: destination,
                 port: parsedPort,
@@ -304,7 +304,7 @@ struct CmuxSSHURLRequest: Equatable {
         )
     }
 
-    private static func standardSSHURLPort(in components: URLComponents) -> Result<Int?, CmuxSSHURLParseError> {
+    private static func standardSSHURLPort(in components: URLComponents) -> Result<Int?, WmuxSSHURLParseError> {
         if let port = components.port {
             guard port > 0, port <= 65_535 else {
                 return .failure(.invalidPort)
@@ -397,7 +397,7 @@ struct CmuxSSHURLRequest: Equatable {
         return normalized.isEmpty ? nil : normalized
     }
 
-    private static func structuredSSHOptions(from queryItems: [URLQueryItem]) -> Result<[String], CmuxSSHURLParseError> {
+    private static func structuredSSHOptions(from queryItems: [URLQueryItem]) -> Result<[String], WmuxSSHURLParseError> {
         var options: [String] = []
         if let value = normalizedQueryValue(namedAnyOf: ["connect-timeout"], in: queryItems) {
             switch boundedInteger(value, parameter: "connect-timeout", range: 1...600) {
@@ -438,7 +438,7 @@ struct CmuxSSHURLRequest: Equatable {
         return .success(options)
     }
 
-    private static func boundedInteger(_ value: String, parameter: String, range: ClosedRange<Int>) -> Result<Int, CmuxSSHURLParseError> {
+    private static func boundedInteger(_ value: String, parameter: String, range: ClosedRange<Int>) -> Result<Int, WmuxSSHURLParseError> {
         guard !containsUnsafeHiddenCharacter(value),
               value.range(of: #"^[0-9]+$"#, options: .regularExpression) != nil,
               let integer = Int(value),
@@ -448,7 +448,7 @@ struct CmuxSSHURLRequest: Equatable {
         return .success(integer)
     }
 
-    private static func normalizedBooleanValue(named name: String, in queryItems: [URLQueryItem]) -> Result<Bool, CmuxSSHURLParseError> {
+    private static func normalizedBooleanValue(named name: String, in queryItems: [URLQueryItem]) -> Result<Bool, WmuxSSHURLParseError> {
         guard let item = queryItems.first(where: { $0.name.lowercased() == name }) else {
             return .success(false)
         }
@@ -522,12 +522,12 @@ struct CmuxSSHURLRequest: Equatable {
     }
 }
 
-enum CmuxNavigationURLParseError: Error, Equatable {
+enum WmuxNavigationURLParseError: Error, Equatable {
     case unsupportedURLShape
     case invalidIdentifier(String)
 }
 
-struct CmuxNavigationURLRequest: Equatable {
+struct WmuxNavigationURLRequest: Equatable {
     enum Target: Equatable {
         case workspace(UUID)
         case pane(workspaceId: UUID, paneId: UUID)
@@ -546,7 +546,7 @@ struct CmuxNavigationURLRequest: Equatable {
     static func parse(
         _ url: URL,
         supportedSchemes: Set<String> = activeSupportedSchemes
-    ) -> Result<CmuxNavigationURLRequest?, CmuxNavigationURLParseError> {
+    ) -> Result<WmuxNavigationURLRequest?, WmuxNavigationURLParseError> {
         guard isSupportedScheme(url.scheme, supportedSchemes: supportedSchemes) else {
             return .success(nil)
         }
@@ -580,7 +580,7 @@ struct CmuxNavigationURLRequest: Equatable {
             case .failure(let error):
                 return .failure(error)
             }
-            return .success(CmuxNavigationURLRequest(
+            return .success(WmuxNavigationURLRequest(
                 originalURL: url,
                 target: .workspace(workspaceId),
                 stableFallbackWorkspaceId: fallback?.workspaceId,
@@ -606,7 +606,7 @@ struct CmuxNavigationURLRequest: Equatable {
                 return .failure(.unsupportedURLShape)
             }
             return .success(
-                CmuxNavigationURLRequest(
+                WmuxNavigationURLRequest(
                     originalURL: url,
                     target: .pane(workspaceId: workspaceId, paneId: childId),
                     stableFallbackWorkspaceId: nil,
@@ -625,7 +625,7 @@ struct CmuxNavigationURLRequest: Equatable {
                 return .failure(error)
             }
             return .success(
-                CmuxNavigationURLRequest(
+                WmuxNavigationURLRequest(
                     originalURL: url,
                     target: .surface(workspaceId: workspaceId, surfaceId: childId),
                     stableFallbackWorkspaceId: fallback?.workspaceId,
@@ -690,7 +690,7 @@ struct CmuxNavigationURLRequest: Equatable {
     private static func parseStableFallback(
         from components: URLComponents,
         allowedNames: Set<String>
-    ) -> Result<(workspaceId: UUID?, surfaceId: UUID?)?, CmuxNavigationURLParseError> {
+    ) -> Result<(workspaceId: UUID?, surfaceId: UUID?)?, WmuxNavigationURLParseError> {
         guard components.percentEncodedQuery != nil else { return .success(nil) }
         guard let items = components.queryItems, !items.isEmpty else {
             return .failure(.unsupportedURLShape)
@@ -735,7 +735,7 @@ struct CmuxNavigationURLRequest: Equatable {
     }
 }
 
-enum CmuxTextURLParseError: Error, Equatable {
+enum WmuxTextURLParseError: Error, Equatable {
     case missingText
     case textTooLong(maxLength: Int)
     case textContainsUnsafeCharacters
@@ -749,7 +749,7 @@ enum CmuxTextURLParseError: Error, Equatable {
     case multipleLinks
 }
 
-struct CmuxTextURLRequest: Equatable {
+struct WmuxTextURLRequest: Equatable {
     enum Kind: String, Equatable {
         case prompt
         case rules
@@ -758,9 +758,9 @@ struct CmuxTextURLRequest: Equatable {
     static let maxTextLength = 8_000
     static let maxNameLength = 120
     static let maxTitleLength = 160
-    static let supportedSchemes: Set<String> = CmuxSSHURLRequest.supportedSchemes
+    static let supportedSchemes: Set<String> = WmuxSSHURLRequest.supportedSchemes
     static var activeSupportedSchemes: Set<String> {
-        CmuxSSHURLRequest.activeSupportedSchemes
+        WmuxSSHURLRequest.activeSupportedSchemes
     }
 
     let originalURL: URL
@@ -782,7 +782,7 @@ struct CmuxTextURLRequest: Equatable {
     static func parse(
         _ url: URL,
         supportedSchemes: Set<String> = activeSupportedSchemes
-    ) -> Result<CmuxTextURLRequest?, CmuxTextURLParseError> {
+    ) -> Result<WmuxTextURLRequest?, WmuxTextURLParseError> {
         guard isSupportedScheme(url.scheme, supportedSchemes: supportedSchemes) else {
             return .success(nil)
         }
@@ -848,7 +848,7 @@ struct CmuxTextURLRequest: Equatable {
             return .failure(error)
         }
 
-        return .success(CmuxTextURLRequest(
+        return .success(WmuxTextURLRequest(
             originalURL: url,
             kind: kind,
             text: text,
@@ -939,7 +939,7 @@ struct CmuxTextURLRequest: Equatable {
         return value
     }
 
-    private static func normalizedBooleanValue(named name: String, in queryItems: [ParsedQueryItem]) -> Result<Bool, CmuxTextURLParseError> {
+    private static func normalizedBooleanValue(named name: String, in queryItems: [ParsedQueryItem]) -> Result<Bool, WmuxTextURLParseError> {
         guard let item = queryItems.first(where: { $0.name.lowercased() == name }) else {
             return .success(false)
         }

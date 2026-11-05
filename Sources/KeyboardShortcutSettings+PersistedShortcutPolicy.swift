@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 
 /// Bridges the app target's legacy shortcut representation into the shared
 /// action-owned persistence policy.
@@ -6,7 +6,7 @@ extension KeyboardShortcutSettings.Action {
     func shortcutBindingPolicyRejection(
         for shortcut: StoredShortcut
     ) -> KeyboardShortcutSettings.ShortcutRecordingRejection? {
-        guard let settingsAction = CmuxSettings.ShortcutAction(rawValue: rawValue) else {
+        guard let settingsAction = WmuxSettings.ShortcutAction(rawValue: rawValue) else {
             return nil
         }
 
@@ -43,7 +43,7 @@ extension KeyboardShortcutSettings {
             return nil
         }
 
-        guard let settingsAction = CmuxSettings.ShortcutAction(rawValue: action.rawValue) else {
+        guard let settingsAction = WmuxSettings.ShortcutAction(rawValue: action.rawValue) else {
             return nil
         }
 
@@ -122,15 +122,15 @@ extension SystemWideHotkeySettings {
 }
 
 extension StoredShortcut {
-    init(cmuxSettingsStoredShortcut shortcut: CmuxSettings.StoredShortcut) {
+    init(cmuxSettingsStoredShortcut shortcut: WmuxSettings.StoredShortcut) {
         self.init(
             first: ShortcutStroke(cmuxSettingsShortcutStroke: shortcut.first),
             second: shortcut.second.map(ShortcutStroke.init(cmuxSettingsShortcutStroke:))
         )
     }
 
-    var cmuxSettingsStoredShortcut: CmuxSettings.StoredShortcut {
-        CmuxSettings.StoredShortcut(
+    var cmuxSettingsStoredShortcut: WmuxSettings.StoredShortcut {
+        WmuxSettings.StoredShortcut(
             first: firstStroke.cmuxSettingsShortcutStroke,
             second: secondStroke?.cmuxSettingsShortcutStroke
         )
@@ -138,7 +138,7 @@ extension StoredShortcut {
 }
 
 extension ShortcutStroke {
-    init(cmuxSettingsShortcutStroke stroke: CmuxSettings.ShortcutStroke) {
+    init(cmuxSettingsShortcutStroke stroke: WmuxSettings.ShortcutStroke) {
         self.init(
             key: stroke.key,
             command: stroke.command,
@@ -149,8 +149,8 @@ extension ShortcutStroke {
         )
     }
 
-    var cmuxSettingsShortcutStroke: CmuxSettings.ShortcutStroke {
-        CmuxSettings.ShortcutStroke(
+    var cmuxSettingsShortcutStroke: WmuxSettings.ShortcutStroke {
+        WmuxSettings.ShortcutStroke(
             key: key,
             command: command,
             shift: shift,

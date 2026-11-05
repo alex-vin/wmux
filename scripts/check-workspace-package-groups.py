@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate / verify the SPM package grouping in cmux.xcworkspace.
+"""Generate / verify the SPM package grouping in wmux.xcworkspace.
 
 The on-disk folder layout is the single source of truth. Every Swift package
 lives physically under exactly one group directory:
@@ -29,29 +29,21 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(SCRIPT_DIR)
 
 PACKAGES_DIR = os.path.join(ROOT, "Packages")
-WORKSPACE_DATA = os.path.join(ROOT, "cmux.xcworkspace", "contents.xcworkspacedata")
+WORKSPACE_DATA = os.path.join(ROOT, "wmux.xcworkspace", "contents.xcworkspacedata")
 
 # Group directories, in the order they appear in the workspace.
-GROUPS = ["Shared", "iOS", "macOS"]
+GROUPS = [g for g in ["Shared", "iOS", "macOS"] if os.path.isdir(os.path.join(PACKAGES_DIR, g))]
 
 # Structural workspace entries that are not Packages/<group>/* folders; kept
 # verbatim so regeneration only ever touches package membership.
-TOP_LEVEL_PROJECTS = ["group:cmux.xcodeproj"]
+TOP_LEVEL_PROJECTS = ["group:wmux.xcodeproj"]
 if os.path.exists(os.path.join(ROOT, "ios", "cmux-ios.xcodeproj")):
     TOP_LEVEL_PROJECTS.append("group:ios/cmux-ios.xcodeproj")
 # The iOS app's own SwiftPM package lives outside Packages/; it heads the iOS
 # group.
 IOS_APP_PACKAGE_REF = "container:ios/cmuxPackage" if os.path.exists(os.path.join(ROOT, "ios", "cmuxPackage")) else None
-# The Examples group is curated by hand and lives under a different container.
-EXAMPLES_GROUP = (
-    "container:Examples",
-    "Examples",
-    [
-        "group:TabsVisibleSidebar/TabsVisibleSidebar.xcodeproj",
-        "group:SampleSidebarExtensionApp/SampleSidebarExtensionApp.xcodeproj",
-        "group:CmuxExtensionSidebarExamples",
-    ],
-)
+# The Examples group has been decommissioned as part of repository cleanup.
+EXAMPLES_GROUP = None
 
 
 def packages_in(group: str) -> list[str]:
@@ -93,7 +85,8 @@ def render() -> str:
         if group == "iOS" and IOS_APP_PACKAGE_REF:
             refs = [IOS_APP_PACKAGE_REF] + refs
         out += _group(f"container:Packages/{group}", f"Packages ({group})", refs)
-    out += _group(*EXAMPLES_GROUP)
+    if EXAMPLES_GROUP:
+        out += _group(*EXAMPLES_GROUP)
     out += "</Workspace>\n"
     return out
 

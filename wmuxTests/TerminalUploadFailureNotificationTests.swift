@@ -2,8 +2,8 @@ import Testing
 import AppKit
 import Foundation
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -139,7 +139,7 @@ import Foundation
             appDelegate.notificationStore = originalStore
         }
 
-        let hook = CmuxResolvedNotificationHook(
+        let hook = WmuxResolvedNotificationHook(
             id: "upload-failure-passthrough",
             command: "cat",
             timeoutSeconds: 5,

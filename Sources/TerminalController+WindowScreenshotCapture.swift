@@ -22,7 +22,7 @@ extension TerminalController {
 
         // Determine output path
         let outputDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("cmux-screenshots")
+            .appendingPathComponent("wmux-screenshots")
         try? FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
 
         let filename = label.isEmpty ? "\(screenshotId).png" : "\(label)_\(screenshotId).png"

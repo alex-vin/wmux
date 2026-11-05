@@ -1,7 +1,7 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxAuthRuntime
-import CmuxBrowser
+import WmuxAuthRuntime
+import WmuxBrowser
 import Foundation
 import WebKit
 
@@ -202,7 +202,7 @@ struct BrowserAuthCallbackNavigationPolicy {
     /// schemes this build does not accept (those must be blocked, not opened).
     private static func isAuthCallbackShapedURL(_ url: URL) -> Bool {
         guard let scheme = url.scheme?.lowercased(),
-              scheme == "cmux" || scheme.hasPrefix("cmux-") else {
+              scheme == "wmux" || scheme.hasPrefix("wmux-") else {
             return false
         }
         return AuthCallbackRouter(extraAllowedScheme: scheme).isAuthCallbackURL(url)

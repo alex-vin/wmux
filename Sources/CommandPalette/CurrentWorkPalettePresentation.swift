@@ -1,5 +1,5 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 
 /// Pure presentation of the same bounded values returned by `current.list`.

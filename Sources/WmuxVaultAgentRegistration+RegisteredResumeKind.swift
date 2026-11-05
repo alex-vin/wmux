@@ -1,6 +1,6 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
-extension CmuxVaultAgentRegistration {
+extension WmuxVaultAgentRegistration {
     /// The package-owned resume kind when this value is an exact built-in registration.
     var registeredResumeKind: RegisteredAgentResumeKind? {
         if self == Self.builtInPi { return .pi }

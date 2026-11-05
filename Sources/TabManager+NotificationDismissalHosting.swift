@@ -1,8 +1,8 @@
-import CmuxNotifications
-import CmuxSettings
+import WmuxNotifications
+import WmuxSettings
 import Foundation
 
-/// The window-side host for the CmuxNotifications dismissal model: snapshot
+/// The window-side host for the WmuxNotifications dismissal model: snapshot
 /// reads of selection/panel/unread state and the synchronous indicator
 /// mutations the legacy `dismissNotification` flow performed inline.
 /// Lookups mirror the legacy optional-chained `tabs.first(where:)` reads,

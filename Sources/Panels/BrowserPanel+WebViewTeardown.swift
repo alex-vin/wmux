@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 
 extension BrowserPanel {
@@ -37,7 +37,7 @@ extension BrowserPanel {
         oldWebView.uiDelegate = nil
         oldWebView.cmuxBrowserViewportHostView = nil
 
-        if let oldCmuxWebView = oldWebView as? CmuxWebView {
+        if let oldCmuxWebView = oldWebView as? WmuxWebView {
             oldCmuxWebView.cmuxDownloadDelegate = nil
             oldCmuxWebView.clearBrowserDownloadCallbacks()
             oldCmuxWebView.browserViewportModel = nil

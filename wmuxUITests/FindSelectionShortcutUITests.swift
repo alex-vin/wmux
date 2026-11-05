@@ -16,9 +16,9 @@ final class FindSelectionShortcutUITests: XCTestCase {
 
     func testRepeatedCmdFPreservesOpenTerminalAndBrowserFindCaretAndSelection() {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_PATH"] = dataPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_PATH"] = dataPath
         launchAndEnsureForeground(app)
 
         XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10.0), "Expected main window")
@@ -41,9 +41,9 @@ final class FindSelectionShortcutUITests: XCTestCase {
 
     func testEscapeClosesTerminalAndBrowserFindAfterQuery() {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_PATH"] = dataPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_PATH"] = dataPath
         launchAndEnsureForeground(app)
 
         XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10.0), "Expected main window")

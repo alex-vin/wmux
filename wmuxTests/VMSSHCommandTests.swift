@@ -81,9 +81,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -116,12 +116,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
         let initialCommand = try XCTUnwrap(createParams["initial_command"] as? String)
         let initialScriptPath = initialCommand.trimmingCharacters(in: CharacterSet(charactersIn: "'"))
         let initialScript = try String(contentsOfFile: initialScriptPath, encoding: .utf8)
-        XCTAssertTrue(initialScript.contains("cmux_ssh_cleanup_password() { rm -rf"), initialScript)
-        XCTAssertTrue(initialScript.contains("cmux_ssh_session_end() {"), initialScript)
-        XCTAssertTrue(initialScript.contains("cmux_ssh_cleanup_password;"), initialScript)
+        XCTAssertTrue(initialScript.contains("wmux_ssh_cleanup_password() { rm -rf"), initialScript)
+        XCTAssertTrue(initialScript.contains("wmux_ssh_session_end() {"), initialScript)
+        XCTAssertTrue(initialScript.contains("wmux_ssh_cleanup_password;"), initialScript)
         XCTAssertTrue(initialScript.contains("-o NumberOfPasswordPrompts=1"), initialScript)
         XCTAssertTrue(initialScript.contains("-o LogLevel=QUIET"), initialScript)
-        XCTAssertFalse(initialScript.contains("trap 'rm -rf \"$cmux_ssh_askpass_dir\"'"), initialScript)
+        XCTAssertFalse(initialScript.contains("trap 'rm -rf \"$wmux_ssh_askpass_dir\"'"), initialScript)
         try? FileManager.default.removeItem(atPath: initialScriptPath)
 
         let configureRequest = try XCTUnwrap(
@@ -200,11 +200,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = callerWorkspaceID
-        environment["CMUX_SURFACE_ID"] = callerSurfaceID
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = callerWorkspaceID
+        environment["WMUX_SURFACE_ID"] = callerSurfaceID
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -271,9 +271,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,

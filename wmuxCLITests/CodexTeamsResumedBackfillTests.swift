@@ -77,10 +77,10 @@ struct CodexTeamsResumedBackfillTests {
             "--max-auto-depth", "2"
         ]
         var environment = ProcessInfo.processInfo.environment
-        for key in environment.keys where key.hasPrefix("CMUX_") {
+        for key in environment.keys where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["AppleLanguages"] = "(en)"
         environment["AppleLocale"] = "en_US"
         environment["LANG"] = "en_US.UTF-8"

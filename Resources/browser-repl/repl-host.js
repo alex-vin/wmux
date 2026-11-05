@@ -6,7 +6,7 @@
 // cells (and closures from earlier cells) see the same bindings.
 (function (root) {
   "use strict";
-  const ns = (root.CmuxBrowserRepl = root.CmuxBrowserRepl || {});
+  const ns = (root.WmuxBrowserRepl = root.WmuxBrowserRepl || {});
 
   function acornApi() {
     const acorn = root.acorn || (ns.vendor && ns.vendor.acorn);
@@ -546,7 +546,7 @@
     // cell runs, so a cell cannot call them (work they start would belong
     // to no cell). The runtime's namespace goes too: a cell must not build
     // a second REPL over this host and driver.
-    delete root.CmuxBrowserRepl;
+    delete root.WmuxBrowserRepl;
   }
 
   ns.replHost = { timerDelay, rewriteTopLevel, createReplSession, createBrowserRepl, createOutputGate, DEFAULT_MAX_OUTPUT, HARD_MAX_OUTPUT, formatError, installNativeHost };

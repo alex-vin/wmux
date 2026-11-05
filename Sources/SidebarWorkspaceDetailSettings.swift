@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Catalog-backed workspace-detail preferences shared by both sidebar row models.

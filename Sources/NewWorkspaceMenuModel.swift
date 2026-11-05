@@ -2,19 +2,19 @@ import Foundation
 
 struct NewWorkspaceMenuModel: Equatable {
     enum CreateRow: Equatable {
-        case action(CmuxResolvedConfigMenuAction, deletable: Bool, isDefault: Bool)
+        case action(WmuxResolvedConfigMenuAction, deletable: Bool, isDefault: Bool)
         case separator
     }
 
     struct LayoutRow: Equatable {
-        let menuAction: CmuxResolvedConfigMenuAction
+        let menuAction: WmuxResolvedConfigMenuAction
         let isDefault: Bool
         let deletable: Bool
     }
 
     struct ManagementSection: Equatable {
         let defaultLayout: NewWorkspaceDefaultLayoutMenuModel
-        let deletableActions: [CmuxResolvedConfigAction]
+        let deletableActions: [WmuxResolvedConfigAction]
     }
 
     enum Section: Equatable {
@@ -27,12 +27,12 @@ struct NewWorkspaceMenuModel: Equatable {
     let sections: [Section]
 
     static func build(
-        newWorkspaceContextMenuItems: [CmuxResolvedConfigContextMenuItem],
-        agentChatAction: CmuxResolvedConfigAction?,
+        newWorkspaceContextMenuItems: [WmuxResolvedConfigContextMenuItem],
+        agentChatAction: WmuxResolvedConfigAction?,
         templateNames: [String],
-        loadedActions: [CmuxResolvedConfigAction],
+        loadedActions: [WmuxResolvedConfigAction],
         newWorkspaceActionID: String?,
-        deletable: (CmuxResolvedConfigAction) -> Bool
+        deletable: (WmuxResolvedConfigAction) -> Bool
     ) -> NewWorkspaceMenuModel {
         var createRows: [CreateRow] = []
         var layoutRows: [LayoutRow] = []
@@ -73,7 +73,7 @@ struct NewWorkspaceMenuModel: Equatable {
 
         if let agentChatAction {
             createRows.append(.action(
-                CmuxResolvedConfigMenuAction(
+                WmuxResolvedConfigMenuAction(
                     id: agentChatAction.id,
                     title: agentChatAction.title,
                     icon: agentChatAction.icon,
@@ -112,7 +112,7 @@ struct NewWorkspaceMenuModel: Equatable {
         return NewWorkspaceMenuModel(sections: sections)
     }
 
-    static func isWorkspaceLayout(_ action: CmuxResolvedConfigAction) -> Bool {
+    static func isWorkspaceLayout(_ action: WmuxResolvedConfigAction) -> Bool {
         action.workspaceCommandName != nil || action.action.inlineWorkspace != nil
     }
 }

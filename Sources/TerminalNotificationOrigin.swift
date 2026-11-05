@@ -2,7 +2,7 @@ import Foundation
 
 /// Where a notification's text came from, carried with the notification through the
 /// store, the hook envelope (`origin`, not hook-patchable), the hook and
-/// `notifications.command` environments (`CMUX_NOTIFICATION_ORIGIN`), and the feed
+/// `notifications.command` environments (`WMUX_NOTIFICATION_ORIGIN`), and the feed
 /// history. Remote origins are untrusted emitters: the store clamps their side effects to
 /// display (no reply shape, no click action, no agent context, no sound override), and
 /// remote-origin notifications never consult project `cmux.json` hooks — only the global
@@ -25,7 +25,7 @@ enum TerminalNotificationOrigin: Hashable, Sendable {
 
     /// `local`, `ssh-relay:<workspace uuid>`, `cloud-vm:<machine id>`, or
     /// `device-mac:<device machine id>`; what hooks see
-    /// in `CMUX_NOTIFICATION_ORIGIN` and in the envelope's `origin.value`.
+    /// in `WMUX_NOTIFICATION_ORIGIN` and in the envelope's `origin.value`.
     var wireValue: String {
         switch self {
         case .local:
@@ -85,7 +85,7 @@ extension TerminalNotificationOrigin: Codable {
 }
 
 /// The `origin` block of the notification-hook envelope. Informational input for hooks
-/// (`case "$CMUX_NOTIFICATION_ORIGIN" in cloud-vm:*) …`), never patchable by them.
+/// (`case "$WMUX_NOTIFICATION_ORIGIN" in cloud-vm:*) …`), never patchable by them.
 struct TerminalNotificationPolicyOriginContext: Codable, Sendable, Equatable {
     var kind: String
     var value: String

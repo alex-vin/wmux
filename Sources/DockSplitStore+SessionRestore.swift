@@ -1,8 +1,8 @@
 import Bonsplit
-import CMUXAgentLaunch
-import CmuxTerminal
-import CmuxTerminalCore
-import CmuxWorkspaces
+import WMUXAgentLaunch
+import WmuxTerminal
+import WmuxTerminalCore
+import WmuxWorkspaces
 import Foundation
 
 extension DockSplitStore {

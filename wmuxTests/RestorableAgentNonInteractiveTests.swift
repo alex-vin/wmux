@@ -1,7 +1,7 @@
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -10,7 +10,7 @@ final class RestorableAgentNonInteractiveTests: XCTestCase {
     func testHookStoreDirectoryCanBeOverriddenForTests() {
         let url = RestorableAgentKind.codex.hookStoreFileURL(
             homeDirectory: "/Users/example",
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": "/tmp/cmux hook state"]
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": "/tmp/cmux hook state"]
         )
 
         XCTAssertEqual(url.path, "/tmp/cmux hook state/codex-hook-sessions.json")

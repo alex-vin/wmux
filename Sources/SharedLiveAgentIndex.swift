@@ -159,7 +159,7 @@ final class SharedLiveAgentIndex {
     private let watchQueue = DispatchQueue(label: "com.cmuxterm.app.sharedLiveAgentIndexWatch")
 
     private let indexLoader: @Sendable () async -> SharedLiveAgentIndexLoader.LoadResult
-    private let processSnapshotLoader: @Sendable () async -> CmuxTopProcessSnapshot
+    private let processSnapshotLoader: @Sendable () async -> WmuxTopProcessSnapshot
     private let forkExecutableIdentityResolver: AgentForkExecutableIdentityResolver
     private let forkCapabilityProbeCache: ForkCapabilityProbeResultCache
     private let customForkSupportProvider: (@Sendable (SessionRestorableAgentSnapshot, Bool) async -> Bool)?
@@ -170,7 +170,7 @@ final class SharedLiveAgentIndex {
         indexLoader: @escaping @Sendable () async -> SharedLiveAgentIndexLoader.LoadResult = {
             await SharedLiveAgentIndexLoader.loadFreshResult()
         },
-        processSnapshotLoader: @escaping @Sendable () async -> CmuxTopProcessSnapshot = { await CmuxTopProcessSnapshot.capture(includeProcessDetails: true, includeCMUXScope: true, includeResources: false) },
+        processSnapshotLoader: @escaping @Sendable () async -> WmuxTopProcessSnapshot = { await WmuxTopProcessSnapshot.capture(includeProcessDetails: true, includeCMUXScope: true, includeResources: false) },
         forkExecutableIdentityResolver: AgentForkExecutableIdentityResolver = AgentForkExecutableIdentityResolver(),
         forkCapabilityProbeCache: ForkCapabilityProbeResultCache = ForkCapabilityProbeResultCache(),
         forkSupportProvider: (@Sendable (SessionRestorableAgentSnapshot, Bool) async -> Bool)? = nil,
@@ -2560,5 +2560,5 @@ final class SharedLiveAgentIndex {
 }
 
 extension Notification.Name {
-    static let sharedLiveAgentIndexDidChange = Notification.Name("cmux.sharedLiveAgentIndexDidChange")
+    static let sharedLiveAgentIndexDidChange = Notification.Name("wmux.sharedLiveAgentIndexDidChange")
 }

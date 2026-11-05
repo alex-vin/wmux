@@ -27,18 +27,18 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         let environment = [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": context.workspaceId,
-            "CMUX_SURFACE_ID": leakedSurfaceId,
-            "CMUX_CLI_TTY_NAME": ttyName,
-            "CMUX_CLAUDE_PID": "42424",
-            "CMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": context.workspaceId,
+            "WMUX_SURFACE_ID": leakedSurfaceId,
+            "WMUX_CLI_TTY_NAME": ttyName,
+            "WMUX_CLAUDE_PID": "42424",
+            "WMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
         ]
 
         let result = runProcess(
@@ -58,7 +58,7 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         )
         #expect(
             request["surface_id"] as? String == ttySurfaceId,
-            "Claude must persist the agent TTY surface, not the leaked ambient CMUX_SURFACE_ID; params=\(request)"
+            "Claude must persist the agent TTY surface, not the leaked ambient WMUX_SURFACE_ID; params=\(request)"
         )
         #expect(
             context.state.snapshot().contains {
@@ -88,15 +88,15 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         let environment = [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": context.workspaceId,
-            "CMUX_SURFACE_ID": context.surfaceId,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": context.workspaceId,
+            "WMUX_SURFACE_ID": context.surfaceId,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
         ]
 
         let result = runProcess(
@@ -145,17 +145,17 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         let environment = [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": leakedWorkspaceId,
-            "CMUX_SURFACE_ID": leakedSurfaceId,
-            "CMUX_CLI_TTY_NAME": ttyName,
-            "CMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": leakedWorkspaceId,
+            "WMUX_SURFACE_ID": leakedSurfaceId,
+            "WMUX_CLI_TTY_NAME": ttyName,
+            "WMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
         ]
 
         let result = runProcess(
@@ -175,11 +175,11 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         )
         #expect(
             request["workspace_id"] as? String == ttyWorkspaceId,
-            "Claude must persist the agent TTY workspace, not the leaked ambient CMUX_WORKSPACE_ID; params=\(request)"
+            "Claude must persist the agent TTY workspace, not the leaked ambient WMUX_WORKSPACE_ID; params=\(request)"
         )
         #expect(
             request["surface_id"] as? String == ttySurfaceId,
-            "Claude must persist the agent TTY surface, not the leaked ambient CMUX_SURFACE_ID; params=\(request)"
+            "Claude must persist the agent TTY surface, not the leaked ambient WMUX_SURFACE_ID; params=\(request)"
         )
         #expect(
             context.state.snapshot().contains {
@@ -221,18 +221,18 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         let environment = [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_SOCKET_PASSWORD": socketPassword,
-            "CMUX_WORKSPACE_ID": leakedWorkspaceId,
-            "CMUX_SURFACE_ID": leakedSurfaceId,
-            "CMUX_CLAUDE_PID": "\(claudePID)",
-            "CMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_SOCKET_PASSWORD": socketPassword,
+            "WMUX_WORKSPACE_ID": leakedWorkspaceId,
+            "WMUX_SURFACE_ID": leakedSurfaceId,
+            "WMUX_CLAUDE_PID": "\(claudePID)",
+            "WMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
         ]
 
         let result = runProcess(
@@ -252,11 +252,11 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         )
         #expect(
             request["workspace_id"] as? String == pidWorkspaceId,
-            "Claude PID binding must beat leaked ambient CMUX_WORKSPACE_ID when no TTY marker exists; params=\(request)"
+            "Claude PID binding must beat leaked ambient WMUX_WORKSPACE_ID when no TTY marker exists; params=\(request)"
         )
         #expect(
             request["surface_id"] as? String == pidSurfaceId,
-            "Claude PID binding must beat leaked ambient CMUX_SURFACE_ID when no TTY marker exists; params=\(request)"
+            "Claude PID binding must beat leaked ambient WMUX_SURFACE_ID when no TTY marker exists; params=\(request)"
         )
         #expect(
             context.state.snapshot().contains("auth \(socketPassword)"),
@@ -300,19 +300,19 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         let environment = [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_SOCKET_PASSWORD": socketPassword,
-            "CMUX_WORKSPACE_ID": leakedWorkspaceId,
-            "CMUX_SURFACE_ID": leakedSurfaceId,
-            "CMUX_CLI_TTY_NAME": ttyName,
-            "CMUX_CLAUDE_PID": "\(claudePID)",
-            "CMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_SOCKET_PASSWORD": socketPassword,
+            "WMUX_WORKSPACE_ID": leakedWorkspaceId,
+            "WMUX_SURFACE_ID": leakedSurfaceId,
+            "WMUX_CLI_TTY_NAME": ttyName,
+            "WMUX_CLAUDE_PID": "\(claudePID)",
+            "WMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
         ]
 
         let result = runProcess(
@@ -373,17 +373,17 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         let environment = [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": context.workspaceId,
-            "CMUX_SURFACE_ID": context.surfaceId,
-            "CMUX_CLI_TTY_NAME": ttyName,
-            "CMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": context.workspaceId,
+            "WMUX_SURFACE_ID": context.surfaceId,
+            "WMUX_CLI_TTY_NAME": ttyName,
+            "WMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
         ]
 
         let result = runProcess(
@@ -403,7 +403,7 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         )
         #expect(
             request["workspace_id"] as? String == context.workspaceId,
-            "Stale TTY workspace must not beat valid ambient CMUX_WORKSPACE_ID; params=\(request)"
+            "Stale TTY workspace must not beat valid ambient WMUX_WORKSPACE_ID; params=\(request)"
         )
         #expect(
             request["surface_id"] as? String == context.surfaceId,
@@ -702,13 +702,13 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
         [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": context.workspaceId,
-            "CMUX_SURFACE_ID": surfaceId,
-            "CMUX_CLI_TTY_NAME": ttyName,
-            "CMUX_CLAUDE_HOOK_STATE_PATH": storeURL.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": context.workspaceId,
+            "WMUX_SURFACE_ID": surfaceId,
+            "WMUX_CLI_TTY_NAME": ttyName,
+            "WMUX_CLAUDE_HOOK_STATE_PATH": storeURL.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
         ]
     }
 
@@ -799,7 +799,7 @@ struct ClaudeHookSurfaceResolutionSwiftTests {
             request["surface_id"] as? String == expected,
             "\(requestMessage); params=\(request)"
         )
-        #expect(request["surface_id"] as? String != ambientSurfaceId, "Raw ambient CMUX_SURFACE_ID must not win")
+        #expect(request["surface_id"] as? String != ambientSurfaceId, "Raw ambient WMUX_SURFACE_ID must not win")
         #expect(
             context.state.snapshot().contains {
                 $0.hasPrefix("set_status claude_code Running ")

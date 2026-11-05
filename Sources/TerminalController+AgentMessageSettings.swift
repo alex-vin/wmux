@@ -1,4 +1,4 @@
-import CmuxAgentJournal
+import WmuxAgentJournal
 import Foundation
 
 /// What `agent.message.settings` acts on, resolved on the main actor.

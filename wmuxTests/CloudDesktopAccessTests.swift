@@ -1,13 +1,13 @@
-import CmuxCloudBannerCore
-import CmuxCloud
-import CmuxSettings
-import CmuxSurfaceCatalogModel
+import WmuxCloudBannerCore
+import WmuxCloud
+import WmuxSettings
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -478,7 +478,7 @@ struct CloudDesktopAccessTests {
             target: .init(host: "10.0.0.7", port: 6901), coordinator: nil,
             wake: {}, startForward: { _ in 46_901 }, stopForward: {}, route: .loopback
         )
-        let url = try #require(URL(string: CmuxTuiSurfaceProvider.privateDesktopURL(privateAddress: "10.0.0.7")))
+        let url = try #require(URL(string: WmuxTuiSurfaceProvider.privateDesktopURL(privateAddress: "10.0.0.7")))
         browser.cloudAccess.configure(model: model, url: url)
         model.connect()
         #expect(await wait { model.isReady })
@@ -511,7 +511,7 @@ struct CloudDesktopAccessTests {
         let first = BrowserPanel(workspaceId: live.id(), websiteDataStore: .nonPersistent())
         let second = BrowserPanel(workspaceId: live.id(), websiteDataStore: .nonPersistent())
         defer { first.close(); second.close() }
-        let remote = try #require(URL(string: CmuxTuiSurfaceProvider.privateDesktopURL(privateAddress: target.host)))
+        let remote = try #require(URL(string: WmuxTuiSurfaceProvider.privateDesktopURL(privateAddress: target.host)))
 
         provider.configureBrowser(first, url: remote)
         provider.configureBrowser(second, url: remote)
@@ -583,10 +583,10 @@ struct CloudDesktopAccessTests {
         store: CloudPortAccessStore,
         catalog: SurfaceCatalog,
         policy: BrowserURLAllowlistPolicy = .init(managedPatterns: nil)
-    ) -> CmuxTuiSurfaceProvider {
+    ) -> WmuxTuiSurfaceProvider {
         var summary = VMSummary(id: "test-desktop", provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil)
         summary.addressIPv4 = "10.0.0.7"
-        return CmuxTuiSurfaceProvider(
+        return WmuxTuiSurfaceProvider(
             summary: summary,
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             catalog: catalog,

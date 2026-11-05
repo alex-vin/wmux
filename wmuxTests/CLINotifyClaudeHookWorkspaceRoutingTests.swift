@@ -7,7 +7,7 @@ import Darwin
 
 extension CLINotifyProcessIntegrationRegressionTests {
     /// A resumed/stale session whose recorded workspace no longer exists must fall
-    /// back to the LIVE `CMUX_WORKSPACE_ID`, never to the currently-focused tab.
+    /// back to the LIVE `WMUX_WORKSPACE_ID`, never to the currently-focused tab.
     /// Regression for cross-workspace notification/status/summary bleed: the hook
     /// used to skip the env fallback and route to `workspace.current`.
     func testClaudeNotificationFallsBackToLiveWorkspaceInsteadOfFocusedTab() throws {
@@ -76,12 +76,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": liveWorkspaceId,
-                "CMUX_SURFACE_ID": liveSurfaceId,
-                "CMUX_CLAUDE_HOOK_STATE_PATH": stateURL.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": liveWorkspaceId,
+                "WMUX_SURFACE_ID": liveSurfaceId,
+                "WMUX_CLAUDE_HOOK_STATE_PATH": stateURL.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","hook_event_name":"Notification","message":"Claude needs your input"}"#,
             timeout: 5
@@ -94,7 +94,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             state.commands.contains {
                 $0.hasPrefix("set_status claude_code Needs input ") && $0.contains("--tab=\(liveWorkspaceId)")
             },
-            "Expected notification to route to the live CMUX_WORKSPACE_ID, saw \(state.commands)"
+            "Expected notification to route to the live WMUX_WORKSPACE_ID, saw \(state.commands)"
         )
         // Scope these to the actual routing commands (set_status / notify_target):
         // state.commands also captures the resolver's own surface.list validation
@@ -178,13 +178,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": staleWorkspaceId,
-                "CMUX_SURFACE_ID": "77777777-7777-7777-7777-777777777777",
-                "CMUX_CLI_TTY_NAME": ttyName,
-                "CMUX_CLAUDE_HOOK_STATE_PATH": root.appendingPathComponent("claude-hook-sessions.json").path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": staleWorkspaceId,
+                "WMUX_SURFACE_ID": "77777777-7777-7777-7777-777777777777",
+                "WMUX_CLI_TTY_NAME": ttyName,
+                "WMUX_CLAUDE_HOOK_STATE_PATH": root.appendingPathComponent("claude-hook-sessions.json").path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"session_id":"orphan-ambiguous","hook_event_name":"Notification","message":"Claude needs your input"}"#,
             timeout: 5
@@ -279,11 +279,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": focusedWorkspaceId,
-                "CMUX_CLAUDE_HOOK_STATE_PATH": root.appendingPathComponent("claude-hook-sessions.json").path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": focusedWorkspaceId,
+                "WMUX_CLAUDE_HOOK_STATE_PATH": root.appendingPathComponent("claude-hook-sessions.json").path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"session_id":"explicit-ref","hook_event_name":"Notification","notification_type":"permission_prompt","tool_use_id":"explicit-ref-request","message":"Claude needs your input"}"#,
             timeout: 5
@@ -392,12 +392,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": ownWorkspaceId,
-                "CMUX_SURFACE_ID": ownSurfaceId,
-                "CMUX_CLAUDE_HOOK_STATE_PATH": stateURL.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": ownWorkspaceId,
+                "WMUX_SURFACE_ID": ownSurfaceId,
+                "WMUX_CLAUDE_HOOK_STATE_PATH": stateURL.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","hook_event_name":"Notification","message":"Claude needs your input"}"#,
             timeout: 5

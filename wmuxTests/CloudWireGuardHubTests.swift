@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxAuthRuntime
+import WmuxCloud
+import WmuxAuthRuntime
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -486,7 +486,7 @@ struct CloudWireGuardHubTests {
             }
             return CloudWireGuardHub.Enrollment(configPath: "/tmp/cmux-app.conf", routes: ["10.0.0.0/8"])
         })
-        // vm.cmux_remote_info pins the hub before the sidebar observes the new
+        // vm.wmux_remote_info pins the hub before the sidebar observes the new
         // machine. Its waiter must survive the same startup failure that the
         // background prewarm knows how to recover from.
         let open = Task { try await h.hub.pinForExternalClient() }

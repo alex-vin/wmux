@@ -1,6 +1,6 @@
 import Foundation
 
-enum CmuxSocketEventMapper {
+enum WmuxSocketEventMapper {
     static func publish(command: String, response: String) {
         autoreleasepool {
             if publishV2(command: command, response: response) {
@@ -178,14 +178,14 @@ enum CmuxSocketEventMapper {
         case "close_surface":
             break
         case "send", "send_surface":
-            CmuxEventBus.shared.publish(name: "surface.input_sent", category: "surface", source: "socket.v1", payload: payload)
+            WmuxEventBus.shared.publish(name: "surface.input_sent", category: "surface", source: "socket.v1", payload: payload)
         case "send_key", "send_key_surface":
-            CmuxEventBus.shared.publish(name: "surface.key_sent", category: "surface", source: "socket.v1", payload: payload)
+            WmuxEventBus.shared.publish(name: "surface.key_sent", category: "surface", source: "socket.v1", payload: payload)
         case "notify_surface":
             var payloadWithSurface = payload
             let surfaceId = firstUUID(in: args)
             payloadWithSurface["surface_id"] = surfaceId ?? NSNull()
-            CmuxEventBus.shared.publish(
+            WmuxEventBus.shared.publish(
                 name: "notification.requested",
                 category: "notification",
                 source: "socket.v1",
@@ -193,29 +193,29 @@ enum CmuxSocketEventMapper {
                 payload: payloadWithSurface
             )
         case "notify", "notify_target", "notify_target_async":
-            CmuxEventBus.shared.publish(name: "notification.requested", category: "notification", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "notification.requested", category: "notification", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "clear_notifications":
-            CmuxEventBus.shared.publish(name: "notification.clear_requested", category: "notification", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "notification.clear_requested", category: "notification", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "set_status", "report_meta", "report_meta_block":
-            CmuxEventBus.shared.publish(name: "sidebar.metadata.updated", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "sidebar.metadata.updated", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "clear_status", "clear_meta", "clear_meta_block":
-            CmuxEventBus.shared.publish(name: "sidebar.metadata.cleared", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "sidebar.metadata.cleared", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "set_progress":
-            CmuxEventBus.shared.publish(name: "sidebar.progress.updated", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "sidebar.progress.updated", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "clear_progress":
-            CmuxEventBus.shared.publish(name: "sidebar.progress.cleared", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "sidebar.progress.cleared", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "log":
-            CmuxEventBus.shared.publish(name: "sidebar.log.appended", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "sidebar.log.appended", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "clear_log":
-            CmuxEventBus.shared.publish(name: "sidebar.log.cleared", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "sidebar.log.cleared", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "reset_sidebar":
-            CmuxEventBus.shared.publish(name: "sidebar.reset", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
+            WmuxEventBus.shared.publish(name: "sidebar.reset", category: "sidebar", source: "socket.v1", workspaceId: firstUUID(in: args), payload: payload)
         case "reload_config":
-            CmuxEventBus.shared.publish(name: "config.reloaded", category: "config", source: "socket.v1", payload: payload)
+            WmuxEventBus.shared.publish(name: "config.reloaded", category: "config", source: "socket.v1", payload: payload)
         case "set_app_focus":
-            CmuxEventBus.shared.publish(name: "app.focus_override.changed", category: "app", source: "socket.v1", payload: payload)
+            WmuxEventBus.shared.publish(name: "app.focus_override.changed", category: "app", source: "socket.v1", payload: payload)
         case "simulate_app_active":
-            CmuxEventBus.shared.publish(name: "app.simulated_active", category: "app", source: "socket.v1", payload: payload)
+            WmuxEventBus.shared.publish(name: "app.simulated_active", category: "app", source: "socket.v1", payload: payload)
         default:
             break
         }
@@ -226,7 +226,7 @@ enum CmuxSocketEventMapper {
         let surfaceId = stringValue(result["surface_id"] ?? params["surface_id"])
         let paneId = stringValue(result["pane_id"] ?? params["pane_id"])
         let windowId = stringValue(result["window_id"] ?? params["window_id"])
-        CmuxEventBus.shared.publish(
+        WmuxEventBus.shared.publish(
             name: name,
             category: category,
             source: "socket.v2",

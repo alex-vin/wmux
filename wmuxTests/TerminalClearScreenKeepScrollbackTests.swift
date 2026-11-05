@@ -2,10 +2,10 @@ import AppKit
 import Carbon.HIToolbox
 import Foundation
 import Testing
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -47,8 +47,8 @@ struct TerminalClearScreenKeepScrollbackTests {
 
     @Test
     func clearScreenKeepScrollbackDeliversFormFeedToForegroundProgram() throws {
-        let readyMarker = "CMUX_CLEAR_READY_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
-        let captureMarker = "CMUX_CLEAR_HEX_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        let readyMarker = "WMUX_CLEAR_READY_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
+        let captureMarker = "WMUX_CLEAR_HEX_\(UUID().uuidString.replacingOccurrences(of: "-", with: ""))"
 
         // A controlled program (not the login shell) that puts the PTY in raw mode and
         // echoes whatever bytes it receives as hex. Ctrl-L must arrive as the single

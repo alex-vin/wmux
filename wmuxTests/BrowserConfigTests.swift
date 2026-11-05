@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import class XCTest.XCTestCase
 import func XCTest.XCTSkipIf
 import func XCTest.XCTAssertEqual
@@ -21,25 +21,25 @@ import ObjectiveC.runtime
 import Bonsplit
 import UserNotifications
 import Network
-import CmuxBrowser
-import CmuxAppKitSupportUI
-import CmuxSettings
-import CmuxSidebar
+import WmuxBrowser
+import WmuxAppKitSupportUI
+import WmuxSettings
+import WmuxSidebar
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 // The app target still declares a legacy duplicate of BrowserThemeMode; with
-// CmuxSettings imported unconditionally the name is ambiguous. Pin the app
+// WmuxSettings imported unconditionally the name is ambiguous. Pin the app
 // type for theme tests and the package type for browser search settings.
-private typealias BrowserThemeMode = cmux_DEV.BrowserThemeMode
-private typealias BrowserSearchEngine = CmuxSettings.BrowserSearchEngine
-private typealias StoredShortcut = cmux_DEV.StoredShortcut
+private typealias BrowserThemeMode = wmux_DEV.BrowserThemeMode
+private typealias BrowserSearchEngine = WmuxSettings.BrowserSearchEngine
+private typealias StoredShortcut = wmux_DEV.StoredShortcut
 // Internal unique-named alias: cross-file helpers can't expose the private alias above.
-typealias BrowserConfigStoredShortcut = cmux_DEV.StoredShortcut
+typealias BrowserConfigStoredShortcut = wmux_DEV.StoredShortcut
 #elseif canImport(cmux)
 @testable import cmux
 private typealias BrowserThemeMode = cmux.BrowserThemeMode
-private typealias BrowserSearchEngine = CmuxSettings.BrowserSearchEngine
+private typealias BrowserSearchEngine = WmuxSettings.BrowserSearchEngine
 private typealias StoredShortcut = cmux.StoredShortcut
 typealias BrowserConfigStoredShortcut = cmux.StoredShortcut
 #endif
@@ -49,7 +49,7 @@ var cmuxUnitTestInspectorOverrideInstalled = false
 var cmuxUnitTestWKWebViewPerformKeyEquivalentOverrideInstalled = false
 var cmuxUnitTestWKWebViewPerformKeyEquivalentHook: ((WKWebView, NSEvent) -> Bool?)?
 
-extension CmuxWebView {
+extension WmuxWebView {
     @objc func cmuxUnitTestInspector() -> NSObject? {
         objc_getAssociatedObject(self, &cmuxUnitTestInspectorAssociationKey) as? NSObject
     }
@@ -78,20 +78,20 @@ func installCmuxUnitTestInspectorOverride() {
     guard !cmuxUnitTestInspectorOverrideInstalled else { return }
 
     guard let replacementMethod = class_getInstanceMethod(
-        CmuxWebView.self,
-        #selector(CmuxWebView.cmuxUnitTestInspector)
+        WmuxWebView.self,
+        #selector(WmuxWebView.cmuxUnitTestInspector)
     ) else {
         fatalError("Unable to locate test inspector replacement method")
     }
 
     let added = class_addMethod(
-        CmuxWebView.self,
+        WmuxWebView.self,
         NSSelectorFromString("_inspector"),
         method_getImplementation(replacementMethod),
         method_getTypeEncoding(replacementMethod)
     )
     guard added else {
-        fatalError("Unable to install CmuxWebView _inspector test override")
+        fatalError("Unable to install WmuxWebView _inspector test override")
     }
 
     cmuxUnitTestInspectorOverrideInstalled = true
@@ -266,7 +266,7 @@ final class BrowserOmnibarNativeFieldRegistryTests: XCTestCase {
     }
 }
 
-final class CmuxWebViewKeyEquivalentTests: XCTestCase {
+final class WmuxWebViewKeyEquivalentTests: XCTestCase {
     private final class ActionSpy: NSObject {
         private(set) var invoked: Bool = false
 
@@ -370,7 +370,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "n", modifiers: [.command])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let event = makeKeyDownEvent(key: "n", modifiers: [.command], keyCode: 45) // kVK_ANSI_N
         XCTAssertNotNil(event)
 
@@ -382,7 +382,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "w", modifiers: [.command])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let event = makeKeyDownEvent(key: "w", modifiers: [.command], keyCode: 13) // kVK_ANSI_W
         XCTAssertNotNil(event)
 
@@ -394,7 +394,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "r", modifiers: [.command])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let event = makeKeyDownEvent(key: "r", modifiers: [.command], keyCode: 15) // kVK_ANSI_R
         XCTAssertNotNil(event)
 
@@ -408,7 +408,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "c", modifiers: [.command])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         var forwardedEvents: [NSEvent] = []
         cmuxUnitTestWKWebViewPerformKeyEquivalentHook = { currentWebView, event in
             guard currentWebView === webView else { return nil }
@@ -432,7 +432,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "c", modifiers: [.command])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         var forwardedEvents: [NSEvent] = []
         cmuxUnitTestWKWebViewPerformKeyEquivalentHook = { currentWebView, event in
             guard currentWebView === webView else { return nil }
@@ -468,7 +468,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -523,7 +523,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -577,7 +577,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -617,7 +617,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "\r", modifiers: [])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let event = makeKeyDownEvent(key: "\r", modifiers: [], keyCode: 36) // kVK_Return
         XCTAssertNotNil(event)
 
@@ -629,7 +629,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "\r", modifiers: [.command])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let event = makeKeyDownEvent(key: "\r", modifiers: [.command], keyCode: 36) // kVK_Return
         XCTAssertNotNil(event)
 
@@ -641,7 +641,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let spy = ActionSpy()
         installMenu(spy: spy, key: "\r", modifiers: [])
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let event = makeKeyDownEvent(key: "\r", modifiers: [], keyCode: 76) // kVK_ANSI_KeypadEnter
         XCTAssertNotNil(event)
 
@@ -662,7 +662,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -695,7 +695,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -728,7 +728,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -764,7 +764,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -801,7 +801,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -875,7 +875,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         slot.autoresizingMask = [.width, .height]
         host.addSubview(slot)
 
-        let webView = CmuxWebView(frame: slot.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: slot.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         slot.addSubview(webView)
 
@@ -930,7 +930,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 80, y: 60, width: 480, height: 260))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
 
         window.makeKeyAndOrderFront(nil)
         contentView.layoutSubtreeIfNeeded()
@@ -1033,7 +1033,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -1240,7 +1240,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         field.stringValue = "abcdef"
         container.addSubview(field)
 
-        let webView = try XCTUnwrap(panel.webView as? CmuxWebView)
+        let webView = try XCTUnwrap(panel.webView as? WmuxWebView)
         webView.frame = NSRect(x: 0, y: 0, width: 640, height: 360)
         webView.allowsFirstResponderAcquisition = true
         container.addSubview(webView)
@@ -1334,7 +1334,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         field.stringValue = "abcdef"
         container.addSubview(field)
 
-        let webView = try XCTUnwrap(panel.webView as? CmuxWebView)
+        let webView = try XCTUnwrap(panel.webView as? WmuxWebView)
         webView.frame = NSRect(x: 0, y: 0, width: 640, height: 360)
         webView.allowsFirstResponderAcquisition = true
         container.addSubview(webView)
@@ -1494,7 +1494,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -1526,7 +1526,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         _ = webView.performKeyEquivalent(with: event)
         XCTAssertFalse(
             spy.invoked,
-            "CmuxWebView should not route Cmd+` directly to the menu when WebKit is first responder"
+            "WmuxWebView should not route Cmd+` directly to the menu when WebKit is first responder"
         )
     }
 
@@ -1550,7 +1550,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -1588,7 +1588,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
         XCTAssertEqual(
             forwardedEvents.count,
             0,
-            "Did not expect CmuxWebView to preflight Cmd+F into page content while Web Inspector is focused"
+            "Did not expect WmuxWebView to preflight Cmd+F into page content while Web Inspector is focused"
         )
     }
 
@@ -1648,7 +1648,7 @@ final class CmuxWebViewKeyEquivalentTests: XCTestCase {
 
 
 @MainActor
-final class CmuxWebViewContextMenuTests: XCTestCase {
+final class WmuxWebViewContextMenuTests: XCTestCase {
     private func makeRightMouseDownEvent() -> NSEvent {
         guard let event = NSEvent.mouseEvent(
             with: .rightMouseDown,
@@ -1668,7 +1668,7 @@ final class CmuxWebViewContextMenuTests: XCTestCase {
 
     func testWillOpenMenuAddsOpenLinkInDefaultBrowserAndRoutesSelectionToDefaultBrowserOpener() {
         _ = NSApplication.shared
-        let webView = CmuxWebView(frame: NSRect(x: 0, y: 0, width: 800, height: 600), configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: NSRect(x: 0, y: 0, width: 800, height: 600), configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let menu = NSMenu()
         let openLinkItem = NSMenuItem(title: "Open Link", action: nil, keyEquivalent: "")
         openLinkItem.identifier = NSUserInterfaceItemIdentifier("WKMenuItemIdentifierOpenLink")
@@ -1710,7 +1710,7 @@ final class CmuxWebViewContextMenuTests: XCTestCase {
     }
 
     func testWillOpenMenuSkipsDefaultBrowserItemWhenContextHasNoOpenLinkEntry() {
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Back", action: nil, keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Forward", action: nil, keyEquivalent: ""))
@@ -1721,7 +1721,7 @@ final class CmuxWebViewContextMenuTests: XCTestCase {
     }
 
     func testWillOpenMenuHooksDownloadImageToDiskMenuVariant() {
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let menu = NSMenu()
         let originalTarget = NSObject()
         let originalAction = NSSelectorFromString("downloadImageToDisk:")
@@ -1738,7 +1738,7 @@ final class CmuxWebViewContextMenuTests: XCTestCase {
     }
 
     func testWillOpenMenuHooksDownloadLinkedFileToDiskMenuVariant() {
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let menu = NSMenu()
         let originalTarget = NSObject()
         let originalAction = NSSelectorFromString("downloadLinkToDisk:")
@@ -4845,7 +4845,7 @@ final class BrowserIMEKeyDownRoutingTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -4895,7 +4895,7 @@ final class BrowserIMEKeyDownRoutingTests: XCTestCase {
         let container = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = container
 
-        let webView = CmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: container.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         container.addSubview(webView)
 
@@ -4966,7 +4966,7 @@ final class BrowserInputEventPerformanceTests: XCTestCase {
         slot.autoresizingMask = [.width, .height]
         contentView.addSubview(slot)
 
-        let webView = CmuxWebView(frame: slot.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: slot.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         webView.autoresizingMask = [.width, .height]
         slot.addSubview(webView)
         slot.pinHostedWebView(webView)

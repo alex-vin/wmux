@@ -1,12 +1,12 @@
-import CmuxCloud
-import CmuxCloudBannerCore
-import CmuxCloudTui
-import CmuxCore
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudBannerCore
+import WmuxCloudTui
+import WmuxCore
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -19,7 +19,7 @@ struct CloudPortRecoveryTests {
         let catalog = SurfaceCatalog()
         let links = CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil })
         var requested: [String] = []
-        let provider = CmuxTuiSurfaceProvider(summary: summary(), links: links, catalog: catalog,
+        let provider = WmuxTuiSurfaceProvider(summary: summary(), links: links, catalog: catalog,
             loadPortSummary: { id in
                 requested.append(id)
                 return summary(address: "10.0.0.7")
@@ -37,7 +37,7 @@ struct CloudPortRecoveryTests {
     func explicitRefreshRequestsDiscovery() async {
         let catalog = SurfaceCatalog()
         let links = CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil })
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: summary(address: "10.0.0.7"), links: links, catalog: catalog
         )
         catalog.register(provider)
@@ -51,7 +51,7 @@ struct CloudPortRecoveryTests {
     func sshLoopbackRouteAdmitsDiscovery() async {
         let catalog = SurfaceCatalog()
         let links = CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil })
-        let provider = CmuxTuiSurfaceProvider(summary: .ssh(sshConnection()), links: links, catalog: catalog)
+        let provider = WmuxTuiSurfaceProvider(summary: .ssh(sshConnection()), links: links, catalog: catalog)
         catalog.register(provider)
         #expect(provider.info.privateAddress == "127.0.0.1")
         #expect(provider.info.portDiscoveryState == .notRequested)
@@ -64,7 +64,7 @@ struct CloudPortRecoveryTests {
     @Test("A requested scan settles when the machine's link cannot connect")
     func failedLinkSettlesDiscovery() async {
         let catalog = SurfaceCatalog()
-        let provider = CmuxTuiSurfaceProvider(summary: .ssh(sshConnection()), links: UnreachableLinks(), catalog: catalog)
+        let provider = WmuxTuiSurfaceProvider(summary: .ssh(sshConnection()), links: UnreachableLinks(), catalog: catalog)
         catalog.register(provider)
         provider.requestPortDiscovery()
         #expect(provider.info.portDiscoveryState == .loading)
@@ -80,7 +80,7 @@ struct CloudPortRecoveryTests {
         let links = CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil })
         let started = CloudLinkFirstValue<Bool>()
         let resume = CloudLinkFirstValue<Bool>()
-        let provider = CmuxTuiSurfaceProvider(summary: summary(address: "10.0.0.7"), links: links, catalog: catalog,
+        let provider = WmuxTuiSurfaceProvider(summary: summary(address: "10.0.0.7"), links: links, catalog: catalog,
             loadPortSummary: { _ in
                 started.resolve(true)
                 _ = await resume.result
@@ -111,7 +111,7 @@ struct CloudPortRecoveryTests {
         }
         var desktop = summary(address: "10.0.0.7")
         desktop.kind = .desktop
-        let provider = CmuxTuiSurfaceProvider(summary: desktop,
+        let provider = WmuxTuiSurfaceProvider(summary: desktop,
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: catalog,
             displayCoordinator: displays, loadPortSummary: { _ in desktop })
         catalog.register(provider)
@@ -130,7 +130,7 @@ struct CloudPortRecoveryTests {
     func sshRefreshSkipsCloudMetadata() async {
         let catalog = SurfaceCatalog()
         var requested: [String] = []
-        let provider = CmuxTuiSurfaceProvider(summary: .ssh(sshConnection()), links: UnreachableLinks(), catalog: catalog,
+        let provider = WmuxTuiSurfaceProvider(summary: .ssh(sshConnection()), links: UnreachableLinks(), catalog: catalog,
             loadPortSummary: { id in
                 requested.append(id)
                 throw URLError(.badServerResponse)
@@ -187,7 +187,7 @@ struct CloudPortRecoveryTests {
         let links = CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil })
         let started = CloudLinkFirstValue<Bool>()
         let resume = CloudLinkFirstValue<Bool>()
-        let provider = CmuxTuiSurfaceProvider(summary: summary(), links: links, catalog: catalog,
+        let provider = WmuxTuiSurfaceProvider(summary: summary(), links: links, catalog: catalog,
             loadPortSummary: { _ in
                 started.resolve(true)
                 _ = await resume.result
@@ -210,7 +210,7 @@ struct CloudPortRecoveryTests {
     func foreignMetadataIsRejected() async {
         let catalog = SurfaceCatalog()
         let links = CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil })
-        let provider = CmuxTuiSurfaceProvider(summary: summary(), links: links, catalog: catalog,
+        let provider = WmuxTuiSurfaceProvider(summary: summary(), links: links, catalog: catalog,
             loadPortSummary: { _ in summary(id: "foreign", address: "10.0.0.8") })
         catalog.register(provider)
         do {
@@ -289,7 +289,7 @@ struct CloudPortRecoveryTests {
     /// Runs `body` against an SSH provider whose daemon is `portsDaemonScript`. The catalog,
     /// provider, link and scan request are production paths; only the daemon is a fixture.
     private func withPortsFixture(
-        _ body: (URL, CmuxTuiSurfaceProvider, SurfaceCatalog) async throws -> Void
+        _ body: (URL, WmuxTuiSurfaceProvider, SurfaceCatalog) async throws -> Void
     ) async throws {
         let fixtureID = UUID().uuidString.prefix(8).lowercased()
         let root = URL(fileURLWithPath: "/tmp/cmux-ports-\(fixtureID)", isDirectory: true)
@@ -308,7 +308,7 @@ struct CloudPortRecoveryTests {
             paths: CloudTuiClientPaths(home: root), isEnabled: { true }
         )
         let catalog = SurfaceCatalog()
-        let provider = CmuxTuiSurfaceProvider(summary: .ssh(connection), links: links, catalog: catalog)
+        let provider = WmuxTuiSurfaceProvider(summary: .ssh(connection), links: links, catalog: catalog)
         do {
             _ = try await links.connected(machineID: connection.id)
             let link = try #require(await links.link(machineID: connection.id))

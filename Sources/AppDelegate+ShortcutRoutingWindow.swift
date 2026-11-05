@@ -1,5 +1,5 @@
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 import ObjectiveC
 
 /// A key routed before portal mount retains its pane as the release owner.

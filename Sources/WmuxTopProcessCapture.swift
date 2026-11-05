@@ -1,8 +1,8 @@
-import CmuxFoundation
+import WmuxFoundation
 
 /// Keeps census identities attached to its immutable projection for later enrichment.
-struct CmuxTopProcessCapture: Sendable {
+struct WmuxTopProcessCapture: Sendable {
     let listing: DarwinProcessListing
-    let snapshot: CmuxTopProcessSnapshot
-    let fields: CmuxTopProcessFields
+    let snapshot: WmuxTopProcessSnapshot
+    let fields: WmuxTopProcessFields
 }

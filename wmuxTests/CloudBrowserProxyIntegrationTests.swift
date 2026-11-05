@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import CryptoKit
 import Foundation
@@ -6,8 +6,8 @@ import Network
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -36,18 +36,18 @@ struct CloudBrowserProxyIntegrationTests {
     func browserCarrierSanitizesInheritedCredentials() {
         let environment = CloudBrowserProxyProcess.sanitizedEnvironment([
             "HOME": "/Users/test",
-            "CMUX_AUTH_CREDENTIALS_FILE": "/tmp/credentials",
-            "CMUX_DOGFOOD_STACK_PASSWORD": "secret",
-            "CMUX_UITEST_STACK_PASSWORD": "secret",
-            "CMUX_SOCKET_PASSWORD": "secret",
+            "WMUX_AUTH_CREDENTIALS_FILE": "/tmp/credentials",
+            "WMUX_DOGFOOD_STACK_PASSWORD": "secret",
+            "WMUX_UITEST_STACK_PASSWORD": "secret",
+            "WMUX_SOCKET_PASSWORD": "secret",
             "PATH": "/usr/bin",
         ])
         #expect(environment["HOME"] == "/Users/test")
         #expect(environment["PATH"] == "/usr/bin")
-        #expect(environment["CMUX_AUTH_CREDENTIALS_FILE"] == nil)
-        #expect(environment["CMUX_DOGFOOD_STACK_PASSWORD"] == nil)
-        #expect(environment["CMUX_UITEST_STACK_PASSWORD"] == nil)
-        #expect(environment["CMUX_SOCKET_PASSWORD"] == nil)
+        #expect(environment["WMUX_AUTH_CREDENTIALS_FILE"] == nil)
+        #expect(environment["WMUX_DOGFOOD_STACK_PASSWORD"] == nil)
+        #expect(environment["WMUX_UITEST_STACK_PASSWORD"] == nil)
+        #expect(environment["WMUX_SOCKET_PASSWORD"] == nil)
     }
 
     @Test("a cold Cloud page has a loading host and proxy before its first request")

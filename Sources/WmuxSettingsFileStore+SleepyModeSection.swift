@@ -1,7 +1,7 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
-extension CmuxSettingsFileStore {
+extension WmuxSettingsFileStore {
     func parseSleepyModeSection(
         _ section: [String: Any],
         sourcePath: String,

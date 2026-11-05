@@ -1,6 +1,6 @@
-import CMUXAgentLaunch
-import CmuxAgentJournal
-import CmuxFoundation
+import WMUXAgentLaunch
+import WmuxAgentJournal
+import WmuxFoundation
 import Foundation
 
 /// An immutable Feed handoff. JSON normalization happens on the journal worker.

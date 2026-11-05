@@ -1,12 +1,12 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import os
 import Testing
-@testable import CmuxTerminal
+@testable import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -17,11 +17,11 @@ struct AgentHibernationProcessTerminationTests {
         workspaceId: UUID(),
         panelId: UUID()
     )
-    private nonisolated static let signalScopeArguments = CmuxTopProcessArguments(
+    private nonisolated static let signalScopeArguments = WmuxTopProcessArguments(
         arguments: ["/usr/bin/test-agent"],
         environment: [
-            "CMUX_WORKSPACE_ID": signalScopeKey.workspaceId.uuidString,
-            "CMUX_SURFACE_ID": signalScopeKey.panelId.uuidString,
+            "WMUX_WORKSPACE_ID": signalScopeKey.workspaceId.uuidString,
+            "WMUX_SURFACE_ID": signalScopeKey.panelId.uuidString,
         ]
     )
 
@@ -38,9 +38,9 @@ struct AgentHibernationProcessTerminationTests {
         let workspaceID = UUID()
         let panelID = UUID()
         let ttyDevice = Int64(0x123)
-        let process: (Int, Int, Bool) -> CmuxTopProcessInfo = {
+        let process: (Int, Int, Bool) -> WmuxTopProcessInfo = {
             processID, parentProcessID, isEnvironmentScoped in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: processID, parentPID: parentProcessID, name: "test", path: nil,
                 ttyDevice: ttyDevice,
                 cmuxWorkspaceID: isEnvironmentScoped ? workspaceID : nil,
@@ -51,7 +51,7 @@ struct AgentHibernationProcessTerminationTests {
                 virtualBytes: 0, threadCount: 1
             )
         }
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 process(10, 1, true),
                 process(20, 10, true),
@@ -74,9 +74,9 @@ struct AgentHibernationProcessTerminationTests {
     @Test
     func freshExitEpochProbesOnlyTTYAndAuthorizedGroupCandidates() async throws {
         let ttyDevice = Int64(0x123)
-        let process: (Int, Int64, Int) -> CmuxTopProcessInfo = {
+        let process: (Int, Int64, Int) -> WmuxTopProcessInfo = {
             processID, processTTYDevice, processGroupID in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: processID,
                 processIdentity: AgentPIDProcessIdentity(pid: pid_t(processID), startSeconds: Int64(processID), startMicroseconds: processID == 202 ? 2 : processID == 303 ? 3 : 1),
                 parentPID: 1,
@@ -94,7 +94,7 @@ struct AgentHibernationProcessTerminationTests {
                 threadCount: 1
             )
         }
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 process(101, ttyDevice, 101),
                 process(202, ttyDevice, 202),
@@ -308,11 +308,11 @@ struct AgentHibernationProcessTerminationTests {
         )
         let exitWait = AsyncStream<Void>.makeStream()
         let signaledTargets = OSAllocatedUnfairLock(initialState: [pid_t]())
-        let wrongScopeArguments = CmuxTopProcessArguments(
+        let wrongScopeArguments = WmuxTopProcessArguments(
             arguments: ["/usr/bin/test-agent"],
             environment: [
-                "CMUX_WORKSPACE_ID": UUID().uuidString,
-                "CMUX_SURFACE_ID": UUID().uuidString,
+                "WMUX_WORKSPACE_ID": UUID().uuidString,
+                "WMUX_SURFACE_ID": UUID().uuidString,
             ]
         )
 
@@ -407,9 +407,9 @@ struct AgentHibernationProcessTerminationTests {
         let workspaceID = UUID()
         let panelID = UUID()
         let ttyDevice = Int64(0x123)
-        let process: (Int, Int, Int) -> CmuxTopProcessInfo = {
+        let process: (Int, Int, Int) -> WmuxTopProcessInfo = {
             processID, parentProcessID, processGroupID in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: processID, parentPID: parentProcessID, name: "test", path: nil,
                 ttyDevice: ttyDevice,
                 cmuxWorkspaceID: workspaceID,
@@ -420,7 +420,7 @@ struct AgentHibernationProcessTerminationTests {
                 virtualBytes: 0, threadCount: 1
             )
         }
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 process(100, 1, 100),
                 process(101, 100, 100),
@@ -444,9 +444,9 @@ struct AgentHibernationProcessTerminationTests {
         let workspaceID = UUID()
         let panelID = UUID()
         let ttyDevice = Int64(0x123)
-        let process: (Int, Int, Int64?, Bool) -> CmuxTopProcessInfo = {
+        let process: (Int, Int, Int64?, Bool) -> WmuxTopProcessInfo = {
             processID, parentProcessID, processTTYDevice, isAgentProcess in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: processID,
                 parentPID: parentProcessID,
                 name: "test-\(processID)",
@@ -463,7 +463,7 @@ struct AgentHibernationProcessTerminationTests {
                 threadCount: 1
             )
         }
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 process(100, 1, ttyDevice, false),
                 process(101, 100, ttyDevice, true),
@@ -488,9 +488,9 @@ struct AgentHibernationProcessTerminationTests {
         let panelID = UUID()
         let ttyDevice = Int64(0x123)
         let maximumProcessCount = AgentHibernationController.maximumScopedProcessTerminationCount
-        let makeProcess: (Int, Int) -> CmuxTopProcessInfo = {
+        let makeProcess: (Int, Int) -> WmuxTopProcessInfo = {
             processID, parentProcessID in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: processID,
                 parentPID: parentProcessID,
                 name: "test-\(processID)",
@@ -511,7 +511,7 @@ struct AgentHibernationProcessTerminationTests {
             Array(101...(100 + maximumProcessCount + 8)).map { processID in
                 makeProcess(processID, processID == 101 ? 100 : processID - 1)
             }
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: processes,
             sampledAt: .now,
             includesProcessDetails: true

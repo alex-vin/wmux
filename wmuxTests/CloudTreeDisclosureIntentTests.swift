@@ -1,13 +1,13 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxCloud
-import CmuxFoundation
-import CmuxSurfaceCatalogModel
+import WmuxAppKitSupportUI
+import WmuxCloud
+import WmuxFoundation
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

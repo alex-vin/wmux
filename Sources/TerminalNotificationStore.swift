@@ -1,14 +1,14 @@
-import CmuxCloud
-import CmuxFoundation
-import CmuxNotifications
+import WmuxCloud
+import WmuxFoundation
+import WmuxNotifications
 import AppKit
 import Combine
 import Foundation
 import os
 import UserNotifications
 import Bonsplit
-import CmuxSettings
-import CmuxNotifications
+import WmuxSettings
+import WmuxNotifications
 
 nonisolated private let terminalNotificationLogger = Logger(
     subsystem: "com.cmuxterm.app",
@@ -54,9 +54,9 @@ final class TerminalNotificationStore: ObservableObject {
             center: UNUserNotificationCenter.current()
         )
     )
-    let notificationHookCache = CmuxNotificationHookCache()
+    let notificationHookCache = WmuxNotificationHookCache()
 
-    static let authorizationStatusDidChangeNotification = Notification.Name("cmux.terminalNotificationAuthorizationStatusDidChange")
+    static let authorizationStatusDidChangeNotification = Notification.Name("wmux.terminalNotificationAuthorizationStatusDidChange")
     static let categoryIdentifier = "com.cmuxterm.app.userNotification"
     static let textReplyCategoryIdentifier = "com.cmuxterm.app.userNotification.textReply"
     static let actionShowIdentifier = "com.cmuxterm.app.userNotification.show"
@@ -106,7 +106,7 @@ final class TerminalNotificationStore: ObservableObject {
     private var dismissedTombstoneOrder: [UUID] = []
     private var dismissedTombstonesLoaded = false
     private static let dismissedTombstoneCapacity = 512
-    static let dismissedTombstoneDefaultsKey = "cmux.notifications.dismissedTombstoneIds"
+    static let dismissedTombstoneDefaultsKey = "wmux.notifications.dismissedTombstoneIds"
 
     private func loadDismissedTombstonesIfNeeded() {
         guard !dismissedTombstonesLoaded else { return }
@@ -266,7 +266,7 @@ final class TerminalNotificationStore: ObservableObject {
         didSet {
             indexes = Self.buildIndexes(for: notifications)
             refreshUnreadPresentation()
-            if !suppressNotificationDiffPublishing { CmuxEventBus.shared.publishNotificationChanges(oldValue: oldValue, newValue: notifications) }
+            if !suppressNotificationDiffPublishing { WmuxEventBus.shared.publishNotificationChanges(oldValue: oldValue, newValue: notifications) }
         }
     }
     @Published private(set) var notificationMenuSnapshot = NotificationMenuSnapshotBuilder.make(notifications: [])
@@ -748,7 +748,7 @@ final class TerminalNotificationStore: ObservableObject {
                 let content = UNMutableNotificationContent()
                 content.title = String(
                     localized: "settings.notifications.desktop.test.title",
-                    defaultValue: "cmux test notification"
+                    defaultValue: "wmux test notification"
                 )
                 content.body = String(
                     localized: "settings.notifications.desktop.subtitle.allowed",
@@ -759,7 +759,7 @@ final class TerminalNotificationStore: ObservableObject {
                 )
                 content.categoryIdentifier = Self.categoryIdentifier
                 let request = UNNotificationRequest(
-                    identifier: "cmux.settings.test.\(UUID().uuidString)",
+                    identifier: "wmux.settings.test.\(UUID().uuidString)",
                     content: content,
                     trigger: nil
                 )
@@ -1165,7 +1165,7 @@ final class TerminalNotificationStore: ObservableObject {
         cooldownInterval: TimeInterval? = nil,
         correlationKey: String? = nil,
         clickAction: TerminalNotificationClickAction? = nil, notificationGeneration: UInt64? = nil,
-        resolvedHooks: [CmuxResolvedNotificationHook]? = nil,
+        resolvedHooks: [WmuxResolvedNotificationHook]? = nil,
         preRegisteredPolicyRequestId: UUID? = nil,
         notificationID: UUID? = nil,
         agent: TerminalNotificationPolicyAgentContext? = nil,
@@ -1360,7 +1360,7 @@ final class TerminalNotificationStore: ObservableObject {
     private struct NotificationPolicyContext: Sendable {
         let request: TerminalNotificationPolicyRequest
         let scrollPosition: TerminalNotificationScrollPosition?
-        let hooks: [CmuxResolvedNotificationHook]
+        let hooks: [WmuxResolvedNotificationHook]
         let globalConfigPath: String?
     }
 
@@ -1427,7 +1427,7 @@ final class TerminalNotificationStore: ObservableObject {
         replyShape: TerminalNotificationReplyShape = .none,
         retargetsToLiveSurfaceOwner: Bool,
         correlationKey: String?,
-        resolvedHooks: [CmuxResolvedNotificationHook]?,
+        resolvedHooks: [WmuxResolvedNotificationHook]?,
         agent: TerminalNotificationPolicyAgentContext? = nil,
         soundContext: NotificationSoundOverrideContext? = nil,
         origin: TerminalNotificationOrigin = .local,
@@ -1493,7 +1493,7 @@ final class TerminalNotificationStore: ObservableObject {
         let isActiveTab: Bool
         let isFocusedSurface: Bool
         let workspace: Workspace?
-        let cmuxConfigStore: CmuxConfigStore?
+        let cmuxConfigStore: WmuxConfigStore?
     }
 
     /// Resolves focus and ownership once for both policy admission and the
@@ -1828,7 +1828,7 @@ final class TerminalNotificationStore: ObservableObject {
             )
             let format = String(
                 localized: "notificationHook.failure.body",
-                defaultValue: "cmux used default notification behavior because '%@' failed."
+                defaultValue: "wmux used default notification behavior because '%@' failed."
             )
             Task { @MainActor [weak self, userNotificationCenter] in
                 let content = UNMutableNotificationContent()
@@ -1839,7 +1839,7 @@ final class TerminalNotificationStore: ObservableObject {
                 )
                 content.categoryIdentifier = Self.categoryIdentifier
                 let request = UNNotificationRequest(
-                    identifier: "cmux.notification-hook.failure.\(UUID().uuidString)",
+                    identifier: "wmux.notification-hook.failure.\(UUID().uuidString)",
                     content: content,
                     trigger: nil
                 )
@@ -2342,7 +2342,7 @@ final class TerminalNotificationStore: ObservableObject {
         clearPanelDerivedWorkspaceUnread()
         clearWorkspaceRestoredUnread()
         focusedReadIndicatorByTabId.removeAll()
-        CmuxEventBus.shared.publishNotificationCleared(ids: ids, workspaceId: nil, surfaceId: nil)
+        WmuxEventBus.shared.publishNotificationCleared(ids: ids, workspaceId: nil, surfaceId: nil)
         removeNotificationRequestsAndReleaseSoundReferences(withIdentifiers: ids)
         emitNotificationsDismissed(ids: ids, drainedSuperseded: supersededPhoneDismissBuffer.flushAll())
     }
@@ -2404,7 +2404,7 @@ final class TerminalNotificationStore: ObservableObject {
         }
         indicatorTabIds.forEach { clearFocusedReadIndicator(forTabId: $0, surfaceId: surfaceId) }
         if !idsToClear.isEmpty {
-            CmuxEventBus.shared.publishNotificationCleared(ids: idsToClear, workspaceId: tabIds.count == 1 ? tabId : nil, surfaceId: surfaceId)
+            WmuxEventBus.shared.publishNotificationCleared(ids: idsToClear, workspaceId: tabIds.count == 1 ? tabId : nil, surfaceId: surfaceId)
             removeNotificationRequestsAndReleaseSoundReferences(withIdentifiers: idsToClear)
             emitNotificationsDismissed(ids: idsToClear, drainedSuperseded: supersededDrained)
         }
@@ -2492,7 +2492,7 @@ final class TerminalNotificationStore: ObservableObject {
         }
         clearFocusedReadIndicator(forTabId: tabId)
         if !idsToClear.isEmpty {
-            CmuxEventBus.shared.publishNotificationCleared(ids: idsToClear, workspaceId: tabId, surfaceId: nil)
+            WmuxEventBus.shared.publishNotificationCleared(ids: idsToClear, workspaceId: tabId, surfaceId: nil)
             removeNotificationRequestsAndReleaseSoundReferences(withIdentifiers: idsToClear)
             emitNotificationsDismissed(
                 ids: idsToClear,
@@ -2504,7 +2504,7 @@ final class TerminalNotificationStore: ObservableObject {
     private func resolvedNotificationTitle(for notification: TerminalNotification) -> String {
         let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
             ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
-            ?? "cmux"
+            ?? "wmux"
         return notification.title.isEmpty ? appName : notification.title
     }
 

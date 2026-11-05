@@ -149,7 +149,7 @@ extension DockSplitStore {
 
     nonisolated private static func dockValidationErrorMessage(for error: Error) -> String? {
         let nsError = error as NSError
-        if nsError.domain == "cmux.dock",
+        if nsError.domain == "wmux.dock",
            let message = nsError.userInfo[NSLocalizedDescriptionKey] as? String,
            !message.isEmpty {
             return message
@@ -158,13 +158,13 @@ extension DockSplitStore {
         return nil
     }
 
-    nonisolated static func trustDescriptor(for resolution: DockConfigResolution) -> CmuxActionTrustDescriptor {
+    nonisolated static func trustDescriptor(for resolution: DockConfigResolution) -> WmuxActionTrustDescriptor {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         let data = (try? encoder.encode(DockConfigFile(controls: resolution.controls))) ?? Data()
         let commandFingerprint = String(data: data, encoding: .utf8) ?? ""
-        return CmuxActionTrustDescriptor(
-            actionID: "cmux.dock",
+        return WmuxActionTrustDescriptor(
+            actionID: "wmux.dock",
             kind: "dockControls",
             command: commandFingerprint,
             target: "rightSidebarDock",
@@ -186,7 +186,7 @@ extension DockSplitStore {
         for control in file.controls {
             guard seen.insert(control.id).inserted else {
                 throw NSError(
-                    domain: "cmux.dock",
+                    domain: "wmux.dock",
                     code: 1,
                     userInfo: [
                         NSLocalizedDescriptionKey: String(
@@ -232,8 +232,8 @@ extension DockSplitStore {
     }
 
     nonisolated private static func globalConfigURL() -> URL {
-        if ProcessInfo.processInfo.environment["CMUX_UI_TEST_MODE"] == "1",
-           let testPath = ProcessInfo.processInfo.environment["CMUX_UI_TEST_DOCK_CONFIG_PATH"]?
+        if ProcessInfo.processInfo.environment["WMUX_UI_TEST_MODE"] == "1",
+           let testPath = ProcessInfo.processInfo.environment["WMUX_UI_TEST_DOCK_CONFIG_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !testPath.isEmpty {
             return URL(fileURLWithPath: testPath)

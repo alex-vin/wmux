@@ -3,7 +3,7 @@ import AppKit
 import Bonsplit
 
 @MainActor
-private enum CmuxSelectionEventState {
+private enum WmuxSelectionEventState {
     static var selectedSurfaceByWorkspacePane: [String: UUID] = [:]
     static var focusedPaneByWorkspace: [UUID: UUID] = [:]
     static var focusedSurfaceByWorkspace: [UUID: UUID] = [:]
@@ -37,7 +37,7 @@ private enum CmuxSelectionEventState {
 
 extension TabManager {
     func publishCmuxWorkspaceCreated(_ workspace: Workspace, selected: Bool) {
-        CmuxEventBus.shared.publishWorkspaceCreated(
+        WmuxEventBus.shared.publishWorkspaceCreated(
             workspaceId: workspace.id,
             title: workspace.cmuxEventWorkspaceTitle,
             customTitle: workspace.customTitle,
@@ -61,18 +61,18 @@ extension TabManager {
     }
 
     func publishCmuxWorkspaceClosed(_ workspace: Workspace) {
-        CmuxEventBus.shared.publishWorkspaceClosed(
+        WmuxEventBus.shared.publishWorkspaceClosed(
             workspaceId: workspace.id,
             title: workspace.cmuxEventWorkspaceTitle,
             customTitle: workspace.customTitle,
             currentDirectory: workspace.currentDirectory,
             remainingTabCount: tabs.count
         )
-        CmuxSelectionEventState.clearWorkspace(workspace.id)
+        WmuxSelectionEventState.clearWorkspace(workspace.id)
     }
 
     func publishCmuxWorkspaceSelected(_ workspace: Workspace) {
-        CmuxEventBus.shared.publishWorkspaceSelected(
+        WmuxEventBus.shared.publishWorkspaceSelected(
             workspaceId: workspace.id,
             title: workspace.cmuxEventWorkspaceTitle,
             customTitle: workspace.customTitle,
@@ -87,7 +87,7 @@ extension TabManager {
         AppDelegate.shared?.workspacePresenceController.refreshSelection()
         guard let selectedTabId,
               let workspace = tabs.first(where: { $0.id == selectedTabId }) else { return }
-        CmuxEventBus.shared.publishWorkspaceSelected(
+        WmuxEventBus.shared.publishWorkspaceSelected(
             workspaceId: workspace.id,
             title: workspace.cmuxEventWorkspaceTitle,
             customTitle: workspace.customTitle,
@@ -113,7 +113,7 @@ extension Workspace {
         origin: String,
         focused: Bool
     ) {
-        CmuxEventBus.shared.publishPaneCreated(
+        WmuxEventBus.shared.publishPaneCreated(
             workspaceId: id,
             paneId: paneId.id,
             sourcePaneId: sourcePaneId?.id,
@@ -133,7 +133,7 @@ extension Workspace {
         origin: String,
         focused: Bool
     ) {
-        CmuxEventBus.shared.publishSurfaceCreated(
+        WmuxEventBus.shared.publishSurfaceCreated(
             workspaceId: id,
             surfaceId: surfaceId,
             paneId: paneId?.id,
@@ -144,34 +144,34 @@ extension Workspace {
     }
 
     func publishCmuxSurfaceClosed(_ surfaceId: UUID, paneId: PaneID?, panel: (any Panel)?, origin: String) {
-        CmuxEventBus.shared.publishSurfaceClosed(
+        WmuxEventBus.shared.publishSurfaceClosed(
             workspaceId: id,
             surfaceId: surfaceId,
             paneId: paneId?.id,
             kind: panel.map(Self.cmuxEventSurfaceKind),
             origin: origin
         )
-        CmuxSelectionEventState.clearSurface(workspaceId: id, surfaceId: surfaceId)
+        WmuxSelectionEventState.clearSurface(workspaceId: id, surfaceId: surfaceId)
     }
 
     func publishCmuxPaneClosed(_ paneId: PaneID, closedPanelIds: [UUID], origin: String) {
-        CmuxEventBus.shared.publishPaneClosed(
+        WmuxEventBus.shared.publishPaneClosed(
             workspaceId: id,
             paneId: paneId.id,
             closedSurfaceIds: closedPanelIds,
             origin: origin
         )
-        CmuxSelectionEventState.clearPane(workspaceId: id, paneId: paneId.id)
+        WmuxSelectionEventState.clearPane(workspaceId: id, paneId: paneId.id)
     }
 
     func publishCmuxFocusedSelection(paneId: PaneID, surfaceId: UUID, origin: String) {
-        let paneKey = CmuxSelectionEventState.paneKey(workspaceId: id, paneId: paneId.id)
-        let previousSelectedSurfaceId = CmuxSelectionEventState.selectedSurfaceByWorkspacePane[paneKey]
+        let paneKey = WmuxSelectionEventState.paneKey(workspaceId: id, paneId: paneId.id)
+        let previousSelectedSurfaceId = WmuxSelectionEventState.selectedSurfaceByWorkspacePane[paneKey]
         let kind = panels[surfaceId].map(Self.cmuxEventSurfaceKind)
 
         if previousSelectedSurfaceId != surfaceId {
-            CmuxSelectionEventState.selectedSurfaceByWorkspacePane[paneKey] = surfaceId
-            CmuxEventBus.shared.publishSurfaceSelected(
+            WmuxSelectionEventState.selectedSurfaceByWorkspacePane[paneKey] = surfaceId
+            WmuxEventBus.shared.publishSurfaceSelected(
                 workspaceId: id,
                 surfaceId: surfaceId,
                 paneId: paneId.id,
@@ -182,9 +182,9 @@ extension Workspace {
             )
         }
 
-        if CmuxSelectionEventState.focusedPaneByWorkspace[id] != paneId.id {
-            CmuxSelectionEventState.focusedPaneByWorkspace[id] = paneId.id
-            CmuxEventBus.shared.publishPaneFocused(
+        if WmuxSelectionEventState.focusedPaneByWorkspace[id] != paneId.id {
+            WmuxSelectionEventState.focusedPaneByWorkspace[id] = paneId.id
+            WmuxEventBus.shared.publishPaneFocused(
                 workspaceId: id,
                 paneId: paneId.id,
                 selectedSurfaceId: surfaceId,
@@ -192,9 +192,9 @@ extension Workspace {
             )
         }
 
-        if CmuxSelectionEventState.focusedSurfaceByWorkspace[id] != surfaceId {
-            CmuxSelectionEventState.focusedSurfaceByWorkspace[id] = surfaceId
-            CmuxEventBus.shared.publishSurfaceFocused(
+        if WmuxSelectionEventState.focusedSurfaceByWorkspace[id] != surfaceId {
+            WmuxSelectionEventState.focusedSurfaceByWorkspace[id] = surfaceId
+            WmuxEventBus.shared.publishSurfaceFocused(
                 workspaceId: id,
                 surfaceId: surfaceId,
                 paneId: paneId.id,
@@ -326,7 +326,7 @@ extension AppDelegate {
             manager?.tabs.firstIndex(where: { $0.id == selectedId })
         }
         let window = mainWindow(for: windowId)
-        CmuxEventBus.shared.publishWindowLifecycle(
+        WmuxEventBus.shared.publishWindowLifecycle(
             name: name,
             windowId: windowId,
             workspaceId: workspaceId,

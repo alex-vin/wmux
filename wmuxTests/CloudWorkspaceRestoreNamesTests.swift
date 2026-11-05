@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
-import CmuxWorkspaces
+import WmuxCloud
+import WmuxSurfaceCatalogModel
+import WmuxWorkspaces
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -21,7 +21,7 @@ struct CloudWorkspaceRestoreNamesTests {
         catalog.register(provider)
         defer { catalog.unregister(machine: machine) }
         let graph = try state(machine, workspace: "Saved name", names: ["Build"], revision: 2)
-        let canonicalResources = CmuxTuiSnapshotParser.resources(from: graph)
+        let canonicalResources = WmuxTuiSnapshotParser.resources(from: graph)
         let pendingWorkspace = SurfaceRemoteWorkspace(id: "ws_pending", name: "Creating", index: 1, focused: false)
         let pendingResource = SurfaceResource(
             id: SurfaceResourceID(machine: machine, kind: .terminal, key: "term_pending"),
@@ -127,7 +127,7 @@ struct CloudWorkspaceRestoreNamesTests {
                 workspaces: { manager.tabs }
             )
         ))
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: machine.rawValue, provider: "freestyle", status: "running",
                                image: "cmux-devbox", createdAt: 0, base: nil),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: catalog
@@ -149,7 +149,7 @@ struct CloudWorkspaceRestoreNamesTests {
             // Cross a real JSON persistence boundary before installing the restored daemon graph.
             let bytes = try JSONSerialization.data(withJSONObject: try #require(checkpoint.snapshotObject()))
             let object = try #require(JSONSerialization.jsonObject(with: bytes) as? [String: Any])
-            let graph = try #require(CmuxTuiSnapshotParser.state(
+            let graph = try #require(WmuxTuiSnapshotParser.state(
                 fromSnapshot: object, machine: machine
             ))
             #expect(provider.installSnapshotIfNewer(graph))
@@ -210,7 +210,7 @@ struct CloudWorkspaceRestoreNamesTests {
 
     private func state(_ machine: SurfaceMachineID, workspace: String, names: [String?],
                        revision: UInt64, generation: String = "daemon") throws -> CloudVMState {
-        try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": generation, "revision": String(revision)],
             "workspaces": [["id": "ws_main", "name": workspace]],
             "screens": [["id": "screen", "workspace_id": "ws_main"]],

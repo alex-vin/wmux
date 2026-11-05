@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import CoreGraphics
 import Foundation
 import ScreenCaptureKit

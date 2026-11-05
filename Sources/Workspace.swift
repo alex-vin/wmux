@@ -1,32 +1,32 @@
-import CmuxCloud
-import CmuxAppKitSupportUI
-import CMUXMobileCore
-import CmuxFoundation
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxAppKitSupportUI
+import WMUXMobileCore
+import WmuxFoundation
+import WmuxSurfaceCatalogModel
 import Foundation
-import CmuxCore
-import CmuxRemoteDaemon
-import CmuxRemoteSession
-import CmuxRemoteWorkspace
-import CmuxWorkspaces
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxCore
+import WmuxRemoteDaemon
+import WmuxRemoteSession
+import WmuxRemoteWorkspace
+import WmuxWorkspaces
+import WmuxTerminal
+import WmuxTerminalCore
 import SwiftUI
 import AppKit
 import WebKit
-import CmuxFoundation
+import WmuxFoundation
 import Bonsplit
-import CMUXAgentLaunch
-import CmuxAgentChat
-import CmuxSettings
-import CmuxBrowser
-import CmuxCanvasUI
-import CmuxCommandPalette
-import CmuxPanes
-import CmuxSidebar
-import CmuxNotifications
+import WMUXAgentLaunch
+import WmuxAgentChat
+import WmuxSettings
+import WmuxBrowser
+import WmuxCanvasUI
+import WmuxCommandPalette
+import WmuxPanes
+import WmuxSidebar
+import WmuxNotifications
 import Combine
-import CmuxProductAnalytics
+import WmuxProductAnalytics
 import CryptoKit
 import Darwin
 import Network
@@ -1273,7 +1273,7 @@ extension Workspace {
         var totalCharacters = 0
         for panelId in panels.keys.sorted(by: { $0.uuidString < $1.uuidString }) {
             guard panels[panelId] is TerminalPanel else { continue }
-            let header = "cmux perf synthetic scrollback workspace=\(id.uuidString) panel=\(panelId.uuidString)\n"
+            let header = "wmux perf synthetic scrollback workspace=\(id.uuidString) panel=\(panelId.uuidString)\n"
             let paddingCount = max(0, targetCharacters - header.count)
             let scrollback = String((header + String(repeating: "s", count: paddingCount)).prefix(targetCharacters))
             debugSessionSnapshotSyntheticScrollbackByPanelId[panelId] = scrollback
@@ -2574,7 +2574,7 @@ extension Workspace {
 
                 self.removePendingTerminalInputObserver(registration, forPanelId: panelId)
                 #if DEBUG
-                NSLog("[CmuxConfig] surface not ready after 3s, dropping command (%d chars)", text.count)
+                NSLog("[WmuxConfig] surface not ready after 3s, dropping command (%d chars)", text.count)
                 #endif
             }
         }
@@ -2724,9 +2724,9 @@ extension Workspace {
     }
 
 }
-/// Lifted to `CmuxBrowser.ClosedBrowserPanelRestoreSnapshot` (Workspace
+/// Lifted to `WmuxBrowser.ClosedBrowserPanelRestoreSnapshot` (Workspace
 /// decomposition, Wave 3). This typealias keeps call sites byte-identical.
-typealias ClosedBrowserPanelRestoreSnapshot = CmuxBrowser.ClosedBrowserPanelRestoreSnapshot
+typealias ClosedBrowserPanelRestoreSnapshot = WmuxBrowser.ClosedBrowserPanelRestoreSnapshot
 
 /// Workspace represents a sidebar tab.
 /// Each workspace contains one BonsplitController that manages split panes and nested surfaces.
@@ -2756,7 +2756,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     }
 
     static let terminalScrollBarHiddenDidChangeNotification = Notification.Name(
-        "cmux.workspaceTerminalScrollBarHiddenDidChange"
+        "wmux.workspaceTerminalScrollBarHiddenDidChange"
     )
     let id: UUID
     private(set) var isRetiredFromOwningTabManager = false
@@ -2812,12 +2812,12 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     @Published var customColor: String?  // hex string, e.g. "#C0392B"
     /// User-defined environment variables applied to every shell spawned in this
     /// workspace: the initial terminal, every later pane/surface/split, and every
-    /// surface recreated on session restore. Managed `CMUX_*` and terminal-identity
+    /// surface recreated on session restore. Managed `WMUX_*` and terminal-identity
     /// variables always win — this dictionary is merged through the
     /// `additionalEnvironment` / `initialEnvironmentOverrides` channels, both of
     /// which skip `protectedStartupEnvironmentKeys` in
     /// `mergedStartupEnvironment(...)`, so a workspace env entry can never clobber
-    /// the variables the daemon relies on (CMUX_WORKSPACE_ID, CMUX_SOCKET_PATH, …).
+    /// the variables the daemon relies on (WMUX_WORKSPACE_ID, WMUX_SOCKET_PATH, …).
     /// Persisted in the session manifest and restored before surfaces are rebuilt.
     @Published var workspaceEnvironment: [String: String] = [:]
     // Legacy in-memory state for old helpers/tests. Product UI, rendering, and
@@ -2853,7 +2853,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     let restorableAgentIndexProvider: @MainActor () -> RestorableAgentSessionIndex?
     private let settings: any SettingsReading
 
-    /// Ordinal for CMUX_PORT range assignment (monotonically increasing per app session)
+    /// Ordinal for WMUX_PORT range assignment (monotonically increasing per app session)
     var portOrdinal: Int = 0
 
     /// The bonsplit controller managing the split panes for this workspace
@@ -2930,9 +2930,9 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     /// workspace so it survives canvas view remounts and workspace switches.
     let canvasModel = CanvasModel(metricsProvider: { CanvasLayoutSettings.currentMetrics() })
     private struct SurfaceTabBarExecutableButton {
-        let button: CmuxSurfaceTabBarButton
-        let builtInAction: CmuxSurfaceTabBarBuiltInAction?
-        let workspaceCommand: CmuxResolvedCommand?
+        let button: WmuxSurfaceTabBarButton
+        let builtInAction: WmuxSurfaceTabBarBuiltInAction?
+        let workspaceCommand: WmuxResolvedCommand?
         let terminalCommandSourcePath: String?
     }
 
@@ -2943,27 +2943,27 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     private var featureFlagsObserver: NSObjectProtocol?
     private var browserAvailabilityObserver: NSObjectProtocol?
 
-    /// The pane-tree sub-model (CmuxPanes): owns the panel registry, the
+    /// The pane-tree sub-model (WmuxPanes): owns the panel registry, the
     /// surface-id mapping, and the pane-layout bookkeeping. The legacy
     /// accessors below forward here; `Workspace` hosts the property-observer
     /// hooks via `PaneTreeHosting`.
     let paneTree = PaneTreeModel<any Panel>()
 
-    /// The surface-list derivation sub-model (CmuxWorkspaces): derives
+    /// The surface-list derivation sub-model (WmuxWorkspaces): derives
     /// the ordered panel-id lists, focused panel, representative panel, per-pane
     /// selection, the `tabIdsTo*` pane queries, and the `paneLayoutVersion`
     /// reorder bump. `Workspace` is its tree-reading host via
     /// `WorkspaceSurfaceTreeReading`; the legacy accessors below forward here.
     let surfaceList = WorkspaceSurfaceListModel()
 
-    /// The surface-registry sub-model (CmuxWorkspaceCore): owns the
+    /// The surface-registry sub-model (WmuxWorkspaceCore): owns the
     /// per-surface registry annotations (tty names, shell-activity states)
     /// and the transient tab-selection/focus-reassert request state. The
     /// legacy accessors below forward here. None of the moved properties
     /// were `@Published`, so no observer hooks are required.
     let surfaceRegistry = SurfaceRegistryModel<PendingTabSelectionRequest>()
 
-    /// The split-layout sub-model (CmuxPanes): owns the split/detach
+    /// The split-layout sub-model (WmuxPanes): owns the split/detach
     /// choreography bookkeeping (programmatic-split flag, detaching surface
     /// ids, captured transfer payloads, detach-close transaction count). The
     /// legacy accessors below forward here. None of the moved properties
@@ -3172,7 +3172,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     var tmuxWorkspaceFlashToken: UInt64 { tmuxWorkspaceFlash.token }
     var tmuxOverlaySelectionRevision: UInt64 = 0
     var manualUnreadMarkedAt: [UUID: Date] = [:]
-    /// The sidebar-metadata sub-model (CmuxSidebar): owns the
+    /// The sidebar-metadata sub-model (WmuxSidebar): owns the
     /// sidebar status entries, metadata blocks, log entries, progress, and
     /// git-branch / pull-request presentation state. The legacy accessors below
     /// forward here. The moved properties were `@Published` and fed the sidebar
@@ -3249,7 +3249,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             owningTabManager?.workspaceHostLabelDidChange(self)
         }
     }
-    /// The cloud machine whose cmux-tui session runs in this workspace's pane. Unlike
+    /// The cloud machine whose wmux-tui session runs in this workspace's pane. Unlike
     /// `remoteConfiguration` (app-managed SSH/websocket transports) the session belongs
     /// to the pane's own `cmux vm-tui-connect` process, so this binding is what the
     /// Machines panel, the sidebar cloud button, and `cmux vm desktop` use to find the
@@ -3729,7 +3729,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         let informativeText = String(
             format: String(
                 localized: "surfaceResumeApproval.runPrompt.message",
-                defaultValue: "cmux is restoring a terminal with this resume command:\n\nWorking directory: %@\n\n%@"
+                defaultValue: "wmux is restoring a terminal with this resume command:\n\nWorking directory: %@\n\n%@"
             ),
             binding.cwd ?? String(localized: "surfaceResumeApproval.cwd.none", defaultValue: "None"),
             binding.command
@@ -3743,7 +3743,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             localized: "surfaceResumeApproval.runPrompt.dontAskAgain",
             defaultValue: "Don’t ask again for this command"
         )
-        let content = CmuxAlertContent(
+        let content = WmuxAlertContent(
             flattenedText: informativeText,
             separatingScrollableDetails: binding.command
         )
@@ -4199,7 +4199,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         title: String = "Terminal",
         workingDirectory: String? = nil,
         portOrdinal: Int = 0,
-        configTemplate: CmuxSurfaceConfigTemplate? = nil,
+        configTemplate: WmuxSurfaceConfigTemplate? = nil,
         initialSurface: NewWorkspaceInitialSurface = .terminal,
         initialTerminalCommand: String? = nil,
         initialTerminalIsRemote: Bool = false,
@@ -4326,7 +4326,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         var resolvedConfigTemplate = configTemplate
         if let trimmedCommand = initialTerminalCommand?.trimmingCharacters(in: .whitespacesAndNewlines),
            !trimmedCommand.isEmpty {
-            var template = resolvedConfigTemplate ?? CmuxSurfaceConfigTemplate()
+            var template = resolvedConfigTemplate ?? WmuxSurfaceConfigTemplate()
             template.waitAfterCommand = true
             resolvedConfigTemplate = template
         }
@@ -4570,7 +4570,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         }
         featureFlagsObserver = NotificationCenter.default.addObserver(
             forName: .cmuxFeatureFlagsDidChange,
-            object: CmuxFeatureFlags.shared,
+            object: WmuxFeatureFlags.shared,
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
@@ -4669,13 +4669,13 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     /// left the button drawn and only beeping (#10866). Named and static so
     /// the gate is testable without standing up a workspace.
     static func surfaceTabBarBuiltInActionIsAvailable(
-        _ action: CmuxSurfaceTabBarBuiltInAction
+        _ action: WmuxSurfaceTabBarBuiltInAction
     ) -> Bool {
         switch action {
         case .cloudVM, .newCloudWorkspace, .newCloudMachine, .mobileConnect:
             return false
-        case .newAgentChat: return CmuxFeatureFlags.shared.isAgentChatUIEnabled
-        case .newSimulator: return CmuxFeatureFlags.shared.isSimulatorEnabled
+        case .newAgentChat: return WmuxFeatureFlags.shared.isAgentChatUIEnabled
+        case .newSimulator: return WmuxFeatureFlags.shared.isSimulatorEnabled
         case .newBrowser:
             return BrowserAvailabilitySettings.offersBrowserAffordance(
                 isEnabled: BrowserAvailabilitySettings.isEnabled()
@@ -4685,12 +4685,12 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     }
 
     func applySurfaceTabBarButtons(
-        _ buttons: [CmuxSurfaceTabBarButton],
+        _ buttons: [WmuxSurfaceTabBarButton],
         sourcePath: String?,
         globalConfigPath: String,
-        settingPresets: [String: CmuxSettingValue] = [:],
+        settingPresets: [String: WmuxSettingValue] = [:],
         terminalCommandSourcePaths: [String: String],
-        workspaceCommands: [String: CmuxResolvedCommand]
+        workspaceCommands: [String: WmuxResolvedCommand]
     ) {
         surfaceTabBarButtonConfiguration = SurfaceTabBarButtonConfiguration(
             buttons: buttons,
@@ -4761,7 +4761,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         let bonsplitButtons = buttons.map { button in
             let executable = executableButtons[button.id]
             let allowProjectLocalIcon = executable.map {
-                CmuxConfigExecutor.isTrustedSurfaceButton(
+                WmuxConfigExecutor.isTrustedSurfaceButton(
                     $0.button,
                     workspaceCommand: $0.workspaceCommand,
                     terminalCommandSourcePath: $0.terminalCommandSourcePath,
@@ -4892,7 +4892,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     private var isAttemptingLayoutFollowUp = false
     private var isNormalizingPinnedTabOrder = false
     /// The pending non-focusing-split focus re-assert request (the value
-    /// type now lives in CmuxWorkspaceCore); stored in the surface-registry
+    /// type now lives in WmuxWorkspaceCore); stored in the surface-registry
     /// sub-model.
     private var pendingNonFocusSplitFocusReassert: PendingNonFocusSplitFocusReassert? {
         get { surfaceRegistry.pendingNonFocusSplitFocusReassert }
@@ -7026,7 +7026,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
 
     func listRemotePTYSessions() throws -> [[String: Any]] {
         guard let controller = remoteSessionController else {
-            throw NSError(domain: "cmux.remote.pty", code: 10, userInfo: [
+            throw NSError(domain: "wmux.remote.pty", code: 10, userInfo: [
                 NSLocalizedDescriptionKey: "remote connection is not active",
             ])
         }
@@ -7035,7 +7035,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
 
     func closeRemotePTYSession(sessionID: String) throws {
         guard let controller = remoteSessionController else {
-            throw NSError(domain: "cmux.remote.pty", code: 11, userInfo: [
+            throw NSError(domain: "wmux.remote.pty", code: 11, userInfo: [
                 NSLocalizedDescriptionKey: "remote connection is not active",
             ])
         }
@@ -7043,7 +7043,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     }
     func resizeRemotePTY(sessionID: String, attachmentID: String, attachmentToken: String, cols: Int, rows: Int) throws {
         guard let controller = remoteSessionController else {
-            throw NSError(domain: "cmux.remote.pty", code: 13, userInfo: [
+            throw NSError(domain: "wmux.remote.pty", code: 13, userInfo: [
                 NSLocalizedDescriptionKey: "remote connection is not active",
             ])
         }
@@ -7057,7 +7057,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     }
     func detachRemotePTYAttachment(sessionID: String, attachmentID: String, attachmentToken: String) throws {
         guard let controller = remoteSessionController else {
-            throw NSError(domain: "cmux.remote.pty", code: 14, userInfo: [
+            throw NSError(domain: "wmux.remote.pty", code: 14, userInfo: [
                 NSLocalizedDescriptionKey: "remote connection is not active",
             ])
         }
@@ -7144,7 +7144,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             payload["local_proxy_port"] = NSNull()
             payload["persistent_daemon_slot"] = NSNull()
         }
-        // A cmux-tui workspace reports its machine under the same key the managed
+        // A wmux-tui workspace reports its machine under the same key the managed
         // transports use, so `cmux vm desktop`/the Machines panel find it either way.
         if let binding = cloudVMBinding {
             if remoteConfiguration?.managedCloudVMID?.isEmpty != false {
@@ -7152,7 +7152,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             }
             payload["cloud_vm_id"] = binding.vmID
             payload["cloud_vm_base"] = binding.isBase
-            payload["cloud_vm_transport"] = "cmux-remote"
+            payload["cloud_vm_transport"] = "wmux-remote"
         } else {
             payload["cloud_vm_id"] = NSNull()
             payload["cloud_vm_base"] = NSNull()
@@ -7504,12 +7504,12 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     /// `initialEnvironmentOverrides` channel (which would otherwise export a blank value on the
     /// initial shell only).
     ///
-    /// Reserved `CMUX_*` variables are intentionally *not* stripped by name — they are protected
+    /// Reserved `WMUX_*` variables are intentionally *not* stripped by name — they are protected
     /// at spawn time by `mergedStartupEnvironment(protectedKeys:)`, the single authority on which
     /// keys are managed. That protection is an exact Swift-string match, but the env eventually
     /// crosses the Swift→C boundary (`strdup` / Ghostty), where a key is truncated at its first
-    /// NUL. A key like `"CMUX_SOCKET_PATH\0x"` would dodge the exact-match check yet collapse to
-    /// `CMUX_SOCKET_PATH` in the spawned shell, so reject any key containing a NUL (and `=`,
+    /// NUL. A key like `"WMUX_SOCKET_PATH\0x"` would dodge the exact-match check yet collapse to
+    /// `WMUX_SOCKET_PATH` in the spawned shell, so reject any key containing a NUL (and `=`,
     /// which is never a valid env var name) and any value containing a NUL. This is the single
     /// choke point for every entry point (CLI, cmux.json, session restore), so the guard cannot be bypassed.
     // `nonisolated` so the nonisolated socket workspace-create parsing path (`v2WorkspaceCreate`)
@@ -7528,7 +7528,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     }
 
     /// Pure merge core: overlays `explicit` on top of `workspaceEnvironment`.
-    /// Managed `CMUX_*` / terminal-identity keys are protected downstream by
+    /// Managed `WMUX_*` / terminal-identity keys are protected downstream by
     /// `mergedStartupEnvironment(protectedKeys:)`; this only decides precedence
     /// among user-supplied values — explicit per-surface entries (layout `env`,
     /// scrollback replay, SSH startup) win over the workspace set. Static so the
@@ -7687,8 +7687,8 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         )
     }
 
-    nonisolated static let remotePTYSessionEnvironmentKey = "CMUX_REMOTE_PTY_SESSION_ID"
-    nonisolated static let remoteInitialWorkingDirectoryEnvironmentKey = "CMUX_REMOTE_INITIAL_CWD"
+    nonisolated static let remotePTYSessionEnvironmentKey = "WMUX_REMOTE_PTY_SESSION_ID"
+    nonisolated static let remoteInitialWorkingDirectoryEnvironmentKey = "WMUX_REMOTE_INITIAL_CWD"
 
     nonisolated static func parsedDefaultSSHPTYSessionID(_ value: String) -> (workspaceId: UUID, panelId: UUID)? {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -7758,7 +7758,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     }
 
     /// The cloud machine this workspace hosts, through either transport: the legacy
-    /// remote configuration (`managedCloudVMID`) or the cmux-tui binding. Nil for
+    /// remote configuration (`managedCloudVMID`) or the wmux-tui binding. Nil for
     /// workspaces that are not cloud machines.
     var cloudVMID: String? {
         if let managedCloudVMID = remoteConfiguration?.managedCloudVMID?
@@ -7848,43 +7848,43 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
 
     private func defaultFreestyleSSHDTerminalStartupCommand(vmID: String) -> String {
         let lines = [
-            "cmux_freestyle_cli=\"${CMUX_BUNDLED_CLI_PATH:-}\"",
-            "if [ -z \"$cmux_freestyle_cli\" ] || [ ! -x \"$cmux_freestyle_cli\" ]; then cmux_freestyle_cli=\"$(command -v cmux 2>/dev/null || true)\"; fi",
-            "if [ -z \"$cmux_freestyle_cli\" ]; then printf '%s\\n' '[cmux] bundled CLI not found for Cloud VM SSH attach.' >&2; exit 127; fi",
-            "CMUX_SSH_RECONNECT_LIMIT=\"${CMUX_SSH_RECONNECT_LIMIT:-\(SSHReconnectBudget().maximumLimit)}\"",
-            "CMUX_SSH_RECONNECT_DELAY_SECONDS=\"${CMUX_SSH_RECONNECT_DELAY_SECONDS:-2}\"",
-            "CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT=\"${CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT:-$CMUX_SSH_RECONNECT_LIMIT}\"",
-            "CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS=\"${CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS:-$CMUX_SSH_RECONNECT_DELAY_SECONDS}\"",
-            "export CMUX_SSH_RECONNECT_LIMIT CMUX_SSH_RECONNECT_DELAY_SECONDS",
-            "export CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS",
-            "cmux_freestyle_attach() {",
-            "  if [ -n \"${CMUX_SOCKET_PATH:-}\" ]; then",
-            "    if [ -n \"${CMUX_REMOTE_PTY_SESSION_ID:-}\" ]; then",
-            "      \"$cmux_freestyle_cli\" --socket \"$CMUX_SOCKET_PATH\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd --session \"$CMUX_REMOTE_PTY_SESSION_ID\"",
+            "wmux_freestyle_cli=\"${WMUX_BUNDLED_CLI_PATH:-}\"",
+            "if [ -z \"$wmux_freestyle_cli\" ] || [ ! -x \"$wmux_freestyle_cli\" ]; then wmux_freestyle_cli=\"$(command -v cmux 2>/dev/null || true)\"; fi",
+            "if [ -z \"$wmux_freestyle_cli\" ]; then printf '%s\\n' '[cmux] bundled CLI not found for Cloud VM SSH attach.' >&2; exit 127; fi",
+            "WMUX_SSH_RECONNECT_LIMIT=\"${WMUX_SSH_RECONNECT_LIMIT:-\(SSHReconnectBudget().maximumLimit)}\"",
+            "WMUX_SSH_RECONNECT_DELAY_SECONDS=\"${WMUX_SSH_RECONNECT_DELAY_SECONDS:-2}\"",
+            "WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT=\"${WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT:-$WMUX_SSH_RECONNECT_LIMIT}\"",
+            "WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS=\"${WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS:-$WMUX_SSH_RECONNECT_DELAY_SECONDS}\"",
+            "export WMUX_SSH_RECONNECT_LIMIT WMUX_SSH_RECONNECT_DELAY_SECONDS",
+            "export WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS",
+            "wmux_freestyle_attach() {",
+            "  if [ -n \"${WMUX_SOCKET_PATH:-}\" ]; then",
+            "    if [ -n \"${WMUX_REMOTE_PTY_SESSION_ID:-}\" ]; then",
+            "      \"$wmux_freestyle_cli\" --socket \"$WMUX_SOCKET_PATH\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd --session \"$WMUX_REMOTE_PTY_SESSION_ID\"",
             "    else",
-            "      \"$cmux_freestyle_cli\" --socket \"$CMUX_SOCKET_PATH\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd",
+            "      \"$wmux_freestyle_cli\" --socket \"$WMUX_SOCKET_PATH\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd",
             "    fi",
             "  else",
-            "    if [ -n \"${CMUX_REMOTE_PTY_SESSION_ID:-}\" ]; then",
-            "      \"$cmux_freestyle_cli\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd --session \"$CMUX_REMOTE_PTY_SESSION_ID\"",
+            "    if [ -n \"${WMUX_REMOTE_PTY_SESSION_ID:-}\" ]; then",
+            "      \"$wmux_freestyle_cli\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd --session \"$WMUX_REMOTE_PTY_SESSION_ID\"",
             "    else",
-            "      \"$cmux_freestyle_cli\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd",
+            "      \"$wmux_freestyle_cli\" vm-pty-attach --id \(Self.shellQuote(vmID)) --default-freestyle-sshd",
             "    fi",
             "  fi",
             "}",
-            "cmux_freestyle_retry=0",
+            "wmux_freestyle_retry=0",
             "while :; do",
-            "  if [ \"$cmux_freestyle_retry\" -gt 0 ]; then",
-            "    export CMUX_CLOUD_RECONNECT_ATTEMPT=\"$cmux_freestyle_retry\"",
+            "  if [ \"$wmux_freestyle_retry\" -gt 0 ]; then",
+            "    export WMUX_CLOUD_RECONNECT_ATTEMPT=\"$wmux_freestyle_retry\"",
             "  else",
-            "    unset CMUX_CLOUD_RECONNECT_ATTEMPT",
+            "    unset WMUX_CLOUD_RECONNECT_ATTEMPT",
             "  fi",
-            "  cmux_freestyle_attach",
-            "  cmux_freestyle_status=$?",
-            "  case \"$cmux_freestyle_status\" in 254|255) ;; *) exit \"$cmux_freestyle_status\" ;; esac",
-            "  if [ \"$cmux_freestyle_retry\" -ge \"$CMUX_SSH_RECONNECT_LIMIT\" ]; then exit \"$cmux_freestyle_status\"; fi",
-            "  cmux_freestyle_retry=$((cmux_freestyle_retry + 1))",
-            "  sleep \"$CMUX_SSH_RECONNECT_DELAY_SECONDS\"",
+            "  wmux_freestyle_attach",
+            "  wmux_freestyle_status=$?",
+            "  case \"$wmux_freestyle_status\" in 254|255) ;; *) exit \"$wmux_freestyle_status\" ;; esac",
+            "  if [ \"$wmux_freestyle_retry\" -ge \"$WMUX_SSH_RECONNECT_LIMIT\" ]; then exit \"$wmux_freestyle_status\"; fi",
+            "  wmux_freestyle_retry=$((wmux_freestyle_retry + 1))",
+            "  sleep \"$WMUX_SSH_RECONNECT_DELAY_SECONDS\"",
             "done",
         ]
         return "/bin/sh -c \(Self.shellQuote(lines.joined(separator: "\n")))"
@@ -7916,7 +7916,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
               configuration.skipDaemonBootstrap else {
             return nil
         }
-        if configuration.persistentDaemonSlot == "cmux-default-freestyle-sshd-v1",
+        if configuration.persistentDaemonSlot == "wmux-default-freestyle-sshd-v1",
            let vmID = configuration.managedCloudVMID {
             return vmID
         }
@@ -8736,7 +8736,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     func inheritedTerminalConfig(
         preferredPanelId: UUID? = nil,
         inPane preferredPaneId: PaneID? = nil
-    ) -> CmuxSurfaceConfigTemplate? {
+    ) -> WmuxSurfaceConfigTemplate? {
 #if DEBUG
         debugInheritedTerminalConfigInvocationCount += 1
 #endif
@@ -8814,7 +8814,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
                 reason: "inheritedTerminalConfig"
             ) else {
                 if let inheritedFontSizeLineage {
-                    var config = CmuxSurfaceConfigTemplate()
+                    var config = WmuxSurfaceConfigTemplate()
                     config.fontSizeLineage = inheritedFontSizeLineage
                     config.fontSizeChangeToken = inheritanceContext?.token
                     config.fontSizeChangeTokens =
@@ -8848,7 +8848,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         if let fallbackFontSizeLineage =
                 activeTerminalFontSizeChangeInheritanceContext?.fallbackLineage
                 ?? lastTerminalConfigInheritanceFontSizeLineage {
-            var config = CmuxSurfaceConfigTemplate()
+            var config = WmuxSurfaceConfigTemplate()
             config.fontSizeLineage = fallbackFontSizeLineage
             config.fontSizeChangeToken =
                 activeTerminalFontSizeChangeInheritanceContext?.token
@@ -8866,7 +8866,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
     /// Remote tmux display surfaces need the workspace's durable font lineage
     /// without inheriting a local terminal's command, environment, or other
     /// process configuration.
-    private func inheritedTerminalFontSizeConfig() -> CmuxSurfaceConfigTemplate? {
+    private func inheritedTerminalFontSizeConfig() -> WmuxSurfaceConfigTemplate? {
         let sourcePanel: TerminalPanel? = {
             if let remembered =
                     lastRememberedTerminalPanelForConfigInheritance() {
@@ -8955,7 +8955,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             transferProjection?.representedRequestTokens
             ?? []
         )
-        var config = CmuxSurfaceConfigTemplate()
+        var config = WmuxSurfaceConfigTemplate()
         config.fontSizeLineage = fontSizeLineage
         config.fontSizeChangeToken = inheritanceContext?.token
         config.fontSizeChangeTokens =
@@ -9145,7 +9145,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         // to $SHELL), and a dead VM looks identical to a healthy workspace with a
         // local prompt — which is what we saw during dogfood.
         if startupCommand != nil {
-            var template = inheritedConfig ?? CmuxSurfaceConfigTemplate()
+            var template = inheritedConfig ?? WmuxSurfaceConfigTemplate()
             template.waitAfterCommand = true
             inheritedConfig = template
         }
@@ -9475,7 +9475,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         // command exits so the user sees the error rather than a silently-respawned
         // local login shell.
         if startupCommand != nil {
-            var template = inheritedConfig ?? CmuxSurfaceConfigTemplate()
+            var template = inheritedConfig ?? WmuxSurfaceConfigTemplate()
             template.waitAfterCommand = true
             inheritedConfig = template
         }
@@ -9624,7 +9624,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             return nil
         }
 
-        var inheritedConfig = inheritedTerminalConfig(inPane: paneId) ?? CmuxSurfaceConfigTemplate()
+        var inheritedConfig = inheritedTerminalConfig(inPane: paneId) ?? WmuxSurfaceConfigTemplate()
         inheritedConfig.waitAfterCommand = true
         let replacementPanel = TerminalPanel(
             id: pair.key,
@@ -9991,10 +9991,10 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         inPane paneId: PaneID,
         title: String,
         focus: Bool = true
-    ) -> CMUXSidebarExtensionBrowserPanel? {
+    ) -> WMUXSidebarExtensionBrowserPanel? {
         guard !isRetiredFromOwningTabManager else { return nil }
         let shouldFocusNewTab = focus || bonsplitController.focusedPaneId == paneId
-        let extensionBrowserPanel = CMUXSidebarExtensionBrowserPanel(title: title)
+        let extensionBrowserPanel = WMUXSidebarExtensionBrowserPanel(title: title)
         panels[extensionBrowserPanel.id] = extensionBrowserPanel
         panelTitles[extensionBrowserPanel.id] = extensionBrowserPanel.displayTitle
 
@@ -11960,7 +11960,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             ? "/usr/bin/false"
             : placeholderCommand
         if replacementInitialCommand != nil {
-            var config = replacementConfig ?? CmuxSurfaceConfigTemplate()
+            var config = replacementConfig ?? WmuxSurfaceConfigTemplate()
             config.waitAfterCommand = true
             replacementConfig = config
         }
@@ -12984,7 +12984,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
         let failure = NSAlert()
         failure.alertStyle = .warning
         failure.messageText = String(localized: "alert.moveTab.failed.title", defaultValue: "Move Failed")
-        failure.informativeText = String(localized: "alert.moveTab.failed.message", defaultValue: "cmux could not move this tab to the selected destination.")
+        failure.informativeText = String(localized: "alert.moveTab.failed.message", defaultValue: "wmux could not move this tab to the selected destination.")
         failure.addButton(withTitle: String(localized: "alert.ok", defaultValue: "OK"))
         _ = failure.runModal()
     }
@@ -13149,7 +13149,7 @@ final class Workspace: Identifiable, ObservableObject, FilePreviewTabMetadataHos
             remoteStartupCommand: startupCommand
         )
         if startupCommand != nil {
-            var template = inheritedConfig ?? CmuxSurfaceConfigTemplate()
+            var template = inheritedConfig ?? WmuxSurfaceConfigTemplate()
             template.waitAfterCommand = true
             inheritedConfig = template
         }
@@ -13537,7 +13537,7 @@ extension Workspace: BonsplitDelegate {
 
         CloseDontAskAgainCheckbox.add(to: alert, offering: dontAskAgain)
         let warningDefaults = closeTabWarningDefaults
-        let content = CmuxAlertContent(informativeText: message)
+        let content = WmuxAlertContent(informativeText: message)
         // Prefer a sheet if we can find a window, otherwise fall back to modal.
         if let window = NSApp.cmuxMainWindowForModalPresentation(),
            window.attachedSheet == nil {
@@ -14770,7 +14770,7 @@ extension Workspace: BonsplitDelegate {
         }
 
         if case .setting(let change) = executable.button.action {
-            CmuxSettingActionRunner.run(
+            WmuxSettingActionRunner.run(
                 change,
                 actionSourcePath: executable.button.actionSourcePath,
                 globalConfigPath: globalConfigPath,
@@ -14802,7 +14802,7 @@ extension Workspace: BonsplitDelegate {
             let trimmedCwd = rawCwd.trimmingCharacters(in: .whitespacesAndNewlines)
             let baseCwd = trimmedCwd.isEmpty ? FileManager.default.homeDirectoryForCurrentUser.path : trimmedCwd
             guard let tabManager = owningTabManager else { return }
-            let command: CmuxCommandDefinition
+            let command: WmuxCommandDefinition
             let configSourcePath: String?
             if let workspaceCommand = executable.workspaceCommand {
                 command = workspaceCommand.command
@@ -14813,7 +14813,7 @@ extension Workspace: BonsplitDelegate {
             } else {
                 return
             }
-            _ = CmuxConfigExecutor.execute(
+            _ = WmuxConfigExecutor.execute(
                 command: command,
                 tabManager: tabManager,
                 baseCwd: baseCwd,
@@ -14830,7 +14830,7 @@ extension Workspace: BonsplitDelegate {
 
         guard let command = executable.button.terminalCommand else { return }
         let target = executable.button.resolvedTerminalCommandTarget
-        let didExecute = CmuxConfigExecutor.prepareShellInputIfAuthorized(
+        let didExecute = WmuxConfigExecutor.prepareShellInputIfAuthorized(
             command,
             confirm: executable.button.confirm ?? false,
             actionID: executable.button.id,

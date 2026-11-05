@@ -1,5 +1,5 @@
 import AppKit
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import SwiftUI
 
 /// Invisible popover content view that promotes the popover window to key as
@@ -230,7 +230,7 @@ struct SidebarWorkspaceTodoPopoverHost<Model: Equatable, PopoverContent: View>: 
             NSHostingController(rootView: AnyView(EmptyView()))
             // DO NOT set sizingOptions here — see the type comment.
         }()
-        private let visibleUpdateScheduler = CmuxPopoverVisibleUpdateScheduler()
+        private let visibleUpdateScheduler = WmuxPopoverVisibleUpdateScheduler()
         private var popover: NSPopover?
         private var currentModel: Model?
         private var currentBuilder: ((Model, @escaping @MainActor () -> Void) -> AnyView)?
@@ -406,7 +406,7 @@ struct SidebarWorkspaceTodoPopoverHost<Model: Equatable, PopoverContent: View>: 
             let fitting = hostingController.view.fittingSize
             guard fitting.width > 0, fitting.height > 0 else { return }
             guard let popover else { return }
-            CmuxPopoverMutation.setContentSize(NSSize(
+            WmuxPopoverMutation.setContentSize(NSSize(
                 width: ceil(max(fitting.width, minWidth)),
                 height: ceil(min(fitting.height, maxHeight))
             ), on: popover)

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Records a process owner together with the evidence used to infer it.
-struct CmuxTopProcessAttribution: Hashable, Sendable {
+struct WmuxTopProcessAttribution: Hashable, Sendable {
     let workspaceID: UUID?
     let workspaceRef: String?
     let paneID: UUID?
@@ -31,7 +31,7 @@ struct CmuxTopProcessAttribution: Hashable, Sendable {
         self.reason = reason
     }
 
-    init(owner: CmuxTopProcessOwner, reason: String) {
+    init(owner: WmuxTopProcessOwner, reason: String) {
         self.init(
             workspaceID: owner.workspaceID,
             workspaceRef: owner.workspaceRef,
@@ -44,8 +44,8 @@ struct CmuxTopProcessAttribution: Hashable, Sendable {
         )
     }
 
-    var owner: CmuxTopProcessOwner {
-        CmuxTopProcessOwner(
+    var owner: WmuxTopProcessOwner {
+        WmuxTopProcessOwner(
             workspaceID: workspaceID,
             workspaceRef: workspaceRef,
             paneID: paneID,

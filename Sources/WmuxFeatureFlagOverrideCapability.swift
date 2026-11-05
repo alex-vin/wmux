@@ -1,9 +1,9 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Grants the Cloud-only dogfood exception from the installed app identity.
 /// Display names, environment variables and persisted defaults cannot grant it.
-struct CmuxFeatureFlagOverrideCapability: Equatable, Sendable {
+struct WmuxFeatureFlagOverrideCapability: Equatable, Sendable {
     let allowsCloudOverride: Bool
     let enablesCloudDogfood: Bool
     let isDebugBuild: Bool
@@ -12,7 +12,7 @@ struct CmuxFeatureFlagOverrideCapability: Equatable, Sendable {
 
     init(bundle: Bundle = .main) {
         #if DEBUG
-        let marker = bundle.object(forInfoDictionaryKey: "CMUXCloudDogfoodEnabled") as? Bool
+        let marker = bundle.object(forInfoDictionaryKey: "WMUXCloudDogfoodEnabled") as? Bool
         self.init(bundleIdentifier: bundle.bundleIdentifier, isDebugBuild: true,
                   cloudDogfoodRequested: marker == true,
                   cloudDogfoodMarkerPresent: marker != nil)
@@ -40,8 +40,8 @@ struct CmuxFeatureFlagOverrideCapability: Equatable, Sendable {
             && bundleIdentifier?.hasPrefix(debugID + ".") == true
     }
 
-    func policy(for definition: CmuxFeatureFlagDefinition) -> CmuxFeatureFlagOverridePolicy {
-        guard definition.key == CmuxFeatureFlags.cloudMachinesFlag.key else { return .remoteFirst }
+    func policy(for definition: WmuxFeatureFlagDefinition) -> WmuxFeatureFlagOverridePolicy {
+        guard definition.key == WmuxFeatureFlags.cloudMachinesFlag.key else { return .remoteFirst }
         return allowsCloudOverride ? .localFirst : .disabled
     }
 }

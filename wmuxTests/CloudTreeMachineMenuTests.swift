@@ -1,14 +1,14 @@
-import CmuxCloud
-import CmuxCloudResizeCore
+import WmuxCloud
+import WmuxCloudResizeCore
 import AppKit
 import SwiftUI
-import CmuxCloudMachines
-import CmuxSurfaceCatalogModel
+import WmuxCloudMachines
+import WmuxSurfaceCatalogModel
 import Testing
 import Observation
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

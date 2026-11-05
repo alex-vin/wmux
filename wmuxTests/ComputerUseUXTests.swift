@@ -1,19 +1,19 @@
-#if canImport(CmuxComputerUse)
-@testable import CmuxComputerUse
+#if canImport(WmuxComputerUse)
+@testable import WmuxComputerUse
 import AppKit
-import CMUXAgentLaunch
-import CmuxFoundation
-import CmuxSettings
-import CmuxTerminal
+import WMUXAgentLaunch
+import WmuxFoundation
+import WmuxSettings
+import WmuxTerminal
 import CryptoKit
 import Darwin
 import Foundation
 import SwiftUI
 import Testing
-@testable import CmuxSettingsUI
+@testable import WmuxSettingsUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -325,7 +325,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: root,
             socketRootDirectoryURL: root,
             userIdentifier: 501,
-            environment: ["CMUX_TAG": "onboarding-ingress-test"],
+            environment: ["WMUX_TAG": "onboarding-ingress-test"],
             authenticationToken: String(repeating: "a", count: 64),
             hostAuthenticationToken: String(repeating: "b", count: 64)
         )
@@ -1424,7 +1424,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: URL(fileURLWithPath: "/Users/tester"),
             socketRootDirectoryURL: URL(fileURLWithPath: "/tmp", isDirectory: true),
             userIdentifier: 501,
-            environment: ["CMUX_TAG": "permission-owner-v2"],
+            environment: ["WMUX_TAG": "permission-owner-v2"],
             authenticationToken: "test-token"
         )
 
@@ -1747,11 +1747,11 @@ struct ComputerUseUXTests {
         let longTagPrefix = String(repeating: "computer-use-long-tag-", count: 4)
         let paths = ComputerUseRuntimePaths(
             homeDirectoryURL: URL(fileURLWithPath: "/Users/\(String(repeating: "long-home-", count: 10))"),
-            environment: ["CMUX_TAG": "\(longTagPrefix)a"]
+            environment: ["WMUX_TAG": "\(longTagPrefix)a"]
         )
         let sibling = ComputerUseRuntimePaths(
             homeDirectoryURL: URL(fileURLWithPath: "/Users/tester"),
-            environment: ["CMUX_TAG": "\(longTagPrefix)b"]
+            environment: ["WMUX_TAG": "\(longTagPrefix)b"]
         )
 
         // Darwin's `sockaddr_un.sun_path` holds at most 104 bytes including
@@ -1764,11 +1764,11 @@ struct ComputerUseUXTests {
     @Test func taggedRuntimeKeepsSanitizationCollisionsIsolated() {
         let slash = ComputerUseRuntimePaths(
             homeDirectoryURL: URL(fileURLWithPath: "/Users/tester"),
-            environment: ["CMUX_TAG": "foo/bar"]
+            environment: ["WMUX_TAG": "foo/bar"]
         )
         let questionMark = ComputerUseRuntimePaths(
             homeDirectoryURL: URL(fileURLWithPath: "/Users/tester"),
-            environment: ["CMUX_TAG": "foo?bar"]
+            environment: ["WMUX_TAG": "foo?bar"]
         )
 
         #expect(slash.scope != questionMark.scope)
@@ -1783,7 +1783,7 @@ struct ComputerUseUXTests {
     @Test func defaultRuntimeUsesDarwinPerUserTemporaryDirectory() {
         let paths = ComputerUseRuntimePaths(
             homeDirectoryURL: URL(fileURLWithPath: "/Users/tester"),
-            environment: ["CMUX_TAG": "secure-runtime"],
+            environment: ["WMUX_TAG": "secure-runtime"],
             authenticationToken: "test-token"
         )
 
@@ -1813,7 +1813,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "restart-safe"],
+            environment: ["WMUX_TAG": "restart-safe"],
             authenticationToken: credential
         )
         let runtime = ComputerUseRuntimeService(paths: firstLaunch)
@@ -1830,7 +1830,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "restart-safe"]
+            environment: ["WMUX_TAG": "restart-safe"]
         )
         #expect(relaunched.authenticationToken == credential)
     }
@@ -1864,7 +1864,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "unverified-peer"],
+            environment: ["WMUX_TAG": "unverified-peer"],
             authenticationToken: "agent-capability",
             hostAuthenticationToken: "host-capability"
         )
@@ -1923,7 +1923,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "host-permission"],
+            environment: ["WMUX_TAG": "host-permission"],
             authenticationToken: "agent-capability",
             hostAuthenticationToken: "host-capability"
         )
@@ -2009,7 +2009,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "direct-capture"],
+            environment: ["WMUX_TAG": "direct-capture"],
             authenticationToken: "agent-capability",
             hostAuthenticationToken: "host-capability"
         )
@@ -2071,7 +2071,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "direct-capture-outcome"],
+            environment: ["WMUX_TAG": "direct-capture-outcome"],
             authenticationToken: "agent-capability",
             hostAuthenticationToken: "host-capability"
         )
@@ -2159,7 +2159,7 @@ struct ComputerUseUXTests {
             homeDirectoryURL: home,
             socketRootDirectoryURL: sockets,
             userIdentifier: getuid(),
-            environment: ["CMUX_TAG": "stale-permission"],
+            environment: ["WMUX_TAG": "stale-permission"],
             authenticationToken: "agent-capability",
             hostAuthenticationToken: "host-capability"
         )
@@ -2220,22 +2220,22 @@ struct ComputerUseUXTests {
             "--cursor-speed",
             "1.75",
         ])
-        #expect(configuration.environment["CMUX_CUA_EXTERNAL_PERMISSION_FLOW"] == "1")
-        #expect(configuration.environment["CMUX_CUA_PERMISSIONS_GATE"] == "0")
-        #expect(configuration.environment["CMUX_CUA_TELEMETRY_ENABLED"] == "false")
-        #expect(configuration.environment["CMUX_CUA_UPDATE_CHECK"] == "false")
-        #expect(configuration.environment["CMUX_CUA_RESPONSIBILITY_DISCLAIMED"] == "1")
-        #expect(configuration.environment["CMUX_CUA_SOCKET_AUTH_TOKEN"] == "test-auth-token")
+        #expect(configuration.environment["WMUX_CUA_EXTERNAL_PERMISSION_FLOW"] == "1")
+        #expect(configuration.environment["WMUX_CUA_PERMISSIONS_GATE"] == "0")
+        #expect(configuration.environment["WMUX_CUA_TELEMETRY_ENABLED"] == "false")
+        #expect(configuration.environment["WMUX_CUA_UPDATE_CHECK"] == "false")
+        #expect(configuration.environment["WMUX_CUA_RESPONSIBILITY_DISCLAIMED"] == "1")
+        #expect(configuration.environment["WMUX_CUA_SOCKET_AUTH_TOKEN"] == "test-auth-token")
         let hostAuthority = try #require(
-            configuration.environment["CMUX_CUA_SOCKET_HOST_AUTH_TOKEN"]
+            configuration.environment["WMUX_CUA_SOCKET_HOST_AUTH_TOKEN"]
         )
         #expect(hostAuthority.count == 64)
         #expect(hostAuthority != "test-auth-token")
-        #expect(configuration.environment["CMUX_CUA_SOCKET_AUTHORIZED_ROOT_PID"]
+        #expect(configuration.environment["WMUX_CUA_SOCKET_AUTHORIZED_ROOT_PID"]
             == "42")
-        #expect(configuration.environment["CMUX_CUA_SOCKET_AUTHORIZED_ROOT_START_SECONDS"]
+        #expect(configuration.environment["WMUX_CUA_SOCKET_AUTHORIZED_ROOT_START_SECONDS"]
             == "1700000000")
-        #expect(configuration.environment["CMUX_CUA_SOCKET_AUTHORIZED_ROOT_START_MICROSECONDS"]
+        #expect(configuration.environment["WMUX_CUA_SOCKET_AUTHORIZED_ROOT_START_MICROSECONDS"]
             == "123456")
 
         let codexConfiguration = try #require(
@@ -2274,13 +2274,13 @@ struct ComputerUseUXTests {
                 .appendingPathComponent(wrapperName, isDirectory: false)
             let source = try String(contentsOf: wrapperURL, encoding: .utf8)
             let declaresExternalFlow = source.contains(
-                #"CMUX_CUA_EXTERNAL_PERMISSION_FLOW="1""#
+                #"WMUX_CUA_EXTERNAL_PERMISSION_FLOW="1""#
             ) || source.contains(
-                #""CMUX_CUA_EXTERNAL_PERMISSION_FLOW":"1""#
+                #""WMUX_CUA_EXTERNAL_PERMISSION_FLOW":"1""#
             )
             #expect(declaresExternalFlow)
             #expect(!source.contains(
-                #"CMUX_CUA_EXTERNAL_PERMISSION_FLOW="0""#
+                #"WMUX_CUA_EXTERNAL_PERMISSION_FLOW="0""#
             ))
         }
     }
@@ -2476,7 +2476,7 @@ struct ComputerUseUXTests {
         let wrapperURL = binDirectory.appendingPathComponent("cmux-claude-wrapper")
         try """
         #!/usr/bin/env bash
-        printf '%s' "${CMUX_COMPUTER_USE_MCP_DISABLED:-missing}" > "$CMUX_TEST_LOG"
+        printf '%s' "${WMUX_COMPUTER_USE_MCP_DISABLED:-missing}" > "$WMUX_TEST_LOG"
         """.write(to: wrapperURL, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: wrapperURL.path)
         let shimSet = try #require(TerminalSurface.installAgentCommandShimsIfPossible(
@@ -2508,7 +2508,7 @@ struct ComputerUseUXTests {
         #expect(try String(contentsOf: logURL, encoding: .utf8) == "0")
 
         // Setting enabled but the user exported the documented kill switch
-        // (CMUX_COMPUTER_USE_MCP_DISABLED=1): the shim must NOT clobber it.
+        // (WMUX_COMPUTER_USE_MCP_DISABLED=1): the shim must NOT clobber it.
         try "1\n".write(to: settingURL, atomically: true, encoding: .utf8)
         try runShim(at: shim.executablePath, logURL: logURL, inheritedDisabled: "1")
         #expect(try String(contentsOf: logURL, encoding: .utf8) == "1")
@@ -3832,8 +3832,8 @@ struct ComputerUseUXTests {
             "HOME": inherited["HOME"] ?? FileManager.default.homeDirectoryForCurrentUser.path,
             "PATH": inherited["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin",
             "TMPDIR": inherited["TMPDIR"] ?? FileManager.default.temporaryDirectory.path,
-            "CMUX_TEST_LOG": logURL.path,
-            "CMUX_COMPUTER_USE_MCP_DISABLED": inheritedDisabled,
+            "WMUX_TEST_LOG": logURL.path,
+            "WMUX_COMPUTER_USE_MCP_DISABLED": inheritedDisabled,
             TerminalSurface.computerUseAppEnabledEnvironmentKey: appEnabledAtSpawn,
         ]
         try process.run()

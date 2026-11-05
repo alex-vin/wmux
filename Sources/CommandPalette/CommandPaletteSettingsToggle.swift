@@ -1,8 +1,8 @@
-import CmuxCommandPalette
-import CmuxFoundation
+import WmuxCommandPalette
+import WmuxFoundation
 import Foundation
-import CmuxSettings
-import CmuxSettingsUI
+import WmuxSettings
+import WmuxSettingsUI
 extension MenuBarOnlySettings {
     static let legacyCommandPaletteUsageKey = "commandPalette.commandUsage.v1"
     static let legacyCommandPaletteMenuBarOnlyCommandId = "palette.toggleSetting.menuBarOnly"

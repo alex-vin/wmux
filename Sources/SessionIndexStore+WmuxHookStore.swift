@@ -1,10 +1,10 @@
-import CmuxAgentSessionStore
+import WmuxAgentSessionStore
 import Foundation
 
 extension SessionIndexStore {
     /// Loads sessions from a registry-owned cmux hook store.
     nonisolated static func loadCmuxHookStoreEntries(
-        registration: CmuxVaultAgentRegistration,
+        registration: WmuxVaultAgentRegistration,
         needle: String,
         cwdFilter: String?,
         offset: Int,

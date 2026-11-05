@@ -1,9 +1,9 @@
 import Foundation
-import CmuxBrowser
+import WmuxBrowser
 
 @MainActor
 struct BrowserImportDestinationResolver {
-    private let packageResolver = CmuxBrowser.BrowserImportDestinationResolver()
+    private let packageResolver = WmuxBrowser.BrowserImportDestinationResolver()
 
     func resolve(
         params: [String: Any],

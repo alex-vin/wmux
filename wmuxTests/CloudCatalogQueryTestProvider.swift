@@ -1,9 +1,9 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -26,7 +26,7 @@ final class CloudCatalogQueryTestProvider: SurfaceProvider {
             hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected,
             linkError: nil, cpuPercent: nil, memoryUsedMb: nil, diskUsedMb: nil
         )
-        state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": "daemon-fixture", "revision": "1"],
             "workspaces": [["id": "ws-1", "name": "workspace-1", "focused": true]],
             "screens": [["id": "screen-1", "workspace_id": "ws-1"]],
@@ -48,7 +48,7 @@ final class CloudCatalogQueryTestProvider: SurfaceProvider {
 
     func refresh(force: Bool) async {
         forcedRefreshes.append(force)
-        catalog.replaceCloudState(state, resources: CmuxTuiSnapshotParser.resources(from: state), info: info)
+        catalog.replaceCloudState(state, resources: WmuxTuiSnapshotParser.resources(from: state), info: info)
     }
 
     func materialize(_ resource: SurfaceResource, at destination: SurfaceDestination, focus: Bool) async throws -> SurfaceProjection {

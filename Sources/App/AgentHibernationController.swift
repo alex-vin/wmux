@@ -1,6 +1,6 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
-import CmuxWorkspaces
+import WmuxWorkspaces
 
 struct AgentHibernationPanelKey: Hashable, Sendable {
     let workspaceId: UUID

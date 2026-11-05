@@ -1,9 +1,9 @@
 import Foundation
 
 /// Builds one command-name memory group and its aggregate ownership classification.
-struct CmuxTopMemoryDiagnosticGroupAccumulator {
+struct WmuxTopMemoryDiagnosticGroupAccumulator {
     private struct AttributionAccumulator {
-        let attribution: CmuxTopProcessAttribution
+        let attribution: WmuxTopProcessAttribution
         var rssBytes: Int64 = 0
         var processIDs: [Int] = []
 
@@ -20,8 +20,8 @@ struct CmuxTopMemoryDiagnosticGroupAccumulator {
                 .joined(separator: "/")
         }
 
-        mutating func append(process: CmuxTopProcessInfo) {
-            rssBytes = CmuxTopProcessSnapshot.clampedAdd(rssBytes, process.residentBytes)
+        mutating func append(process: WmuxTopProcessInfo) {
+            rssBytes = WmuxTopProcessSnapshot.clampedAdd(rssBytes, process.residentBytes)
             processIDs.append(process.pid)
         }
 
@@ -40,9 +40,9 @@ struct CmuxTopMemoryDiagnosticGroupAccumulator {
     let name: String
     var rssBytes: Int64 = 0
     private var processIDs: [Int] = []
-    private var attributions: [CmuxTopProcessOwner: AttributionAccumulator] = [:]
+    private var attributions: [WmuxTopProcessOwner: AttributionAccumulator] = [:]
     private var attributedProcessCount = 0
-    private var commonOwner: CmuxTopProcessOwner?
+    private var commonOwner: WmuxTopProcessOwner?
     private var ownerIdentityKeys: Set<String> = []
     private var workspaceIdentityKeys: Set<String> = []
 
@@ -52,10 +52,10 @@ struct CmuxTopMemoryDiagnosticGroupAccumulator {
     }
 
     mutating func append(
-        process: CmuxTopProcessInfo,
-        attribution: CmuxTopProcessAttribution?
+        process: WmuxTopProcessInfo,
+        attribution: WmuxTopProcessAttribution?
     ) {
-        rssBytes = CmuxTopProcessSnapshot.clampedAdd(rssBytes, process.residentBytes)
+        rssBytes = WmuxTopProcessSnapshot.clampedAdd(rssBytes, process.residentBytes)
         processIDs.append(process.pid)
         guard let attribution else { return }
         attributedProcessCount += 1
@@ -114,7 +114,7 @@ struct CmuxTopMemoryDiagnosticGroupAccumulator {
             ownerPayload = NSNull()
         } else if let commonOwner {
             kind = "common"
-            ownerPayload = CmuxTopProcessAttribution(
+            ownerPayload = WmuxTopProcessAttribution(
                 owner: commonOwner,
                 reason: "common-command-group-owner"
             ).payload()

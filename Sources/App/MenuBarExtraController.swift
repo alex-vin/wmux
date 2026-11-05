@@ -1,12 +1,12 @@
 import AppKit
 import Combine
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 @MainActor
 final class MenuBarExtraController: NSObject, NSMenuDelegate {
     private let statusItem: NSStatusItem
-    private let menu = NSMenu(title: "cmux")
+    private let menu = NSMenu(title: "wmux")
     private let notificationStore: TerminalNotificationStore
     private let caffeineController: CaffeineController
     private let onShowGlobalSearch: (NSStatusBarButton, (() -> Void)?) -> Void
@@ -73,7 +73,7 @@ final class MenuBarExtraController: NSObject, NSMenuDelegate {
             button.imagePosition = .imageOnly
             button.imageScaling = .scaleProportionallyDown
             button.image = MenuBarIconRenderer.makeImage(unreadCount: 0)
-            button.toolTip = "cmux"
+            button.toolTip = "wmux"
         }
 
         notificationMenuSnapshotCancellable = notificationStore.$notificationMenuSnapshot
@@ -213,7 +213,7 @@ final class MenuBarExtraController: NSObject, NSMenuDelegate {
         if let button = statusItem.button {
             button.image = MenuBarIconRenderer.makeImage(unreadCount: displayedUnreadCount)
             button.toolTip = displayedUnreadCount == 0
-                ? "cmux"
+                ? "wmux"
                 : displayedUnreadCount == 1
                     ? "cmux: " + String(localized: "statusMenu.tooltip.unread.one", defaultValue: "1 unread notification")
                     : "cmux: " + String(localized: "statusMenu.tooltip.unread.other", defaultValue: "\(displayedUnreadCount) unread notifications")
@@ -511,7 +511,7 @@ enum MenuBarBuildHintFormatter {
     ) -> String? {
         guard isDebugBuild else { return nil }
         let normalized = appName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let prefix = "cmux DEV"
+        let prefix = "wmux DEV"
         guard normalized.hasPrefix(prefix) else { return "Build: DEV" }
 
         let suffix = String(normalized.dropFirst(prefix.count)).trimmingCharacters(in: .whitespacesAndNewlines)

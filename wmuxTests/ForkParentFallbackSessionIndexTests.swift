@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -63,13 +63,13 @@ struct ForkParentFallbackSessionIndexTests {
         let fixture = try makeFixture()
         defer { fixture.cleanup() }
 
-        // A tool spawned inside a claude pane inherits CMUX_AGENT_LAUNCH_* but is not
+        // A tool spawned inside a claude pane inherits WMUX_AGENT_LAUNCH_* but is not
         // the launched claude executable; ambient environment alone must not mint a
         // fork fallback for the pane.
         let detected = detectedSnapshots(
             fixture: fixture,
             argv: ["/usr/local/bin/some-tool", "--resume", fixture.parentSessionId, "--fork-session"],
-            extraEnvironment: ["CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude"],
+            extraEnvironment: ["WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude"],
             processName: "some-tool",
             processPath: "/usr/local/bin/some-tool"
         )
@@ -84,12 +84,12 @@ struct ForkParentFallbackSessionIndexTests {
         let fixture = try makeFixture()
         defer { fixture.cleanup() }
 
-        // A custom claude binary (CMUX_CUSTOM_CLAUDE_PATH) has a non-"claude" basename;
+        // A custom claude binary (WMUX_CUSTOM_CLAUDE_PATH) has a non-"claude" basename;
         // the launch-kind token plus the recorded launch executable identify it.
         let detected = detectedSnapshots(
             fixture: fixture,
             argv: ["/opt/tools/claude-custom", "--resume", fixture.parentSessionId, "--fork-session", "--model", "sonnet"],
-            extraEnvironment: ["CMUX_AGENT_LAUNCH_EXECUTABLE": "/opt/tools/claude-custom"],
+            extraEnvironment: ["WMUX_AGENT_LAUNCH_EXECUTABLE": "/opt/tools/claude-custom"],
             processName: "claude-custom",
             processPath: "/opt/tools/claude-custom"
         )
@@ -267,7 +267,7 @@ struct ForkParentFallbackSessionIndexTests {
         let result = SharedLiveAgentIndexLoader(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             processSnapshotProvider: { processSnapshot },
             capturedAtProvider: { 42 },
             processArgumentsProvider: { $0 == fixture.forkProcessID ? processArguments : nil },
@@ -377,7 +377,7 @@ struct ForkParentFallbackSessionIndexTests {
             extraEnvironment: extraEnvironment
         )
         return RestorableAgentSessionIndex.processDetectedSnapshots(
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             fileManager: fixture.fileManager,
             processSnapshot: snapshot(fixture: fixture, processName: processName, processPath: processPath),
             capturedAt: 42,
@@ -395,13 +395,13 @@ struct ForkParentFallbackSessionIndexTests {
     private func loadIndex(
         fixture: Fixture,
         detectedSnapshots: [RestorableAgentSessionIndex.PanelKey: RestorableAgentSessionIndex.ProcessDetectedSnapshotEntry],
-        processArgumentsProvider: @escaping (Int) -> CmuxTopProcessArguments? = { _ in nil },
+        processArgumentsProvider: @escaping (Int) -> WmuxTopProcessArguments? = { _ in nil },
         processIdentityProvider: @escaping (Int) -> AgentPIDProcessIdentity? = { _ in nil }
     ) -> RestorableAgentSessionIndex {
         RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: detectedSnapshots,
             processArgumentsProvider: processArgumentsProvider,
             processIdentityProvider: processIdentityProvider
@@ -412,10 +412,10 @@ struct ForkParentFallbackSessionIndexTests {
         fixture: Fixture,
         processName: String = "claude",
         processPath: String? = "/usr/local/bin/claude"
-    ) -> CmuxTopProcessSnapshot {
-        CmuxTopProcessSnapshot(
+    ) -> WmuxTopProcessSnapshot {
+        WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: fixture.forkProcessID,
                     parentPID: 1,
                     name: processName,
@@ -441,19 +441,19 @@ struct ForkParentFallbackSessionIndexTests {
         fixture: Fixture,
         argv: [String],
         extraEnvironment: [String: String] = [:]
-    ) -> CmuxTopProcessArguments {
+    ) -> WmuxTopProcessArguments {
         var environment = [
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_CWD": fixture.cwd.path,
-            "CMUX_WORKSPACE_ID": fixture.workspaceId.uuidString,
-            "CMUX_SURFACE_ID": fixture.forkPanelId.uuidString,
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_CWD": fixture.cwd.path,
+            "WMUX_WORKSPACE_ID": fixture.workspaceId.uuidString,
+            "WMUX_SURFACE_ID": fixture.forkPanelId.uuidString,
             "CLAUDE_CONFIG_DIR": fixture.configDir.path,
             "PWD": fixture.cwd.path,
         ]
         for (key, value) in extraEnvironment {
             environment[key] = value
         }
-        return CmuxTopProcessArguments(arguments: argv, environment: environment)
+        return WmuxTopProcessArguments(arguments: argv, environment: environment)
     }
 
     private func hookRecord(

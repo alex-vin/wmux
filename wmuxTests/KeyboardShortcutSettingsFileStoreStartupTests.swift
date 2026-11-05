@@ -2,24 +2,24 @@ import XCTest
 import AppKit
 import Testing
 // Selective imports: the app target also defines AppIconMode/StoredShortcut/etc.,
-// so a blanket `import CmuxSettings` here makes those names ambiguous. Import only
+// so a blanket `import WmuxSettings` here makes those names ambiguous. Import only
 // the settings symbols this file needs.
-import struct CmuxSettings.AppCatalogSection
-import struct CmuxFoundation.CmuxAccentColor
-import enum CmuxFoundation.CmuxAccentColorMode
-import struct CmuxSettings.QuitConfirmationStore
-import enum CmuxSettings.ConfirmQuitMode
-import enum CmuxSettings.BrowserSearchEngine
-import struct CmuxSettings.BrowserSearchSettingsStore
-import struct CmuxSettings.NotificationSoundOverride
-import struct CmuxSettings.NotificationSoundOverrides
-import enum CmuxSettings.NotificationSoundAlertType
-import struct CmuxSettings.NotificationsCatalogSection
-import enum CmuxSettings.PaneTabBarVisibility
+import struct WmuxSettings.AppCatalogSection
+import struct WmuxFoundation.WmuxAccentColor
+import enum WmuxFoundation.WmuxAccentColorMode
+import struct WmuxSettings.QuitConfirmationStore
+import enum WmuxSettings.ConfirmQuitMode
+import enum WmuxSettings.BrowserSearchEngine
+import struct WmuxSettings.BrowserSearchSettingsStore
+import struct WmuxSettings.NotificationSoundOverride
+import struct WmuxSettings.NotificationSoundOverrides
+import enum WmuxSettings.NotificationSoundAlertType
+import struct WmuxSettings.NotificationsCatalogSection
+import enum WmuxSettings.PaneTabBarVisibility
 import Bonsplit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -115,8 +115,8 @@ final class KeyboardShortcutSettingsFileStoreStartupTests: XCTestCase {
     func testHexAccentColorSelectsCustomModeWithNormalizedColor() throws {
         let defaults = UserDefaults.standard
         let keys = [
-            CmuxAccentColorMode.userDefaultsKey,
-            CmuxAccentColorMode.customHexUserDefaultsKey,
+            WmuxAccentColorMode.userDefaultsKey,
+            WmuxAccentColorMode.customHexUserDefaultsKey,
             settingsFileBackupsDefaultsKey,
             importedManagedDefaultsKey,
         ]
@@ -154,9 +154,9 @@ final class KeyboardShortcutSettingsFileStoreStartupTests: XCTestCase {
             startWatching: false
         )
 
-        XCTAssertEqual(defaults.string(forKey: CmuxAccentColorMode.userDefaultsKey), CmuxAccentColorMode.custom.rawValue)
-        XCTAssertEqual(defaults.string(forKey: CmuxAccentColorMode.customHexUserDefaultsKey), "#FF6A00")
-        XCTAssertEqual(CmuxAccentColor.stored(in: defaults).customHex, "#FF6A00")
+        XCTAssertEqual(defaults.string(forKey: WmuxAccentColorMode.userDefaultsKey), WmuxAccentColorMode.custom.rawValue)
+        XCTAssertEqual(defaults.string(forKey: WmuxAccentColorMode.customHexUserDefaultsKey), "#FF6A00")
+        XCTAssertEqual(WmuxAccentColor.stored(in: defaults).customHex, "#FF6A00")
 
         try writeSettingsFile(
             """
@@ -175,7 +175,7 @@ final class KeyboardShortcutSettingsFileStoreStartupTests: XCTestCase {
             startWatching: false
         )
 
-        XCTAssertNotEqual(defaults.string(forKey: CmuxAccentColorMode.userDefaultsKey), CmuxAccentColorMode.custom.rawValue)
+        XCTAssertNotEqual(defaults.string(forKey: WmuxAccentColorMode.userDefaultsKey), WmuxAccentColorMode.custom.rawValue)
     }
 
     func testSettingsFileStoreRestoresAbsentAppIconBackupDuringStartupWithoutTouchingAppKit() throws {
@@ -438,7 +438,7 @@ final class KeyboardShortcutSettingsFileStoreStartupTests: XCTestCase {
             XCTAssertEqual(defaults.string(forKey: key), AppearanceMode.light.rawValue)
             XCTAssertTrue(
                 terminalReloadSources.isEmpty,
-                "CmuxSettingsFileStore must not synchronously route managed appearance replay into Ghostty reloadConfiguration"
+                "WmuxSettingsFileStore must not synchronously route managed appearance replay into Ghostty reloadConfiguration"
             )
         }
     }

@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -420,7 +420,7 @@ extension GlobalSearchShortcutBehaviorTests {
 
     private func makeBrowserHarness(
         appDelegate: AppDelegate
-    ) throws -> (window: NSWindow, panel: BrowserPanel, webView: CmuxWebView) {
+    ) throws -> (window: NSWindow, panel: BrowserPanel, webView: WmuxWebView) {
         let windowId = appDelegate.createMainWindow()
         guard let window = findWindow(withId: windowId),
               let manager = appDelegate.tabManagerFor(windowId: windowId),
@@ -433,7 +433,7 @@ extension GlobalSearchShortcutBehaviorTests {
               ),
               let browserPanel = manager.selectedWorkspace?.browserPanel(for: browserPanelId)
                   ?? workspace.browserPanel(for: browserPanelId),
-              let webView = browserPanel.webView as? CmuxWebView else {
+              let webView = browserPanel.webView as? WmuxWebView else {
             if let window = findWindow(withId: windowId) {
                 closeWindow(window, appDelegate: appDelegate)
             }

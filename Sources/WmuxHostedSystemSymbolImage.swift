@@ -1,5 +1,5 @@
 import AppKit
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import SwiftUI
 
 /// Draws an SF Symbol through the AppKit-hosted icon renderer with the tint
@@ -11,7 +11,7 @@ import SwiftUI
 /// showing a pre-tinted bitmap stays visible. The shared renderer resolves the
 /// dynamic tint under the view's effective appearance and retries the same
 /// symbol through its fallback slot when a draw comes back blank.
-struct CmuxHostedSystemSymbolImage: View {
+struct WmuxHostedSystemSymbolImage: View {
     let systemName: String
     /// SF Symbol configuration point size.
     let pointSize: CGFloat
@@ -32,8 +32,8 @@ struct CmuxHostedSystemSymbolImage: View {
         imageSize: NSSize,
         weight: NSFont.Weight,
         tintColor: NSColor
-    ) -> CmuxResolvedIconRequest {
-        CmuxResolvedIconRequest(
+    ) -> WmuxResolvedIconRequest {
+        WmuxResolvedIconRequest(
             source: .systemSymbol(name: systemName, accessibilityDescription: nil),
             size: imageSize,
             tintColor: tintColor,
@@ -44,7 +44,7 @@ struct CmuxHostedSystemSymbolImage: View {
     }
 
     var body: some View {
-        CmuxResolvedIconImage(request: Self.iconRequest(
+        WmuxResolvedIconImage(request: Self.iconRequest(
             systemName: systemName,
             pointSize: pointSize,
             imageSize: imageSize,

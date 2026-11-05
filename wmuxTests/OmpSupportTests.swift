@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -42,10 +42,10 @@ struct OmpSupportTests {
 
     @Test func ompRegistriesUsePiIconAsset() throws {
         let taskManagerDefinition = try #require(
-            CmuxTaskManagerCodingAgentDefinition.builtIns.first { $0.id == "omp" }
+            WmuxTaskManagerCodingAgentDefinition.builtIns.first { $0.id == "omp" }
         )
         #expect(taskManagerDefinition.assetName == "AgentIcons/Pi")
-        #expect(CmuxVaultAgentRegistration.builtInOmp.iconAssetName == "AgentIcons/Pi")
+        #expect(WmuxVaultAgentRegistration.builtInOmp.iconAssetName == "AgentIcons/Pi")
     }
 
     @Test func directProcessDetectionUsesExplicitSessionSelectorsBeforeLatestFallback() throws {
@@ -226,10 +226,10 @@ struct OmpSupportTests {
             modifiedAt: Date(timeIntervalSince1970: 2_000)
         )
 
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "omp",
             name: "OMP",
-            detect: CmuxVaultAgentDetectRule(processName: "omp"),
+            detect: WmuxVaultAgentDetectRule(processName: "omp"),
             sessionIdSource: .piSessionFile,
             resumeCommand: "{{executable}} --session {{sessionId}}",
             sessionDirectory: customRoot.path
@@ -381,7 +381,7 @@ struct OmpSupportTests {
     }
 
     @Test func taskManagerClassifiesOmpBeforeLegacyPiPackageNeedles() throws {
-        let direct = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let direct = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "omp",
             processPath: "/Users/example/.bun/bin/omp",
             arguments: ["/Users/example/.bun/bin/omp", "--model", "anthropic/claude-sonnet-4-5"],
@@ -389,7 +389,7 @@ struct OmpSupportTests {
         ))
         #expect(direct.id == "omp")
 
-        let hostedOmp = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let hostedOmp = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "bun",
             processPath: "/opt/homebrew/bin/bun",
             arguments: [
@@ -402,7 +402,7 @@ struct OmpSupportTests {
         ))
         #expect(hostedOmp.id == "omp")
 
-        let legacyPi = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let legacyPi = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "bun",
             processPath: "/opt/homebrew/bin/bun",
             arguments: [
@@ -421,15 +421,15 @@ struct OmpSupportTests {
         processPath: String? = "/Users/example/.bun/bin/omp",
         arguments: [String],
         environment: [String: String],
-        registration: CmuxVaultAgentRegistration = .builtInOmp
+        registration: WmuxVaultAgentRegistration = .builtInOmp
     ) -> SessionRestorableAgentSnapshot? {
         let workspaceId = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
         let panelId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
         let processId = 4242
         let panelKey = RestorableAgentSessionIndex.PanelKey(workspaceId: workspaceId, panelId: panelId)
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: processId,
                     parentPID: 1,
                     name: processName,
@@ -450,13 +450,13 @@ struct OmpSupportTests {
             includesProcessDetails: true
         )
         return RestorableAgentSessionIndex.processDetectedSnapshots(
-            registry: CmuxVaultAgentRegistry(registrations: [registration]),
+            registry: WmuxVaultAgentRegistry(registrations: [registration]),
             fileManager: FileManager.default,
             processSnapshot: processSnapshot,
             capturedAt: 42,
             processArgumentsProvider: { requestedProcessId in
                 guard requestedProcessId == processId else { return nil }
-                return CmuxTopProcessArguments(arguments: arguments, environment: environment)
+                return WmuxTopProcessArguments(arguments: arguments, environment: environment)
             }
         )[panelKey]?.snapshot
     }

@@ -1,10 +1,10 @@
-import CMUXAuthCore
-import CmuxAuthRuntime
+import WMUXAuthCore
+import WmuxAuthRuntime
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -16,7 +16,7 @@ struct TeamChangeRejectedError: Error {}
 /// until the test releases it, so a test can start a second change mid-flight.
 /// It can also refuse the next create or switch.
 actor TeamChangeAuthClient: AuthClient {
-    private var teams: [CMUXAuthTeam]
+    private var teams: [WMUXAuthTeam]
     private(set) var createCount = 0
     private(set) var selectCount = 0
     private var holdsNextCreate = false
@@ -28,8 +28,8 @@ actor TeamChangeAuthClient: AuthClient {
 
     init(firstTeamName: String = "Team A") {
         teams = [
-            CMUXAuthTeam(id: "team-a", displayName: firstTeamName),
-            CMUXAuthTeam(id: "team-b", displayName: "Team B"),
+            WMUXAuthTeam(id: "team-a", displayName: firstTeamName),
+            WMUXAuthTeam(id: "team-b", displayName: "Team B"),
         ]
     }
 
@@ -50,9 +50,9 @@ actor TeamChangeAuthClient: AuthClient {
         heldSelect = nil
     }
 
-    func createTeam(displayName: String) async throws -> CMUXAuthTeam {
+    func createTeam(displayName: String) async throws -> WMUXAuthTeam {
         createCount += 1
-        let team = CMUXAuthTeam(id: "team-new-\(createCount)", displayName: displayName)
+        let team = WMUXAuthTeam(id: "team-new-\(createCount)", displayName: displayName)
         if holdsNextCreate {
             holdsNextCreate = false
             await withCheckedContinuation { heldCreate = $0 }
@@ -77,12 +77,12 @@ actor TeamChangeAuthClient: AuthClient {
         }
     }
 
-    func listTeams() async throws -> [CMUXAuthTeam] { teams }
+    func listTeams() async throws -> [WMUXAuthTeam] { teams }
     func accessToken() async -> String? { "fixture-access" }
     func refreshToken() async -> String? { "fixture-refresh" }
     func forceRefreshAccessToken() async -> String? { "fixture-access" }
-    func currentUser(throwOnMissing: Bool) async throws -> CMUXAuthUser? {
-        CMUXAuthUser(id: "fixture", primaryEmail: "fixture@example.test", displayName: "Fixture")
+    func currentUser(throwOnMissing: Bool) async throws -> WMUXAuthUser? {
+        WMUXAuthUser(id: "fixture", primaryEmail: "fixture@example.test", displayName: "Fixture")
     }
     func sendMagicLinkEmail(email: String, callbackURL: String) async throws -> String { "fixture" }
     func signInWithMagicLink(code: String) async throws {}
@@ -102,20 +102,20 @@ extension HostAccountFlow {
         let anchor = AuthPresentationContextProvider()
         let coordinator = AuthCoordinator(
             client: client,
-            sessionCache: CMUXAuthSessionCache(keyValueStore: defaults, key: "session"),
-            userCache: CMUXAuthIdentityStore(keyValueStore: defaults, key: "user"),
-            teamSelection: CMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
+            sessionCache: WMUXAuthSessionCache(keyValueStore: defaults, key: "session"),
+            userCache: WMUXAuthIdentityStore(keyValueStore: defaults, key: "user"),
+            teamSelection: WMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
             anchor: anchor,
             config: AuthConfig(
-                stack: CMUXAuthConfig(projectId: "fixture", publishableClientKey: "fixture"),
+                stack: WMUXAuthConfig(projectId: "fixture", publishableClientKey: "fixture"),
                 magicLinkCallbackURL: "http://127.0.0.1:1/callback", apiBaseURL: "http://127.0.0.1:1"
             ),
             launch: AuthLaunchOptions(
                 clearAuthRequested: false, mockDataEnabled: false,
                 environment: [
-                    "CMUX_UITEST_AUTH_FIXTURE": "1",
-                    "CMUX_UITEST_AUTH_USER_ID": "fixture",
-                    "CMUX_UITEST_AUTH_FIXTURE_TEAMS": "1",
+                    "WMUX_UITEST_AUTH_FIXTURE": "1",
+                    "WMUX_UITEST_AUTH_USER_ID": "fixture",
+                    "WMUX_UITEST_AUTH_FIXTURE_TEAMS": "1",
                 ],
                 includesDevAuth: true
             )

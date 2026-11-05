@@ -2,14 +2,14 @@ import AppKit
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 /// Regression coverage for the Sentry crash family "Attempted to read an unowned reference"
-/// in `KeyViewProxy.nextResponder.getter` (CMUXTERM-MACOS-3Z73 and siblings). SwiftUI's
+/// in `KeyViewProxy.nextResponder.getter` (WMUXTERM-MACOS-3Z73 and siblings). SwiftUI's
 /// `KeyViewProxy` returns its `FocusBridge`'s unowned host as `nextResponder`, so walking a
 /// proxy that outlived its `NSHostingView` aborts the app.
 @MainActor

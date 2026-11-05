@@ -177,7 +177,7 @@ final class DiffSidecarBridge: NSObject, WKScriptMessageHandlerWithReply {
 
     static func isTrustedSidecarURL(_ url: URL?) -> Bool {
         guard let url else { return false }
-        return CmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: url)
+        return WmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: url)
     }
 
     #if compiler(>=6.2)
@@ -287,7 +287,7 @@ final class DiffSidecarBridge: NSObject, WKScriptMessageHandlerWithReply {
                     "value": [
                         "sessionId": sessionID,
                         "patch": [
-                            "id": "cmux-diff-viewer://\(capabilityToken)/\(fileName)",
+                            "id": "wmux-diff-viewer://\(capabilityToken)/\(fileName)",
                             "mediaType": "text/x-diff",
                             "byteLength": diffData.count,
                             "revision": 1
@@ -322,7 +322,7 @@ final class DiffSidecarBridge: NSObject, WKScriptMessageHandlerWithReply {
                 "result": [
                     "type": "navigation",
                     "value": [
-                        "url": "cmux-diff-viewer://\(capabilityToken)/generated.html"
+                        "url": "wmux-diff-viewer://\(capabilityToken)/generated.html"
                     ]
                 ],
                 "error": NSNull()
@@ -342,7 +342,7 @@ final class DiffSidecarBridge: NSObject, WKScriptMessageHandlerWithReply {
 
     nonisolated private static func prepareRootDirectory() throws -> URL {
         let root = URL(fileURLWithPath: "/tmp", isDirectory: true)
-            .appendingPathComponent("cmux-diff-viewer-\(Darwin.getuid())", isDirectory: true)
+            .appendingPathComponent("wmux-diff-viewer-\(Darwin.getuid())", isDirectory: true)
         try FileManager.default.createDirectory(
             at: root,
             withIntermediateDirectories: true,

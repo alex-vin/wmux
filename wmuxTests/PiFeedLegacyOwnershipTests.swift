@@ -1,9 +1,9 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -25,13 +25,13 @@ extension PiFeedOwnershipTests {
             }
             appDelegate.tabManager = nil
             AppDelegate.shared = previousAppDelegate
-            CmuxEventBus.shared.resetForTesting()
+            WmuxEventBus.shared.resetForTesting()
         }
 
         let staleWorkspaceId = UUID().uuidString
         let store = WorkstreamStore(ringCapacity: 10)
         FeedCoordinator.shared.install(store: store)
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
         let event = WorkstreamEvent(
             sessionId: "codex-legacy-stale-workspace",
             hookEventName: .postToolUse,

@@ -1,10 +1,10 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
-import CmuxCore
+import WmuxCore
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -137,11 +137,11 @@ import Testing
 
         let startupInput = try #require(binding.inlineStartupInput)
         #expect(
-            startupInput.contains("/usr/bin/env 'CMUX_AGENT_RESTORE_LAUNCH=\(kind):\(sessionId)'"),
+            startupInput.contains("/usr/bin/env 'WMUX_AGENT_RESTORE_LAUNCH=\(kind):\(sessionId)'"),
             "\(startupInput)"
         )
-        #expect(startupInput.contains("CMUX_\(kind.uppercased())_WRAPPER_SHIM"), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_CUSTOM_\(kind.uppercased())_PATH="), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_\(kind.uppercased())_WRAPPER_SHIM"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CUSTOM_\(kind.uppercased())_PATH="), "\(startupInput)")
     }
 
     @Test func routedCodexBindingRoutesSubrouterChildThroughManagedWrapper() throws {
@@ -158,7 +158,7 @@ import Testing
                 arguments: ["/opt/company/bin/codex", "-c", "model_provider=subrouter"],
                 workingDirectory: "/tmp/project",
                 environment: [
-                    "CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
+                    "WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
                     "SUBROUTER_CODEX_BIN": "/opt/company/bin/codex",
                     "SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
                 ],
@@ -170,10 +170,10 @@ import Testing
 
         let startupInput = try #require(binding.inlineStartupInput)
 
-        #expect(startupInput.contains("CMUX_AGENT_RESTORE_LAUNCH=codex:\(sessionId)"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_AGENT_RESTORE_LAUNCH=codex:\(sessionId)"), "\(startupInput)")
         #expect(startupInput.contains("SUBROUTER_CODEX_BIN="), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_CODEX_WRAPPER_SHIM"), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_CUSTOM_CODEX_PATH=/opt/company/bin/codex"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CODEX_WRAPPER_SHIM"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CUSTOM_CODEX_PATH=/opt/company/bin/codex"), "\(startupInput)")
         #expect(startupInput.contains("/bin/sh -c"), "\(startupInput)")
     }
 
@@ -190,9 +190,9 @@ import Testing
                 arguments: ["/opt/custom/codex", "-c", "model_provider=subrouter"],
                 workingDirectory: "/tmp/project",
                 environment: [
-                    "CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
-                    "CMUX_CUSTOM_CODEX_PATH": "/opt/custom/codex",
-                    "SUBROUTER_CODEX_BIN": "${CMUX_CODEX_WRAPPER_SHIM:-codex}",
+                    "WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
+                    "WMUX_CUSTOM_CODEX_PATH": "/opt/custom/codex",
+                    "SUBROUTER_CODEX_BIN": "${WMUX_CODEX_WRAPPER_SHIM:-codex}",
                     "SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
                 ],
                 capturedAt: 1,
@@ -203,9 +203,9 @@ import Testing
 
         let startupInput = try #require(binding.inlineStartupInput)
 
-        #expect(startupInput.contains("CMUX_CUSTOM_CODEX_PATH=/opt/custom/codex"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CUSTOM_CODEX_PATH=/opt/custom/codex"), "\(startupInput)")
         #expect(
-            !startupInput.contains("${CMUX_CODEX_WRAPPER_SHIM:-codex}"),
+            !startupInput.contains("${WMUX_CODEX_WRAPPER_SHIM:-codex}"),
             "\(startupInput)"
         )
     }
@@ -234,9 +234,9 @@ import Testing
             autoResume: true
         )
 
-        #expect(try #require(nonHook.inlineStartupInput).contains("CMUX_AGENT_RESTORE_LAUNCH") == false)
-        #expect(try #require(unsupported.inlineStartupInput).contains("CMUX_AGENT_RESTORE_LAUNCH") == false)
-        #expect(try #require(invalidSession.inlineStartupInput).contains("CMUX_AGENT_RESTORE_LAUNCH") == false)
+        #expect(try #require(nonHook.inlineStartupInput).contains("WMUX_AGENT_RESTORE_LAUNCH") == false)
+        #expect(try #require(unsupported.inlineStartupInput).contains("WMUX_AGENT_RESTORE_LAUNCH") == false)
+        #expect(try #require(invalidSession.inlineStartupInput).contains("WMUX_AGENT_RESTORE_LAUNCH") == false)
     }
 
     @Test func agentHookSurfaceResumeRoutesCustomExecutableThroughWrapper() throws {
@@ -251,8 +251,8 @@ import Testing
 
         let startupInput = try #require(binding.startupInput)
 
-        #expect(startupInput.contains("CMUX_CODEX_WRAPPER_SHIM"), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_CUSTOM_CODEX_PATH="), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CODEX_WRAPPER_SHIM"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CUSTOM_CODEX_PATH="), "\(startupInput)")
         #expect(startupInput.contains("/opt/company/bin/codex"), "\(startupInput)")
     }
 
@@ -281,7 +281,7 @@ import Testing
 
         #expect(binding.command.contains(executablePath), "\(binding.command)")
         #expect(startupInput.contains("/bin/sh -c"), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_CLAUDE_WRAPPER_SHIM"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CLAUDE_WRAPPER_SHIM"), "\(startupInput)")
         #expect(startupInput.contains("--resume"), "\(startupInput)")
         #expect(!startupInput.contains(executablePath), "\(startupInput)")
     }
@@ -310,7 +310,7 @@ import Testing
         #expect(binding.kind == nil)
         #expect(binding.command.contains(executablePath), "\(binding.command)")
         #expect(
-            startupInput.contains("CMUX_CODEX_WRAPPER_SHIM")
+            startupInput.contains("WMUX_CODEX_WRAPPER_SHIM")
                 && startupInput.contains("resume")
                 && startupInput.contains("session-legacy-cli"),
             "\(startupInput)"
@@ -362,7 +362,7 @@ import Testing
 
             let startupInput = try #require(binding.startupInput)
             #expect(
-                startupInput.contains("CMUX_CODEX_WRAPPER_SHIM")
+                startupInput.contains("WMUX_CODEX_WRAPPER_SHIM")
                     && startupInput.contains("resume")
                     && startupInput.contains("session-managed-cli"),
                 "\(startupInput)"
@@ -382,7 +382,7 @@ import Testing
         )
         let binding = SurfaceResumeBindingSnapshot(
             kind: "codex",
-            command: "CMUX_TRACE=1 '\(staleExecutablePath)' 'resume' 'session-env-cli'",
+            command: "WMUX_TRACE=1 '\(staleExecutablePath)' 'resume' 'session-env-cli'",
             checkpointId: "session-env-cli",
             source: "agent-hook",
             autoResume: true
@@ -391,8 +391,8 @@ import Testing
         let startupInput = try #require(binding.startupInput)
 
         #expect(
-            startupInput.contains("CMUX_TRACE=1")
-                && startupInput.contains("CMUX_CODEX_WRAPPER_SHIM")
+            startupInput.contains("WMUX_TRACE=1")
+                && startupInput.contains("WMUX_CODEX_WRAPPER_SHIM")
                 && startupInput.contains("session-env-cli"),
             "\(startupInput)"
         )
@@ -410,7 +410,7 @@ import Testing
         )
         let binding = SurfaceResumeBindingSnapshot(
             kind: "codex",
-            command: "env 'CMUX_TRACE=1' '\(staleExecutablePath)' 'resume' 'session-quoted-env-cli'",
+            command: "env 'WMUX_TRACE=1' '\(staleExecutablePath)' 'resume' 'session-quoted-env-cli'",
             checkpointId: "session-quoted-env-cli",
             source: "agent-hook",
             autoResume: true
@@ -418,8 +418,8 @@ import Testing
         let startupInput = try #require(binding.startupInput)
 
         #expect(
-            startupInput.contains("env CMUX_TRACE=1")
-                && startupInput.contains("CMUX_CODEX_WRAPPER_SHIM")
+            startupInput.contains("env WMUX_TRACE=1")
+                && startupInput.contains("WMUX_CODEX_WRAPPER_SHIM")
                 && startupInput.contains("session-quoted-env-cli"),
             "\(startupInput)"
         )
@@ -437,7 +437,7 @@ import Testing
         )
         let binding = SurfaceResumeBindingSnapshot(
             kind: "claude",
-            command: "CMUX_TRACE='bar baz' '\(staleExecutablePath)' '--resume' 'session-env-cli'",
+            command: "WMUX_TRACE='bar baz' '\(staleExecutablePath)' '--resume' 'session-env-cli'",
             checkpointId: "session-env-cli",
             source: "agent-hook",
             autoResume: true
@@ -445,8 +445,8 @@ import Testing
         let startupInput = try #require(binding.startupInput)
 
         #expect(startupInput.contains("/bin/sh -c"), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_CLAUDE_WRAPPER_SHIM"), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_TRACE="), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CLAUDE_WRAPPER_SHIM"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_TRACE="), "\(startupInput)")
         #expect(startupInput.contains("bar baz"), "\(startupInput)")
         #expect(!startupInput.contains(staleExecutablePath), "\(startupInput)")
     }
@@ -473,7 +473,7 @@ import Testing
         #expect(binding.command.contains("&& echo done"), "\(binding.command)")
         #expect(binding.command.contains(staleExecutablePath), "\(binding.command)")
         #expect(startupInput.contains("/bin/sh -c"), "\(startupInput)")
-        #expect(startupInput.contains("CMUX_CLAUDE_WRAPPER_SHIM"), "\(startupInput)")
+        #expect(startupInput.contains("WMUX_CLAUDE_WRAPPER_SHIM"), "\(startupInput)")
         #expect(startupInput.contains("session-operator-cli \(redirection) && echo done"), "\(startupInput)")
         #expect(!startupInput.contains(staleExecutablePath), "\(startupInput)")
     }
@@ -669,7 +669,7 @@ import Testing
         let fakeCodex = bin.appendingPathComponent("codex", isDirectory: false)
         try """
         #!/bin/sh
-        printf '%s|%s\\n' "$PWD" "$*" > "$CMUX_FAKE_CODEX_OUTPUT"
+        printf '%s|%s\\n' "$PWD" "$*" > "$WMUX_FAKE_CODEX_OUTPUT"
         """.write(to: fakeCodex, atomically: true, encoding: .utf8)
         try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fakeCodex.path)
 
@@ -690,7 +690,7 @@ import Testing
         process.arguments = ["-fc", startupInput]
         process.environment = [
             "PATH": "\(bin.path):/usr/bin:/bin",
-            "CMUX_FAKE_CODEX_OUTPUT": outputURL.path,
+            "WMUX_FAKE_CODEX_OUTPUT": outputURL.path,
         ]
         let stderr = Pipe()
         process.standardError = stderr

@@ -14,7 +14,7 @@
 // Page._inputText; repl-host.js output and errors; api.js fetch).
 (function (root) {
   "use strict";
-  const ns = (root.CmuxBrowserRepl = root.CmuxBrowserRepl || {});
+  const ns = (root.WmuxBrowserRepl = root.WmuxBrowserRepl || {});
   const core = ns.core;
   const { Buffer } = core;
   const AGENT = 'globalThis[Symbol.for("cmux.browserRepl.agent")]';

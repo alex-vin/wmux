@@ -1,8 +1,8 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
-import CMUXAgentLaunch
-import CmuxWorkspaces
+import WMUXAgentLaunch
+import WmuxWorkspaces
 import Darwin
 import os
 
@@ -390,7 +390,7 @@ enum AgentResumeCommandBuilder {
         sessionId: String,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?,
-        registrationOverride: CmuxVaultAgentRegistration? = nil,
+        registrationOverride: WmuxVaultAgentRegistration? = nil,
         includeWorkingDirectoryPrefix: Bool = true,
         observedPermissionMode: String? = nil
     ) -> String? {
@@ -413,7 +413,7 @@ enum AgentResumeCommandBuilder {
         launchCommand: AgentLaunchCommandSnapshot?,
         resolvedWorkingDirectory: String?,
         discardRecordedCwdOptions: Bool,
-        registrationOverride: CmuxVaultAgentRegistration? = nil,
+        registrationOverride: WmuxVaultAgentRegistration? = nil,
         includeWorkingDirectoryPrefix: Bool = true,
         observedPermissionMode: String? = nil
     ) -> String? {
@@ -499,7 +499,7 @@ enum AgentResumeCommandBuilder {
         sessionId: String,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?,
-        registrationOverride: CmuxVaultAgentRegistration? = nil,
+        registrationOverride: WmuxVaultAgentRegistration? = nil,
         includeWorkingDirectoryPrefix: Bool = true,
         observedPermissionMode: String? = nil
     ) -> String? {
@@ -534,7 +534,7 @@ enum AgentResumeCommandBuilder {
         kind: RestorableAgentKind,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?,
-        customRegistration: CmuxVaultAgentRegistration?,
+        customRegistration: WmuxVaultAgentRegistration?,
         includeWorkingDirectoryPrefix: Bool,
         discardRecordedCwdOptions: Bool,
         externalLauncher: AgentExternalLauncher? = nil,
@@ -657,7 +657,7 @@ enum AgentResumeCommandBuilder {
     private static func launchEnvironmentParts(
         kind: RestorableAgentKind,
         launchCommand: AgentLaunchCommandSnapshot?,
-        customRegistration: CmuxVaultAgentRegistration?
+        customRegistration: WmuxVaultAgentRegistration?
     ) -> [String] {
         var environment = launchCommand?.environment ?? [:]
         if let managedProviderKind = managedProviderKind(
@@ -684,8 +684,8 @@ enum AgentResumeCommandBuilder {
         // for wrapper routing, but a plain resume command already names that
         // executable directly. Only a path the launch itself captured (a routed
         // Subrouter restore keeps the real binary behind the wrapper) is replayed.
-        if launchCommand?.environment?["CMUX_CUSTOM_CODEX_PATH"] == nil {
-            selectedEnvironment.removeValue(forKey: "CMUX_CUSTOM_CODEX_PATH")
+        if launchCommand?.environment?["WMUX_CUSTOM_CODEX_PATH"] == nil {
+            selectedEnvironment.removeValue(forKey: "WMUX_CUSTOM_CODEX_PATH")
         }
         let piFamilyUsesCapturedPath = kind == .pi
             || kind.customAgentID == "pi"
@@ -704,9 +704,9 @@ enum AgentResumeCommandBuilder {
             }
         }
         if !preservedClaudeAuthSelectionEnvironmentKeys.isEmpty {
-            environmentParts.append("CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1")
+            environmentParts.append("WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1")
             environmentParts.append(
-                "CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=\(preservedClaudeAuthSelectionEnvironmentKeys.joined(separator: ","))"
+                "WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=\(preservedClaudeAuthSelectionEnvironmentKeys.joined(separator: ","))"
             )
         }
         return environmentParts
@@ -714,7 +714,7 @@ enum AgentResumeCommandBuilder {
 
     private static func managedProviderKind(
         kind: RestorableAgentKind,
-        customRegistration: CmuxVaultAgentRegistration?
+        customRegistration: WmuxVaultAgentRegistration?
     ) -> String? {
         if case .custom = kind {
             return customRegistration?.registeredResumeKind?.rawValue
@@ -727,7 +727,7 @@ enum AgentResumeCommandBuilder {
         sessionId: String,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?,
-        customRegistration: CmuxVaultAgentRegistration?,
+        customRegistration: WmuxVaultAgentRegistration?,
         observedPermissionMode: String? = nil
     ) -> [String]? {
         agentResumeArguments(
@@ -772,7 +772,7 @@ enum AgentResumeCommandBuilder {
         sessionId: String,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?,
-        customRegistration: CmuxVaultAgentRegistration?,
+        customRegistration: WmuxVaultAgentRegistration?,
         observedPermissionMode: String? = nil
     ) -> [String]? {
         let resumeArgv = AgentResumeArgv()
@@ -821,7 +821,7 @@ enum AgentResumeCommandBuilder {
         sessionId: String,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?,
-        customRegistration: CmuxVaultAgentRegistration?,
+        customRegistration: WmuxVaultAgentRegistration?,
         observedPermissionMode: String? = nil
     ) -> [String]? {
         let customTemplate = customRegistration?.forkCommand.map { command in
@@ -856,7 +856,7 @@ enum AgentResumeCommandBuilder {
     }
 
     private static func customResumeArguments(
-        registration: CmuxVaultAgentRegistration,
+        registration: WmuxVaultAgentRegistration,
         sessionId: String,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?
@@ -872,7 +872,7 @@ enum AgentResumeCommandBuilder {
 
     private static func customTemplateArguments(
         template: String,
-        registration: CmuxVaultAgentRegistration,
+        registration: WmuxVaultAgentRegistration,
         sessionId: String,
         launchCommand: AgentLaunchCommandSnapshot?,
         workingDirectory: String?
@@ -935,7 +935,7 @@ struct SessionRestorableAgentSnapshot: Codable, Sendable {
     var sessionId: String
     var workingDirectory: String?
     var launchCommand: AgentLaunchCommandSnapshot?
-    var registration: CmuxVaultAgentRegistration? = nil
+    var registration: WmuxVaultAgentRegistration? = nil
     /// Last hook-observed permission mode; re-applied as `--permission-mode` on
     /// user-owned claude resume/fork when no explicit launch flag covers it.
     var permissionMode: String? = nil; var hadActivePromptTurn: Bool? = nil
@@ -1689,9 +1689,9 @@ struct RestorableAgentSessionIndex: Sendable {
     /// running entry stays live only when its exact process generation, cmux scope, executable,
     /// invocation mode, and explicit session argument still match.
     func revalidatingCachedProcesses(
-        against processSnapshot: CmuxTopProcessSnapshot,
-        processArgumentsProvider: (Int) -> CmuxTopProcessArguments? = {
-            CmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
+        against processSnapshot: WmuxTopProcessSnapshot,
+        processArgumentsProvider: (Int) -> WmuxTopProcessArguments? = {
+            WmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
         },
         processIdentityProvider: (Int) -> AgentPIDProcessIdentity? = {
             guard $0 > 0, $0 <= Int(Int32.max) else { return nil }
@@ -1817,7 +1817,7 @@ struct RestorableAgentSessionIndex: Sendable {
         homeDirectory: String = NSHomeDirectory(),
         fileManager: FileManager = .default
     ) -> RestorableAgentSessionIndex {
-        let registry = CmuxVaultAgentRegistry.load(homeDirectory: homeDirectory, fileManager: fileManager)
+        let registry = WmuxVaultAgentRegistry.load(homeDirectory: homeDirectory, fileManager: fileManager)
         return load(
             homeDirectory: homeDirectory,
             fileManager: fileManager,
@@ -1828,13 +1828,13 @@ struct RestorableAgentSessionIndex: Sendable {
     static func load(
         homeDirectory: String,
         fileManager: FileManager,
-        registry: CmuxVaultAgentRegistry,
+        registry: WmuxVaultAgentRegistry,
         detectedSnapshots: [PanelKey: ProcessDetectedSnapshotEntry],
         hibernationProcessScopes: [PanelKey: HibernationProcessScope] = [:],
         hookProcessScopeProvider: ((PanelKey, Int) -> HookProcessScope?)? = nil,
         environment: [String: String] = ProcessInfo.processInfo.environment,
-        processArgumentsProvider: @escaping (Int) -> CmuxTopProcessArguments? = {
-            CmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
+        processArgumentsProvider: @escaping (Int) -> WmuxTopProcessArguments? = {
+            WmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
         },
         processPresenceProvider: @escaping (Int) -> PIDPresence = {
             guard $0 > 0, $0 <= Int(Int32.max) else { return .absent }
@@ -1856,7 +1856,7 @@ struct RestorableAgentSessionIndex: Sendable {
         let codexHomeResolver = CodexHomeResolver()
         let cachedAgentProcessValidator = CachedAgentProcessIdentityValidator()
         let builtInKindIDs = Set(RestorableAgentKind.allCases.map(\.rawValue))
-        let hookKinds: [(kind: RestorableAgentKind, registration: CmuxVaultAgentRegistration?)] =
+        let hookKinds: [(kind: RestorableAgentKind, registration: WmuxVaultAgentRegistration?)] =
             RestorableAgentKind.allCases.map { (kind: $0, registration: nil) }
             + registry.registrations.compactMap { registration in
                 builtInKindIDs.contains(registration.id)
@@ -2279,7 +2279,7 @@ struct RestorableAgentSessionIndex: Sendable {
                 let recordedProcessID = effectiveRecord.pid
                 let currentProcessArguments = recordedProcessID.flatMap(processArgumentsProvider)
                 let currentProcessIdentity = recordedProcessID.flatMap(processIdentityProvider)
-                let processArgumentsForRecord: (Int) -> CmuxTopProcessArguments? = { candidatePID in
+                let processArgumentsForRecord: (Int) -> WmuxTopProcessArguments? = { candidatePID in
                     guard candidatePID == recordedProcessID else {
                         return processArgumentsProvider(candidatePID)
                     }
@@ -2849,7 +2849,7 @@ struct RestorableAgentSessionIndex: Sendable {
 
     /// Drops launch captures that cannot describe this agent kind: a capture
     /// inherited from a different agent's session (codex started under claude
-    /// carries claude's `CMUX_AGENT_LAUNCH_*`) or the hook dispatch shell's own
+    /// carries claude's `WMUX_AGENT_LAUNCH_*`) or the hook dispatch shell's own
     /// argv. Resume/fork then fall back to the kind's bare verbs instead of
     /// rendering the foreign binary. Existing poisoned records heal on load.
     private static func trustedLaunchCommand(
@@ -3181,7 +3181,7 @@ struct RestorableAgentSessionIndex: Sendable {
     private static func restorableWorkingDirectory(
         for record: RestorableAgentHookSessionRecord,
         kind: RestorableAgentKind,
-        registration: CmuxVaultAgentRegistration?,
+        registration: WmuxVaultAgentRegistration?,
         fileManager: FileManager,
         lookup: ClaudeTranscriptLookupCache,
         codexCwdLookup: CodexSessionCwdLookupCache
@@ -3767,7 +3767,7 @@ struct RestorableAgentSessionIndex: Sendable {
         processID: Int,
         recordedProcessIdentity: AgentPIDProcessIdentity?,
         currentProcessIdentity: AgentPIDProcessIdentity?,
-        processArgumentsProvider: (Int) -> CmuxTopProcessArguments?,
+        processArgumentsProvider: (Int) -> WmuxTopProcessArguments?,
         processPresenceProvider: (Int) -> PIDPresence,
         validator: CachedAgentProcessIdentityValidator,
         hermesSessionValidation: CachedAgentProcessIdentityValidator.HermesSessionValidation = .cachedSnapshot
@@ -3976,7 +3976,7 @@ struct DeferredAgentResumeRestore: Sendable {
     }
 }
 
-private extension CmuxTopProcessArguments {
+private extension WmuxTopProcessArguments {
     func environmentUUID(forKey key: String) -> UUID? {
         guard let rawValue = environment[key]?.trimmingCharacters(in: .whitespacesAndNewlines),
               !rawValue.isEmpty else {

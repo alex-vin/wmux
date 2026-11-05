@@ -1,6 +1,6 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxGeminiQuota
+import WmuxAppKitSupportUI
+import WmuxGeminiQuota
 import SwiftUI
 
 /// Floating Gemini quota indicator button located at the bottom-left corner of the window.
@@ -48,7 +48,7 @@ struct FloatingGeminiQuotaButton: View {
             isPopoverPresented.toggle()
         } label: {
             ZStack(alignment: .bottomTrailing) {
-                CmuxSystemSymbolImage(
+                WmuxSystemSymbolImage(
                     systemName: "sparkles",
                     pointSize: iconSize,
                     weight: .medium,

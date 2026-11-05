@@ -1,5 +1,5 @@
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 
 /// Lets native callbacks and main-actor tasks run while a hosted-view test waits.
 @MainActor

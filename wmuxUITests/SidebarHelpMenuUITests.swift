@@ -34,7 +34,7 @@ final class SidebarHelpMenuUITests: XCTestCase {
             "-NSQuitAlwaysKeepsWindows", "NO",
             "-menuBarOnly", "false",
         ]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
         app.launch()
         XCTAssertTrue(
             sidebarHelpPollUntil(timeout: 10.0) {
@@ -242,12 +242,12 @@ final class CommandPaletteAllSurfacesUITests: XCTestCase {
     ) {
         app.launchArguments += ["-socketControlMode", "allowAll"]
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
         if showSettingsWindow {
-            app.launchEnvironment["CMUX_UI_TEST_SHOW_SETTINGS"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_SHOW_SETTINGS"] = "1"
         }
     }
 
@@ -415,9 +415,9 @@ final class CommandPaletteAllSurfacesUITests: XCTestCase {
         let diagnosticsPath = "/tmp/cmux-ui-test-settings-focus-\(UUID().uuidString).json"
         try? FileManager.default.removeItem(atPath: diagnosticsPath)
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SHOW_SETTINGS"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SHOW_SETTINGS"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
         launchAndActivate(app)
 
         XCTAssertTrue(
@@ -493,9 +493,9 @@ final class CommandPaletteAllSurfacesUITests: XCTestCase {
             "-menuBarOnly", "false",
             "-showMenuBarExtra", "true",
         ]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SHOW_SETTINGS"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SHOW_SETTINGS"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
         launchAndActivate(app)
 
         XCTAssertTrue(

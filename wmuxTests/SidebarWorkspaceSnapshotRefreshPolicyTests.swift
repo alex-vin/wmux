@@ -1,12 +1,12 @@
 import AppKit
-import CmuxNotifications
-import CmuxSidebar
-import CmuxWorkspaces
-@_spi(CmuxHostTransport) import CmuxExtensionKit
+import WmuxNotifications
+import WmuxSidebar
+import WmuxWorkspaces
+@_spi(WmuxHostTransport) import WmuxExtensionKit
 import SwiftUI
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,12 +15,12 @@ import Testing
     @Test @MainActor
     func extensionSnapshotCacheDoesNotInflateSequenceForIdenticalProviderContent() throws {
         let workspaceID = UUID()
-        let initial = CmuxSidebarSnapshot(
+        let initial = WmuxSidebarSnapshot(
             sequence: 10,
             selectedWorkspaceID: workspaceID,
-            workspaces: [CmuxSidebarWorkspace(id: workspaceID, title: "Pi")]
+            workspaces: [WmuxSidebarWorkspace(id: workspaceID, title: "Pi")]
         )
-        let cache = CMUXSidebarSnapshotCache()
+        let cache = WMUXSidebarSnapshotCache()
         _ = cache.replace(with: initial)
         let unread = SidebarUnreadSnapshot(
             totalUnreadCount: 1,
@@ -32,11 +32,11 @@ import Testing
             ]
         )
         let patched = try #require(cache.applyUnread(unread))
-        let matchingProvider = CmuxSidebarSnapshot(
+        let matchingProvider = WmuxSidebarSnapshot(
             sequence: 10,
             selectedWorkspaceID: workspaceID,
             workspaces: [
-                CmuxSidebarWorkspace(
+                WmuxSidebarWorkspace(
                     id: workspaceID,
                     title: "Pi",
                     unreadCount: 1,
@@ -51,11 +51,11 @@ import Testing
         #expect(firstPoll.sequence == patched.sequence)
         #expect(secondPoll.sequence == patched.sequence)
 
-        let changedProvider = CmuxSidebarSnapshot(
+        let changedProvider = WmuxSidebarSnapshot(
             sequence: 10,
             selectedWorkspaceID: workspaceID,
             workspaces: [
-                CmuxSidebarWorkspace(
+                WmuxSidebarWorkspace(
                     id: workspaceID,
                     title: "Pi renamed",
                     unreadCount: 1,

@@ -1,9 +1,9 @@
 import AppKit
-import CmuxCore
-import CmuxSettings
-import CmuxTerminalCore
-import CmuxTestSupport
-import CmuxWorkspaces
+import WmuxCore
+import WmuxSettings
+import WmuxTerminalCore
+import WmuxTestSupport
+import WmuxWorkspaces
 import Foundation
 
 /// Owns terminal-link policy and routes the resulting action through whichever
@@ -156,7 +156,7 @@ struct TerminalLinkOpenCoordinator {
 
         #if DEBUG
         if UITestCaptureSink().appendLineIfConfigured(
-            envKey: "CMUX_UI_TEST_CAPTURE_OPEN_URL_PATH",
+            envKey: "WMUX_UI_TEST_CAPTURE_OPEN_URL_PATH",
             line: target.url.absoluteString
         ) {
             return true
@@ -198,7 +198,7 @@ struct TerminalLinkOpenCoordinator {
             break
         case .followsSetting:
             guard BrowserLinkOpenSettings.openTerminalLinksInCmuxBrowser(defaults: defaults) else {
-                return openExternally(destinations.externalURL, reason: "cmux browser disabled")
+                return openExternally(destinations.externalURL, reason: "wmux browser disabled")
             }
         }
         switch target {
@@ -240,7 +240,7 @@ struct TerminalLinkOpenCoordinator {
         guard container.deferTerminalFileLinkOpen(
             sourcePanelId: sourcePanelId,
             filePath: fileURL.path,
-            fallback: { [self] in _ = openExternally(fileURL, reason: "cmux file route fallback") }
+            fallback: { [self] in _ = openExternally(fileURL, reason: "wmux file route fallback") }
         ) else {
             return openExternally(fileURL, reason: unavailableReason)
         }

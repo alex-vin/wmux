@@ -1,10 +1,10 @@
 import Foundation
 import Testing
-import CmuxAgentSessionStore
-import CmuxWorkspaces
+import WmuxAgentSessionStore
+import WmuxWorkspaces
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -18,7 +18,7 @@ struct AmpVaultRegistrationTests {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
 
-        let registry = CmuxVaultAgentRegistry.load(homeDirectory: root.path)
+        let registry = WmuxVaultAgentRegistry.load(homeDirectory: root.path)
         let registration = try #require(registry.registration(id: "amp"))
 
         #expect(registration == .builtInAmp)
@@ -28,7 +28,7 @@ struct AmpVaultRegistrationTests {
         #expect(registration.sessionIdSource == .cmuxHookStore(.amp))
         #expect(registration.resumeCommand == "amp threads continue {{sessionId}}")
         let taskManagerDefinition = try #require(
-            CmuxTaskManagerCodingAgentDefinition.builtIns.first { $0.id == "amp" }
+            WmuxTaskManagerCodingAgentDefinition.builtIns.first { $0.id == "amp" }
         )
         #expect(taskManagerDefinition.assetName == registration.iconAssetName)
     }
@@ -46,7 +46,7 @@ struct AmpVaultRegistrationTests {
         """#.utf8)
 
         #expect(throws: (any Error).self) {
-            try JSONDecoder().decode(CmuxVaultAgentRegistration.self, from: data)
+            try JSONDecoder().decode(WmuxVaultAgentRegistration.self, from: data)
         }
     }
 
@@ -63,7 +63,7 @@ struct AmpVaultRegistrationTests {
         """#.utf8)
 
         #expect(throws: (any Error).self) {
-            try JSONDecoder().decode(CmuxVaultAgentRegistration.self, from: data)
+            try JSONDecoder().decode(WmuxVaultAgentRegistration.self, from: data)
         }
     }
 
@@ -172,7 +172,7 @@ struct AmpVaultRegistrationTests {
         #expect(entry.fileURL == nil)
 
         let resume = try #require(entry.copyResumeCommand)
-        #expect(resume.contains("CMUX_AMP_WRAPPER_SHIM"))
+        #expect(resume.contains("WMUX_AMP_WRAPPER_SHIM"))
         #expect(resume.contains("T-newer"))
         #expect(resume.contains("--mode"))
         #expect(resume.contains("smart"))
@@ -244,7 +244,7 @@ struct AmpVaultRegistrationTests {
 private struct AmpRegistrationSnapshot: SessionSnapshotRepresenting, Equatable {
     let version: Int
     let windows: [String]
-    let registration: CmuxVaultAgentRegistration
+    let registration: WmuxVaultAgentRegistration
 
     var hasWindows: Bool { !windows.isEmpty }
 }

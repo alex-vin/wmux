@@ -1,9 +1,9 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -171,7 +171,7 @@ struct AgentHibernationBackgroundWorkTests {
     }
 
     /// Agent 101 (`claude`, group leader) with an MCP server started at launch.
-    private func processSnapshot(including extra: [Process]) -> CmuxTopProcessSnapshot {
+    private func processSnapshot(including extra: [Process]) -> WmuxTopProcessSnapshot {
         let workspaceID = UUID()
         let panelID = UUID()
         let base = [
@@ -179,7 +179,7 @@ struct AgentHibernationBackgroundWorkTests {
             Process(pid: 102, parent: 101, group: 101, name: "node", startOffset: 2),
         ]
         let processes = (base + extra).map { process in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: process.pid,
                 processIdentity: AgentPIDProcessIdentity(
                     pid: pid_t(process.pid),
@@ -196,7 +196,7 @@ struct AgentHibernationBackgroundWorkTests {
                 virtualBytes: 0, threadCount: 1
             )
         }
-        return CmuxTopProcessSnapshot(processes: processes, sampledAt: .now, includesProcessDetails: true)
+        return WmuxTopProcessSnapshot(processes: processes, sampledAt: .now, includesProcessDetails: true)
     }
 
     struct TranscriptFixture {

@@ -1,8 +1,8 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import SwiftUI
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 @Suite
 @MainActor

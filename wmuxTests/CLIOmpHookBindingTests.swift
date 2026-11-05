@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -69,14 +69,14 @@ struct CLIOmpHookBindingTests {
         )
         let launchPath = "\(binDirectory.path):/usr/bin:/bin:/usr/sbin:/sbin"
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
         environment["PATH"] = launchPath
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = stateDirectory.path
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "pi"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = pi.path
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated([pi.path])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = stateDirectory.path
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "pi"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = pi.path
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated([pi.path])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
         let result = Harness.runHookProcess(
             context: context,
             arguments: [
@@ -137,14 +137,14 @@ struct CLIOmpHookBindingTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.leakedSurfaceId
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "omp"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.leakedSurfaceId
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "omp"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
 
         let result = Harness.runHookProcess(
             context: context,
@@ -221,10 +221,10 @@ struct CLIOmpHookBindingTests {
             pidTarget: nil
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.leakedSurfaceId
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.leakedSurfaceId
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -252,10 +252,10 @@ struct CLIOmpHookBindingTests {
             acknowledgesPIDResolution: false
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.leakedSurfaceId
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.leakedSurfaceId
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -283,12 +283,12 @@ struct CLIOmpHookBindingTests {
             pidTarget: (workspaceId: Self.leakedWorkspaceId, surfaceId: Self.leakedSurfaceId)
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "omp"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "omp"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
 
         let result = Harness.runHookProcess(
             context: context,
@@ -338,22 +338,22 @@ struct CLIOmpHookBindingTests {
             ],
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_CLI_TTY_NAME"] = staleTTY
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "codex"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/codex"])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_CLI_TTY_NAME"] = staleTTY
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "codex"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/codex"])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
         // The app-host process can itself sit below another Codex fixture in
         // the shared test runner. Pin the synthetic callback identity to a
         // non-agent PID so nested-session ancestry detection cannot classify
         // this foreground routing test as a Codex subagent.
-        environment["CMUX_CODEX_HOOK_PID"] = "2"
-        environment["CMUX_CODEX_PID"] = "2"
-        environment["CMUX_CODEX_INVOCATION_ID"] = "foreground-ambient-tty-boundary"
-        environment["CMUX_CODEX_PARENT_INVOCATION_ID"] = ""
-        environment["CMUX_CODEX_TURN_LEDGER_PATH"] = context.root
+        environment["WMUX_CODEX_HOOK_PID"] = "2"
+        environment["WMUX_CODEX_PID"] = "2"
+        environment["WMUX_CODEX_INVOCATION_ID"] = "foreground-ambient-tty-boundary"
+        environment["WMUX_CODEX_PARENT_INVOCATION_ID"] = ""
+        environment["WMUX_CODEX_TURN_LEDGER_PATH"] = context.root
             .appendingPathComponent("codex-turn-ledger.json")
             .path
 
@@ -409,14 +409,14 @@ struct CLIOmpHookBindingTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.leakedSurfaceId
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "omp"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.leakedWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.leakedSurfaceId
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "omp"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/omp"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/omp"])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
 
         let result = Harness.runHookProcess(
             context: context,
@@ -457,10 +457,10 @@ struct CLIOmpHookBindingTests {
             pidTarget: (workspaceId: Self.liveWorkspaceId, surfaceId: Self.liveSurfaceId)
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_OMP_PID"] = String(Self.ompPID)
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_OMP_PID"] = String(Self.ompPID)
 
         let result = Harness.runHookProcess(
             context: context,
@@ -516,13 +516,13 @@ struct CLIOmpHookBindingTests {
             surfaceTargets: [Self.liveSurfaceId: Self.liveWorkspaceId]
         )
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "pi"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/pi"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/pi"])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "pi"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/pi"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.base64NULSeparated(["/usr/local/bin/pi"])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
 
         let result = Harness.runHookProcess(
             context: context,

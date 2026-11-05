@@ -1,16 +1,16 @@
-import CmuxAgentJournal
-import CmuxSettings
+import WmuxAgentJournal
+import WmuxSettings
 import Foundation
 import XCTest
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 /// Wiring of `app.reorderOnNotification` modes to real TabManager ordering.
 /// The decision table itself is covered by `WorkspaceActivityReorderGateTests`
-/// in CmuxWorkspaces and `AgentLifecycleActivityTests` in CmuxAgentJournal.
+/// in WmuxWorkspaces and `AgentLifecycleActivityTests` in WmuxAgentJournal.
 @MainActor
 final class WorkspaceActivityReorderControllerTests: XCTestCase {
     private final class Clock {

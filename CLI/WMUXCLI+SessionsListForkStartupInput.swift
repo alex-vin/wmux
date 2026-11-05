@@ -1,5 +1,5 @@
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 extension WMUXCLI {
     func sessionsListForkStartupInputAvailable(
@@ -100,8 +100,8 @@ extension WMUXCLI {
             }
         }
         if !preservedClaudeKeys.isEmpty {
-            environmentParts.append("CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1")
-            environmentParts.append("CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=\(preservedClaudeKeys.joined(separator: ","))")
+            environmentParts.append("WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1")
+            environmentParts.append("WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS=\(preservedClaudeKeys.joined(separator: ","))")
         }
         return environmentParts
     }

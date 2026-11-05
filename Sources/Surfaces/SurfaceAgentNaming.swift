@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 
 /// A provider that persists automatic names with a daemon-side user/epoch check.

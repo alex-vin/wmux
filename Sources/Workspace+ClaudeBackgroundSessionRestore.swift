@@ -1,6 +1,6 @@
-import CMUXAgentLaunch
-import CmuxTerminal
-import CmuxWorkspaces
+import WMUXAgentLaunch
+import WmuxTerminal
+import WmuxWorkspaces
 import Foundation
 
 /// How one restored terminal relates to a live Claude background session.
@@ -36,7 +36,7 @@ struct ClaudeBackgroundViewerObservation: Sendable {
     static func observe(
         processID: Int,
         previous: ClaudeBackgroundViewerObservation?,
-        processArguments: (Int) -> CmuxTopProcessArguments?
+        processArguments: (Int) -> WmuxTopProcessArguments?
     ) -> ClaudeBackgroundViewerObservation {
         if let previous, previous.processID == processID { return previous }
         let viewer = processArguments(processID).flatMap {
@@ -64,8 +64,8 @@ extension Workspace {
     func claudeBackgroundViewerForSnapshot(
         panelId: UUID,
         terminal: TerminalPanel,
-        processArguments: (Int) -> CmuxTopProcessArguments? = {
-            CmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
+        processArguments: (Int) -> WmuxTopProcessArguments? = {
+            WmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
         }
     ) -> ClaudeBackgroundSessionViewer? {
         guard !isRemoteTerminalSurface(panelId),

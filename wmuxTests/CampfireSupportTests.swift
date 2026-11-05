@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -277,7 +277,7 @@ struct CampfireSupportTests {
             in: projectSessions,
             modifiedAt: Date(timeIntervalSince1970: 2_000)
         )
-        var registration = CmuxVaultAgentRegistration.builtInCampfire
+        var registration = WmuxVaultAgentRegistration.builtInCampfire
         registration.resumeCommand = "custom-campfire restore {{sessionId}}"
 
         let detected = try #require(Self.detectedCampfireSnapshot(
@@ -316,7 +316,7 @@ struct CampfireSupportTests {
             in: projectSessions,
             modifiedAt: Date(timeIntervalSince1970: 2_000)
         )
-        var registration = CmuxVaultAgentRegistration.builtInCampfire
+        var registration = WmuxVaultAgentRegistration.builtInCampfire
         registration.resumeCommand = "custom-campfire restore {{sessionId}}"
 
         let detected = try #require(Self.detectedCampfireSnapshot(

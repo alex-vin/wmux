@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Classifies a raw agent hook event into our wire `hook_event_name` plus an

@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 // Picks the longest directory candidate that fits the available width.

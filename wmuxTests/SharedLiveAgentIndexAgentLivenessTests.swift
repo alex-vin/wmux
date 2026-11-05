@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -18,9 +18,9 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         let panelId = UUID()
         let ttyDevice: Int64 = 0x123
         let processGroupID = 500
-        let makeProcess: (Int, Int, UUID?, UUID?, Int) -> CmuxTopProcessInfo = {
+        let makeProcess: (Int, Int, UUID?, UUID?, Int) -> WmuxTopProcessInfo = {
             pid, parentPID, cmuxWorkspaceID, cmuxSurfaceID, processGroupID in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: pid,
                 parentPID: parentPID,
                 name: "test-\(pid)",
@@ -42,12 +42,12 @@ struct SharedLiveAgentIndexAgentLivenessTests {
             makeProcess(501, 500, workspaceId, panelId, processGroupID),
             makeProcess(502, 501, workspaceId, panelId, processGroupID),
         ]
-        let base = CmuxTopProcessSnapshot(
+        let base = WmuxTopProcessSnapshot(
             processes: baseProcesses,
             sampledAt: Date(timeIntervalSince1970: 42),
             includesProcessDetails: true
         )
-        let withUnscopedSibling = CmuxTopProcessSnapshot(
+        let withUnscopedSibling = WmuxTopProcessSnapshot(
             processes: baseProcesses + [makeProcess(503, 500, nil, nil, processGroupID + 1)],
             sampledAt: Date(timeIntervalSince1970: 43),
             includesProcessDetails: true
@@ -102,18 +102,18 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         let ttyDevice: Int64 = 0x123
         let processGroupID = shellPID
         let executable = "/usr/local/bin/\(agentId)"
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: agentId,
             name: "Scope Aware Agent",
-            detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+            detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "{{executable}} --session {{sessionId}}",
             forkCommand: "{{executable}} --session {{sessionId}} --fork"
         )
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
-        let processInfo: (Int, Int, String, String?) -> CmuxTopProcessInfo = {
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
+        let processInfo: (Int, Int, String, String?) -> WmuxTopProcessInfo = {
             pid, parentPID, name, path in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: pid,
                 parentPID: parentPID,
                 name: name,
@@ -130,7 +130,7 @@ struct SharedLiveAgentIndexAgentLivenessTests {
                 threadCount: 1
             )
         }
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
                 processInfo(shellPID, 1, "zsh", "/bin/zsh"),
                 processInfo(agentPID, shellPID, agentId, executable),
@@ -152,12 +152,12 @@ struct SharedLiveAgentIndexAgentLivenessTests {
             capturedAtProvider: { 42 },
             processArgumentsProvider: { pid in
                 guard pid == agentPID else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: [executable, "--session", sessionId],
                     environment: [
                         "PWD": root.path,
-                        "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-                        "CMUX_SURFACE_ID": panelId.uuidString,
+                        "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+                        "WMUX_SURFACE_ID": panelId.uuidString,
                     ]
                 )
             },
@@ -189,19 +189,19 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         let agentIdentity = AgentPIDProcessIdentity(pid: pid_t(agentPID), startSeconds: 42, startMicroseconds: 7)
         let childIdentity = AgentPIDProcessIdentity(pid: pid_t(childPID), startSeconds: 43, startMicroseconds: 8)
         let executable = "/usr/local/bin/\(agentId)"
-        let registry = CmuxVaultAgentRegistry(registrations: [
-            CmuxVaultAgentRegistration(
+        let registry = WmuxVaultAgentRegistry(registrations: [
+            WmuxVaultAgentRegistration(
                 id: agentId,
                 name: "Forkable Liveness Agent",
-                detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+                detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "{{executable}} --session {{sessionId}}",
                 forkCommand: "{{executable}} --session {{sessionId}} --fork"
             ),
         ])
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: agentPID,
                     parentPID: 1,
                     name: agentId,
@@ -217,7 +217,7 @@ struct SharedLiveAgentIndexAgentLivenessTests {
                     virtualBytes: 0,
                     threadCount: 1
                 ),
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: childPID,
                     parentPID: agentPID,
                     name: "short-lived-child",
@@ -237,12 +237,12 @@ struct SharedLiveAgentIndexAgentLivenessTests {
             sampledAt: Date(timeIntervalSince1970: 42),
             includesProcessDetails: true
         )
-        let processArguments = OSAllocatedUnfairLock(initialState: CmuxTopProcessArguments(
+        let processArguments = OSAllocatedUnfairLock(initialState: WmuxTopProcessArguments(
             arguments: [executable, "--session", sessionId],
             environment: [
                 "PWD": cwd.path,
-                "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-                "CMUX_SURFACE_ID": panelId.uuidString,
+                "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+                "WMUX_SURFACE_ID": panelId.uuidString,
             ]
         ))
         let sharedIndex = SharedLiveAgentIndex(
@@ -283,12 +283,12 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         )
 
         processArguments.withLock {
-            $0 = CmuxTopProcessArguments(
+            $0 = WmuxTopProcessArguments(
                 arguments: [executable, "--session", sessionId],
                 environment: [
                     "PWD": cwd.path,
-                    "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-                    "CMUX_SURFACE_ID": UUID().uuidString,
+                    "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+                    "WMUX_SURFACE_ID": UUID().uuidString,
                 ]
             )
         }
@@ -315,19 +315,19 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         let agentPID = 7_388
         let executable = "/usr/local/bin/\(agentId)"
         let identity = AgentPIDProcessIdentity(pid: pid_t(agentPID), startSeconds: 51, startMicroseconds: 9)
-        let registry = CmuxVaultAgentRegistry(registrations: [
-            CmuxVaultAgentRegistration(
+        let registry = WmuxVaultAgentRegistry(registrations: [
+            WmuxVaultAgentRegistration(
                 id: agentId,
                 name: "Forkable Read Cache Agent",
-                detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+                detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "{{executable}} --session {{sessionId}}",
                 forkCommand: "{{executable}} --session {{sessionId}} --fork"
             ),
         ])
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: agentPID,
                     parentPID: 1,
                     name: agentId,
@@ -359,11 +359,11 @@ struct SharedLiveAgentIndexAgentLivenessTests {
                     processArgumentsProvider: { pid in
                         guard pid == agentPID else { return nil }
                         processArgumentReads.withLock { $0 += 1 }
-                        return CmuxTopProcessArguments(
+                        return WmuxTopProcessArguments(
                             arguments: [executable, "--session", sessionId],
                             environment: [
-                                "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-                                "CMUX_SURFACE_ID": panelId.uuidString,
+                                "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+                                "WMUX_SURFACE_ID": panelId.uuidString,
                             ]
                         )
                     },
@@ -405,19 +405,19 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         let agentPID = 7_489
         let executable = "/usr/local/bin/\(agentId)"
         let identity = AgentPIDProcessIdentity(pid: pid_t(agentPID), startSeconds: 61, startMicroseconds: 4)
-        let registry = CmuxVaultAgentRegistry(registrations: [
-            CmuxVaultAgentRegistration(
+        let registry = WmuxVaultAgentRegistry(registrations: [
+            WmuxVaultAgentRegistration(
                 id: agentId,
                 name: "Forkable Panel Fallback Agent",
-                detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+                detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "{{executable}} --session {{sessionId}}",
                 forkCommand: "{{executable}} --session {{sessionId}} --fork"
             ),
         ])
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: agentPID,
                     parentPID: 1,
                     name: agentId,
@@ -447,11 +447,11 @@ struct SharedLiveAgentIndexAgentLivenessTests {
                     capturedAtProvider: { 61 },
                     processArgumentsProvider: { pid in
                         guard pid == agentPID else { return nil }
-                        return CmuxTopProcessArguments(
+                        return WmuxTopProcessArguments(
                             arguments: [executable, "--session", sessionId],
                             environment: [
-                                "CMUX_WORKSPACE_ID": originalWorkspaceId.uuidString,
-                                "CMUX_SURFACE_ID": panelId.uuidString,
+                                "WMUX_WORKSPACE_ID": originalWorkspaceId.uuidString,
+                                "WMUX_SURFACE_ID": panelId.uuidString,
                             ]
                         )
                     },
@@ -480,10 +480,10 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         let agentId = "forkable-identity-agent"
         let sessionId = "expected-session"
         let executable = "/usr/local/bin/\(agentId)"
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: agentId,
             name: "Forkable Identity Agent",
-            detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+            detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "{{executable}} --session {{sessionId}}",
             forkCommand: "{{executable}} --session {{sessionId}} --fork"
@@ -507,18 +507,18 @@ struct SharedLiveAgentIndexAgentLivenessTests {
 
         #expect(
             validator.currentProcess(
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: [executable, "--session", sessionId],
-                    environment: ["CMUX_AGENT_LAUNCH_KIND": agentId]
+                    environment: ["WMUX_AGENT_LAUNCH_KIND": agentId]
                 ),
                 matches: snapshot
             )
         )
         #expect(
             !validator.currentProcess(
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: ["/bin/zsh"],
-                    environment: ["CMUX_AGENT_LAUNCH_KIND": agentId]
+                    environment: ["WMUX_AGENT_LAUNCH_KIND": agentId]
                 ),
                 matches: snapshot
             ),
@@ -526,9 +526,9 @@ struct SharedLiveAgentIndexAgentLivenessTests {
         )
         #expect(
             !validator.currentProcess(
-                CmuxTopProcessArguments(
+                WmuxTopProcessArguments(
                     arguments: [executable, "--session", "different-session"],
-                    environment: ["CMUX_AGENT_LAUNCH_KIND": agentId]
+                    environment: ["WMUX_AGENT_LAUNCH_KIND": agentId]
                 ),
                 matches: snapshot
             ),

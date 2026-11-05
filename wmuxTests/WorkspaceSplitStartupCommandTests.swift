@@ -1,11 +1,11 @@
 import XCTest
-import CmuxTerminal
+import WmuxTerminal
 import Bonsplit
 import AppKit
 import SwiftUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -92,15 +92,15 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
     func testCustomLayoutSplitRatioSurvivesInitialBonsplitViewLayout() throws {
         let workspace = Workspace()
         let expectedDividerPosition = 0.33
-        let layout = CmuxLayoutNode.split(CmuxSplitDefinition(
+        let layout = WmuxLayoutNode.split(WmuxSplitDefinition(
             direction: .horizontal,
             split: expectedDividerPosition,
             children: [
-                .pane(CmuxPaneDefinition(surfaces: [
-                    CmuxSurfaceDefinition(type: .terminal, name: "Left")
+                .pane(WmuxPaneDefinition(surfaces: [
+                    WmuxSurfaceDefinition(type: .terminal, name: "Left")
                 ])),
-                .pane(CmuxPaneDefinition(surfaces: [
-                    CmuxSurfaceDefinition(type: .terminal, name: "Right")
+                .pane(WmuxPaneDefinition(surfaces: [
+                    WmuxSurfaceDefinition(type: .terminal, name: "Right")
                 ]))
             ]
         ))
@@ -244,7 +244,7 @@ final class WorkspaceSplitStartupCommandTests: XCTestCase {
         try FileManager.default.createDirectory(atPath: requestedDirectory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(atPath: requestedDirectory) }
         let startupEnvironment = [
-            "CMUX_OMO_SUBAGENT": "1",
+            "WMUX_OMO_SUBAGENT": "1",
             "OMO_SUBAGENT_DESC": "test"
         ]
 

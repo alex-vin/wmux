@@ -1,17 +1,17 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Bonsplit
 import Combine
-import CmuxSimulatorUI
-import CmuxSettings
-import CmuxTerminal
-import CmuxWorkspaces
+import WmuxSimulatorUI
+import WmuxSettings
+import WmuxTerminal
+import WmuxWorkspaces
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-typealias DockRoutingStoredShortcut = cmux_DEV.StoredShortcut
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+typealias DockRoutingStoredShortcut = wmux_DEV.StoredShortcut
 #elseif canImport(cmux)
 @testable import cmux
 typealias DockRoutingStoredShortcut = cmux.StoredShortcut
@@ -182,7 +182,7 @@ struct DockShortcutRoutingTests {
                     harness.dock.browserPanel(for: dockBrowserId)
                 )
                 let dockWebView = try #require(
-                    dockBrowser.webView as? CmuxWebView
+                    dockBrowser.webView as? WmuxWebView
                 )
 
                 dockBrowser.startFind()
@@ -406,7 +406,7 @@ struct DockShortcutRoutingTests {
                 let browser = try #require(
                     harness.dock.browserPanel(for: browserId)
                 )
-                let webView = try #require(browser.webView as? CmuxWebView)
+                let webView = try #require(browser.webView as? WmuxWebView)
                 let workspaceCountBefore = harness.tabManager.tabs.count
 
                 #expect(
@@ -1595,8 +1595,8 @@ struct DockShortcutRoutingTests {
     func simulatorShortcutTargetsFocusedDock() async throws {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
-                let flags = CmuxFeatureFlags.shared
-                let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+                let flags = WmuxFeatureFlags.shared
+                let simulatorFlag = WmuxFeatureFlags.simulatorFlag
                 let previousOverride = flags.overrideValue(for: simulatorFlag)
                 flags.setOverride(true, for: simulatorFlag)
                 defer { flags.setOverride(previousOverride, for: simulatorFlag) }
@@ -1621,8 +1621,8 @@ struct DockShortcutRoutingTests {
     func simulatorToolEditorRetainsPanelFocus() async throws {
         try await AppContextSerialGate.withExclusiveAppContext {
             try await Self.withHarness { harness in
-                let flags = CmuxFeatureFlags.shared
-                let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+                let flags = WmuxFeatureFlags.shared
+                let simulatorFlag = WmuxFeatureFlags.simulatorFlag
                 let previousOverride = flags.overrideValue(for: simulatorFlag)
                 flags.setOverride(true, for: simulatorFlag)
                 defer { flags.setOverride(previousOverride, for: simulatorFlag) }

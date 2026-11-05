@@ -1,8 +1,8 @@
-import CmuxCommandPalette
+import WmuxCommandPalette
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -320,7 +320,7 @@ final class CommandPaletteNucleoFFITests: XCTestCase {
         if environmentFlagIsEnabled(environment["CI"]) {
             return true
         }
-        return environmentFlagIsEnabled(environment["CMUX_NUCLEO_FFI_REQUIRE_CARGO"])
+        return environmentFlagIsEnabled(environment["WMUX_NUCLEO_FFI_REQUIRE_CARGO"])
     }
 
     private static func environmentFlagIsEnabled(_ value: String?) -> Bool {

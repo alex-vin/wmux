@@ -103,7 +103,7 @@ function projectPiFeedValue(value: unknown, state: PiFeedProjectionState, depth 
     try {
       for (const key in value as Record<string, unknown>) {
         if (scanned >= 12) {
-          out.cmux_truncated = true;
+          out.wmux_truncated = true;
           break;
         }
         scanned += 1;
@@ -134,17 +134,17 @@ function boundedPiFeedInput(payload: Record<string, unknown>, maximumBytes: numb
   const serialized = JSON.stringify(payload);
   if (Buffer.byteLength(serialized, "utf8") <= maximumBytes) return serialized;
 
-  const summaries = Array.isArray(payload.cmux_compacted_terminal_events)
-    ? payload.cmux_compacted_terminal_events
+  const summaries = Array.isArray(payload.wmux_compacted_terminal_events)
+    ? payload.wmux_compacted_terminal_events
     : [];
   const latest = summaries.length > 0 && typeof summaries[summaries.length - 1] === "object"
     ? summaries[summaries.length - 1] as Record<string, unknown>
     : undefined;
-  const rawCount = payload.cmux_compacted_terminal_count;
+  const rawCount = payload.wmux_compacted_terminal_count;
   const totalCount = typeof rawCount === "number" && Number.isFinite(rawCount)
     ? Math.max(summaries.length, rawCount)
     : summaries.length;
-  const rawOmitted = payload.cmux_compacted_terminal_omitted_count;
+  const rawOmitted = payload.wmux_compacted_terminal_omitted_count;
   const omittedCount = typeof rawOmitted === "number" && Number.isFinite(rawOmitted)
     ? Math.max(0, rawOmitted, totalCount - 1)
     : Math.max(0, totalCount - 1);
@@ -165,13 +165,13 @@ function boundedPiFeedInput(payload: Record<string, unknown>, maximumBytes: numb
       if (value !== undefined) summary[key] = value;
     }
     if (typeof latest.is_error === "boolean") summary.is_error = latest.is_error;
-    safe.cmux_compacted_terminal_count = totalCount;
-    safe.cmux_compacted_terminal_omitted_count = omittedCount;
-    safe.cmux_compacted_terminal_events = [summary];
+    safe.wmux_compacted_terminal_count = totalCount;
+    safe.wmux_compacted_terminal_omitted_count = omittedCount;
+    safe.wmux_compacted_terminal_events = [summary];
   } else if (firstString(payload.hook_event_name, payload.event) === "PostToolUse") {
-    safe.cmux_compacted_terminal_count = 1;
-    safe.cmux_compacted_terminal_omitted_count = 0;
-    safe.cmux_compacted_terminal_events = [piTerminalFeedSummary(payload)];
+    safe.wmux_compacted_terminal_count = 1;
+    safe.wmux_compacted_terminal_omitted_count = 0;
+    safe.wmux_compacted_terminal_events = [piTerminalFeedSummary(payload)];
   } else if (payload.tool_input !== undefined) {
     safe.tool_input = piFeedValueSummary(payload.tool_input);
   }
@@ -184,7 +184,7 @@ function boundedPiFeedInput(payload: Record<string, unknown>, maximumBytes: numb
     hook_event_name: fallbackEvent,
     event: fallbackEvent,
     tool_call_id: "compacted-overflow",
-    tool_name: "cmux_compacted_terminal_overflow",
+    tool_name: "wmux_compacted_terminal_overflow",
     tool_input: fallbackEvent === "PostToolUse"
       ? { omitted_terminal_count: Math.max(1, totalCount) }
       : piFeedValueSummary(payload.tool_input),
@@ -345,16 +345,16 @@ function safeNodeEnvKey(key: string): boolean {
 }
 
 function safeCmuxEnvKey(key: string): boolean {
-  if (key.startsWith("CMUX_TEST_PI_")) return !secretLikeEnvKey(key);
-  if (key.startsWith("CMUX_AGENT_LAUNCH_")) return !secretLikeEnvKey(key);
-  if (key === "CMUX_AGENT_HOOK_STATE_DIR") return true;
-  if (key === "CMUX_PI_CMUX_BIN" || key === "CMUX_PI_HOOKS_DISABLED") return true;
-  if (key === "CMUX_PI_HOOK_TIMEOUT_MS") return true;
-  if (key === "CMUX_SURFACE_ID" || key === "CMUX_WORKSPACE_ID" || key === "CMUX_WINDOW_ID") return true;
-  if (key === "CMUX_PANE_ID" || key === "CMUX_TAB_ID" || key === "CMUX_PANEL_ID") return true;
-  if (key === "CMUX_SOCKET" || key === "CMUX_SOCKET_PATH") return true;
-  if (key === "CMUX_BUNDLE_ID" || key === "CMUX_BUNDLED_CLI_PATH") return true;
-  if (key === "CMUX_CLI_SENTRY_DISABLED" || key === "CMUX_DEBUG_LOG") return true;
+  if (key.startsWith("WMUX_TEST_PI_")) return !secretLikeEnvKey(key);
+  if (key.startsWith("WMUX_AGENT_LAUNCH_")) return !secretLikeEnvKey(key);
+  if (key === "WMUX_AGENT_HOOK_STATE_DIR") return true;
+  if (key === "WMUX_PI_CMUX_BIN" || key === "WMUX_PI_HOOKS_DISABLED") return true;
+  if (key === "WMUX_PI_HOOK_TIMEOUT_MS") return true;
+  if (key === "WMUX_SURFACE_ID" || key === "WMUX_WORKSPACE_ID" || key === "WMUX_WINDOW_ID") return true;
+  if (key === "WMUX_PANE_ID" || key === "WMUX_TAB_ID" || key === "WMUX_PANEL_ID") return true;
+  if (key === "WMUX_SOCKET" || key === "WMUX_SOCKET_PATH") return true;
+  if (key === "WMUX_BUNDLE_ID" || key === "WMUX_BUNDLED_CLI_PATH") return true;
+  if (key === "WMUX_CLI_SENTRY_DISABLED" || key === "WMUX_DEBUG_LOG") return true;
   return false;
 }
 
@@ -379,15 +379,15 @@ function hookEnvironment(cwd: string, includeSocketPassword = false): NodeJS.Pro
   }
   // Only wmux CLI children need the socket credential; keep it out of the generic allowlist.
   if (includeSocketPassword) {
-    const socketPassword = process.env.CMUX_SOCKET_PASSWORD;
-    if (socketPassword) env.CMUX_SOCKET_PASSWORD = socketPassword;
+    const socketPassword = process.env.WMUX_SOCKET_PASSWORD;
+    if (socketPassword) env.WMUX_SOCKET_PASSWORD = socketPassword;
   }
-  if (!env.CMUX_AGENT_LAUNCH_ARGV_B64) {
+  if (!env.WMUX_AGENT_LAUNCH_ARGV_B64) {
     const argv = normalizedLaunchArgv();
-    env.CMUX_AGENT_LAUNCH_KIND = "pi";
-    env.CMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("pi");
-    env.CMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
-    env.CMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
+    env.WMUX_AGENT_LAUNCH_KIND = "pi";
+    env.WMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("pi");
+    env.WMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
+    env.WMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
   }
   return env;
 }
@@ -541,7 +541,7 @@ async function warn(
 }
 
 function cmuxExecutable(): string {
-  return process.env.CMUX_PI_CMUX_BIN || "wmux";
+  return process.env.WMUX_PI_CMUX_BIN || "wmux";
 }
 """#
 }

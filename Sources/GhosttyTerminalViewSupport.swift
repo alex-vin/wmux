@@ -1,7 +1,7 @@
 import AppKit
-import CmuxSettings
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxSettings
+import WmuxTerminal
+import WmuxTerminalCore
 import GhosttyKit
 
 final class GhosttyPassthroughVisualEffectView: NSVisualEffectView {
@@ -234,7 +234,7 @@ extension GhosttyNSView {
     /// the view's full bounds would hide AppKit's edge and corner resize cursors.
     func terminalCursorRect() -> NSRect {
         guard let window,
-              window is CmuxMainWindow,
+              window is WmuxMainWindow,
               window.styleMask.contains(.resizable),
               window.styleMask.contains(.fullSizeContentView),
               !window.styleMask.contains(.fullScreen)

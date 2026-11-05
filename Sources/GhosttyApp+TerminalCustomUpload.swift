@@ -1,6 +1,6 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxTerminalCore
+import WmuxTerminalCore
 
 extension GhosttyApp {
     @MainActor

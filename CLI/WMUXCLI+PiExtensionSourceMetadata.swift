@@ -49,7 +49,7 @@ async function publishPiWorkspaceMetadata(
   context: PiExtensionContextSnapshot,
   sessionId: string,
 ): Promise<void> {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1") return;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1") return;
   const target = piSidebarTargetArgs(dispatcher, sessionId);
   if (!target) return;
 
@@ -83,7 +83,7 @@ async function publishPiPullRequestHint(
   sessionId: string,
   action: string,
 ): Promise<void> {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1") return;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1") return;
   const target = piSidebarTargetArgs(dispatcher, sessionId);
   if (!target) return;
   await dispatcher.run(
@@ -99,7 +99,7 @@ async function publishPiQuestion(
   context: PiExtensionContextSnapshot,
   turnId: string,
 ): Promise<void> {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1") return;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1") return;
   const sessionId = context.sessionId;
   if (!sessionId) return;
   await sendHook(dispatcher, "notification", context, {
@@ -119,12 +119,12 @@ async function publishPiApprovalResponse(
   turnId: string,
   idleDialog: boolean,
 ): Promise<void> {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1") return;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1") return;
   const sessionId = context.sessionId;
   if (!sessionId) return;
   await sendHook(dispatcher, "approval-response", context, {
     turn_id: turnId,
-    cmux_pi_idle_dialog: idleDialog,
+    wmux_pi_idle_dialog: idleDialog,
   });
 }
 
@@ -143,7 +143,7 @@ function installPiUIDialogHooks(
     operation: () => Promise<unknown> | unknown,
   ) => Promise<void>,
 ): (() => void) | undefined {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1" || !context.hasUI) return undefined;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1" || !context.hasUI) return undefined;
   const ui = context.ui as any;
   const patchKey = Symbol.for("wmux.pi.wmux-dialog-hooks");
   if (ui[patchKey]) return undefined;

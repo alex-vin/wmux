@@ -3,7 +3,7 @@ import Foundation
 
 struct SharedLiveAgentIndexScheduledHibernationSession: Sendable {
     let cachedIndex: RestorableAgentSessionIndex
-    let processSnapshotLoader: @Sendable () async -> CmuxTopProcessSnapshot
+    let processSnapshotLoader: @Sendable () async -> WmuxTopProcessSnapshot
     let completionGeneration: Int
 }
 

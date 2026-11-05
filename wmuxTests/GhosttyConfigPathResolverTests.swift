@@ -1,9 +1,9 @@
 import XCTest
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -370,7 +370,7 @@ final class GhosttyConfigPathResolverTests: XCTestCase {
             )
 
             XCTAssertEqual(
-                CmuxGhosttyConfigPathResolver().activeOrEditableConfigURL(
+                WmuxGhosttyConfigPathResolver().activeOrEditableConfigURL(
                     currentBundleIdentifier: "com.cmuxterm.app",
                     appSupportDirectory: appSupportDirectory
                 ),
@@ -386,7 +386,7 @@ final class GhosttyConfigPathResolverTests: XCTestCase {
                 .appendingPathComponent("config.ghostty", isDirectory: false)
 
             XCTAssertEqual(
-                CmuxGhosttyConfigPathResolver().activeOrEditableConfigURL(
+                WmuxGhosttyConfigPathResolver().activeOrEditableConfigURL(
                     currentBundleIdentifier: "com.cmuxterm.app.debug.issue-3518",
                     appSupportDirectory: appSupportDirectory
                 ),

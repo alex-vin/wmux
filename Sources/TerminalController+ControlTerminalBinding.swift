@@ -1,5 +1,5 @@
-import CmuxControlSocket
-import CmuxTerminal
+import WmuxControlSocket
+import WmuxTerminal
 import Foundation
 import GhosttyKit
 import OSLog

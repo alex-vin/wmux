@@ -1,11 +1,11 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import Bonsplit
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -72,7 +72,7 @@ final class CloudDesktopOpenFixture {
         )))
         provider = CloudDesktopOpenTestProvider(machine: .cloud(ownerID))
         catalog.register(provider)
-        var display = CmuxTuiSnapshotParser.display(machine: provider.machine)
+        var display = WmuxTuiSnapshotParser.display(machine: provider.machine)
         display.remoteViews = hasRemoteView ? [SurfaceRemoteView(tabID: "tab-desktop", workspace: remote)] : []
         self.display = display
         var info = provider.info

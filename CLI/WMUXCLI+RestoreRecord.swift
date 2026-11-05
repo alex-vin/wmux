@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 extension WMUXCLI {
     /// The socket continuation payload after validation and typed decoding.

@@ -1,10 +1,10 @@
 import AppKit
-import CmuxCore
-import CmuxSettings
-import CmuxSurfaceCatalogModel
+import WmuxCore
+import WmuxSettings
+import WmuxSurfaceCatalogModel
 import Observation
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 @Suite(.serialized)
 @MainActor

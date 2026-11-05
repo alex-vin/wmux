@@ -1,13 +1,13 @@
 import Foundation
 
 public struct ComputerUseRuntimePaths: Sendable {
-    public static let daemonSocketEnvironmentKey = "CMUX_COMPUTER_USE_DAEMON_SOCKET"
-    public static let codexDaemonSocketEnvironmentKey = "CMUX_COMPUTER_USE_CODEX_SOCKET"
-    public static let stateDirectoryEnvironmentKey = "CMUX_COMPUTER_USE_STATE_DIR"
-    public static let runtimeScopeEnvironmentKey = "CMUX_COMPUTER_USE_RUNTIME_SCOPE"
-    public static let clientExecutableEnvironmentKey = "CMUX_COMPUTER_USE_CLIENT_EXEC"
-    public static let authenticationTokenEnvironmentKey = "CMUX_COMPUTER_USE_AUTH_TOKEN"
-    public static let authenticationTokenFileEnvironmentKey = "CMUX_COMPUTER_USE_AUTH_FILE"
+    public static let daemonSocketEnvironmentKey = "WMUX_COMPUTER_USE_DAEMON_SOCKET"
+    public static let codexDaemonSocketEnvironmentKey = "WMUX_COMPUTER_USE_CODEX_SOCKET"
+    public static let stateDirectoryEnvironmentKey = "WMUX_COMPUTER_USE_STATE_DIR"
+    public static let runtimeScopeEnvironmentKey = "WMUX_COMPUTER_USE_RUNTIME_SCOPE"
+    public static let clientExecutableEnvironmentKey = "WMUX_COMPUTER_USE_CLIENT_EXEC"
+    public static let authenticationTokenEnvironmentKey = "WMUX_COMPUTER_USE_AUTH_TOKEN"
+    public static let authenticationTokenFileEnvironmentKey = "WMUX_COMPUTER_USE_AUTH_FILE"
 
     public let daemonSocketURL = URL(fileURLWithPath: "/dev/null")
     public let codexDaemonSocketURL = URL(fileURLWithPath: "/dev/null")

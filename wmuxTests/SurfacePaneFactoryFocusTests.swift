@@ -1,16 +1,16 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxAuthRuntime
-import CmuxCloudTui
-import CmuxPanes
-import CmuxSurfaceCatalogModel
+import WmuxAppKitSupportUI
+import WmuxAuthRuntime
+import WmuxCloudTui
+import WmuxPanes
+import WmuxSurfaceCatalogModel
 import Testing
 import SwiftUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -239,7 +239,7 @@ import SwiftUI
         let paneID = try #require(workspace.bonsplitController.focusedPaneId)
         let sourcePanelID = try #require(workspace.focusedPanelId)
         let machine = SurfaceMachineID.cloud("failed-pane-\(UUID().uuidString)")
-        let error = CmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab-failure")
+        let error = WmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab-failure")
         let provider = CloudCreationProvider(machine: machine, workingDirectory: nil, creationError: error)
         let catalog = SurfaceCatalog.shared
         catalog.register(provider)
@@ -312,11 +312,11 @@ import SwiftUI
     @Test("Provider and placement failures retain safe error categories")
     func knownCloudTerminalFailuresAreNotUnknown() {
         let errors: [(Error, CloudDiagnosticFailure)] = [
-            (CmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab"), .notFound),
-            (CmuxTuiSurfaceProvider.ProviderError.noWorkspaceOnMachine("machine"), .placement),
-            (CmuxTuiSurfaceProvider.ProviderError.stateUnavailable("machine"), .response),
-            (CmuxTuiSurfaceProvider.ProviderError.terminalExited("term"), .process),
-            (CmuxTuiSurfaceProvider.ProviderError.terminalNotCreated("private response"), .process),
+            (WmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab"), .notFound),
+            (WmuxTuiSurfaceProvider.ProviderError.noWorkspaceOnMachine("machine"), .placement),
+            (WmuxTuiSurfaceProvider.ProviderError.stateUnavailable("machine"), .response),
+            (WmuxTuiSurfaceProvider.ProviderError.terminalExited("term"), .process),
+            (WmuxTuiSurfaceProvider.ProviderError.terminalNotCreated("private response"), .process),
             (SurfaceCatalogError.ambiguousRemotePlacement(.init(machine: .cloud("machine"), kind: .terminal, key: "term"), workspaceID: "private-workspace"), .conflict)
         ]
         for (error, expected) in errors {
@@ -361,7 +361,7 @@ import SwiftUI
         let request = store.beginRequest()
         harness.workspace.presentCloudPaneCreationFailure(
             machine: .cloud("overlay-test"),
-            error: CmuxTuiSurfaceProvider.ProviderError.stateUnavailable("overlay-test"),
+            error: WmuxTuiSurfaceProvider.ProviderError.stateUnavailable("overlay-test"),
             requestID: request
         )
 
@@ -428,7 +428,7 @@ import SwiftUI
 
     @Test("Failure text uses the full width in narrow terminals", arguments: [CGFloat(166), 260, 360])
     func narrowFailureCardRemainsReadable(width: CGFloat) {
-        let failure = CloudPaneCreationFailure(machine: .cloud("narrow-pane"), error: CmuxTuiSurfaceProvider.ProviderError.stateUnavailable("narrow-pane"))
+        let failure = CloudPaneCreationFailure(machine: .cloud("narrow-pane"), error: WmuxTuiSurfaceProvider.ProviderError.stateUnavailable("narrow-pane"))
         let host = NSHostingView(rootView: CloudPaneCreationFailureView(failure: failure, onRetry: {}, onDismiss: {})
             .frame(width: width).fixedSize(horizontal: false, vertical: true))
         let size = host.fittingSize
@@ -486,7 +486,7 @@ import SwiftUI
 
     @Test("Cloud placement errors have a specific diagnostic")
     func cloudPlacementErrorHasSpecificDiagnostic() {
-        let error = CmuxTuiSurfaceProvider.ProviderError.noWorkspaceOnMachine("vm-placement")
+        let error = WmuxTuiSurfaceProvider.ProviderError.noWorkspaceOnMachine("vm-placement")
         #expect(CloudDiagnosticFailure.classify(error) == .placement)
         #expect(CloudDiagnosticFailure.classify(error).label.contains("placement"))
     }

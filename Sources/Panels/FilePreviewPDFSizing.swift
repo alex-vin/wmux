@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import PDFKit
 
 enum FilePreviewPDFSizing {

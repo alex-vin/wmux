@@ -1,14 +1,14 @@
-import CmuxFoundation
+import WmuxFoundation
 import Bonsplit
-import CmuxSettings
-import CmuxCore
+import WmuxSettings
+import WmuxCore
 import Darwin
 import Foundation
-import CmuxSidebar
+import WmuxSidebar
 
 extension Workspace {
     private static let structuredAgentHookStatusKeys = AgentHibernationLifecycleStatusKeys.allowedStatusKeys
-    private static let managedSubagentEnvironmentKey = "CMUX_AGENT_MANAGED_SUBAGENT"
+    private static let managedSubagentEnvironmentKey = "WMUX_AGENT_MANAGED_SUBAGENT"
     private static let truthyStartupEnvironmentValues: Set<String> = ["1", "true", "yes", "on", "enabled"]
     var agentPIDs: [String: pid_t] {
         get { sidebarAgentRuntimeObservation.agentPIDs }

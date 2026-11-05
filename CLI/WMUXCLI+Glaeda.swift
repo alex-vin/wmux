@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 
 extension WMUXCLI {
     static var glaedaUsage: String {
-        CmuxGlaedaExecutionLocalization().string(
+        WmuxGlaedaExecutionLocalization().string(
             "glaeda.cli.usage",
             defaultValue: """
             Usage: wmux glaeda <request|observe> [options]
@@ -39,7 +39,7 @@ extension WMUXCLI {
     }
 
     func runGlaedaCommand(commandArgs: [String]) throws {
-        let localization = CmuxGlaedaExecutionLocalization()
+        let localization = WmuxGlaedaExecutionLocalization()
         guard let subcommand = commandArgs.first?.lowercased() else {
             throw CLIError(message: Self.glaedaUsage)
         }
@@ -48,14 +48,14 @@ extension WMUXCLI {
             switch subcommand {
             case "request":
                 let request = try glaedaRequest(arguments: rest, localization: localization)
-                let data = try CmuxGlaedaExecutionContract().encodeRequest(request)
+                let data = try WmuxGlaedaExecutionContract().encodeRequest(request)
                 cliWriteStdout(data)
             case "observe":
                 let observation = try glaedaObservation(
                     arguments: rest,
                     localization: localization
                 )
-                let data = try CmuxGlaedaExecutionContract().encodeObservation(observation)
+                let data = try WmuxGlaedaExecutionContract().encodeObservation(observation)
                 cliWriteStdout(data)
             case "help", "--help", "-h":
                 guard rest.isEmpty else {
@@ -76,15 +76,15 @@ extension WMUXCLI {
                     ) + "\n\n" + Self.glaedaUsage
                 )
             }
-        } catch let error as CmuxGlaedaExecutionContractError {
+        } catch let error as WmuxGlaedaExecutionContractError {
             throw CLIError(message: localization.contractError(error))
         }
     }
 
     private func glaedaRequest(
         arguments: [String],
-        localization: CmuxGlaedaExecutionLocalization
-    ) throws -> CmuxGlaedaExecutionRequest {
+        localization: WmuxGlaedaExecutionLocalization
+    ) throws -> WmuxGlaedaExecutionRequest {
         let options = try glaedaParseOptions(
             arguments,
             allowed: [
@@ -97,7 +97,7 @@ extension WMUXCLI {
             ],
             localization: localization
         )
-        return CmuxGlaedaExecutionRequest(
+        return WmuxGlaedaExecutionRequest(
             externalRequestRef: try glaedaRequiredOption(
                 "--request-ref",
                 options: options,
@@ -129,8 +129,8 @@ extension WMUXCLI {
 
     private func glaedaObservation(
         arguments: [String],
-        localization: CmuxGlaedaExecutionLocalization
-    ) throws -> CmuxGlaedaExecutionObservation {
+        localization: WmuxGlaedaExecutionLocalization
+    ) throws -> WmuxGlaedaExecutionObservation {
         let options = try glaedaParseOptions(
             arguments,
             allowed: ["--request", "--receipt"],
@@ -154,7 +154,7 @@ extension WMUXCLI {
             path: receiptPath,
             localization: localization
         )
-        return try CmuxGlaedaExecutionContract().observe(
+        return try WmuxGlaedaExecutionContract().observe(
             requestData: requestData,
             receiptData: receiptData
         )
@@ -163,7 +163,7 @@ extension WMUXCLI {
     private func glaedaParseOptions(
         _ arguments: [String],
         allowed: Set<String>,
-        localization: CmuxGlaedaExecutionLocalization
+        localization: WmuxGlaedaExecutionLocalization
     ) throws -> [String: String] {
         var result: [String: String] = [:]
         var index = 0
@@ -206,7 +206,7 @@ extension WMUXCLI {
     private func glaedaRequiredOption(
         _ key: String,
         options: [String: String],
-        localization: CmuxGlaedaExecutionLocalization
+        localization: WmuxGlaedaExecutionLocalization
     ) throws -> String {
         guard let value = options[key], !value.isEmpty else {
             throw CLIError(
@@ -222,13 +222,13 @@ extension WMUXCLI {
 
     private func glaedaReadDocument(
         path: String,
-        localization: CmuxGlaedaExecutionLocalization
+        localization: WmuxGlaedaExecutionLocalization
     ) throws -> Data {
         if path == "-" {
             let data = FileHandle.standardInput.readData(
-                ofLength: CmuxGlaedaExecutionContract.maxDocumentBytes + 1
+                ofLength: WmuxGlaedaExecutionContract.maxDocumentBytes + 1
             )
-            guard data.count <= CmuxGlaedaExecutionContract.maxDocumentBytes else {
+            guard data.count <= WmuxGlaedaExecutionContract.maxDocumentBytes else {
                 throw CLIError(
                     message: localization.string(
                         "glaeda.cli.error.documentTooLarge",
@@ -263,7 +263,7 @@ extension WMUXCLI {
             )
         }
 
-        let limit = CmuxGlaedaExecutionContract.maxDocumentBytes + 1
+        let limit = WmuxGlaedaExecutionContract.maxDocumentBytes + 1
         var data = Data()
         var buffer = [UInt8](repeating: 0, count: min(1024, limit))
         while data.count < limit {
@@ -289,7 +289,7 @@ extension WMUXCLI {
             )
         }
 
-        guard data.count <= CmuxGlaedaExecutionContract.maxDocumentBytes else {
+        guard data.count <= WmuxGlaedaExecutionContract.maxDocumentBytes else {
             throw CLIError(
                 message: localization.string(
                     "glaeda.cli.error.documentTooLarge",

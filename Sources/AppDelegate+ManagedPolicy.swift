@@ -1,6 +1,6 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 /// Runtime enforcement for MDM managed policies (`DisableEmbeddedBrowser`,
@@ -13,7 +13,7 @@ extension AppDelegate {
         guard managedPolicyEnforcementObserver == nil else { return }
         managedPolicyEnforcementObserver = ManagedPolicyEnforcementObserver(
             socketControlPolicy: {
-                CmuxSettingsFileStore.socketControlPolicyResolution()
+                WmuxSettingsFileStore.socketControlPolicyResolution()
             },
             enforceBrowserPolicy: { [weak self] in
                 self?.closeBrowserPanelsForManagedPolicy()
@@ -79,7 +79,7 @@ extension AppDelegate {
                 }
             }
         }
-        CmuxTuiSurfaceProviderRegistry.shared.syncPollingToActivationPolicy()
+        WmuxTuiSurfaceProviderRegistry.shared.syncPollingToActivationPolicy()
     }
 
     /// `DisableComputerUse` transitions, both directions: activation stops the
@@ -89,7 +89,7 @@ extension AppDelegate {
         guard let service = computerUseRuntimeService else { return }
         let catalog = settingsRuntime?.catalog ?? SettingCatalog()
         let store = settingsRuntime?.jsonStore
-            ?? JSONConfigStore(fileURL: CmuxConfigLocation().userConfigFile)
+            ?? JSONConfigStore(fileURL: WmuxConfigLocation().userConfigFile)
         let userEnabled = store.snapshotValue(for: catalog.computerUse.enabled)
         Task { @MainActor in
             // `setEnabled` applies the policy itself; passing the user's value
@@ -135,14 +135,14 @@ extension AppDelegate {
             _ = await previous?.value
             guard let self else { return }
             guard ManagedDevicePolicy().isEnforced(.disableCloud) else {
-                CmuxTuiSurfaceProviderRegistry.shared.start(catalog: .shared)
+                WmuxTuiSurfaceProviderRegistry.shared.start(catalog: .shared)
                 return
             }
-            await CmuxTuiSurfaceProviderRegistry.shared.accessDidEnd()
+            await WmuxTuiSurfaceProviderRegistry.shared.accessDidEnd()
             guard ManagedDevicePolicy().isEnforced(.disableCloud) else {
                 // The profile was removed mid-teardown: Cloud is allowed again,
                 // so restart discovery instead of ending live access.
-                CmuxTuiSurfaceProviderRegistry.shared.start(catalog: .shared)
+                WmuxTuiSurfaceProviderRegistry.shared.start(catalog: .shared)
                 return
             }
             self.endCloudVMAccess(reason: .managedPolicy)

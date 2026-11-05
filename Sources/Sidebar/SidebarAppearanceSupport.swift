@@ -1,13 +1,13 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import Foundation
 import SwiftUI
-import CmuxSettings
+import WmuxSettings
 
 enum SidebarMatchTerminalBackgroundSettings {
     static let userDefaultsKey = "sidebarMatchTerminalBackground"
-    static let legacyAppliedSettingsFileDefaultKey = "cmux.settingsFile.sidebarMatchTerminalBackground.appliedDefault.v1"
+    static let legacyAppliedSettingsFileDefaultKey = "wmux.settingsFile.sidebarMatchTerminalBackground.appliedDefault.v1"
 }
 
 enum SidebarTabItemFontScale {
@@ -148,7 +148,7 @@ func titlebarControlForegroundNSColor(opacity: CGFloat, appearance: WindowAppear
     )
 }
 
-extension CmuxAccentColor {
+extension WmuxAccentColor {
     /// The accent for a SwiftUI color scheme.
     func nsColor(for colorScheme: ColorScheme) -> NSColor {
         nsColor(isDark: colorScheme == .dark)
@@ -303,7 +303,7 @@ enum SidebarRemoteErrorCopySupport {
 /// window's selection. Increase Contrast strengthens both. Picked from a
 /// pairwise comparison of eight treatments across accents and sidebar themes
 /// (manaflow-ai/cmux#14890).
-struct CmuxSelectionFill: Equatable {
+struct WmuxSelectionFill: Equatable {
     let color: NSColor
     let edgeColor: NSColor?
 
@@ -312,7 +312,7 @@ struct CmuxSelectionFill: Equatable {
         isEmphasized: Bool,
         increaseContrast: Bool = false,
         isSecondary: Bool = false
-    ) -> CmuxSelectionFill {
+    ) -> WmuxSelectionFill {
         let isDark = colorScheme == .dark
         let base: NSColor
         let fillAlpha: CGFloat
@@ -330,7 +330,7 @@ struct CmuxSelectionFill: Equatable {
         // primary strength so the active row stays the clear anchor.
         let scale: CGFloat = isSecondary ? 0.55 : 1
         let resolver = SidebarAppearanceColorResolver()
-        return CmuxSelectionFill(
+        return WmuxSelectionFill(
             color: resolver.resolvedColor(base, for: colorScheme, opacity: fillAlpha * scale),
             edgeColor: resolver.resolvedColor(base, for: colorScheme, opacity: edgeAlpha * scale)
         )
@@ -349,7 +349,7 @@ func sidebarSelectedWorkspaceBackgroundNSColor(
     subtleSelection: Bool = false,
     isEmphasized: Bool = true,
     increaseContrast: Bool = false,
-    accent: CmuxAccentColor = CmuxAccentColor()
+    accent: WmuxAccentColor = WmuxAccentColor()
 ) -> NSColor {
     if let hex = sidebarSelectionColorHex,
        let parsed = NSColor(hex: hex) {
@@ -359,7 +359,7 @@ func sidebarSelectedWorkspaceBackgroundNSColor(
         return accent.nsColor(for: colorScheme)
     }
     let surface = NSColor(white: colorScheme == .dark ? 0.16 : 0.93, alpha: 1)
-    let fill = CmuxSelectionFill.resolve(
+    let fill = WmuxSelectionFill.resolve(
         colorScheme: colorScheme,
         isEmphasized: isEmphasized,
         increaseContrast: increaseContrast
@@ -415,7 +415,7 @@ func sidebarGroupHeaderAnchorActiveEdgeNSColor(
         subtleSelection: subtleSelection,
         sidebarSelectionColorHex: sidebarSelectionColorHex
     ) else { return nil }
-    return CmuxSelectionFill.resolve(
+    return WmuxSelectionFill.resolve(
         colorScheme: colorScheme,
         isEmphasized: false,
         increaseContrast: increaseContrast
@@ -457,7 +457,7 @@ func sidebarWorkspaceRowBackgroundStyle(
     brightenInDarkMode: Bool = true,
     isEmphasized: Bool = true,
     increaseContrast: Bool = false,
-    accent: CmuxAccentColor = CmuxAccentColor()
+    accent: WmuxAccentColor = WmuxAccentColor()
 ) -> SidebarWorkspaceRowBackgroundStyle {
     // Increase Contrast: the multi-selection wash is otherwise too faint to
     // read against the sidebar material.
@@ -478,7 +478,7 @@ func sidebarWorkspaceRowBackgroundStyle(
         sidebarSelectionColorHex: sidebarSelectionColorHex
     )
     func calmFill(isSecondary: Bool) -> SidebarWorkspaceRowBackgroundStyle {
-        let fill = CmuxSelectionFill.resolve(
+        let fill = WmuxSelectionFill.resolve(
             colorScheme: colorScheme,
             isEmphasized: isEmphasized,
             increaseContrast: increaseContrast,

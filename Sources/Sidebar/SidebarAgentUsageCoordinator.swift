@@ -1,7 +1,7 @@
-import CMUXAgentLaunch
-import CmuxAgentChat
-import CmuxSettings
-import CmuxSidebar
+import WMUXAgentLaunch
+import WmuxAgentChat
+import WmuxSettings
+import WmuxSidebar
 import Foundation
 
 /// Keeps the opt-in sidebar agent usage (`sidebar.showAgentUsage`) current.

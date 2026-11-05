@@ -1,18 +1,18 @@
-import CmuxBrowser
+import WmuxBrowser
 import Combine
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 import Foundation
 import os
 nonisolated private let cmuxSettingsFileStoreLogger = Logger(subsystem: "com.cmuxterm.app", category: "SettingsStore")
 
-final class CmuxSettingsFileStore {
+final class WmuxSettingsFileStore {
     static let currentSchemaVersion = 1
     static let schemaURLString = "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json"
     private static let legacySchemaURLString = "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux-settings.schema.json"
     private static let releaseBundleIdentifier = "com.cmuxterm.app"
-    private static let backupsDefaultsKey = "cmux.settingsFile.backups.v1"
-    private static let importedManagedDefaultsDefaultsKey = "cmux.settingsFile.importedManagedDefaults.v1"
+    private static let backupsDefaultsKey = "wmux.settingsFile.backups.v1"
+    private static let importedManagedDefaultsDefaultsKey = "wmux.settingsFile.importedManagedDefaults.v1"
     fileprivate static let socketPasswordBackupIdentifier = "automation.socketPassword"
 
     static var defaultPrimaryPath: String {
@@ -74,9 +74,9 @@ final class CmuxSettingsFileStore {
     private(set) var activeSourcePath: String?
 
     init(
-        primaryPath: String = CmuxSettingsFileStore.defaultPrimaryPath,
-        fallbackPath: String? = CmuxSettingsFileStore.defaultFallbackPath,
-        additionalFallbackPaths: [String] = [CmuxSettingsFileStore.defaultApplicationSupportFallbackPath].compactMap { $0 },
+        primaryPath: String = WmuxSettingsFileStore.defaultPrimaryPath,
+        fallbackPath: String? = WmuxSettingsFileStore.defaultFallbackPath,
+        additionalFallbackPaths: [String] = [WmuxSettingsFileStore.defaultApplicationSupportFallbackPath].compactMap { $0 },
         fileManager: FileManager = .default,
         notificationCenter: NotificationCenter = .default,
         userDefaults: UserDefaults = .standard,
@@ -338,8 +338,8 @@ final class CmuxSettingsFileStore {
                 let fontOnlyIssues = !snapshot.invalidManagedUserDefaultKeys.isEmpty
                     && issues.count == snapshot.invalidManagedUserDefaultKeys.count
                     && issues.allSatisfy {
-                        $0.contains(CmuxJSONFontSettings.sidebarPath)
-                            || $0.contains(CmuxJSONFontSettings.surfaceTabBarPath)
+                        $0.contains(WmuxJSONFontSettings.sidebarPath)
+                            || $0.contains(WmuxJSONFontSettings.surfaceTabBarPath)
                     }
                 if fontOnlyIssues, let lastGoodResolvedSettings {
                     for key in snapshot.invalidManagedUserDefaultKeys {
@@ -398,7 +398,7 @@ final class CmuxSettingsFileStore {
             return .missing
         }
         guard let data = fileManager.contents(atPath: path), !data.isEmpty else {
-            return .invalid(Self.configurationIssue(path: path, data: Data(), message: "cmux.json is empty"))
+            return .invalid(Self.configurationIssue(path: path, data: Data(), message: "wmux.json is empty"))
         }
         do {
             let sanitized = try JSONCParser.preprocess(data: data)
@@ -407,7 +407,7 @@ final class CmuxSettingsFileStore {
                 return .invalid(Self.configurationIssue(
                     path: path,
                     data: data,
-                    message: CmuxConfigValidationLocalization().string(
+                    message: WmuxConfigValidationLocalization().string(
                         "config.validation.cli.doctor.topLevelObject",
                         defaultValue: "top-level value must be a JSON object"
                     )
@@ -1105,7 +1105,7 @@ final class CmuxSettingsFileStore {
                     allowBareFirstStroke: action.allowsBareFirstStroke
                 )
             }
-            // Object form written by the CmuxSettings package recorder (in-app
+            // Object form written by the WmuxSettings package recorder (in-app
             // Settings UI): { "first": { key, command, ... }, "second": { ... }? }.
             // A Settings rebinding only reaches this store in that shape; decode it
             // so every action resolved here — including foreground Global Search and the
@@ -1123,7 +1123,7 @@ final class CmuxSettingsFileStore {
         return action.normalizedSettingsFileShortcut(shortcut)
     }
 
-    /// Decodes the nested-object binding the CmuxSettings package writes
+    /// Decodes the nested-object binding the WmuxSettings package writes
     /// (`{ "first": { stroke }, "second": { stroke }? }`) into the app-target
     /// ``StoredShortcut``. An empty primary key is the package's explicit
     /// "unbound" marker. Returns `nil` when `first` is missing or malformed —
@@ -1921,7 +1921,7 @@ final class CmuxSettingsFileStore {
 
 }
 
-typealias KeyboardShortcutSettingsFileStore = CmuxSettingsFileStore
+typealias KeyboardShortcutSettingsFileStore = WmuxSettingsFileStore
 
 struct ResolvedSettingsSnapshot {
     var path: String?
@@ -2002,7 +2002,7 @@ struct ManagedCustomSettings: Equatable {
     var managedIdentifiers: Set<String> {
         var identifiers: Set<String> = []
         if socketPassword != nil {
-            identifiers.insert(CmuxSettingsFileStore.socketPasswordBackupIdentifier)
+            identifiers.insert(WmuxSettingsFileStore.socketPasswordBackupIdentifier)
         }
         return identifiers
     }

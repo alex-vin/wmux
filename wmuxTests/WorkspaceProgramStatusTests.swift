@@ -1,9 +1,9 @@
 import Foundation
 import Testing
-import CmuxSidebar
+import WmuxSidebar
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -101,8 +101,8 @@ struct WorkspaceProgramStatusTests {
     @Test func programStatusChangesReachTheMacEventStream() throws {
         let workspace = Workspace()
         let panelId = try #require(workspace.focusedPanelId)
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         workspace.applyProgramStatus(
             ProgramStatusReport(state: .done, id: "lint", app: "cargo"),
@@ -116,9 +116,9 @@ struct WorkspaceProgramStatusTests {
             ProgramStatusReport(event: .promptStart, state: .idle),
             panelId: panelId
         )
-        CmuxEventBus.shared.flushEventLogForTesting()
+        WmuxEventBus.shared.flushEventLogForTesting()
 
-        let events = CmuxEventBus.shared.retainedSnapshot().filter {
+        let events = WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "program_status.changed"
         }
         #expect(events.count == 3)
@@ -131,8 +131,8 @@ struct WorkspaceProgramStatusTests {
     @Test func programStatusClearReachesTheMacEventStream() throws {
         let workspace = Workspace()
         let panelId = try #require(workspace.focusedPanelId)
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         workspace.applyProgramStatus(
             ProgramStatusReport(state: .working, id: "build", app: "cargo"),
@@ -142,9 +142,9 @@ struct WorkspaceProgramStatusTests {
             ProgramStatusReport(state: .clear, id: "build"),
             panelId: panelId
         )
-        CmuxEventBus.shared.flushEventLogForTesting()
+        WmuxEventBus.shared.flushEventLogForTesting()
 
-        let events = CmuxEventBus.shared.retainedSnapshot().filter {
+        let events = WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "program_status.changed"
         }
         #expect(events.count == 2)
@@ -159,8 +159,8 @@ struct WorkspaceProgramStatusTests {
     @Test func transientCleanupPublishesOnceBeforePromptStartNoOp() throws {
         let workspace = Workspace()
         let panelId = try #require(workspace.focusedPanelId)
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         workspace.applyProgramStatus(
             ProgramStatusReport(state: .blocked, kind: .permission, id: "deploy"),
@@ -173,9 +173,9 @@ struct WorkspaceProgramStatusTests {
             ProgramStatusReport(event: .promptStart, state: .idle),
             panelId: panelId
         )
-        CmuxEventBus.shared.flushEventLogForTesting()
+        WmuxEventBus.shared.flushEventLogForTesting()
 
-        let events = CmuxEventBus.shared.retainedSnapshot().filter {
+        let events = WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "program_status.changed"
         }
         #expect(events.count == 2)
@@ -188,8 +188,8 @@ struct WorkspaceProgramStatusTests {
     @Test func dismissingCompletedStatusPublishesUpdatedSnapshot() throws {
         let workspace = Workspace()
         let panelId = try #require(workspace.focusedPanelId)
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         workspace.applyProgramStatus(
             ProgramStatusReport(state: .done, id: "build"),
@@ -197,9 +197,9 @@ struct WorkspaceProgramStatusTests {
         )
         workspace.dismissCompletedProgramStatus(panelId: panelId)
         workspace.dismissCompletedProgramStatus(panelId: panelId)
-        CmuxEventBus.shared.flushEventLogForTesting()
+        WmuxEventBus.shared.flushEventLogForTesting()
 
-        let events = CmuxEventBus.shared.retainedSnapshot().filter {
+        let events = WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "program_status.changed"
         }
         #expect(events.count == 2)
@@ -240,13 +240,13 @@ struct WorkspaceProgramStatusTests {
             ProgramStatusReport(state: .done, id: "lint", app: "cargo"),
             panelId: reportingPanelId
         )
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         workspace.teardownAllPanels()
-        CmuxEventBus.shared.flushEventLogForTesting()
+        WmuxEventBus.shared.flushEventLogForTesting()
 
-        let events = CmuxEventBus.shared.retainedSnapshot().filter {
+        let events = WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "program_status.changed"
         }
         #expect(events.count == 1)
@@ -273,15 +273,15 @@ struct WorkspaceProgramStatusTests {
             ProgramStatusReport(state: .blocked, kind: .question, id: "deploy", app: "deploy"),
             panelId: movedPanel.id
         )
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         let detached = try #require(source.detachSurface(panelId: movedPanel.id))
         let destinationPane = try #require(destination.bonsplitController.allPaneIds.first)
         _ = try #require(destination.attachDetachedSurface(detached, inPane: destinationPane, focus: false))
-        CmuxEventBus.shared.flushEventLogForTesting()
+        WmuxEventBus.shared.flushEventLogForTesting()
 
-        let events = CmuxEventBus.shared.retainedSnapshot().filter {
+        let events = WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "program_status.changed"
         }
         #expect(events.count == 2)
@@ -314,13 +314,13 @@ struct WorkspaceProgramStatusTests {
             ProgramStatusReport(state: .working, id: "build", app: "cargo"),
             panelId: reportingPanelId
         )
-        CmuxEventBus.shared.resetForTesting()
-        defer { CmuxEventBus.shared.resetForTesting() }
+        WmuxEventBus.shared.resetForTesting()
+        defer { WmuxEventBus.shared.resetForTesting() }
 
         workspace.resetSidebarContext(reason: "test")
-        CmuxEventBus.shared.flushEventLogForTesting()
+        WmuxEventBus.shared.flushEventLogForTesting()
 
-        let events = CmuxEventBus.shared.retainedSnapshot().filter {
+        let events = WmuxEventBus.shared.retainedSnapshot().filter {
             $0["name"] as? String == "program_status.changed"
         }
         #expect(events.count == 1)

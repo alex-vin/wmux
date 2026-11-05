@@ -3,7 +3,7 @@
 // session, console. Built on runtime-core (Playwright model) and snapshot.js.
 (function (root) {
   "use strict";
-  const ns = (root.CmuxBrowserRepl = root.CmuxBrowserRepl || {});
+  const ns = (root.WmuxBrowserRepl = root.WmuxBrowserRepl || {});
   const core = ns.core;
   const { Buffer } = core;
 

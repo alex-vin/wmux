@@ -1,7 +1,7 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
-extension CmuxSettingsFileStore {
+extension WmuxSettingsFileStore {
     /// Returns the user-selected socket mode before process environment overrides.
     static func configuredSocketMode(defaults: UserDefaults = .standard) -> SocketControlMode {
         let raw = defaults.string(forKey: SocketControlSettings.appStorageKey)
@@ -115,15 +115,15 @@ extension CmuxSettingsFileStore {
     }
 
     /// Creates the process store wired to the host's shared reload coordinator.
-    static var appLive: CmuxSettingsFileStore {
-        CmuxSettingsFileStore(
+    static var appLive: WmuxSettingsFileStore {
+        WmuxSettingsFileStore(
             languageSettingsStore: LanguageSettingsStore(defaults: .standard, domainName: ProcessDefaultsDomain.name),
             onWatchedFileReload: { source in
                 AppDelegate.shared?.reloadCmuxConfigStores(source: source)
             },
             onConfigurationIssue: { messages in
                 AppDelegate.shared?.cmuxConfigDiagnosticsDidReload(
-                    source: CmuxSettingsFileStore.defaultPrimaryPath,
+                    source: WmuxSettingsFileStore.defaultPrimaryPath,
                     messages: messages
                 )
             }

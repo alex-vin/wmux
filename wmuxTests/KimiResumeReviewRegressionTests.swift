@@ -1,10 +1,10 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import Testing
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -30,7 +30,7 @@ struct KimiResumeReviewRegressionTests {
             "--model", "kimi-k2",
             "--config-file", configPath,
         ]
-        let process = CmuxTopProcessInfo(
+        let process = WmuxTopProcessInfo(
             pid: 4_321,
             parentPID: 1,
             name: "kimi",
@@ -47,9 +47,9 @@ struct KimiResumeReviewRegressionTests {
             threadCount: 1
         )
         let detected = RestorableAgentSessionIndex.processDetectedSnapshots(
-            registry: CmuxVaultAgentRegistry(registrations: [.builtInKimi]),
+            registry: WmuxVaultAgentRegistry(registrations: [.builtInKimi]),
             fileManager: fileManager,
-            processSnapshot: CmuxTopProcessSnapshot(
+            processSnapshot: WmuxTopProcessSnapshot(
                 processes: [process],
                 sampledAt: Date(timeIntervalSince1970: 123),
                 includesProcessDetails: true
@@ -57,7 +57,7 @@ struct KimiResumeReviewRegressionTests {
             capturedAt: 123,
             processArgumentsProvider: { pid in
                 guard pid == process.pid else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: arguments,
                     environment: ["PWD": launchDirectory.path]
                 )
@@ -95,11 +95,11 @@ struct KimiResumeReviewRegressionTests {
         defer { try? fileManager.removeItem(at: root) }
 
         var userRegistration = try JSONDecoder().decode(
-            CmuxVaultAgentRegistration.self,
-            from: JSONEncoder().encode(CmuxVaultAgentRegistration.builtInKimi)
+            WmuxVaultAgentRegistration.self,
+            from: JSONEncoder().encode(WmuxVaultAgentRegistration.builtInKimi)
         )
         userRegistration.name = "Custom Kimi"
-        let registry = CmuxVaultAgentRegistry(registrations: [
+        let registry = WmuxVaultAgentRegistry(registrations: [
             .builtInKimi,
             userRegistration,
         ])
@@ -165,10 +165,10 @@ struct KimiResumeReviewRegressionTests {
         defaults.set(true, forKey: AgentSessionAutoResumeSettings.autoResumeAgentSessionsKey)
 
         let sessionID = "custom-kimi-binding-session"
-        let customRegistration = CmuxVaultAgentRegistration(
+        let customRegistration = WmuxVaultAgentRegistration(
             id: "kimi",
             name: "Custom Kimi",
-            detect: CmuxVaultAgentDetectRule(processName: "custom-kimi"),
+            detect: WmuxVaultAgentDetectRule(processName: "custom-kimi"),
             sessionIdSource: .argvOption("--resume"),
             resumeCommand: "custom-kimi --resume {{sessionId}}"
         )

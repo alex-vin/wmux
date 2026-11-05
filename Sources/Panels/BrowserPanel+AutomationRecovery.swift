@@ -1,7 +1,7 @@
-import CmuxCore
-import CmuxCloud
+import WmuxCore
+import WmuxCloud
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 
 /// The bounded result of preparing one browser WebView for automation input.
@@ -188,7 +188,7 @@ extension BrowserPanel {
     func makeReplacementWebView(
         profileID: UUID,
         websiteDataStore: WKWebsiteDataStore
-    ) -> CmuxWebView {
+    ) -> WmuxWebView {
         let replacementStore: WKWebsiteDataStore
         if cloudAccess.model?.usesBrowserProxy == true {
             if let endpoint = cloudAccess.model?.browserProxy,

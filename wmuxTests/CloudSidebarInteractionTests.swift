@@ -3,8 +3,8 @@ import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,9 +14,9 @@ import Testing
 @MainActor
 @Suite("Cloud sidebar recorded interaction", .serialized)
 struct CloudSidebarInteractionTests {
-    @Test(.enabled(if: ProcessInfo.processInfo.environment["CMUX_SIDEBAR_RECORDING_FIFO"] != nil))
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["WMUX_SIDEBAR_RECORDING_FIFO"] != nil))
     func recordNativeInteraction() async throws {
-        let path = try #require(ProcessInfo.processInfo.environment["CMUX_SIDEBAR_RECORDING_FIFO"])
+        let path = try #require(ProcessInfo.processInfo.environment["WMUX_SIDEBAR_RECORDING_FIFO"])
         #expect(path.hasPrefix("/tmp/") || path.hasPrefix("/private/tmp/"))
         try #require(mkfifo(path, S_IRUSR | S_IWUSR) == 0)
         defer { unlink(path) }

@@ -1,5 +1,5 @@
 import Foundation
-import CmuxSidebar
+import WmuxSidebar
 
 extension Workspace {
     /// Stores a CLI-owned pull-request association at workspace scope. The

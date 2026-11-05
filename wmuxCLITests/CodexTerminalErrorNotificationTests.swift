@@ -37,14 +37,14 @@ struct CodexTerminalErrorNotificationTests {
         defer { server.stop() }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = workspaceID
-        environment["CMUX_SURFACE_ID"] = surfaceID
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = root.path
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = workspaceID
+        environment["WMUX_SURFACE_ID"] = surfaceID
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         // Keep this foreground error fixture independent of other Codex test
         // processes in the app-host ancestry walk.
-        environment["CMUX_CODEX_HOOK_PID"] = "2"
+        environment["WMUX_CODEX_HOOK_PID"] = "2"
 
         let hookInput = """
         {"session_id":"\(sessionID)","turn_id":"\(turnID)","transcript_path":"\(transcriptURL.path)","cwd":"\(root.path)","hook_event_name":"Stop","model":"gpt-5.5","permission_mode":"default","stop_hook_active":false,"last_assistant_message":"Partial response"}

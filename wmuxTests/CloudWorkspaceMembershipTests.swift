@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -41,7 +41,7 @@ struct CloudWorkspaceMembershipTests {
             ["id": "term_new", "tab_id": "tab_new", "title": "terminal", "lifecycle": "running"]
         ]
         document["cursor"] = ["generation": "membership", "revision": "2"]
-        let created = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        let created = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
         publish(created, to: catalog)
         try expectMembership(created, in: catalog)
     }
@@ -88,9 +88,9 @@ struct CloudWorkspaceMembershipTests {
     func displayPoolOpenHasNoImplicitTab() throws {
         let current = try state(desktops: ["desk_b": "b"])
         let display = try #require(resources(current).first { $0.id.key == "display:1" })
-        #expect(CmuxTuiSurfaceProvider.defaultRemoteView(for: display) == nil)
+        #expect(WmuxTuiSurfaceProvider.defaultRemoteView(for: display) == nil)
         let terminal = try #require(resources(current).first { $0.id.key == "term_a" })
-        #expect(CmuxTuiSurfaceProvider.defaultRemoteView(for: terminal)?.tabID == "tab_a")
+        #expect(WmuxTuiSurfaceProvider.defaultRemoteView(for: terminal)?.tabID == "tab_a")
         let rename = CloudWorkspaceRenameService()
         let projection = SurfaceProjection(resource: display.id, workspaceID: UUID(), panelID: UUID())
         #expect(rename.inferredRemoteWorkspaceTarget(projections: [projection], resources: [display]) == nil)
@@ -282,7 +282,7 @@ struct CloudWorkspaceMembershipTests {
             "browsers": [["id": "docs", "tab_id": "tab_docs", "title": "Docs", "url": "http://localhost:3000"]],
             "agents": []
         ]
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
     }
 
     private func removing(_ tabID: String, from state: CloudVMState) throws -> CloudVMState {
@@ -292,7 +292,7 @@ struct CloudWorkspaceMembershipTests {
             "kind": "delta", "previous_revision": String(previous.revision), "revision": String(cursor.revision),
             "changes": [["kind": "delete", "resource": "tab", "id": tabID]]
         ]
-        return try #require(CmuxTuiSnapshotParser.applying(
+        return try #require(WmuxTuiSnapshotParser.applying(
             deltaPayload: JSONSerialization.data(withJSONObject: delta), cursor: cursor, to: state
         ))
     }
@@ -309,9 +309,9 @@ struct CloudWorkspaceMembershipTests {
     }
 
     private func resources(_ state: CloudVMState) -> [SurfaceResource] {
-        CmuxTuiSnapshotParser.mergingDisplays(
-            pool: ["display:1", "display:2"].map { CmuxTuiSnapshotParser.display(machine: machine, key: $0) },
-            parsed: CmuxTuiSnapshotParser.resources(from: state)
+        WmuxTuiSnapshotParser.mergingDisplays(
+            pool: ["display:1", "display:2"].map { WmuxTuiSnapshotParser.display(machine: machine, key: $0) },
+            parsed: WmuxTuiSnapshotParser.resources(from: state)
         )
     }
 

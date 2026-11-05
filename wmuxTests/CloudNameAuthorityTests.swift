@@ -1,8 +1,8 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -75,7 +75,7 @@ extension SetAutoTitleSocketTests {
             var snapshot = try #require(fixture.provider.graph.snapshotObject())
             snapshot["cursor"] = ["generation": "reconnected", "revision": "1"]
             snapshot["notifications"] = [["id": "notice", "terminal_id": "term_a", "title": "Old process"]]
-            let reconnect = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: fixture.provider.machine))
+            let reconnect = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: fixture.provider.machine))
             #expect(fixture.provider.install(reconnect))
             await fixture.provider.refresh()
             #expect(restored.title == "machine: API & tests 🚀")
@@ -158,7 +158,7 @@ extension SetAutoTitleSocketTests {
             var terminals = try #require(document["terminals"] as? [[String: Any]])
             terminals[0]["title"] = "vim README.md"
             document["terminals"] = terminals
-            #expect(fixture.provider.install(try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: fixture.provider.machine))))
+            #expect(fixture.provider.install(try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: fixture.provider.machine))))
             try fixture.expectParity("vim README.md")
             _ = fixture.workspace.updatePanelTitle(panelId: fixture.panelID, title: "Delayed local OSC")
             try fixture.expectParity("vim README.md")

@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -35,17 +35,17 @@ struct RemoteInitialCommandBootstrapFailureTests {
             #!/bin/sh
             while [ "$#" -gt 0 ]; do
               case "$1" in
-                --rcfile) cmux_test_rcfile="$2"; shift 2 ;;
+                --rcfile) wmux_test_rcfile="$2"; shift 2 ;;
                 *) shift ;;
               esac
             done
             env > "$HOME/bash startup environment.txt"
-            for cmux_test_payload in "${cmux_test_rcfile%/*}"/.initial-command.payload.*; do
-              [ -f "$cmux_test_payload" ] || continue
-              stat -f '%Lp' "$cmux_test_payload" > "$HOME/initial command payload mode.txt"
+            for wmux_test_payload in "${wmux_test_rcfile%/*}"/.initial-command.payload.*; do
+              [ -f "$wmux_test_payload" ] || continue
+              stat -f '%Lp' "$wmux_test_payload" > "$HOME/initial command payload mode.txt"
               break
             done
-            [ -n "${cmux_test_rcfile:-}" ] && . "$cmux_test_rcfile"
+            [ -n "${wmux_test_rcfile:-}" ] && . "$wmux_test_rcfile"
             """
         )
         try writeFailingThenWorkingBase64(to: bin.appendingPathComponent("base64"))
@@ -59,7 +59,7 @@ struct RemoteInitialCommandBootstrapFailureTests {
             "HOME": home.path,
             "PATH": "\(bin.path):/usr/bin:/bin",
             "SHELL": bin.appendingPathComponent("bash").path,
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
         ]) { _, new in new }
 
         let failedDecode = try runShell(script, environment: environment)
@@ -70,7 +70,7 @@ struct RemoteInitialCommandBootstrapFailureTests {
             contentsOf: home.appendingPathComponent("bash startup environment.txt"),
             encoding: .utf8
         )
-        #expect(!startupEnvironment.contains("CMUX_INITIAL_COMMAND_B64="))
+        #expect(!startupEnvironment.contains("WMUX_INITIAL_COMMAND_B64="))
         let payloadMode = try String(
             contentsOf: home.appendingPathComponent("initial command payload mode.txt"),
             encoding: .utf8
@@ -120,7 +120,7 @@ struct RemoteInitialCommandBootstrapFailureTests {
             "PATH": "\(bin.path):/usr/bin:/bin",
             "SHELL": fish,
             "XDG_CONFIG_HOME": home.appendingPathComponent(".config").path,
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
         ]) { _, new in new }
 
         let failedDecode = try runShell(script, environment: environment)
@@ -174,7 +174,7 @@ struct RemoteInitialCommandBootstrapFailureTests {
             "HOME": home.path,
             "PATH": "\(bin.path):/usr/bin:/bin",
             "SHELL": unsupportedShell.path,
-            "CMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
+            "WMUX_PERSISTENT_PTY_EXEC_HELPER": persistentPTYExecHelper.path,
         ]) { _, new in new }
 
         let unsupported = try runShell(script, environment: unsupportedEnvironment)
@@ -207,11 +207,11 @@ struct RemoteInitialCommandBootstrapFailureTests {
             to: url,
             body: """
             #!/bin/sh
-            cmux_test_attempt=0
-            [ ! -f "$HOME/base64-attempts" ] || cmux_test_attempt=$(cat "$HOME/base64-attempts")
-            cmux_test_attempt=$((cmux_test_attempt + 1))
-            printf '%s\n' "$cmux_test_attempt" > "$HOME/base64-attempts"
-            if [ "$cmux_test_attempt" -le 2 ]; then
+            wmux_test_attempt=0
+            [ ! -f "$HOME/base64-attempts" ] || wmux_test_attempt=$(cat "$HOME/base64-attempts")
+            wmux_test_attempt=$((wmux_test_attempt + 1))
+            printf '%s\n' "$wmux_test_attempt" > "$HOME/base64-attempts"
+            if [ "$wmux_test_attempt" -le 2 ]; then
               printf partial-output
               exit 1
             fi

@@ -1,8 +1,8 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxBrowser
-import CmuxCore
-import CmuxSettings
+import WmuxBrowser
+import WmuxCore
+import WmuxSettings
 import Foundation
 import WebKit
 

@@ -77,7 +77,7 @@ struct LocalTmuxSessionRegistry {
     /// same format under its own directory.
     static func live(
         directoryName: String = "local-tmux",
-        overrideVariable: String = "CMUX_LOCAL_TMUX_STATE_DIR",
+        overrideVariable: String = "WMUX_LOCAL_TMUX_STATE_DIR",
         environment: [String: String] = ProcessInfo.processInfo.environment,
         fileManager: FileManager = .default
     ) -> LocalTmuxSessionRegistry {

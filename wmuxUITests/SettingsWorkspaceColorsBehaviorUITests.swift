@@ -3,8 +3,8 @@ import XCTest
 /// Behavioral UI tests for the Settings **Workspace Colors** section.
 ///
 /// Section controls and their catalog keys (see
-/// `Packages/macOS/CmuxSettingsUI/.../Sections/WorkspaceColorsSection.swift`
-/// and `Packages/macOS/CmuxSettings/.../Keys/WorkspaceColorsCatalogSection.swift`):
+/// `Packages/macOS/WmuxSettingsUI/.../Sections/WorkspaceColorsSection.swift`
+/// and `Packages/macOS/WmuxSettings/.../Keys/WorkspaceColorsCatalogSection.swift`):
 ///
 /// - **Workspace Color Indicator** (`workspaceColors.indicatorStyle`,
 ///   UserDefaults `sidebarActiveTabIndicatorStyle`): menu Picker, Left

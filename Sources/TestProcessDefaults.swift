@@ -86,10 +86,10 @@ enum TestProcessDefaults {
 
     /// Whether this process is an XCTest host: xcodebuild injects the test
     /// bundle through these variables, and the CI wrapper sets
-    /// `CMUX_TEST_PROCESS` before XCTest connects. An XCUITest target app gets
+    /// `WMUX_TEST_PROCESS` before XCTest connects. An XCUITest target app gets
     /// none of them.
     static func hostsTestBundles(environment: [String: String]) -> Bool {
-        environment["CMUX_TEST_PROCESS"] == "1"
+        environment["WMUX_TEST_PROCESS"] == "1"
             || environment["XCTestConfigurationFilePath"] != nil
             || environment["XCInjectBundleInto"] != nil
     }

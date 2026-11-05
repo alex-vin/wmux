@@ -46,10 +46,10 @@ struct WorkspaceSSHFishProcessDrainTests {
             try? FileManager.default.removeItem(at: directory)
         }
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_DRAIN_PID_FILE"] = pidFile.path
+        environment["WMUX_DRAIN_PID_FILE"] = pidFile.path
         let result = SSHFishProcessRunner.runProcess(
             executablePath: "/bin/sh",
-            arguments: ["-c", "/bin/sleep 15 & echo $! > \"$CMUX_DRAIN_PID_FILE\"; printf parent-exited >&2"],
+            arguments: ["-c", "/bin/sleep 15 & echo $! > \"$WMUX_DRAIN_PID_FILE\"; printf parent-exited >&2"],
             environment: environment,
             timeout: 5,
             // The backgrounded writer holds the pipes past the parent's exit,

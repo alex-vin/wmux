@@ -27,7 +27,7 @@ import Testing
     /// The environment denies tools and config overrides while retaining provider credentials.
     @Test func environmentDisablesOpenCodeToolsAndProjectConfig() throws {
         let environment = policy.openCodeSummarizerEnvironment(from: [
-            "CMUX_WORKSPACE_ID": "workspace",
+            "WMUX_WORKSPACE_ID": "workspace",
             "OPENCODE_PERMISSION": "{\"*\":\"allow\"}",
             "OPENCODE_PROJECT_CONFIG": "/tmp/project/opencode.json",
             "OPENCODE_CONFIG": "/tmp/user/opencode.json",
@@ -35,7 +35,7 @@ import Testing
             "PATH": "/usr/bin"
         ])
 
-        #expect(environment["CMUX_WORKSPACE_ID"] == nil)
+        #expect(environment["WMUX_WORKSPACE_ID"] == nil)
         #expect(environment["OPENCODE_PERMISSION"] == #"{"*":"deny"}"#)
         #expect(environment["OPENCODE_DISABLE_PROJECT_CONFIG"] == "1")
         #expect(environment["OPENCODE_PURE"] == "1")

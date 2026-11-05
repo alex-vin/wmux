@@ -1,10 +1,10 @@
 import Darwin
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -140,17 +140,17 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
         var environment = sshPTYAttachTestEnvironment(socketPath: socketPath)
         if wrapperRetryPending {
-            environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+            environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
         } else {
-            environment.removeValue(forKey: "CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY")
+            environment.removeValue(forKey: "WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY")
         }
         if managedReconnect {
-            environment["CMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] = "1"
+            environment["WMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] = "1"
         } else {
-            environment.removeValue(forKey: "CMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT")
+            environment.removeValue(forKey: "WMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT")
         }
         if let debugLogURL {
-            environment["CMUX_DEBUG_LOG"] = debugLogURL.path
+            environment["WMUX_DEBUG_LOG"] = debugLogURL.path
         }
         let result = runProcess(
             executablePath: cliPath,
@@ -213,9 +213,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "#!/bin/sh",
             "case \" $* \" in",
             "  *\" ssh-pty-attach \"*)",
-            "    count=$(cat \"${CMUX_TEST_ATTACH_ATTEMPTS}\" 2>/dev/null || printf 0)",
+            "    count=$(cat \"${WMUX_TEST_ATTACH_ATTEMPTS}\" 2>/dev/null || printf 0)",
             "    count=$((count + 1))",
-            "    printf '%s' \"$count\" > \"${CMUX_TEST_ATTACH_ATTEMPTS}\"",
+            "    printf '%s' \"$count\" > \"${WMUX_TEST_ATTACH_ATTEMPTS}\"",
             "    case \"$count\" in 1) exit 255 ;; 2) exit 254 ;; *) exit 253 ;; esac",
             "    ;;",
             "  *) exit 0 ;;",
@@ -224,13 +224,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         try writeSSHPTYReconnectTestShell(at: fakeSSH, lines: [
             "#!/bin/sh",
             "case \" $* \" in",
-            "  *\" -G \"*) printf '%s\\n' \"controlpath ${CMUX_TEST_CONTROL_PATH}\"; exit 0 ;;",
+            "  *\" -G \"*) printf '%s\\n' \"controlpath ${WMUX_TEST_CONTROL_PATH}\"; exit 0 ;;",
             "  *\" -O check \"*) exit 1 ;;",
             "  *\" -O \"*) exit 0 ;;",
             "esac",
-            "count=$(cat \"${CMUX_TEST_AUTH_ATTEMPTS}\" 2>/dev/null || printf 0)",
+            "count=$(cat \"${WMUX_TEST_AUTH_ATTEMPTS}\" 2>/dev/null || printf 0)",
             "count=$((count + 1))",
-            "printf '%s' \"$count\" > \"${CMUX_TEST_AUTH_ATTEMPTS}\"",
+            "printf '%s' \"$count\" > \"${WMUX_TEST_AUTH_ATTEMPTS}\"",
             "if [ \"$count\" -eq 2 ]; then",
             "  printf '%s\\n' 'ssh: connect to host user@example.test port 22: Network is unreachable' >&2",
             "  exit 255",
@@ -239,8 +239,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         ])
         try writeSSHPTYReconnectTestShell(at: fakeSleep, lines: [
             "#!/bin/sh",
-            "count=$(cat \"${CMUX_TEST_SLEEP_ATTEMPTS}\" 2>/dev/null || printf 0)",
-            "printf '%s' $((count + 1)) > \"${CMUX_TEST_SLEEP_ATTEMPTS}\"",
+            "count=$(cat \"${WMUX_TEST_SLEEP_ATTEMPTS}\" 2>/dev/null || printf 0)",
+            "printf '%s' $((count + 1)) > \"${WMUX_TEST_SLEEP_ATTEMPTS}\"",
         ])
         for executable in [fakeCLI, fakeSSH, fakeSleep] {
             try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
@@ -248,16 +248,16 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         var environment = sshPTYAttachTestEnvironment(socketPath: "/tmp/cmux-debug-test.sock")
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_AUTH_ATTEMPTS"] = authAttempts.path
-        environment["CMUX_TEST_ATTACH_ATTEMPTS"] = attachAttempts.path
-        environment["CMUX_TEST_SLEEP_ATTEMPTS"] = sleepAttempts.path
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_AUTH_ATTEMPTS"] = authAttempts.path
+        environment["WMUX_TEST_ATTACH_ATTEMPTS"] = attachAttempts.path
+        environment["WMUX_TEST_SLEEP_ATTEMPTS"] = sleepAttempts.path
         environment[SSHForegroundAuthenticationLaunch.environmentKey] = "foreground-auth-token"
-        environment["CMUX_TEST_CONTROL_PATH"] = controlPath
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
-        environment["CMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
+        environment["WMUX_TEST_CONTROL_PATH"] = controlPath
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
+        environment["WMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "2"
 
         let generatedCommand = SSHPTYAttachStartupCommandBuilder.command(
             sessionID: "ssh-test-session",
@@ -347,8 +347,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
         let bridgeHandled = startSilentBridgeServer(listenerFD: bridge.fd)
         var environment = sshPTYAttachTestEnvironment(socketPath: socketPath)
-        environment["CMUX_SSH_PTY_BRIDGE_READY_TIMEOUT_SECONDS"] = "1"
-        environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+        environment["WMUX_SSH_PTY_BRIDGE_READY_TIMEOUT_SECONDS"] = "1"
+        environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
         let result = runProcess(
             executablePath: cliPath,
             arguments: [
@@ -405,8 +405,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
     private func sshPTYAttachTestEnvironment(socketPath: String) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         return environment
     }
 

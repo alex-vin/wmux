@@ -1,10 +1,10 @@
 import Foundation
-import CmuxBrowser
+import WmuxBrowser
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,21 +15,21 @@ import WebKit
 @MainActor
 private final class PrewarmPoolHarness {
     let dataStore = WKWebsiteDataStore.nonPersistent()
-    private(set) var madeWebViews: [CmuxWebView] = []
+    private(set) var madeWebViews: [WmuxWebView] = []
     private(set) var loadedRequests: [URLRequest] = []
     let pool: BrowserPrewarmedWebViewPool
 
     init(expirySleep: @escaping @Sendable (Duration) async throws -> Void = { _ in
         try await Task.sleep(for: .seconds(3600))
     }) {
-        var recordWebView: (@MainActor (CmuxWebView) -> Void)!
+        var recordWebView: (@MainActor (WmuxWebView) -> Void)!
         var recordRequest: (@MainActor (URLRequest) -> Void)!
         let dataStore = dataStore
         pool = BrowserPrewarmedWebViewPool(
             makeWebView: { _ in
                 let configuration = WKWebViewConfiguration()
                 configuration.websiteDataStore = dataStore
-                let webView = CmuxWebView(frame: .zero, configuration: configuration, host: CmuxWebViewAppHost())
+                let webView = WmuxWebView(frame: .zero, configuration: configuration, host: WmuxWebViewAppHost())
                 recordWebView(webView)
                 return webView
             },

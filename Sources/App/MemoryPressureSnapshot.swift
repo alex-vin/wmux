@@ -1,5 +1,5 @@
 import Foundation
-import CmuxMemoryPressure
+import WmuxMemoryPressure
 
 struct MemoryPressureSnapshot: Equatable, Sendable {
     let severity: MemoryPressureSeverity

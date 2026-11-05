@@ -5,7 +5,7 @@
 // posts made through LinkedIn's share composer after a confirmed draft.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
   const ORIGIN = "https://www.linkedin.com";
   const SIGN_IN = [/linkedin\.com\/(login|authwall|checkpoint|uas\/login|signup)/];

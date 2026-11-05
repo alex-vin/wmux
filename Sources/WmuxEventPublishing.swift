@@ -1,8 +1,8 @@
 import Foundation
-import CMUXAgentLaunch
-import CmuxSidebar
+import WMUXAgentLaunch
+import WmuxSidebar
 
-extension CmuxEventBus {
+extension WmuxEventBus {
     /// Keeps each status snapshot event below the event stream's 16 KiB line
     /// limit. OSC 7501 record ids are limited to 128 bytes, so 32 records leave
     /// room for the event envelope and addressed record as well.
@@ -487,7 +487,7 @@ extension CmuxEventBus {
         notification: TerminalNotification,
         payload extraPayload: [String: Any] = [:]
     ) {
-        var payload = CmuxSocketEventMapper.redactedNotificationParams([
+        var payload = WmuxSocketEventMapper.redactedNotificationParams([
             "notification_id": notification.id.uuidString,
             "workspace_id": notification.tabId.uuidString,
             "surface_id": notification.surfaceId?.uuidString ?? NSNull(),

@@ -1,11 +1,11 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
 @MainActor
-extension CmuxTuiSurfaceProvider {
-    /// A new terminal in the machine's cmux-tui session (`workspace <ws> run -- argv`).
+extension WmuxTuiSurfaceProvider {
+    /// A new terminal in the machine's wmux-tui session (`workspace <ws> run -- argv`).
     func createTerminal(command: [String]?, cwd: String?, name: String?, remoteWorkspaceID: String?) async throws -> SurfaceResource {
         try await createTerminal(command: command, cwd: cwd, name: name, remoteWorkspaceID: remoteWorkspaceID, request: CloudTerminalCreationRequest())
     }
@@ -61,7 +61,7 @@ extension CmuxTuiSurfaceProvider {
         ), deadline: .seconds(30))
         try validateTerminalMutationLifecycle(lifecycle)
         guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let created = CmuxTuiSnapshotParser.createdTerminal(fromRunResult: object) else {
+              let created = WmuxTuiSnapshotParser.createdTerminal(fromRunResult: object) else {
             throw ProviderError.terminalNotCreated(String(data: data, encoding: .utf8) ?? "")
         }
         guard let resolvedWorkspaceID = created.workspaceID ?? (workspaceID == "current" ? nil : workspaceID) else {

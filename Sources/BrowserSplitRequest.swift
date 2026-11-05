@@ -1,4 +1,4 @@
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 
 /// Browser creation options shared by main-workspace and Dock split hosts.

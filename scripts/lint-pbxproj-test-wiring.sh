@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Lint: every Swift file under cmuxTests/ must be wired into
-# cmux.xcodeproj/project.pbxproj.
+# wmux.xcodeproj/project.pbxproj.
 #
 # A test file added to the worktree but not registered as a PBXFileReference +
 # PBXSourcesBuildPhase entry in project.pbxproj is silently ignored by Xcode and
@@ -80,7 +80,7 @@ if [ -z "$REPO_ROOT" ]; then
   REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)"
 fi
 
-PBXPROJ="$REPO_ROOT/cmux.xcodeproj/project.pbxproj"
+PBXPROJ="$REPO_ROOT/wmux.xcodeproj/project.pbxproj"
 TESTS_REL="${TESTS_DIR_ARG:-$TARGET_NAME}"
 TESTS_DIR="$REPO_ROOT/$TESTS_REL"
 
@@ -256,12 +256,12 @@ if [ "${#missing[@]}" -eq 0 ]; then
   exit 0
 fi
 
-echo "lint-pbxproj-test-wiring: ${#missing[@]} Swift file(s) not a member of the $TARGET_NAME target's Sources build phase (uuid=$tests_sources_uuid) in cmux.xcodeproj/project.pbxproj"
+echo "lint-pbxproj-test-wiring: ${#missing[@]} Swift file(s) not a member of the $TARGET_NAME target's Sources build phase (uuid=$tests_sources_uuid) in wmux.xcodeproj/project.pbxproj"
 for entry in "${missing[@]}"; do
   echo "  - $entry"
 done
 echo ""
-echo "Each $TESTS_REL/<file>.swift must be wired into cmux.xcodeproj/project.pbxproj"
+echo "Each $TESTS_REL/<file>.swift must be wired into wmux.xcodeproj/project.pbxproj"
 echo "as a full target member of $TARGET_NAME:"
 echo "  1. a PBXBuildFile entry (line ends with '<file>.swift in Sources */ = { ... };')"
 echo "  2. a PBXFileReference entry"

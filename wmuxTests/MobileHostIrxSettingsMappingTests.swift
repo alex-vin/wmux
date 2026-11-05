@@ -1,11 +1,11 @@
-import CMUXMobileCore
-import CmuxAuthRuntime
-import CmuxIrxTransport
+import WMUXMobileCore
+import WmuxAuthRuntime
+import WmuxIrxTransport
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -310,9 +310,9 @@ struct MobileHostV2ConfigurationTests {
 
     @Test func blankOverridesDoNotMaskTheProductionEnvironment() throws {
         try withBlankReleaseBundle { bundle, defaults in
-            defaults.set("production", forKey: "cmux.iroh.v2.config.CMUX_IROH_V2_ENVIRONMENT")
+            defaults.set("production", forKey: "cmux.iroh.v2.config.WMUX_IROH_V2_ENVIRONMENT")
             let configuration = try MobileHostV2Configuration.current(
-                values: ["CMUX_IROH_V2_ENVIRONMENT": " \n", "CMUX_IROH_V2_BASE_URL": ""],
+                values: ["WMUX_IROH_V2_ENVIRONMENT": " \n", "WMUX_IROH_V2_BASE_URL": ""],
                 defaults: defaults,
                 bundle: bundle
             )
@@ -325,7 +325,7 @@ struct MobileHostV2ConfigurationTests {
         try withBlankReleaseBundle { bundle, defaults in
             #expect(throws: V2ControlFailure.scopeMismatch) {
                 try MobileHostV2Configuration.current(
-                    values: ["CMUX_IROH_V2_ENVIRONMENT": "produciton"],
+                    values: ["WMUX_IROH_V2_ENVIRONMENT": "produciton"],
                     defaults: defaults,
                     bundle: bundle
                 )
@@ -346,8 +346,8 @@ struct MobileHostV2ConfigurationTests {
         }
         let info: [String: String] = [
             "CFBundleIdentifier": "com.cmuxterm.app.nightly",
-            "CMUX_IROH_V2_ENVIRONMENT": "",
-            "CMUX_IROH_V2_BASE_URL": ""
+            "WMUX_IROH_V2_ENVIRONMENT": "",
+            "WMUX_IROH_V2_BASE_URL": ""
         ]
         try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0)
             .write(to: directory.appendingPathComponent("Info.plist"))

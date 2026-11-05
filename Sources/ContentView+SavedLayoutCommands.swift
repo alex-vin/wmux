@@ -1,5 +1,5 @@
 import AppKit
-import CmuxCommandPalette
+import WmuxCommandPalette
 import Foundation
 
 extension ContentView {
@@ -104,7 +104,7 @@ extension ContentView {
         do {
             let capture = try workspace.captureLayoutDefinition()
             try store.save(
-                CmuxSavedLayout(name: name, description: nil, workspace: capture.workspace),
+                WmuxSavedLayout(name: name, description: nil, workspace: capture.workspace),
                 overwrite: overwrite
             )
         } catch {
@@ -152,7 +152,7 @@ extension ContentView {
         return String(localized: "dialog.savedLayout.error.unknown", defaultValue: "The saved layout request could not be completed. Try again.")
     }
 
-    private func savedLayoutsForCommandPalette() -> [CmuxSavedLayout] {
+    private func savedLayoutsForCommandPalette() -> [WmuxSavedLayout] {
         (try? SavedLayoutStore().list()) ?? []
     }
 
@@ -167,5 +167,5 @@ extension ContentView {
 }
 
 extension Notification.Name {
-    static let savedLayoutSaveRequested = Notification.Name("cmux.savedLayoutSaveRequested")
+    static let savedLayoutSaveRequested = Notification.Name("wmux.savedLayoutSaveRequested")
 }

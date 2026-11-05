@@ -2,16 +2,16 @@ import Darwin
 import Foundation
 import Testing
 
-import CmuxControlSocket
-import CmuxCore
-import CmuxRemoteDaemon
-import CmuxRemoteSession
-import CmuxRemoteWorkspace
-import CmuxSidebar
-import CmuxTerminal
+import WmuxControlSocket
+import WmuxCore
+import WmuxRemoteDaemon
+import WmuxRemoteSession
+import WmuxRemoteWorkspace
+import WmuxSidebar
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -86,7 +86,7 @@ struct SSHRemoteCWDRegressionTests {
               shift || true
             done
             if [ -n "$rcfile" ]; then . "$rcfile"; fi
-            printf '%s\\n' "$PWD" > "$CMUX_CAPTURE_PWD"
+            printf '%s\\n' "$PWD" > "$WMUX_CAPTURE_PWD"
             """)
         let helper = bin.appendingPathComponent("persistent-pty-exec-helper")
         try writeExecutableShellFile(at: helper, body: """
@@ -114,7 +114,7 @@ struct SSHRemoteCWDRegressionTests {
             arguments: [
                 "HOME=\(home.path)", "SHELL=\(bin.appendingPathComponent("bash").path)",
                 "PATH=\(bin.path):/usr/bin:/bin", "TERM=xterm-256color", "USER=\(NSUserName())",
-                "CMUX_CAPTURE_PWD=\(capturedPWD.path)", "CMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
+                "WMUX_CAPTURE_PWD=\(capturedPWD.path)", "WMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
                 "/bin/sh", "-c", script,
             ],
             timeout: 30
@@ -152,7 +152,7 @@ struct SSHRemoteCWDRegressionTests {
               shift || true
             done
             if [ -n "$rcfile" ]; then . "$rcfile"; fi
-            printf '%s\\n' "$PWD" >> "$CMUX_CAPTURE_PWD"
+            printf '%s\\n' "$PWD" >> "$WMUX_CAPTURE_PWD"
             """)
         try writeExecutableShellFile(at: bin.appendingPathComponent("persistent-pty-exec-helper"), body: """
             #!/bin/sh
@@ -163,9 +163,9 @@ struct SSHRemoteCWDRegressionTests {
             shift
             [ "${1:-}" = "$executable" ] || exit 2
             shift
-            if [ ! -e "$CMUX_HELPER_MARKER" ]; then
-              : > "$CMUX_HELPER_MARKER"
-              /bin/sh "$CMUX_SECOND_BOOTSTRAP"
+            if [ ! -e "$WMUX_HELPER_MARKER" ]; then
+              : > "$WMUX_HELPER_MARKER"
+              /bin/sh "$WMUX_SECOND_BOOTSTRAP"
             fi
             exec "$executable" "$@"
             """)
@@ -184,8 +184,8 @@ struct SSHRemoteCWDRegressionTests {
             arguments: [
                 "HOME=\(home.path)", "SHELL=\(bin.appendingPathComponent("bash").path)",
                 "PATH=\(bin.path):/usr/bin:/bin", "TERM=xterm-256color", "USER=\(NSUserName())",
-                "CMUX_CAPTURE_PWD=\(capturedPWD.path)", "CMUX_HELPER_MARKER=\(helperMarker.path)",
-                "CMUX_SECOND_BOOTSTRAP=\(secondBootstrap.path)", "CMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
+                "WMUX_CAPTURE_PWD=\(capturedPWD.path)", "WMUX_HELPER_MARKER=\(helperMarker.path)",
+                "WMUX_SECOND_BOOTSTRAP=\(secondBootstrap.path)", "WMUX_PERSISTENT_PTY_EXEC_HELPER=\(helper.path)",
                 "/bin/sh", "-c", bootstrap(for: firstWorkingDirectory),
             ],
             timeout: 30
@@ -219,7 +219,7 @@ struct SSHRemoteCWDRegressionTests {
         #expect(workspace.updateRemotePanelDirectory(panelId: sourcePanelID, directory: selectedPanelDirectory))
         let splitPanel = try #require(workspace.newTerminalSplit(from: sourcePanelID, orientation: .vertical, focus: false))
         #expect(splitPanel.requestedWorkingDirectory == nil)
-        #expect(splitPanel.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == selectedPanelDirectory)
+        #expect(splitPanel.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == selectedPanelDirectory)
     }
 
     @Test @MainActor
@@ -236,7 +236,7 @@ struct SSHRemoteCWDRegressionTests {
         #expect(workspace.panelDirectories[sourcePanel.id] == nil)
         let splitPanel = try #require(workspace.newTerminalSplit(from: sourcePanel.id, orientation: .vertical, focus: false))
         #expect(splitPanel.requestedWorkingDirectory == nil)
-        #expect(splitPanel.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == sourceDirectory)
+        #expect(splitPanel.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == sourceDirectory)
     }
 
     @Test @MainActor
@@ -246,7 +246,7 @@ struct SSHRemoteCWDRegressionTests {
         let sourcePanelID = try #require(workspace.focusedTerminalPanel?.id)
         let splitPanel = try #require(workspace.newTerminalSplit(from: sourcePanelID, orientation: .vertical, focus: false))
         #expect(splitPanel.requestedWorkingDirectory == nil)
-        #expect(splitPanel.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == nil)
+        #expect(splitPanel.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == nil)
     }
 
     @Test @MainActor
@@ -257,13 +257,13 @@ struct SSHRemoteCWDRegressionTests {
         #expect(workspace.updateRemotePanelDirectory(panelId: sourcePanelID, directory: "/srv/cmux/selected"))
         let withoutFallback = try #require(workspace.newTerminalSurface(inPane: paneID, focus: false, inheritWorkingDirectoryFallback: false))
         #expect(withoutFallback.requestedWorkingDirectory == nil)
-        #expect(withoutFallback.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == nil)
+        #expect(withoutFallback.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == nil)
         let explicitDirectory = "/srv/cmux/explicit"
         let withExplicitDirectory = try #require(workspace.newTerminalSurface(
             inPane: paneID, focus: false, workingDirectory: explicitDirectory, inheritWorkingDirectoryFallback: false
         ))
         #expect(withExplicitDirectory.requestedWorkingDirectory == nil)
-        #expect(withExplicitDirectory.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == explicitDirectory)
+        #expect(withExplicitDirectory.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == explicitDirectory)
     }
 
     @Test @MainActor
@@ -272,13 +272,13 @@ struct SSHRemoteCWDRegressionTests {
         workspace.workspaceEnvironment[Workspace.remoteInitialWorkingDirectoryEnvironmentKey] = "/srv/cmux/stale"
         let sourcePanelID = try #require(workspace.focusedTerminalPanel?.id)
         let splitPanel = try #require(workspace.newTerminalSplit(from: sourcePanelID, orientation: .vertical, focus: false))
-        #expect(splitPanel.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == nil)
+        #expect(splitPanel.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == nil)
         let paneID = try #require(workspace.bonsplitController.allPaneIds.first)
         let explicitDirectory = "/srv/cmux/explicit-environment"
         let surface = try #require(workspace.newTerminalSurface(
             inPane: paneID, focus: false,
             startupEnvironment: [Workspace.remoteInitialWorkingDirectoryEnvironmentKey: explicitDirectory]
         ))
-        #expect(surface.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == explicitDirectory)
+        #expect(surface.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == explicitDirectory)
     }
 }

@@ -1,11 +1,11 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
-import CMUXAgentLaunch
-import CmuxAgentJournal
-import CmuxControlSocket
-import CmuxFoundation
-import CmuxSettings
-import CmuxSudoBroker
+import WMUXAgentLaunch
+import WmuxAgentJournal
+import WmuxControlSocket
+import WmuxFoundation
+import WmuxSettings
+import WmuxSudoBroker
 import CoreFoundation
 import CryptoKit
 import Darwin
@@ -76,7 +76,7 @@ private func agentHookDebugLog(
     try? handle.write(contentsOf: data)
 }
 private func agentHookDebugLogPath(socketPath: String?, env: [String: String]) -> String {
-    if let explicit = agentHookDebugNonEmpty(env["CMUX_DEBUG_LOG"]) {
+    if let explicit = agentHookDebugNonEmpty(env["WMUX_DEBUG_LOG"]) {
         return NSString(string: explicit).expandingTildeInPath
     }
     if let socketPath {
@@ -406,10 +406,10 @@ final class ClaudeHookSessionStore {
         processEnv: [String: String] = ProcessInfo.processInfo.environment,
         fileManager: FileManager = .default
     ) {
-        if let overridePath = processEnv["CMUX_CLAUDE_HOOK_STATE_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        if let overridePath = processEnv["WMUX_CLAUDE_HOOK_STATE_PATH"]?.trimmingCharacters(in: .whitespacesAndNewlines),
            !overridePath.isEmpty {
             self.statePath = NSString(string: overridePath).expandingTildeInPath
-        } else if let overrideDirectory = processEnv["CMUX_AGENT_HOOK_STATE_DIR"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        } else if let overrideDirectory = processEnv["WMUX_AGENT_HOOK_STATE_DIR"]?.trimmingCharacters(in: .whitespacesAndNewlines),
                   !overrideDirectory.isEmpty {
             self.statePath = URL(fileURLWithPath: NSString(string: overrideDirectory).expandingTildeInPath, isDirectory: true)
                 .appendingPathComponent("claude-hook-sessions.json", isDirectory: false)
@@ -2939,12 +2939,12 @@ private let agentHookWrapperProcessNames: Set<String> = [
 ]
 
 private let suppressSubagentNotificationsDefaultsKey = "suppressSubagentNotifications"
-private let suppressSubagentNotificationsEnvironmentKey = "CMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS"
-private let managedSubagentEnvironmentKey = "CMUX_AGENT_MANAGED_SUBAGENT"
-let agentHookRelayOriginEnvironmentKey = "CMUX_AGENT_HOOK_RELAY_ORIGIN"
-private let codexTeamsThreadEnvironmentKey = "CMUX_CODEX_TEAMS_THREAD_ID"
-private let codexTeamsParentThreadEnvironmentKey = "CMUX_CODEX_TEAMS_PARENT_THREAD_ID"
-private let codexTeamsDepthEnvironmentKey = "CMUX_CODEX_TEAMS_DEPTH"
+private let suppressSubagentNotificationsEnvironmentKey = "WMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS"
+private let managedSubagentEnvironmentKey = "WMUX_AGENT_MANAGED_SUBAGENT"
+let agentHookRelayOriginEnvironmentKey = "WMUX_AGENT_HOOK_RELAY_ORIGIN"
+private let codexTeamsThreadEnvironmentKey = "WMUX_CODEX_TEAMS_THREAD_ID"
+private let codexTeamsParentThreadEnvironmentKey = "WMUX_CODEX_TEAMS_PARENT_THREAD_ID"
+private let codexTeamsDepthEnvironmentKey = "WMUX_CODEX_TEAMS_DEPTH"
 
 enum CLIIDFormat: String {
     case refs
@@ -2979,7 +2979,7 @@ enum SocketPasswordResolver {
         if let explicit = normalized(explicit) {
             return explicit
         }
-        if let env = normalized(ProcessInfo.processInfo.environment["CMUX_SOCKET_PASSWORD"]) {
+        if let env = normalized(ProcessInfo.processInfo.environment["WMUX_SOCKET_PASSWORD"]) {
             return env
         }
         if let filePassword = loadFromFile() {
@@ -3025,7 +3025,7 @@ enum SocketPasswordResolver {
         socketPath: String,
         environment: [String: String] = ProcessInfo.processInfo.environment
     ) -> String? {
-        if let tag = normalized(environment["CMUX_TAG"]) {
+        if let tag = normalized(environment["WMUX_TAG"]) {
             let scoped = sanitizeScope(tag)
             if !scoped.isEmpty {
                 return scoped
@@ -3158,7 +3158,7 @@ final class SocketClient {
     private static let connectRetryIntervalMicros: useconds_t = 25_000
     static let responseTimeoutSeconds: TimeInterval = {
         let env = ProcessInfo.processInfo.environment
-        if let raw = env["CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"],
+        if let raw = env["WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"],
            let seconds = Double(raw),
            seconds.isFinite,
            seconds > 0 {
@@ -3627,7 +3627,7 @@ final class SocketClient {
         return coderouterDebugArmServerSigningFieldsAreAllowed(
             identifier: information[kSecCodeInfoIdentifier as String] as? String,
             teamIdentifier: information[kSecCodeInfoTeamIdentifier as String] as? String,
-            expectedBundleIdentifier: ProcessInfo.processInfo.environment["CMUX_BUNDLE_ID"]
+            expectedBundleIdentifier: ProcessInfo.processInfo.environment["WMUX_BUNDLE_ID"]
         )
     }
 
@@ -3945,7 +3945,7 @@ final class SocketClient {
 
     private static func automationEnvelopeCommand(_ command: String) -> String {
         guard !command.hasPrefix("__cmux_automation_origin "),
-              let ruleID = ProcessInfo.processInfo.environment["CMUX_AUTOMATION_RULE_ID"],
+              let ruleID = ProcessInfo.processInfo.environment["WMUX_AUTOMATION_RULE_ID"],
               !ruleID.isEmpty else {
             return command
         }
@@ -3959,7 +3959,7 @@ final class SocketClient {
 
     /// Builds the automation-origin envelope shared by v1 and v2 requests.
     static func automationOriginPayload(ruleID: String) -> [String: Any] {
-        let rawChain = ProcessInfo.processInfo.environment["CMUX_AUTOMATION_CHAIN"] ?? ruleID
+        let rawChain = ProcessInfo.processInfo.environment["WMUX_AUTOMATION_CHAIN"] ?? ruleID
         let chain: [String]
         if let data = rawChain.data(using: .utf8),
            let decoded = try? JSONSerialization.jsonObject(with: data) as? [String] {
@@ -4165,8 +4165,8 @@ final class SocketClient {
 
     private static func relayCredentials(for endpoint: RelayEndpoint) throws -> RelayCredentials {
         let environment = ProcessInfo.processInfo.environment
-        if let relayID = trimmedEnvValue(environment["CMUX_RELAY_ID"]),
-           let relayTokenHex = trimmedEnvValue(environment["CMUX_RELAY_TOKEN"]),
+        if let relayID = trimmedEnvValue(environment["WMUX_RELAY_ID"]),
+           let relayTokenHex = trimmedEnvValue(environment["WMUX_RELAY_TOKEN"]),
            let relayToken = Data(relayHex: relayTokenHex) {
             return RelayCredentials(relayID: relayID, relayToken: relayToken)
         }
@@ -4784,7 +4784,6 @@ struct CoderouterArmServerPeerVerifier {
 struct WMUXCLI {
     let args: [String]
     let initialSIGPIPEInspectionPayload: [String: Any]?
-    let simulatorOwnedCommandRunner: any SimulatorOwnedCommandRunning
     let coderouterArmServerPeerVerifier: CoderouterArmServerPeerVerifier
 
     /// Bounded socket wait around the cmux worker's hosted arm deadline.
@@ -4826,8 +4825,8 @@ struct WMUXCLI {
     ) -> Bool {
         #if DEBUG
         // Tests use short-lived shell fixtures. This bypass is not present in
-        // a Release build and the CMUX_ prefix keeps it out of the child.
-        if environment["CMUX_CODEROUTER_TEST_ALLOW_UNSIGNED"] == "1" {
+        // a Release build and the WMUX_ prefix keeps it out of the child.
+        if environment["WMUX_CODEROUTER_TEST_ALLOW_UNSIGNED"] == "1" {
             return true
         }
         #endif
@@ -4986,7 +4985,7 @@ struct WMUXCLI {
         return VMMachineKind.defaultKind
     }
     private static let cloudVMDesktopPort = 6901
-    /// Opens the machine shell through cmux-tui, honoring explicit background attachment.
+    /// Opens the machine shell through wmux-tui, honoring explicit background attachment.
     func openVMWorkspaceShell(
         vmId: String,
         windowRaw: String?,
@@ -5151,13 +5150,10 @@ struct WMUXCLI {
     init(
         args: [String],
         initialSIGPIPEInspectionPayload: [String: Any]? = nil,
-        simulatorOwnedCommandRunner: any SimulatorOwnedCommandRunning =
-            SimulatorOwnedCommandRunner(),
         coderouterArmServerPeerVerifier: CoderouterArmServerPeerVerifier = .production
     ) {
         self.args = args
         self.initialSIGPIPEInspectionPayload = initialSIGPIPEInspectionPayload
-        self.simulatorOwnedCommandRunner = simulatorOwnedCommandRunner
         self.coderouterArmServerPeerVerifier = coderouterArmServerPeerVerifier
     }
 
@@ -5217,7 +5213,7 @@ struct WMUXCLI {
     }
 
     private static func isCodingAgentEnvironment(_ environment: [String: String]) -> Bool {
-        if let kind = normalizedEnvValue(environment["CMUX_AGENT_LAUNCH_KIND"])?.lowercased() {
+        if let kind = normalizedEnvValue(environment["WMUX_AGENT_LAUNCH_KIND"])?.lowercased() {
             let agentKinds: Set<String> = [
                 "claude",
                 "codex",
@@ -5260,12 +5256,12 @@ struct WMUXCLI {
     /// caller passed neither `--focus` nor `--no-focus`. A person typing the command
     /// lands in what they opened; a coding agent or a script (no terminal on stdin or
     /// stdout) must not pull the person away from what they are typing in
-    /// (cmux-socket-policy). `CMUX_FOCUS_NEW=1|0` overrides the detection.
+    /// (cmux-socket-policy). `WMUX_FOCUS_NEW=1|0` overrides the detection.
     static func defaultFocusForUserOpen(
         environment: [String: String] = ProcessInfo.processInfo.environment,
         isInteractiveTerminal: Bool = isatty(STDIN_FILENO) == 1 && isatty(STDOUT_FILENO) == 1
     ) -> Bool {
-        switch normalizedEnvValue(environment["CMUX_FOCUS_NEW"]) {
+        switch normalizedEnvValue(environment["WMUX_FOCUS_NEW"]) {
         case "1"?: return true
         case "0"?: return false
         default: return isInteractiveTerminal && !isCodingAgentEnvironment(environment)
@@ -5320,18 +5316,18 @@ struct WMUXCLI {
     /// The focus flag at `args[index]` and how many tokens it used, or nil when that
     /// token is not one. For commands that walk their own arguments; the value after a
     /// bare `--focus` is taken only when it is exactly a boolean
-    /// (`CmuxTuiRemoteRouting.focusFlagValue`).
+    /// (`WmuxTuiRemoteRouting.focusFlagValue`).
     static func openFocusFlag(in args: [String], at index: Int, command: String) throws -> (focus: Bool, consumed: Int)? {
         let arg = args[index]
         if arg == "--no-focus" { return (false, 1) }
         if arg == "--focus" {
-            if index + 1 < args.count, let value = CmuxTuiRemoteRouting.focusFlagValue(args[index + 1]) {
+            if index + 1 < args.count, let value = WmuxTuiRemoteRouting.focusFlagValue(args[index + 1]) {
                 return (value, 2)
             }
             return (true, 1)
         }
         guard arg.hasPrefix("--focus=") else { return nil }
-        guard let value = CmuxTuiRemoteRouting.focusFlagValue(String(arg.dropFirst("--focus=".count))) else {
+        guard let value = WmuxTuiRemoteRouting.focusFlagValue(String(arg.dropFirst("--focus=".count))) else {
             throw CLIError(message: "\(command): --focus takes true or false")
         }
         return (value, 1)
@@ -5492,7 +5488,7 @@ struct WMUXCLI {
     }
 
     private static func browserSettingsDomain(environment: [String: String]) -> String {
-        normalizedEnvValue(environment["CMUX_BUNDLE_ID"])
+        normalizedEnvValue(environment["WMUX_BUNDLE_ID"])
         ?? containingAppBundleIdentifier()
         ?? defaultBrowserSettingsDomain
     }
@@ -5592,7 +5588,7 @@ struct WMUXCLI {
             defaultValue: "coderouter|cr [coderouter-args...]                 (aliases for the CodeRouter CLI; offers to install it when missing)",
             bundle: bundle
         )
-        let explicitValue = CMUXDiffViewerLocalization.string(
+        let explicitValue = WMUXDiffViewerLocalization.string(
             "cli.coderouter.aliases",
             defaultValue: defaultValue
         )
@@ -5607,7 +5603,7 @@ struct WMUXCLI {
             defaultValue: "coderouter <status|machines|claude> [--team <id>] [--json]    (team model-plane settings; other verbs pass through)",
             bundle: bundle
         )
-        let explicitValue = CMUXDiffViewerLocalization.string(
+        let explicitValue = WMUXDiffViewerLocalization.string(
             "cli.coderouter.commands",
             defaultValue: defaultValue
         )
@@ -5622,7 +5618,7 @@ struct WMUXCLI {
             defaultValue: "Could not start the required CLI. Check the installation and try again.",
             bundle: bundle
         )
-        let explicitValue = CMUXDiffViewerLocalization.string(
+        let explicitValue = WMUXDiffViewerLocalization.string(
             "cli.coderouter.error.launchFailed",
             defaultValue: defaultValue
         )
@@ -5637,7 +5633,7 @@ struct WMUXCLI {
             defaultValue: String.LocalizationValue(stringLiteral: defaultValue),
             bundle: bundle
         )
-        let explicitValue = CMUXDiffViewerLocalization.string(
+        let explicitValue = WMUXDiffViewerLocalization.string(
             "cli.coderouter.handoff.failed",
             defaultValue: defaultValue
         )
@@ -5652,7 +5648,7 @@ struct WMUXCLI {
             defaultValue: String.LocalizationValue(stringLiteral: defaultValue),
             bundle: bundle
         )
-        let explicitValue = CMUXDiffViewerLocalization.string(
+        let explicitValue = WMUXDiffViewerLocalization.string(
             "cli.coderouter.handoff.notAuthenticated",
             defaultValue: defaultValue
         )
@@ -5667,7 +5663,7 @@ struct WMUXCLI {
             defaultValue: String.LocalizationValue(stringLiteral: defaultValue),
             bundle: bundle
         )
-        let explicitValue = CMUXDiffViewerLocalization.string(
+        let explicitValue = WMUXDiffViewerLocalization.string(
             "cli.coderouter.handoff.teamRequired",
             defaultValue: defaultValue
         )
@@ -5682,7 +5678,7 @@ struct WMUXCLI {
             defaultValue: String.LocalizationValue(stringLiteral: defaultValue),
             bundle: bundle
         )
-        let explicitValue = CMUXDiffViewerLocalization.string(
+        let explicitValue = WMUXDiffViewerLocalization.string(
             "cli.coderouter.handoff.unsupported",
             defaultValue: defaultValue
         )
@@ -5732,7 +5728,7 @@ struct WMUXCLI {
     private static func coderouterHandoffProofContext(
         environment: [String: String]
     ) -> CoderouterHandoffProofContext? {
-        guard let capability = environment["CMUX_SOCKET_CAPABILITY"] else {
+        guard let capability = environment["WMUX_SOCKET_CAPABILITY"] else {
             return nil
         }
 
@@ -6418,7 +6414,7 @@ struct WMUXCLI {
         if passesThroughProviderArguments {
             presentationOptions = (false, nil, rawCommandArgs)
         } else {
-            let parsed = try CmuxCLIArgumentParser().parse(rawCommandArgs)
+            let parsed = try WmuxCLIArgumentParser().parse(rawCommandArgs)
             presentationOptions = (parsed.jsonOutput, parsed.idFormat, parsed.remaining)
         }
         if presentationOptions.jsonOutput {
@@ -6771,7 +6767,7 @@ struct WMUXCLI {
             }
         }
         if command == "setup-hooks" || command == "uninstall-hooks" { try runSetupHooks(uninstall: command == "uninstall-hooks", arguments: try Self.parseHooksSetupArguments(commandArgs)); return } // Backwards compatibility for old hook setup docs/scripts.
-        if (command == "codex-hook" || command == "feed-hook"), processEnv["CMUX_SURFACE_ID"]?.isEmpty != false, processEnv["CMUX_WORKSPACE_ID"]?.isEmpty != false,
+        if (command == "codex-hook" || command == "feed-hook"), processEnv["WMUX_SURFACE_ID"]?.isEmpty != false, processEnv["WMUX_WORKSPACE_ID"]?.isEmpty != false,
            !commandArgs.contains(where: { $0 == "--workspace" || $0 == "--surface" || $0.hasPrefix("--workspace=") || $0.hasPrefix("--surface=") }) { print("{}"); return } // Backwards compatibility for old installed hooks outside cmux terminals.
         if command == "hooks" {
             if try runHooksNoSocketCommand(commandArgs: commandArgs) {
@@ -6786,8 +6782,8 @@ struct WMUXCLI {
                 return
             }
             if Self.hooksCommandNeedsCmuxTarget(commandArgs),
-               processEnv["CMUX_SURFACE_ID"]?.isEmpty != false,
-               processEnv["CMUX_WORKSPACE_ID"]?.isEmpty != false,
+               processEnv["WMUX_SURFACE_ID"]?.isEmpty != false,
+               processEnv["WMUX_WORKSPACE_ID"]?.isEmpty != false,
                !commandArgs.contains(where: { $0 == "--workspace" || $0 == "--surface" || $0.hasPrefix("--workspace=") || $0.hasPrefix("--surface=") }) {
                 AgentHookEnqueueWallClock.shared.respond { print("{}") }
                 return
@@ -7014,7 +7010,7 @@ struct WMUXCLI {
             try runAgentHibernation(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput)
 
         case "vpn":
-            try runVPNCommand(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput)
+            throw CLIError(message: "wmux vpn is not available in local wmux.")
 
         case "billing":
             let (planOption, rest) = parseOption(Array(commandArgs.dropFirst()), name: "--plan")
@@ -7052,973 +7048,10 @@ struct WMUXCLI {
             }
 
         case "vm", "cloud":
-            let sub = commandArgs.first?.lowercased() ?? "ls"
-            let rest = Array(commandArgs.dropFirst())
-            switch sub {
-            case "domains":
-                try runCloudDomainsCommand(
-                    commandArgs: rest,
-                    client: client,
-                    jsonOutput: jsonOutput
-                )
-
-            case "ls", "list":
-                let response = try client.sendV2(method: "vm.list")
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let vms = (response["vms"] as? [[String: Any]]) ?? []
-                if vms.isEmpty {
-                    print("No cloud VMs. Try: wmux vm new")
-                    break
-                }
-                var rows: [(String, String, String, String, String)] = []
-                rows.reserveCapacity(vms.count)
-                for vm in vms {
-                    let id = (vm["id"] as? String) ?? "?"
-                    let displayName = vm["displayName"] as? String
-                    let slug = vm["slug"] as? String
-                    let label: String
-                    if let displayName, !displayName.isEmpty {
-                        label = displayName
-                    } else if let slug, !slug.isEmpty {
-                        label = slug
-                    } else {
-                        label = id
-                    }
-                    rows.append((
-                        id,
-                        label,
-                        (vm["status"] as? String) ?? "unknown",
-                        (vm["provider"] as? String) ?? "?",
-                        (vm["image"] as? String) ?? "?"
-                    ))
-                }
-                let hasLabels = rows.contains { !$0.1.isEmpty }
-                let nameWidth = max(4, rows.map { $0.0.count }.max() ?? 4)
-                let labelWidth = max(5, rows.map { $0.1.count }.max() ?? 5)
-                let stateWidth = max(5, rows.map { $0.2.count }.max() ?? 5)
-                let providerWidth = max(8, rows.map { $0.3.count }.max() ?? 8)
-                func pad(_ text: String, _ width: Int) -> String {
-                    text.padding(toLength: width, withPad: " ", startingAt: 0)
-                }
-                let labelHeader = hasLabels ? "\(pad("LABEL", labelWidth))  " : ""
-                print("\(pad("NAME", nameWidth))  \(labelHeader)\(pad("STATE", stateWidth))  \(pad("PROVIDER", providerWidth))  IMAGE")
-                for row in rows {
-                    let labelCell = hasLabels ? "\(pad(row.1, labelWidth))  " : ""
-                    print("\(pad(row.0, nameWidth))  \(labelCell)\(pad(row.2, stateWidth))  \(pad(row.3, providerWidth))  \(row.4)")
-                }
-                if let limits = response["limits"] as? [String: Any],
-                   let planId = limits["planId"] as? String {
-                    // The cap counts running and provisioning machines; paused
-                    // ones are listed above but do not hold a slot.
-                    let activeCount = (limits["activeVmCount"] as? Int) ?? vms.count(where: { vm in
-                        let status = (vm["status"] as? String)?.lowercased()
-                        return status == "running" || status == "provisioning"
-                    })
-                    // Absent or null means the plan has no active-machine cap.
-                    if let maxActiveVms = limits["maxActiveVms"] as? Int, maxActiveVms == 1 {
-                        let format = String(
-                            localized: "cli.vm.list.planMeter.single",
-                            defaultValue: "%1$d of 1 machine on the %2$@ plan"
-                        )
-                        print(String(format: format, activeCount, planId))
-                    } else if let maxActiveVms = limits["maxActiveVms"] as? Int {
-                        let format = String(
-                            localized: "cli.vm.list.planMeter",
-                            defaultValue: "%1$d of %2$d machines on the %3$@ plan"
-                        )
-                        print(String(format: format, activeCount, maxActiveVms, planId))
-                    } else {
-                        let format = String(
-                            localized: "cli.vm.list.planMeter.unlimited",
-                            defaultValue: "%1$d machines on the %2$@ plan, no limit"
-                        )
-                        print(String(format: format, activeCount, planId))
-                    }
-                    // Free plans: the backend says when access to the fleet closes;
-                    // the footer counts down to it so the lock never comes as a surprise.
-                    let expiresAtMs = (limits["freeAccessExpiresAt"] as? Int64)
-                        ?? (limits["freeAccessExpiresAt"] as? Int).map(Int64.init)
-                        ?? (limits["freeAccessExpiresAt"] as? Double).map(Int64.init)
-                    if let expiresAtMs {
-                        let expiresAt = Date(timeIntervalSince1970: TimeInterval(expiresAtMs) / 1000)
-                        let remaining = expiresAt.timeIntervalSinceNow
-                        // Attribution only: the pricing page forwards it to checkout.
-                        let upgradeURL = "https://wmux.com/pricing?cmux_source=cli_free_access_expiry&cmux_client=cli"
-                        // "6d 23h" / "5h 12m" / "1m": whole units, truncated, never overstated.
-                        func countdown(_ remaining: TimeInterval) -> String {
-                            let total = max(Int(remaining), 60)
-                            let days = total / 86_400
-                            let hours = (total % 86_400) / 3_600
-                            let minutes = (total % 3_600) / 60
-                            if days > 0 {
-                                return String(format: String(localized: "machines.freeAccess.countdown.daysHours", defaultValue: "%1$dd %2$dh"), days, hours)
-                            }
-                            if hours > 0 {
-                                return String(format: String(localized: "machines.freeAccess.countdown.hoursMinutes", defaultValue: "%1$dh %2$dm"), hours, minutes)
-                            }
-                            return String(format: String(localized: "machines.freeAccess.countdown.minutes", defaultValue: "%dm"), max(minutes, 1))
-                        }
-                        if remaining <= 0 {
-                            let format = String(
-                                localized: "cli.vm.list.freeAccessExpired",
-                                defaultValue: "Free cloud access has expired \u{2014} upgrade to reconnect: %1$@"
-                            )
-                            print(String(format: format, upgradeURL))
-                        } else {
-                            let formatter = DateFormatter()
-                            formatter.dateStyle = .medium
-                            formatter.timeStyle = .short
-                            let format = String(
-                                localized: "cli.vm.list.freeAccess",
-                                defaultValue: "Free cloud access expires in %1$@ (%2$@) \u{2014} upgrade to keep using it: %3$@"
-                            )
-                            print(String(format: format, countdown(remaining), formatter.string(from: expiresAt), upgradeURL))
-                        }
-                    }
-                }
-
-            case "open", "port":
-                // Three forms, one resolver (see vmOpenUsage):
-                //   vm open <id> <port> [--print]  the port form: a private tokened URL, as a pane
-                //   vm open <target>               tree addresses: <m>/<ws>[/<term>], <m>:desktop, <m>:port/<n>
-                //   vm open <machine>              the machine's shell, same as `vm shell`
-                if rest.contains("--help") || rest.contains("-h") {
-                    print(Self.vmOpenUsage)
-                    break
-                }
-                let printOnly = hasFlag(rest, name: "--print")
-                let (workspaceOpt, rest1) = parseOption(rest, name: "--workspace")
-                let (focus, rest2) = try parseOpenFocusFlags(rest1, command: "vm open")
-                let (windowOpt, rest3) = parseOption(rest2, name: "--window")
-                let openArgs = rest3.filter { $0 != "--print" }
-                guard let rawTarget = openArgs.first, let target = Self.parseVMOpenTarget(rawTarget), openArgs.count <= 2 else {
-                    throw CLIError(message: Self.vmOpenUsage)
-                }
-                if let portArg = openArgs.dropFirst().first {
-                    // `vm open <id> <port>`: exactly the port form, nothing else takes a second positional.
-                    guard case .machine(let vmId) = target, let port = Int(portArg), (1...65535).contains(port) else {
-                        throw CLIError(message: Self.vmOpenUsage)
-                    }
-                    try openVMPort(vmId: vmId, port: port, printOnly: printOnly, workspaceRaw: workspaceOpt, client: client, jsonOutput: jsonOutput)
-                    break
-                }
-                if case .machine(let vmId) = target {
-                    // The bare machine is the shell: exactly `vm shell <machine>`.
-                    try openVMWorkspaceShell(
-                        vmId: vmId,
-                        windowRaw: windowOpt ?? windowId,
-                        targetWorkspaceId: workspaceOpt, focus: focus ?? Self.defaultFocusForUserOpen(),
-                        client: client,
-                        jsonOutput: jsonOutput,
-                        idFormat: idFormat
-                    )
-                    break
-                }
-                try runVMOpenTarget(target, workspaceRaw: workspaceOpt, focus: focus, printOnly: printOnly, client: client, jsonOutput: jsonOutput)
-
-            case "status", "info":
-                guard let vmId = rest.first else {
-                    throw CLIError(message: """
-                        Usage: wmux vm status <id>
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                let response = try client.sendV2(method: "vm.status", params: ["id": vmId], responseTimeout: 60)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let id = (response["id"] as? String) ?? vmId
-                let provider = (response["provider"] as? String) ?? "?"
-                let image = (response["image"] as? String) ?? "?"
-                let status = (response["status"] as? String) ?? "unknown"
-                print("\(id)  [\(provider)] \(status)")
-                print("image: \(image)")
-
-            case "prompt", "skill":
-                // The Machines panel's "Copy Cloud Prompt" / "Open Cloud Agent", as CLI.
-                // Both go through CloudAgentSkillLauncher in the app: the bundled
-                // cmux-cloud skill file is (re)installed at a stable path, then the
-                // kickoff prompt is printed here — or handed to a local agent terminal
-                // with --open.
-                let promptUsage = Self.vmPromptUsage
-                if rest.contains("--help") || rest.contains("-h") {
-                    print(promptUsage)
-                    break
-                }
-                if let openIndex = rest.firstIndex(of: "--open") {
-                    guard rest.indices.contains(openIndex + 1) else { throw CLIError(message: promptUsage) }
-                    let agent = rest[openIndex + 1]
-                    let response = try client.sendV2(method: "vm.cloud_agent_open", params: ["agent": agent], responseTimeout: 60)
-                    if jsonOutput { print(jsonString(response)); break }
-                    let terminal = (response["surface_id"] as? String) ?? (response["terminal_id"] as? String) ?? "?"
-                    print("OK opened \(agent) with the wmux-cloud prompt (terminal=\(terminal))")
-                    break
-                }
-                let response = try client.sendV2(method: "vm.cloud_prompt", params: [:], responseTimeout: 60)
-                if jsonOutput { print(jsonString(response)); break }
-                if let prompt = response["prompt"] as? String {
-                    print(prompt)
-                }
-                if let skillPath = response["skill_path"] as? String {
-                    cliWriteStderr("skill: \(skillPath)\n")
-                }
-
-            case "stats", "top":
-                guard let vmId = rest.first else {
-                    throw CLIError(message: """
-                        Usage: wmux vm stats <id>
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                let response = try client.sendV2(method: "vm.stats", params: ["id": vmId], responseTimeout: 60)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                print(Self.formatVMStatsLine(id: vmId, payload: response))
-
-            case "resize":
-                try runVMResizeCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "network":
-                try runVMNetworkCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "agent-updates":
-                try runVMAgentUpdatesCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "pause", "resume", "restart":
-                // Lifecycle, not sizing: pausing parks the machine (compute stops, the volume
-                // stays); resuming brings the daemon and its terminals back.
-                let lifecycleArgs = rest.filter { $0 != "--json" }
-                guard lifecycleArgs.count == 1, let vmId = lifecycleArgs.first, !vmId.hasPrefix("-") else {
-                    throw CLIError(message: Self.vmLifecycleUsage)
-                }
-                let response = try client.sendV2(method: "vm.\(sub)", params: ["id": vmId], responseTimeout: sub == "restart" ? 60 : 180)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let status = (response["status"] as? String) ?? "?"
-                if sub == "pause" {
-                    print("OK \(vmId) paused (status=\(status)); `wmux vm resume \(vmId)` wakes it")
-                } else if sub == "resume" {
-                    print("OK \(vmId) resumed (status=\(status))")
-                } else {
-                    print("OK " + String(format: String(localized: "cli.vm.restart.result", defaultValue: "%1$@ restarted (status=%2$@)"), vmId, status))
-                }
-
-            case "base":
-                let baseAction = rest.first?.lowercased()
-                if baseAction == nil || baseAction == "open" {
-                    let baseArgs = baseAction == "open" ? Array(rest.dropFirst()) : rest
-                    try runPersistentBaseOpenCommand(
-                        args: baseArgs,
-                        client: client,
-                        jsonOutput: jsonOutput,
-                        idFormat: idFormat,
-                        windowId: windowId
-                    )
-                } else if baseAction == "reset" {
-                    try runPersistentBaseResetCommand(
-                        args: Array(rest.dropFirst()),
-                        client: client,
-                        jsonOutput: jsonOutput,
-                        idFormat: idFormat,
-                        windowId: windowId
-                    )
-                } else if rest.first?.hasPrefix("-") == true {
-                    try runPersistentBaseOpenCommand(
-                        args: rest,
-                        client: client,
-                        jsonOutput: jsonOutput,
-                        idFormat: idFormat,
-                        windowId: windowId
-                    )
-                } else {
-                    throw CLIError(message: Self.vmBaseUsage)
-                }
-
-            case "new", "create":
-                let (imageOptRaw, rem0) = parseOption(rest, name: "--image")
-                let (providerOpt, rem1) = parseOption(rem0, name: "--provider")
-                let (targetWorkspaceOpt, rem1a) = parseOption(rem1, name: "--workspace")
-                let (nameOpt, rem1b) = parseOption(rem1a, name: "--name")
-                let (windowOpt, rem1c) = parseOption(rem1b, name: "--window")
-                let (explicitFocus, rem2) = try parseOpenFocusFlags(rem1c, command: "vm new")
-                // `--focus false` opens the machine in the background: its workspace is
-                // created and bound but never selected, so a create the person walked
-                // away from (the New Machine sheet) does not yank them back when it lands.
-                let focus = explicitFocus ?? Self.defaultFocusForUserOpen()
-                let detach = hasFlag(rem2, name: "--detach") || hasFlag(rem2, name: "-d")
-                let machineKind = try Self.cloudVMCreateKind(rem2, command: "vm new")
-                let (sizeOpt, rem2a) = parseOption(rem2, name: "--size")
-                let (networkPolicyOpt, rem2b) = parseOption(rem2a, name: "--network-policy")
-                let (networkModeOpt, rem2c) = parseOption(rem2b, name: "--network")
-                let (agentUpdatesOpt, rem3) = parseOption(rem2c, name: "--agent-updates")
-                let networkPolicy = try Self.parseVMCreateNetworkPolicy(json: networkPolicyOpt, mode: networkModeOpt)
-                let agentUpdates = try agentUpdatesOpt.map { try Self.parseVMAgentUpdatesSetting($0, command: "vm new") }
-                let memoryMb: Int?
-                if let sizeOpt {
-                    guard let parsed = Self.parseCloudVMSize(sizeOpt) else {
-                        throw CLIError(message: """
-                            vm new: unknown size '\(sizeOpt)'.
-
-                            Sizes: 4g, 8g, 16g, 24g, 32g, 64g (or memory in MB).
-                            Pro goes up to 16g; 24g, 32g, and 64g need wmux Max. Active machines draw from shared vCPU and RAM pools. `wmux vm ls` shows your plan.
-                            """)
-                    }
-                    memoryMb = parsed
-                } else {
-                    memoryMb = nil
-                }
-                let remaining = rem3.filter { !["--detach", "-d", "--desktop", "--base", "--no-desktop"].contains($0) }
-                // The backend resolves the machine kind to its image.
-                let machineName = nameOpt?.trimmingCharacters(in: .whitespacesAndNewlines)
-                if let unknown = remaining.first(where: { Self.isUnknownFlagToken($0, allowedShortFlags: ["-d"]) }) {
-                    throw CLIError(message: """
-                        vm new: unknown flag '\(unknown)'.
-
-                        Known flags:
-                          --size <4g|8g|16g|24g|32g|64g>  4g to 16g on Pro; 24g, 32g, and 64g need wmux Max
-                          --network <full|allowlist|none>  outbound access (see `wmux vm network --help`)
-                          --network-policy <json>  full network policy object
-                          --agent-updates <latest|image>  \(String(localized: "cli.vm.new.agentUpdatesFlag", defaultValue: "latest keeps coding agents up to date; image (default) keeps the baked versions"))
-                          --desktop, --base  \(String(localized: "cli.vm.help.legacyKindFlags", defaultValue: "accepted for older scripts; every machine has a screen"))
-                          --name <label>    display label (the id stays the address)
-                          --image <image-id>  explicit image override (normally omit)
-                          --provider <provider>
-                          --workspace <workspace-id>
-                          --focus, --no-focus  select the machine's workspace, or open it in the background
-                                            \(Self.openFocusDefaultHelp)
-                          --detach, -d
-
-                        Try:
-                          wmux vm new
-                        """)
-                }
-                // Stray positional args (e.g. a typo like `cmux vm new myvm`) previously fell
-                // through and still provisioned a VM. That silently costs the user money and
-                // hides the typo. Reject them explicitly.
-                if let extra = remaining.first(where: { !Self.isFlagToken($0) }) {
-                    throw CLIError(
-                        message: """
-                            vm new: unexpected argument '\(extra)'.
-
-                            `wmux vm new` does not take a VM name or positional arguments.
-
-                            Try:
-                              wmux vm new
-                              wmux vm new --detach
-                            """
-                    )
-                }
-                let normalizedProvider = try Self.normalizedVMProvider(providerOpt)
-                var params: [String: Any] = [:]
-                // Request by kind; `--image` is the explicit override and wins server-side.
-                if let imageOptRaw {
-                    params["image"] = imageOptRaw
-                } else {
-                    params["kind"] = machineKind.rawValue
-                }
-                if let normalizedProvider { params["provider"] = normalizedProvider }
-                // Size is independent of the image/provider override. Providers that do
-                // not expose sizing ignore this optional field; providers that do use it
-                // for runtime memory get it, and the backend applies the plan ceiling.
-                if let memoryMb { params["memory_mb"] = memoryMb }
-                if let machineName, !machineName.isEmpty { params["display_name"] = machineName }
-                if let networkPolicy { params["network_policy"] = networkPolicy.object }
-                if let agentUpdates { params["agent_updates"] = agentUpdates }
-                // Freestyle is the default and only deployed provider. It does not support
-                // persistent home volumes, so leave both volume flags out of this request.
-                let targetWindow = try validatedWindowHandle(windowOpt ?? windowId, client: client)
-                // Store-based idempotency: retries of a failed create reuse the key; a
-                // successful create clears it, so the next `vm new` makes a new machine.
-                // A different network policy is a different request: it must not
-                // replay an in-flight create that carries the old one.
-                let idempotency = try Self.activeVMCreateIdempotency(
-                    image: (imageOptRaw ?? "kind=\(machineKind.rawValue)")
-                        + (networkPolicy.map { " network=\($0.canonicalJSON)" } ?? "")
-                        + (agentUpdates.map { " agentUpdates=\($0)" } ?? ""),
-                    provider: normalizedProvider,
-                    workspace: targetWorkspaceOpt
-                )
-                params["idempotency_key"] = idempotency.key
-                let vmCreateStartedAt = Date()
-                let response: [String: Any]
-                do {
-                    response = try client.sendV2(
-                        method: "vm.create",
-                        params: params,
-                        responseTimeout: Self.vmCreateResponseTimeoutSeconds
-                    )
-                } catch let error as CLIError {
-                    // The backend records a definitive create failure under the
-                    // sent key and replays it on every retry, so keeping the key
-                    // would wedge every future `vm new` on the old failure. Keep
-                    // it only while the create is still running (resending joins
-                    // the in-flight attempt) or when the outcome is unknown
-                    // (transport error/timeout: no backend code arrived).
-                    if let backendCode = error.vmBackendCode, backendCode != "vm_create_in_progress" {
-                        Self.clearVMCreateIdempotency(idempotency)
-                    }
-                    throw error
-                }
-                logVMTiming(
-                    "create",
-                    vmID: (response["id"] as? String) ?? "?",
-                    provider: (response["provider"] as? String) ?? normalizedProvider ?? "?",
-                    startedAt: vmCreateStartedAt
-                )
-                if jsonOutput {
-                    Self.clearVMCreateIdempotency(idempotency)
-                    print(jsonString(response))
-                    break
-                }
-                let id = (response["id"] as? String) ?? "?"
-                let provider = (response["provider"] as? String) ?? "?"
-                let image = (response["image"] as? String) ?? "?"
-                // Older backends ignore create-time naming; preserve their rename behavior.
-                if let machineName, !machineName.isEmpty, response["displayName"] as? String != machineName {
-                    _ = try? client.sendV2(
-                        method: "vm.rename",
-                        params: ["id": id, "display_name": machineName],
-                        responseTimeout: 30
-                    )
-                }
-                if detach {
-                    Self.clearVMCreateIdempotency(idempotency)
-                    let readyMessage = String(
-                        format: String(
-                            localized: "cli.vm.create.machineReady",
-                            defaultValue: "%@ is ready"
-                        ),
-                        id
-                    )
-                    print(readyMessage)
-                    print("")
-                    print("  shell    wmux vm shell \(id)")
-                    print("  run      wmux vm exec \(id) -- uname -a")
-                    print("  web      wmux vm open \(id) <port>")
-                    print("  remove   wmux vm rm \(id)")
-                    print("")
-                    print("  provider \(provider) · \(image)")
-                    break
-                }
-                // Create the VM then drop the user into its workspace through the shared
-                // open path: the machine's cmux-tui remote daemon, the same session
-                // `cmux vm shell`, Base, and the Machines panel use.
-                let createdMessage = String(
-                    format: String(
-                        localized: "cli.vm.create.createdCloudVM",
-                        defaultValue: "Created Cloud VM %@"
-                    ),
-                    id
-                )
-                print(createdMessage)
-                // Stable machine-readable marker alongside the localized line: the app
-                // (`CloudVMActionLauncher`) classifies "created but opening failed" from
-                // this token, never from display text that follows the user's locale.
-                print("OK machine=\(id)")
-                // The machine exists now. Clear the retry key here, not after the attach:
-                // a failed attach must not make the next `vm new` replay this create and
-                // "create" the same machine again.
-                Self.clearVMCreateIdempotency(idempotency)
-                try vmOpenShell(
-                    id: id,
-                    workspaceName: nil,
-                    windowRaw: targetWindow,
-                    targetWorkspaceId: targetWorkspaceOpt,
-                    forceSSH: false,
-                    // A new machine is its own computer, never the Base slot: pinning it
-                    // as Base made "Open Base" and the sidebar cloud button target the
-                    // most recently created machine instead of Base.
-                    shouldPinWorkspaceToTop: false,
-                    focus: focus,
-                    client: client,
-                    jsonOutput: jsonOutput,
-                    idFormat: idFormat
-                )
-
-            case "desktop", "vnc":
-                // The machine's screen, on demand: the noVNC desktop opens as a browser
-                // pane in the machine's own workspace when it has one open (beside its
-                // shell), in the workspace named by --workspace, or where you are when
-                // the machine has no open workspace.
-                let (workspaceOpt, vmArgs) = parseOption(rest, name: "--workspace")
-                guard let vmId = vmArgs.first else {
-                    throw CLIError(message: """
-                        Usage: wmux vm desktop <id> [--workspace <id|ref|index>]
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                let desktopWorkspace = workspaceOpt ?? vmAttachedWorkspaceId(vmId: vmId, client: client)
-                // One desktop path for `vm desktop`, `vm open <m>:desktop`,
-                // and the sidebar tree: vm.desktop_open in the app.
-                guard try openVMDesktopSplit(vmId: vmId, client: client, workspaceId: desktopWorkspace, jsonOutput: jsonOutput) else {
-                    throw CLIError(message: String(
-                        format: String(localized: "cli.vm.desktop.unavailable", defaultValue: "%@ has no desktop to show. New machines boot a screen; this one was created shell-only (`--base`)."),
-                        vmId
-                    ))
-                }
-
-            case "snapshot", "checkpoint":
-                // `snapshot ls|rm` are the only new shapes; a machine id in first position
-                // keeps creating a snapshot exactly as before.
-                if let first = rest.first?.lowercased(), first == "ls" || first == "list" {
-                    try runVMSnapshotListCommand(rest: Array(rest.dropFirst()), client: client, jsonOutput: jsonOutput)
-                    break
-                }
-                if let first = rest.first?.lowercased(), first == "rm" || first == "delete" {
-                    try runVMSnapshotDeleteCommand(rest: Array(rest.dropFirst()), client: client, jsonOutput: jsonOutput)
-                    break
-                }
-                let (nameOpt, snapshotArgs) = parseOption(rest, name: "--name")
-                guard snapshotArgs.count == 1, let vmId = snapshotArgs.first, !vmId.hasPrefix("-") else {
-                    throw CLIError(message: """
-                        Usage: wmux vm snapshot <id> [--name <name>]
-                               wmux vm snapshot ls <id>
-                               wmux vm snapshot rm <id> <snapshot-id>
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                var params: [String: Any] = ["id": vmId]
-                if let nameOpt { params["name"] = nameOpt }
-                let response = try client.sendV2(method: "vm.snapshot", params: params, responseTimeout: Self.vmCreateResponseTimeoutSeconds)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let snapshotId = (response["snapshot_id"] as? String) ?? (response["id"] as? String) ?? "?"
-                print("OK snapshot=\(snapshotId)")
-
-            case "fork":
-                let (explicitFocus, focusRest) = try parseOpenFocusFlags(rest, command: "vm fork")
-                let (nameOpt, rem0) = parseOption(focusRest, name: "--name")
-                let (windowOpt, rem1) = parseOption(rem0, name: "--window")
-                let (workspaceOpt, rem2) = parseOption(rem1, name: "--workspace")
-                let detach = hasFlag(rem2, name: "--detach") || hasFlag(rem2, name: "-d")
-                let vmArgs = rem2.filter { $0 != "--detach" && $0 != "-d" }
-                guard vmArgs.count == 1, let vmId = vmArgs.first, !vmId.hasPrefix("-") else {
-                    throw CLIError(message: """
-                        Usage: wmux vm fork <id> [--name <name>] [--window <id|ref|index>] [--workspace <id|ref|index>] [--focus|--no-focus] [--detach|-d]
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                let targetWindow = try validatedWindowHandle(windowOpt ?? windowId, client: client)
-                let targetWorkspace: String? = if let workspaceOpt {
-                    try normalizeWorkspaceHandle(workspaceOpt, client: client)
-                } else {
-                    nil
-                }
-                // Same store-based idempotency as `vm new`: a retry of a fork whose
-                // outcome is unknown (timeout, dropped transport, still running) joins
-                // the first attempt instead of copying the source a second time. The
-                // reserved workspace scopes the key, so separate Fork clicks differ.
-                let idempotency = try Self.activeVMCreateIdempotency(
-                    image: "fork=\(vmId)" + (nameOpt.map { " name=\($0)" } ?? ""),
-                    provider: nil,
-                    workspace: targetWorkspace
-                )
-                var params: [String: Any] = [
-                    "id": vmId,
-                    "idempotency_key": idempotency.key,
-                ]
-                if let nameOpt { params["name"] = nameOpt }
-                let response: [String: Any]
-                do {
-                    response = try client.sendV2(method: "vm.fork", params: params, responseTimeout: Self.vmCreateResponseTimeoutSeconds)
-                } catch let error as CLIError {
-                    // A definitive backend failure is replayed under its key; only an
-                    // in-flight or unknown outcome keeps the key for the retry.
-                    if let backendCode = error.vmBackendCode, backendCode != "vm_create_in_progress" {
-                        Self.clearVMCreateIdempotency(idempotency)
-                    }
-                    throw error
-                }
-                // The copy exists now; a failed attach must not replay this fork.
-                Self.clearVMCreateIdempotency(idempotency)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let id = (response["id"] as? String) ?? "?"
-                let snapshotId = response["snapshot_id"] as? String
-                let provider = (response["provider"] as? String) ?? "?"
-                let image = (response["image"] as? String) ?? "?"
-                if detach {
-                    print("OK \(id)")
-                    print("  provider: \(provider)")
-                    print("  image:    \(image)")
-                    print("  snapshot: \(snapshotId ?? "native fork")")
-                    break
-                }
-                print("Forked Cloud VM \(id)")
-                print("  snapshot: \(snapshotId ?? "native fork")")
-                // Same machine-readable receipt as `vm new`: the app's pending
-                // Fork row adopts the machine from this token.
-                print("OK machine=\(id)")
-                try vmOpenShell(
-                    id: id,
-                    workspaceName: nil,
-                    windowRaw: targetWindow,
-                    targetWorkspaceId: targetWorkspace,
-                    forceSSH: false,
-                    shouldPinWorkspaceToTop: false,
-                    focus: explicitFocus ?? Self.defaultFocusForUserOpen(),
-                    client: client,
-                    jsonOutput: jsonOutput,
-                    idFormat: idFormat
-                )
-
-            case "restore":
-                let (explicitFocus, focusRest) = try parseOpenFocusFlags(rest, command: "vm restore")
-                let (providerOpt, rem0) = parseOption(focusRest, name: "--provider")
-                let (windowOpt, rem1) = parseOption(rem0, name: "--window")
-                let detach = hasFlag(rem1, name: "--detach") || hasFlag(rem1, name: "-d")
-                let restoreArgs = rem1.filter { $0 != "--detach" && $0 != "-d" }
-                guard restoreArgs.count == 1, let snapshotId = restoreArgs.first, !snapshotId.hasPrefix("-") else {
-                    throw CLIError(message: """
-                        Usage: wmux vm restore <snapshot-id> [--provider <provider>] [--window <id|ref|index>] [--focus|--no-focus] [--detach|-d]
-                    """)
-                }
-                let normalizedProvider = try Self.normalizedVMProvider(providerOpt)
-                let targetWindow = try validatedWindowHandle(windowOpt ?? windowId, client: client)
-                var params: [String: Any] = [
-                    "snapshot_id": snapshotId,
-                    "idempotency_key": UUID().uuidString.lowercased(),
-                ]
-                if let normalizedProvider { params["provider"] = normalizedProvider }
-                let response = try client.sendV2(method: "vm.restore", params: params, responseTimeout: Self.vmCreateResponseTimeoutSeconds)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let id = (response["id"] as? String) ?? "?"
-                let provider = (response["provider"] as? String) ?? normalizedProvider ?? "?"
-                let image = (response["image"] as? String) ?? snapshotId
-                if detach {
-                    print("OK \(id)")
-                    print("  provider: \(provider)")
-                    print("  image:    \(image)")
-                    break
-                }
-                print("Restored Cloud VM \(id)")
-                try vmOpenShell(
-                    id: id,
-                    workspaceName: nil,
-                    windowRaw: targetWindow,
-                    forceSSH: false,
-                    shouldPinWorkspaceToTop: false,
-                    focus: explicitFocus ?? Self.defaultFocusForUserOpen(),
-                    client: client,
-                    jsonOutput: jsonOutput,
-                    idFormat: idFormat
-                )
-
-            case "shell", "attach":
-                let (explicitFocus, focusRest) = try parseOpenFocusFlags(rest, command: "vm shell")
-                let (windowOpt, vmArgs) = parseOption(focusRest, name: "--window")
-                guard let vmId = vmArgs.first else {
-                    throw CLIError(message: """
-                        Usage: wmux \(command) shell <id> [--window <id|ref|index>] [--focus|--no-focus]
-
-                        \(Self.openFocusDefaultHelp)
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                try openVMWorkspaceShell(
-                    vmId: vmId,
-                    windowRaw: windowOpt ?? windowId,
-                    targetWorkspaceId: nil,
-                    focus: explicitFocus ?? Self.defaultFocusForUserOpen(),
-                    client: client,
-                    jsonOutput: jsonOutput,
-                    idFormat: idFormat
-                )
-
-            case "tui":
-                let (windowOpt, vmArgs) = parseOption(rest, name: "--window")
-                try runVMTuiCommand(rest: vmArgs, windowRaw: windowOpt ?? windowId, client: client, jsonOutput: jsonOutput)
-
-            case "rename":
-                let clear = hasFlag(rest, name: "--clear")
-                let positional = rest.filter { !Self.isFlagToken($0) }
-                guard let vmId = positional.first, clear || positional.count >= 2 else {
-                    throw CLIError(message: String(localized: "cli.vm.rename.usage", defaultValue: """
-                        Usage: wmux vm rename <id> <new-label>
-                               wmux vm rename <id> --clear
-
-                        The label is display-only; the machine id stays its address.
-                        Find an id:
-                          wmux vm ls
-                        """))
-                }
-                let label = clear ? nil : positional.dropFirst().joined(separator: " ")
-                var renameParams: [String: Any] = ["id": vmId]
-                if let label { renameParams["display_name"] = label }
-                let renameResponse = try client.sendV2(method: "vm.rename", params: renameParams, responseTimeout: 30)
-                if jsonOutput {
-                    print(jsonString(renameResponse))
-                    break
-                }
-                if let stored = renameResponse["displayName"] as? String, !stored.isEmpty {
-                    let format = String(localized: "cli.vm.rename.set", defaultValue: "%1$@ is now labeled \u{201C}%2$@\u{201D}")
-                    print(String(format: format, vmId, stored))
-                } else {
-                    let format = String(localized: "cli.vm.rename.cleared", defaultValue: "%@ label cleared")
-                    print(String(format: format, vmId))
-                }
-
-            case "rm", "destroy", "delete":
-                guard rest.count == 1, let vmId = rest.first, !Self.isFlagToken(vmId) else {
-                    throw CLIError(message: """
-                        Usage: wmux vm rm <id>
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                _ = try client.sendV2(method: "vm.destroy", params: ["id": vmId], responseTimeout: 120)
-                if jsonOutput {
-                    print("{\"ok\":true,\"id\":\"\(vmId)\"}")
-                } else {
-                    print("OK \(vmId)")
-                }
-
-            case "ssh":
-                let (explicitFocus, focusRest) = try parseOpenFocusFlags(rest, command: "vm ssh")
-                let (windowOpt, vmArgs) = parseOption(focusRest, name: "--window")
-                guard let vmId = vmArgs.first else {
-                    throw CLIError(message: """
-                        Usage: wmux \(command) ssh <id> [--window <id|ref|index>] [--focus|--no-focus]
-
-                        \(Self.openFocusDefaultHelp)
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                try vmOpenShell(
-                    id: vmId,
-                    workspaceName: nil,
-                    windowRaw: windowOpt ?? windowId,
-                    forceSSH: true,
-                    shouldPinWorkspaceToTop: false,
-                    focus: explicitFocus ?? Self.defaultFocusForUserOpen(),
-                    client: client,
-                    jsonOutput: jsonOutput,
-                    idFormat: idFormat
-                )
-
-            case "ssh-info":
-                guard let vmId = rest.first else {
-                    throw CLIError(message: """
-                        Usage: wmux \(command) ssh-info <id>
-
-                        Find an id:
-                          wmux vm ls
-                        """)
-                }
-                try printVMSSHInfo(id: vmId, command: command, client: client, jsonOutput: jsonOutput)
-
-            case "ssh-attach":
-                try runVMSSHAttach(commandArgs: rest, client: client)
-
-            case "exec":
-                // `--timeout <seconds>` may sit anywhere before `--`; everything after `--`
-                // is the command, verbatim (parseOption stops at the separator).
-                let (execTimeoutOpt, execRest) = parseOption(rest, name: "--timeout")
-                let execSeconds = try Self.vmExecTimeoutSeconds(execTimeoutOpt)
-                guard let vmId = execRest.first, !vmId.hasPrefix("-") else {
-                    throw CLIError(message: Self.vmExecUsage)
-                }
-                var commandArgsForVM: [String] = Array(execRest.dropFirst())
-                // Consume a leading "--" separator if present.
-                if commandArgsForVM.first == "--" {
-                    commandArgsForVM.removeFirst()
-                }
-                guard !commandArgsForVM.isEmpty else {
-                    throw CLIError(message: """
-                        Usage: wmux vm exec [--timeout <seconds>] <id> -- <command...>
-
-                        Example:
-                          wmux vm exec \(vmId) -- uname -a
-                        """)
-                }
-                // Shell-quote each argv element before joining. Plain-space join previously
-                // dropped quoting so `cmux vm exec <id> -- printf '%s\n' "a b"` reached the
-                // VM as `printf %s\n a b`, changing semantics for any non-trivial command
-                // (Codex P2).
-                let command = commandArgsForVM.map(shellQuote).joined(separator: " ")
-                let response = try client.sendV2(
-                    method: "vm.exec",
-                    params: ["id": vmId, "command": command, "timeout_ms": execSeconds * 1000],
-                    responseTimeout: TimeInterval(execSeconds + 10)
-                )
-                let stdout = (response["stdout"] as? String) ?? ""
-                let stderr = (response["stderr"] as? String) ?? ""
-                let exitCode = (response["exit_code"] as? Int) ?? -1
-                if jsonOutput {
-                    print(jsonString(response))
-                    if exitCode != 0 {
-                        throw CLIError(message: "exit \(exitCode)")
-                    }
-                    break
-                }
-                if !stdout.isEmpty { print(stdout, terminator: stdout.hasSuffix("\n") ? "" : "\n") }
-                if !stderr.isEmpty {
-                    cliWriteStderr(Data(stderr.utf8))
-                    if !stderr.hasSuffix("\n") {
-                        cliWriteStderr(Data("\n".utf8))
-                    }
-                }
-                if exitCode != 0 {
-                    throw CLIError(message: "exit \(exitCode)")
-                }
-
-            case "tree":
-                try runVMTreeCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "self":
-                try runVMSelfCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "dev":
-                try runVMDevCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "workspace":
-                try runVMWorkspaceCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "terminal":
-                try runVMTerminalCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "layout":
-                try runVMLayoutCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "env":
-                try runVMEnvCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "tab":
-                try runVMTabCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "route":
-                try runVMRouteCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "agent":
-                try runVMAgentCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "run":
-                try runVMRunCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "push", "upload":
-                try runVMPushCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "pull", "download":
-                try runVMPullCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "wait":
-                try runVMWaitCommand(rest: rest, client: client, jsonOutput: jsonOutput)
-
-            case "tools", "tool-inspector":
-                guard let vmId = rest.first else {
-                    throw CLIError(message: "Usage: wmux vm tools <id>")
-                }
-                let command = [
-                    "printf 'shell: '; printf '%s\\n' \"$SHELL\"",
-                    "for tool in zsh git gh htop btop node bun python3; do if command -v \"$tool\" >/dev/null 2>&1; then printf '%-8s %s\\n' \"$tool\" \"$(command -v \"$tool\")\"; else printf '%-8s missing\\n' \"$tool\"; fi; done",
-                    "zsh --version 2>/dev/null || true",
-                    "gh --version 2>/dev/null | head -n 1 || true",
-                ].joined(separator: "; ")
-                let response = try client.sendV2(method: "vm.exec", params: ["id": vmId, "command": command, "timeout_ms": 30_000], responseTimeout: 35)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                print((response["stdout"] as? String) ?? "")
-
-            case "ports":
-                guard let vmId = rest.first else {
-                    throw CLIError(message: "Usage: wmux vm ports <id>")
-                }
-                let command = "if command -v ss >/dev/null 2>&1; then ss -ltnp; elif command -v netstat >/dev/null 2>&1; then netstat -ltnp; else echo 'No port inspector found'; fi"
-                let response = try client.sendV2(method: "vm.exec", params: ["id": vmId, "command": command, "timeout_ms": 30_000], responseTimeout: 35)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                print((response["stdout"] as? String) ?? "")
-
-            case "handoff":
-                guard let vmId = rest.first else {
-                    throw CLIError(message: "Usage: wmux vm handoff <id>")
-                }
-                let response = try client.sendV2(method: "vm.status", params: ["id": vmId], responseTimeout: 60)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let provider = (response["provider"] as? String) ?? "?"
-                let status = (response["status"] as? String) ?? "unknown"
-                print("wmux Cloud VM handoff")
-                print("id:       \(vmId)")
-                print("provider: \(provider)")
-                print("status:   \(status)")
-                print("attach:   wmux vm ssh \(vmId)")
-                print("inspect:  wmux vm tools \(vmId)")
-
-            case "promote-template":
-                guard rest.count == 1, let vmId = rest.first, !vmId.hasPrefix("-") else {
-                    throw CLIError(message: "Usage: wmux vm promote-template <id>")
-                }
-                let name = "template-\(String(vmId.prefix(12)))-\(Int(Date().timeIntervalSince1970))"
-                let response = try client.sendV2(method: "vm.snapshot", params: ["id": vmId, "name": name], responseTimeout: Self.vmCreateResponseTimeoutSeconds)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let snapshotId = (response["snapshot_id"] as? String) ?? (response["id"] as? String) ?? "?"
-                print("OK template=\(snapshotId)")
-
-            default:
-                throw CLIError(message: """
-                    Usage: wmux \(command) <base|new|ls|domains|tree|self|status|stats|rename|pause|resume|snapshot|fork|restore|rm|run|route|agent|dev|prompt|exec|push|pull|wait|shell|tui|desktop|open|workspace|terminal|tab|layout|env|ports|tools|handoff|promote-template|attach|ssh|ssh-info> [args...]
-
-                    Common commands:
-                      wmux vm ls
-                      wmux vm new
-                      wmux cloud domains
-                      wmux vm status <id>
-                      wmux vm tree
-                      wmux vm snapshot <id>
-                      wmux vm snapshot ls <id>
-                      wmux vm fork <id>
-                      wmux vm exec <id> -- <command...>
-                      wmux vm push <id> <local-path>
-                      wmux vm dev <id>
-                      wmux vm self <id>
-                      wmux vm ssh <id>
-                      wmux vm shell <id>
-                      wmux vm rm <id>
-                    """)
-            }
+            throw CLIError(message: "wmux vm/cloud is not available in local wmux.")
 
         case "remotes", "remote":
-            try runRemotesCommand(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput)
+            throw CLIError(message: "wmux remotes is not available in local wmux.")
 
         case "ai-accounts":
             try runAIAccountsCommand(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput)
@@ -8027,358 +7060,11 @@ struct WMUXCLI {
             try runCoderouterCommand(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput)
 
         case "mobile":
-            let sub = commandArgs.first?.lowercased()
-            let rest = Array(commandArgs.dropFirst())
-            let mobileUsage = String(
-                localized: "cli.mobile.setFont.usage",
-                defaultValue: "Usage: wmux mobile set-font <points> [--surface <id>] [--workspace <id>]"
-            )
-            let compatibleTagsUsage = String(
-                localized: "cli.mobile.compatibleTags.usage",
-                defaultValue: "Usage: wmux mobile compatible-tags [list|set <tags...>|add <tags...>|remove <tags...>|clear]"
-            )
-            switch sub {
-            case "set-font":
-                guard let sizeArg = rest.first(where: { !$0.hasPrefix("--") }),
-                      let size = Double(sizeArg), size.isFinite, size > 0 else {
-                    throw CLIError(message: mobileUsage)
-                }
-                var params: [String: Any] = ["font_size": size]
-                if let surface = optionValue(rest, name: "--surface") {
-                    params["surface_id"] = surface
-                }
-                if let workspace = optionValue(rest, name: "--workspace") {
-                    params["workspace_id"] = workspace
-                }
-                let response = try client.sendV2(method: "mobile.terminal.set_font", params: params)
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let delivered = (response["delivered"] as? Bool) ?? false
-                if delivered {
-                    print(localizedFormat(
-                        "cli.mobile.setFont.applied",
-                        defaultValue: "Set mobile terminal font to %@pt on connected device(s).",
-                        sizeArg
-                    ))
-                } else {
-                    print(localizedFormat(
-                        "cli.mobile.setFont.appliedNoDevice",
-                        defaultValue: "Set mobile terminal font to %@pt (no iOS device is currently connected).",
-                        sizeArg
-                    ))
-                }
-            case "compatible-tags":
-                let action = rest.first?.lowercased() ?? "list"
-                let requestedTags = Array(rest.dropFirst())
-                    .flatMap { $0.split(separator: ",").map(String.init) }
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
-                    .filter { !$0.isEmpty }
-                func currentTags() throws -> [String] {
-                    let response = try client.sendV2(method: "mobile.compatible_tags.get", params: [:])
-                    return (response["tags"] as? [String]) ?? []
-                }
-                if action == "list" {
-                    let tags = try currentTags()
-                    if jsonOutput {
-                        print(jsonString(["tags": tags]))
-                    } else if tags.isEmpty {
-                        print(String(
-                            localized: "cli.mobile.compatibleTags.empty",
-                            defaultValue: "No additional Mac dev tags are granted to this Mac's paired phones."
-                        ))
-                    } else {
-                        print(tags.joined(separator: "\n"))
-                    }
-                    break
-                }
-                let resolvedTags: [String]
-                switch action {
-                case "set":
-                    guard !requestedTags.isEmpty else { throw CLIError(message: compatibleTagsUsage) }
-                    resolvedTags = requestedTags
-                case "add":
-                    guard !requestedTags.isEmpty else { throw CLIError(message: compatibleTagsUsage) }
-                    resolvedTags = Array(Set(try currentTags()).union(requestedTags))
-                case "remove":
-                    guard !requestedTags.isEmpty else { throw CLIError(message: compatibleTagsUsage) }
-                    resolvedTags = Array(Set(try currentTags()).subtracting(requestedTags))
-                case "clear":
-                    resolvedTags = []
-                default:
-                    throw CLIError(message: compatibleTagsUsage)
-                }
-                let response = try client.sendV2(
-                    method: "mobile.compatible_tags.set",
-                    params: ["tags": resolvedTags]
-                )
-                if jsonOutput {
-                    print(jsonString(response))
-                    break
-                }
-                let stored = (response["tags"] as? [String]) ?? []
-                let delivered = (response["delivered"] as? Bool) ?? false
-                let storedList = stored.isEmpty
-                    ? String(localized: "cli.mobile.compatibleTags.none", defaultValue: "(none)")
-                    : stored.joined(separator: ", ")
-                if delivered {
-                    print(localizedFormat(
-                        "cli.mobile.compatibleTags.applied",
-                        defaultValue: "Granted Mac dev tags for paired phones: %@ (pushed to connected device(s)).",
-                        storedList
-                    ))
-                } else {
-                    print(localizedFormat(
-                        "cli.mobile.compatibleTags.appliedNoDevice",
-                        defaultValue: "Granted Mac dev tags for paired phones: %@ (applies when a phone next connects).",
-                        storedList
-                    ))
-                }
-            default:
-                throw CLIError(message: mobileUsage + "\n" + compatibleTagsUsage)
-            }
+            throw CLIError(message: "wmux mobile is not available in local wmux.")
 
-        case "rpc":
-            guard let method = commandArgs.first?.trimmingCharacters(in: .whitespacesAndNewlines),
-                  !method.isEmpty else {
-                throw CLIError(message: "Usage: wmux rpc <method> [json-params]")
-            }
-            var params = try parseRPCParams(Array(commandArgs.dropFirst()))
-            if method.lowercased() == "surface.read_selection",
-               let windowId,
-               params["window_id"] == nil || params["window_id"] is NSNull {
-                // Selection reads must not focus the target window, but an
-                // explicit global --window still constrains routing to it.
-                params["window_id"] = try normalizeWindowHandle(windowId, client: client) ?? windowId
-            }
-            let response: [String: Any]
-            do {
-                response = try client.sendV2(method: method, params: params)
-            } catch let error as CLIError
-                where method == "workspace.remote.terminal_session_launching"
-                && (error.message == "Command timed out"
-                    || error.message == "Relay command timed out"
-                    || error.message == "Socket connection deadline exceeded") {
-                // The SSH wrapper has a bounded retry phase for a busy app. Keep
-                // structured lifecycle rejections terminal while giving a pure
-                // response timeout its own shell-visible status.
-                throw CLIError(
-                    message: error.message,
-                    exitCode: SSHPTYAttachExitCode.launchAcknowledgementTimedOut.rawValue,
-                    v2Code: error.v2Code,
-                    isStructuredProtocolResponse: error.isStructuredProtocolResponse,
-                    v2Retryable: error.v2Retryable,
-                    vmBackendCode: error.vmBackendCode,
-                    vmBackendHTTPStatus: error.vmBackendHTTPStatus,
-                    socketFailureKind: error.socketFailureKind
-                )
-            }
-            let output: Any = idFormatArg == nil ? response : formatIDs(response, mode: idFormat)
-            print(jsonString(output))
+        case "simulator", "ios":
+            throw CLIError(message: "wmux simulator/ios is not available in local wmux.")
 
-        case "identify":
-            var params: [String: Any] = [:]
-            let localWindowRaw = optionValue(commandArgs, name: "--window")
-            let effectiveWindowRaw = localWindowRaw ?? windowId
-            let targetWindow = try normalizeWindowHandle(effectiveWindowRaw, client: client)
-            if let targetWindow {
-                params["window_id"] = targetWindow
-            }
-            let includeCaller = !hasFlag(commandArgs, name: "--no-caller")
-            let idWsFlag = optionValue(commandArgs, name: "--workspace")
-            let idSurfaceFlag = optionValue(commandArgs, name: "--surface")
-            let usesImplicitCaller = includeCaller
-                && effectiveWindowRaw == nil
-                && idWsFlag == nil
-                && idSurfaceFlag == nil
-            let response: [String: Any]
-            if usesImplicitCaller {
-                response = try implicitCallerIdentifyResponse(
-                    client: client,
-                    processEnvironment: processEnv
-                )
-            } else {
-                if includeCaller {
-                    let workspaceArg = idWsFlag ?? (effectiveWindowRaw == nil ? processEnv["CMUX_WORKSPACE_ID"] : nil)
-                    let surfaceArg = idSurfaceFlag ?? (idWsFlag == nil && effectiveWindowRaw == nil ? processEnv["CMUX_SURFACE_ID"] : nil)
-                    if workspaceArg != nil || surfaceArg != nil {
-                        let workspaceId = try normalizeWorkspaceHandle(
-                            workspaceArg,
-                            client: client,
-                            windowHandle: targetWindow,
-                            allowCurrent: surfaceArg != nil
-                        )
-                        var caller: [String: Any] = [:]
-                        if let workspaceId {
-                            caller["workspace_id"] = workspaceId
-                        }
-                        if surfaceArg != nil {
-                            guard let surfaceId = try normalizeSurfaceHandle(
-                                surfaceArg,
-                                client: client,
-                                workspaceHandle: workspaceId,
-                                windowHandle: targetWindow
-                            ) else {
-                                throw CLIError(message: "Invalid surface handle")
-                            }
-                            caller["surface_id"] = surfaceId
-                        }
-                        if !caller.isEmpty {
-                            params["caller"] = caller
-                        }
-                    }
-                }
-                response = try client.sendV2(method: "system.identify", params: params)
-            }
-            print(jsonString(formatIDs(response, mode: idFormat)))
-
-        case "list-windows":
-            let response = try sendV1Command("list_windows", client: client)
-            if jsonOutput {
-                let windows = parseWindows(response)
-                let payload = windows.map { item -> [String: Any] in
-                    var dict: [String: Any] = [
-                        "index": item.index,
-                        "id": item.id,
-                        "key": item.key,
-                        "workspace_count": item.workspaceCount,
-                    ]
-                    dict["selected_workspace_id"] = item.selectedWorkspaceId ?? NSNull()
-                    return dict
-                }
-                print(jsonString(payload))
-            } else {
-                print(response)
-            }
-
-        case "current-window":
-            let response = try sendV1Command("current_window", client: client)
-            if jsonOutput {
-                print(jsonString(["window_id": response]))
-            } else {
-                print(response)
-            }
-
-        case "new-window":
-            let (name, remaining) = parseOption(commandArgs, name: "--name")
-            guard (!commandArgs.contains("--name") || name != nil),
-                  remaining.isEmpty,
-                  name.map({ !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !$0.hasPrefix("--") }) ?? true else {
-                throw CLIError(message: String(
-                    localized: "cli.newWindow.error.name",
-                    defaultValue: "Usage: wmux new-window [--name <title>]. The name must not be empty."
-                ))
-            }
-            var params: [String: Any] = [:]
-            if let name { params["title"] = name }
-            let response = try client.sendV2(method: "window.create", params: params)
-            // Preserve the legacy command's OK + UUID output for scripts.
-            print("OK \(formatHandle(response, kind: "window", idFormat: .uuids) ?? "")")
-
-        case "focus-window":
-            guard let target = optionValue(commandArgs, name: "--window"), let windowID = try normalizeWindowHandle(target, client: client) else {
-                throw CLIError(message: "focus-window requires --window")
-            }
-            let response = try sendV1Command("focus_window \(windowID)", client: client)
-            print(response)
-
-        case "close-window":
-            guard let target = optionValue(commandArgs, name: "--window"), let windowID = try normalizeWindowHandle(target, client: client) else {
-                throw CLIError(message: "close-window requires --window")
-            }
-            let force = commandArgs.contains("--force")
-            let response = try sendV1Command("close_window \(windowID)\(force ? " --force" : "")", client: client)
-            print(response)
-
-        case "resize-window":
-            guard let target = optionValue(commandArgs, name: "--window"), let windowID = try normalizeWindowHandle(target, client: client) else {
-                throw CLIError(message: "resize-window requires --window")
-            }
-            let width = optionValue(commandArgs, name: "--width") ?? "-"
-            let height = optionValue(commandArgs, name: "--height") ?? "-"
-            for (flag, value) in [("--width", width), ("--height", height)] where value != "-" {
-                guard let points = Double(value), points.isFinite, points > 0 else {
-                    throw CLIError(message: "\(flag) must be a positive number")
-                }
-            }
-            // With neither flag the command is a frame read: the app changes
-            // nothing and reports the window's current size.
-            let response = try sendV1Command("resize_window \(windowID) \(width) \(height)", client: client)
-            print(response)
-
-        case "move-workspace-to-window":
-            guard let workspaceRaw = optionValue(commandArgs, name: "--workspace") else {
-                throw CLIError(message: "move-workspace-to-window requires --workspace")
-            }
-            guard let windowRaw = optionValue(commandArgs, name: "--window") else {
-                throw CLIError(message: "move-workspace-to-window requires --window")
-            }
-            var params: [String: Any] = [:]
-            let wsId = try normalizeWorkspaceHandle(workspaceRaw, client: client)
-            if let wsId { params["workspace_id"] = wsId }
-            let winId = try normalizeWindowHandle(windowRaw, client: client)
-            if let winId { params["window_id"] = winId }
-            let payload = try client.sendV2(method: "workspace.move_to_window", params: params)
-            printV2Payload(payload, jsonOutput: jsonOutput, idFormat: idFormat, fallbackText: v2OKSummary(payload, idFormat: idFormat, kinds: ["workspace", "window"]))
-
-        case "move-surface":
-            try runMoveSurface(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat)
-
-        case "split-off":
-            try runSplitOff(commandName: "split-off", commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat)
-
-        case "reorder-surface":
-            try runReorderSurface(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat)
-
-        case "reorder-workspace":
-            try runReorderWorkspace(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat)
-
-        case "reorder-workspaces":
-            try runReorderWorkspaces(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat)
-
-        case "simulate-sidebar-drag":
-            try runSimulateSidebarDrag(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat)
-
-        case "workspace-action":
-            try runWorkspaceAction(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
-        case "tab-action":
-            try runTabAction(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
-        case "move-tab-to-new-workspace", "detach-tab":
-            try runMoveTabToNewWorkspace(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
-        case "rename-tab":
-            try runRenameTab(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
-
-        case "workspace-group":
-            try runWorkspaceGroup(
-                commandArgs: commandArgs,
-                client: client,
-                jsonOutput: jsonOutput,
-                idFormat: idFormat,
-                windowOverride: windowId
-            )
-
-        case "window":
-            try runWindowNamespace(
-                commandArgs: commandArgs,
-                client: client,
-                jsonOutput: jsonOutput,
-                idFormat: idFormat,
-                windowOverride: windowId
-            )
-
-        case "canvas":
-            try runCanvasNamespace(
-                commandArgs: commandArgs,
-                client: client,
-                jsonOutput: jsonOutput,
-                idFormat: idFormat
-            )
-
-        case "simulator":
-            try runSimulatorNamespace(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
-        case "ios":
-            try runIOSNamespace(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput, idFormat: idFormat, windowOverride: windowId)
         case "workspace":
             try runWorkspaceNamespace(
                 commandArgs: commandArgs,
@@ -8815,7 +7501,7 @@ struct WMUXCLI {
             let preferTTYFallback = windowRaw == nil && ProcessInfo.processInfo.environment["TMUX"] != nil
             let explicitSurfaceArg = optionValue(commandArgs, name: "--surface") ?? optionValue(commandArgs, name: "--panel")
             let callerSurfaceArg = explicitSurfaceArg == nil && preferTTYFallback == false && windowRaw == nil
-                ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"]
+                ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"]
                 : nil
             let surfaceArg = explicitSurfaceArg ?? callerSurfaceArg
             let callerWorkspaceArg = preferTTYFallback || explicitWorkspaceArg != nil
@@ -9016,7 +7702,7 @@ struct WMUXCLI {
 
             let windowRaw = windowOpt ?? windowId
             let workspaceArg = wsArg ?? Self.callerWorkspaceForSurfaceHandle(sfArg, windowRaw: windowRaw)
-            let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+            let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
 
             var params: [String: Any] = [:]
             let winId = try normalizeWindowHandle(windowRaw, client: client)
@@ -9070,7 +7756,7 @@ struct WMUXCLI {
                     idFormat: idFormat
                 )
             } else {
-                let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+                let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
                 let text = unescapeSendText(rawText)
                 var params: [String: Any] = ["text": text]
                 let winId = try normalizeWindowHandle(windowRaw, client: client)
@@ -9107,7 +7793,7 @@ struct WMUXCLI {
             let (windowOpt, rem2) = parseOption(rem1, name: "--window")
             let windowRaw = windowOpt ?? windowId
             let workspaceArg = wsArg ?? Self.callerWorkspaceForSurfaceHandle(sfArg, windowRaw: windowRaw)
-            let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+            let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
             let (force, rem3) = Self.splitLeadingForceFlag(rem2)
             let keyArgs = rem3.first == "--" ? Array(rem3.dropFirst()) : rem3
             guard let key = keyArgs.first else { throw CLIError(message: "send-key requires a key") }
@@ -9433,7 +8119,7 @@ struct WMUXCLI {
                 socketCmd += " --tab=\(wsId)"
                 resolvedWorkspaceID = wsId
             } else if windowRaw == nil,
-                      let envWs = ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"],
+                      let envWs = ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"],
                       let wsId = try? resolveWorkspaceId(envWs, client: client) {
                 socketCmd += " --tab=\(wsId)"
                 resolvedWorkspaceID = wsId
@@ -9823,7 +8509,7 @@ struct WMUXCLI {
                 params["surface_id"] = surface
             }
         }
-        let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+        let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
         if let workspaceRaw {
             if let workspace = try normalizeWorkspaceHandle(workspaceRaw, client: client) {
                 params["workspace_id"] = workspace
@@ -9878,7 +8564,7 @@ struct WMUXCLI {
         }
         let absolutePath = resolvePath(rawPath)
         var params: [String: Any] = ["path": absolutePath]
-        let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+        let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
         if let workspaceRaw {
             if let workspace = try normalizeWorkspaceHandle(workspaceRaw, client: client) {
                 params["workspace_id"] = workspace
@@ -9995,7 +8681,7 @@ struct WMUXCLI {
             $0 == "--workspace" || $0 == "--surface"
                 || $0.hasPrefix("--workspace=") || $0.hasPrefix("--surface=")
         }
-        let hasAmbientTarget = ["CMUX_SURFACE_ID", "CMUX_WORKSPACE_ID"].contains {
+        let hasAmbientTarget = ["WMUX_SURFACE_ID", "WMUX_WORKSPACE_ID"].contains {
             environment[$0]?.isEmpty == false
         }
         return !hasExplicitTarget && !hasAmbientTarget
@@ -10133,16 +8819,16 @@ struct WMUXCLI {
     }
 
     private static let launchServicesPathOpenScrubbedEnvironmentKeys: Set<String> = [
-        "CMUX_ALLOW_SOCKET_OVERRIDE",
-        "CMUX_SOCKET",
-        "CMUX_SOCKET_ENABLE",
-        "CMUX_SOCKET_MODE",
-        "CMUX_SOCKET_PASSWORD",
-        "CMUX_SOCKET_PATH",
-        "CMUX_PANEL_ID",
-        "CMUX_SURFACE_ID",
-        "CMUX_TAB_ID",
-        "CMUX_WORKSPACE_ID",
+        "WMUX_ALLOW_SOCKET_OVERRIDE",
+        "WMUX_SOCKET",
+        "WMUX_SOCKET_ENABLE",
+        "WMUX_SOCKET_MODE",
+        "WMUX_SOCKET_PASSWORD",
+        "WMUX_SOCKET_PATH",
+        "WMUX_PANEL_ID",
+        "WMUX_SURFACE_ID",
+        "WMUX_TAB_ID",
+        "WMUX_WORKSPACE_ID",
     ]
 
     private func launchServicesPathOpenEnvironment() -> [String: String] {
@@ -10214,7 +8900,7 @@ struct WMUXCLI {
 
     private func openToolPath() -> String {
 #if DEBUG
-        if let override = ProcessInfo.processInfo.environment["CMUX_TEST_OPEN_TOOL_PATH"]?
+        if let override = ProcessInfo.processInfo.environment["WMUX_TEST_OPEN_TOOL_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !override.isEmpty {
             return NSString(string: override).expandingTildeInPath
@@ -10252,7 +8938,7 @@ struct WMUXCLI {
         if emailOpt == nil && bodyOpt == nil && imagePaths.isEmpty {
             var params: [String: Any] = [:]
             let env = ProcessInfo.processInfo.environment
-            if let workspaceId = env["CMUX_WORKSPACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+            if let workspaceId = env["WMUX_WORKSPACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines),
                !workspaceId.isEmpty {
                 params["workspace_id"] = workspaceId
                 params["activate"] = false
@@ -11079,12 +9765,12 @@ struct WMUXCLI {
     }
     static func callerWorkspaceForSurfaceHandle(_ raw: String?, windowRaw: String?) -> String? {
         let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return windowRaw == nil && (trimmed.isEmpty || Int(trimmed) != nil) ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil
+        return windowRaw == nil && (trimmed.isEmpty || Int(trimmed) != nil) ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil
     }
     /// The workspace to pair with an explicit surface handle when the caller named no
     /// workspace or window.
     ///
-    /// A pane keeps the `CMUX_WORKSPACE_ID` it started with after it moves to another
+    /// A pane keeps the `WMUX_WORKSPACE_ID` it started with after it moves to another
     /// workspace, so that value can name a workspace the surface has left. A UUID or
     /// `surface:<n>` ref names one surface wherever it is, so when the caller's
     /// workspace does not list it, this looks for the workspace that does. An index
@@ -11096,7 +9782,7 @@ struct WMUXCLI {
         client: SocketClient
     ) -> String? {
         guard windowRaw == nil,
-              let callerWorkspace = ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] else {
+              let callerWorkspace = ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] else {
             return nil
         }
         let handle = raw?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -11391,7 +10077,7 @@ struct WMUXCLI {
             commandName: commandName
         )
         let windowRaw = windowOpt ?? windowOverride
-        let surfaceRaw = sfArg ?? panelArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+        let surfaceRaw = sfArg ?? panelArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
         let workspaceArg = wsArg ?? callerWorkspace(owningSurface: surfaceRaw, windowRaw: windowRaw, client: client)
         let rawDir = dirOpt ?? rem5.first
         let direction = try validatedSplitDirection(rawDir, commandName: commandName)
@@ -11449,7 +10135,7 @@ struct WMUXCLI {
             throw CLIError(message: "\(commandName): unexpected argument '\(positional[1])'")
         }
         let explicitSurfaceRaw = surfaceOpt ?? panelOpt ?? positional.first
-        let surfaceRaw = explicitSurfaceRaw ?? (csWsFlag == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+        let surfaceRaw = explicitSurfaceRaw ?? (csWsFlag == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
         let workspaceArg = csWsFlag ?? callerWorkspace(owningSurface: surfaceRaw, windowRaw: windowRaw, client: client)
         var params: [String: Any] = [:]
         let winId = try normalizeWindowHandle(windowRaw, client: client)
@@ -11749,12 +10435,12 @@ struct WMUXCLI {
         let env = ProcessInfo.processInfo.environment
         let usesImplicitSurface = surfaceOpt == nil
             && windowRaw == nil
-            && env["CMUX_SURFACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+            && env["WMUX_SURFACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
         let shouldUseEnvWorkspace = surfaceOpt == nil
             && !usesImplicitSurface
             && windowRaw == nil
-        let workspaceRaw = workspaceOpt ?? (shouldUseEnvWorkspace ? env["CMUX_WORKSPACE_ID"] : nil)
-        let surfaceRaw = surfaceOpt ?? (workspaceOpt == nil && windowRaw == nil ? env["CMUX_SURFACE_ID"] : nil)
+        let workspaceRaw = workspaceOpt ?? (shouldUseEnvWorkspace ? env["WMUX_WORKSPACE_ID"] : nil)
+        let surfaceRaw = surfaceOpt ?? (workspaceOpt == nil && windowRaw == nil ? env["WMUX_SURFACE_ID"] : nil)
         var params: [String: Any] = [:]
         let windowHandle = try normalizeWindowHandle(windowRaw, client: client)
         if let windowHandle { params["window_id"] = windowHandle }
@@ -12169,7 +10855,7 @@ struct WMUXCLI {
 
         let action = actionRaw.lowercased().replacingOccurrences(of: "-", with: "_")
         let windowRaw = windowOpt ?? windowOverride
-        let workspaceArg = workspaceOpt ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+        let workspaceArg = workspaceOpt ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
         let windowHandle = try normalizeWindowHandle(windowRaw, client: client)
         let workspaceId = try normalizeWorkspaceHandle(
             workspaceArg,
@@ -12274,7 +10960,7 @@ struct WMUXCLI {
         let tabArg = tabOpt
             ?? surfaceOpt
             ?? (workspaceOpt == nil && windowRaw == nil
-                ? (ProcessInfo.processInfo.environment["CMUX_TAB_ID"] ?? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"])
+                ? (ProcessInfo.processInfo.environment["WMUX_TAB_ID"] ?? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"])
                 : nil)
         let workspaceArg = workspaceOpt
             ?? callerWorkspace(
@@ -12571,11 +11257,11 @@ struct WMUXCLI {
         let positional = rem1.first(where: { !$0.hasPrefix("--") })
         let windowRaw = windowFromArgsOrOverride(commandArgs, windowOverride: windowOverride)
         // Match reconnect/disconnect: default to the caller's workspace
-        // ($CMUX_WORKSPACE_ID) before the selected one, but only when no explicit
+        // ($WMUX_WORKSPACE_ID) before the selected one, but only when no explicit
         // --window is given (the caller's workspace may live in another window).
         let target = workspaceArg
             ?? positional
-            ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+            ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
 
         var params: [String: Any] = [:]
         let winId = try normalizeWindowHandle(windowRaw, client: client)
@@ -12725,7 +11411,7 @@ struct WMUXCLI {
             let (wsArg, rem0) = parseOption(commandArgs, name: "--workspace")
             let (windowOpt, rem1) = parseOption(rem0, name: "--window")
             let windowRaw = windowOpt ?? windowOverride
-            let workspaceArg = wsArg ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+            let workspaceArg = wsArg ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
             let titleArgs = rem1.dropFirst(rem1.first == "--" ? 1 : 0)
             title = titleArgs.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)
             guard !title.isEmpty else {
@@ -12770,12 +11456,12 @@ struct WMUXCLI {
     /// `cmux window default-display [<name>|--clear]` — read/write the shared,
     /// cross-tag default display that DEBUG cmux builds open new windows on.
     ///
-    /// Persisted through ``CmuxSettings/JSONConfigStore`` in the shared
+    /// Persisted through ``WmuxSettings/JSONConfigStore`` in the shared
     /// `cmux.json` under `app.devWindowDisplay`, so it applies to every tagged
     /// dev build regardless of bundle id. No running app required: the value is
     /// read/written directly on disk via the store on this no-socket early path.
     private func runWindowDefaultDisplayCommand(commandArgs: [String], jsonOutput: Bool) throws {
-        let store = JSONConfigStore(fileURL: CmuxConfigLocation().userConfigFile)
+        let store = JSONConfigStore(fileURL: WmuxConfigLocation().userConfigFile)
         let key = SettingCatalog().app.devWindowDisplay
 
         // Bridge the actor-backed store to this synchronous CLI: run the async
@@ -13185,10 +11871,10 @@ struct WMUXCLI {
         let windowRaw = windowFromArgsOrOverride(commandArgs, windowOverride: windowOverride)
         // With an explicit --window and no workspace argument, target that
         // window's selected workspace on the server instead of the caller's
-        // CMUX_WORKSPACE_ID, which may live in a different window.
+        // WMUX_WORKSPACE_ID, which may live in a different window.
         let target = workspaceArg
             ?? positional
-            ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+            ?? (windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
 
         var params: [String: Any] = [:]
         let winId = try normalizeWindowHandle(windowRaw, client: client)
@@ -13231,13 +11917,13 @@ struct WMUXCLI {
     }
 
     /// Print a one-time deprecation hint to stderr for a legacy CLI verb that
-    /// has a `cmux workspace <subcommand>` replacement. Honors CMUX_QUIET so
+    /// has a `cmux workspace <subcommand>` replacement. Honors WMUX_QUIET so
     /// scripts can opt out.
-    private static let cliDeprecationNoticeShownKey = "CMUX_CLI_DEPRECATION_SHOWN"
+    private static let cliDeprecationNoticeShownKey = "WMUX_CLI_DEPRECATION_SHOWN"
     static func warnLegacyVerbDeprecated(_ legacy: String, replacement: String) {
-        if ProcessInfo.processInfo.environment["CMUX_QUIET"] != nil { return }
+        if ProcessInfo.processInfo.environment["WMUX_QUIET"] != nil { return }
         if getenv(cliDeprecationNoticeShownKey) != nil { return }
-        cliWriteStderr("wmux: '\(legacy)' is now an alias for '\(replacement)'. The legacy form keeps working indefinitely; set CMUX_QUIET=1 to silence this notice.\n")
+        cliWriteStderr("wmux: '\(legacy)' is now an alias for '\(replacement)'. The legacy form keeps working indefinitely; set WMUX_QUIET=1 to silence this notice.\n")
         setenv(cliDeprecationNoticeShownKey, "1", 1)
     }
 
@@ -13630,7 +12316,7 @@ struct WMUXCLI {
         throw CLIError(message: "ssh-tmux is disabled in this local-only macOS build")
     }
 
-    /// Generic "open a workspace, SSH into the remote, bootstrap cmuxd-remote, forward socket,
+    /// Generic "open a workspace, SSH into the remote, bootstrap wmuxd-remote, forward socket,
     /// drop the user in a shell" pipeline. The inner loop of `cmux ssh`; also called from
     /// `cmux vm new`/`shell`/`attach` so cloud VMs reuse the exact same bootstrap.
     private func runSSHWithOptions(
@@ -13754,7 +12440,7 @@ struct WMUXCLI {
         let initialSSHCommand = buildSSHCommandText(sshOptions)
         // For VM workspaces (Freestyle), skip the interactive bootstrap script: the russh
         // gateway forwards shell-request PTYs but stalls on exec-channel I/O, and the bootstrap
-        // script is only meaningful if cmuxd-remote is participating. Let ssh open a plain
+        // script is only meaningful if wmuxd-remote is participating. Let ssh open a plain
         // interactive shell instead.
         let remoteTerminalBootstrapScript: String?
         if sshOptions.skipDaemonBootstrap || fallsBackToOpenSSHInteractiveSession {
@@ -13900,8 +12586,8 @@ struct WMUXCLI {
             } else {
                 let splitAttachCommand = [
                     "env",
-                    "CMUX_SSH_RECONNECT_LIMIT=${CMUX_SSH_RECONNECT_LIMIT:-\(SSHReconnectBudget().maximumLimit)}",
-                    "CMUX_SSH_RECONNECT_DELAY_SECONDS=${CMUX_SSH_RECONNECT_DELAY_SECONDS:-2}",
+                    "WMUX_SSH_RECONNECT_LIMIT=${WMUX_SSH_RECONNECT_LIMIT:-\(SSHReconnectBudget().maximumLimit)}",
+                    "WMUX_SSH_RECONNECT_DELAY_SECONDS=${WMUX_SSH_RECONNECT_DELAY_SECONDS:-2}",
                     shellQuote(executablePath),
                     "vm",
                     "ssh-attach",
@@ -14591,19 +13277,19 @@ struct WMUXCLI {
         )
         var lines: [String] = [
             staging.preparationShellScript,
-            "if [ \"$cmux_remote_install_status\" -ne 0 ]; then",
-            "  exit \"$cmux_remote_install_status\"",
+            "if [ \"$wmux_remote_install_status\" -ne 0 ]; then",
+            "  exit \"$wmux_remote_install_status\"",
             "fi",
-            "unset cmux_remote_install_status",
-            "cmux_workspace_id=\"${CMUX_WORKSPACE_ID:-}\"",
-            "cmux_surface_id=\"${CMUX_SURFACE_ID:-}\"",
-            "cmux_terminal_lifecycle_id=\"${CMUX_TERMINAL_LIFECYCLE_ID:-}\"",
-            "cmux_ssh_attempt_id=\"${CMUX_SSH_ATTEMPT_ID:-}\"",
-            "cmux_remote_command_template=\(shellQuote(remoteCommandTemplate))",
-            "cmux_remote_command=\"$(printf '%s' \"$cmux_remote_command_template\" | sed \"s/__CMUX_WORKSPACE_ID__/$cmux_workspace_id/g; s/__CMUX_SURFACE_ID__/$cmux_surface_id/g; s/__CMUX_TERMINAL_LIFECYCLE_ID__/$cmux_terminal_lifecycle_id/g; s/__CMUX_SSH_ATTEMPT_ID__/$cmux_ssh_attempt_id/g\")\"",
+            "unset wmux_remote_install_status",
+            "wmux_workspace_id=\"${WMUX_WORKSPACE_ID:-}\"",
+            "wmux_surface_id=\"${WMUX_SURFACE_ID:-}\"",
+            "wmux_terminal_lifecycle_id=\"${WMUX_TERMINAL_LIFECYCLE_ID:-}\"",
+            "wmux_ssh_attempt_id=\"${WMUX_SSH_ATTEMPT_ID:-}\"",
+            "wmux_remote_command_template=\(shellQuote(remoteCommandTemplate))",
+            "wmux_remote_command=\"$(printf '%s' \"$wmux_remote_command_template\" | sed \"s/__CMUX_WORKSPACE_ID__/$wmux_workspace_id/g; s/__CMUX_SURFACE_ID__/$wmux_surface_id/g; s/__CMUX_TERMINAL_LIFECYCLE_ID__/$wmux_terminal_lifecycle_id/g; s/__CMUX_SSH_ATTEMPT_ID__/$wmux_ssh_attempt_id/g\")\"",
         ]
 
-        var sshInvocation = "command \(sessionSSHPrefix) -o \"RemoteCommand=$cmux_remote_command\""
+        var sshInvocation = "command \(sessionSSHPrefix) -o \"RemoteCommand=$wmux_remote_command\""
         if !options.effectiveTTYRequestArguments.isEmpty {
             sshInvocation += " " + options.effectiveTTYRequestArguments.map(shellQuote).joined(separator: " ")
         }
@@ -14646,42 +13332,42 @@ struct WMUXCLI {
         )
         let originalRemoteCommand = options.remoteCommand.arguments.joined(separator: " ")
         let remoteCommandPrefix = [
-            "cmux_remote_readiness_pid=",
-            "cmux_remote_readiness_cleanup() {",
-            "  if [ -n \"${cmux_remote_readiness_pid:-}\" ]; then",
-            "    kill \"$cmux_remote_readiness_pid\" >/dev/null 2>&1 || true",
-            "    wait \"$cmux_remote_readiness_pid\" >/dev/null 2>&1 || true",
-            "    cmux_remote_readiness_pid=",
+            "wmux_remote_readiness_pid=",
+            "wmux_remote_readiness_cleanup() {",
+            "  if [ -n \"${wmux_remote_readiness_pid:-}\" ]; then",
+            "    kill \"$wmux_remote_readiness_pid\" >/dev/null 2>&1 || true",
+            "    wait \"$wmux_remote_readiness_pid\" >/dev/null 2>&1 || true",
+            "    wmux_remote_readiness_pid=",
             "  fi",
             "}",
-            "trap 'cmux_remote_readiness_cleanup' EXIT",
+            "trap 'wmux_remote_readiness_cleanup' EXIT",
             "trap 'exit 129' HUP",
             "trap 'exit 130' INT",
             "trap 'exit 143' TERM",
         ].joined(separator: "\n") + "\n"
         let remoteCommandBetween = " </dev/null >/dev/null 2>&1 &\n" + [
-            "cmux_remote_readiness_pid=$!",
+            "wmux_remote_readiness_pid=$!",
             "(",
         ].joined(separator: "\n") + "\n"
         let remoteCommandSuffix = "\n" + [
             ")",
-            "cmux_user_remote_command_status=$?",
-            "cmux_remote_readiness_cleanup",
+            "wmux_user_remote_command_status=$?",
+            "wmux_remote_readiness_cleanup",
             "trap - EXIT HUP INT TERM",
-            "exit \"$cmux_user_remote_command_status\"",
+            "exit \"$wmux_user_remote_command_status\"",
         ].joined(separator: "\n")
         let lines = [
-            "cmux_workspace_id=\"${CMUX_WORKSPACE_ID:-}\"",
-            "cmux_surface_id=\"${CMUX_SURFACE_ID:-}\"",
-            "cmux_terminal_lifecycle_id=\"${CMUX_TERMINAL_LIFECYCLE_ID:-}\"",
-            "cmux_ssh_attempt_id=\"${CMUX_SSH_ATTEMPT_ID:-}\"",
-            "cmux_remote_readiness_template=\(shellQuote(readinessTemplate))",
-            "cmux_remote_readiness=\"$(printf '%s' \"$cmux_remote_readiness_template\" | sed \"s/__CMUX_WORKSPACE_ID__/$cmux_workspace_id/g; s/__CMUX_SURFACE_ID__/$cmux_surface_id/g; s/__CMUX_TERMINAL_LIFECYCLE_ID__/$cmux_terminal_lifecycle_id/g; s/__CMUX_SSH_ATTEMPT_ID__/$cmux_ssh_attempt_id/g\")\"",
-            "cmux_user_remote_command=\(shellQuote(originalRemoteCommand))",
-            "cmux_remote_command=\(shellQuote(remoteCommandPrefix))\"$cmux_remote_readiness\"\(shellQuote(remoteCommandBetween))\"$cmux_user_remote_command\"\(shellQuote(remoteCommandSuffix))",
+            "wmux_workspace_id=\"${WMUX_WORKSPACE_ID:-}\"",
+            "wmux_surface_id=\"${WMUX_SURFACE_ID:-}\"",
+            "wmux_terminal_lifecycle_id=\"${WMUX_TERMINAL_LIFECYCLE_ID:-}\"",
+            "wmux_ssh_attempt_id=\"${WMUX_SSH_ATTEMPT_ID:-}\"",
+            "wmux_remote_readiness_template=\(shellQuote(readinessTemplate))",
+            "wmux_remote_readiness=\"$(printf '%s' \"$wmux_remote_readiness_template\" | sed \"s/__CMUX_WORKSPACE_ID__/$wmux_workspace_id/g; s/__CMUX_SURFACE_ID__/$wmux_surface_id/g; s/__CMUX_TERMINAL_LIFECYCLE_ID__/$wmux_terminal_lifecycle_id/g; s/__CMUX_SSH_ATTEMPT_ID__/$wmux_ssh_attempt_id/g\")\"",
+            "wmux_user_remote_command=\(shellQuote(originalRemoteCommand))",
+            "wmux_remote_command=\(shellQuote(remoteCommandPrefix))\"$wmux_remote_readiness\"\(shellQuote(remoteCommandBetween))\"$wmux_user_remote_command\"\(shellQuote(remoteCommandSuffix))",
             "command \(sshPrefix) \(shellQuote(options.destination))" +
                 (options.remoteCommand.usesArgumentSeparator ? " --" : "") +
-                " \"$cmux_remote_command\"",
+                " \"$wmux_remote_command\"",
         ]
         return lines.joined(separator: "\n")
     }
@@ -14702,28 +13388,28 @@ struct WMUXCLI {
         guard remoteRelayPort > 0 else { return [] }
 
         var lines: [String] = [
-            "cmux_bootstrap_tty=\"$(tty 2>/dev/null || true)\"",
-            "cmux_bootstrap_tty=\"${cmux_bootstrap_tty##*/}\"",
-            "if [ -n \"$cmux_bootstrap_tty\" ] && [ \"$cmux_bootstrap_tty\" != \"not a tty\" ]; then",
+            "wmux_bootstrap_tty=\"$(tty 2>/dev/null || true)\"",
+            "wmux_bootstrap_tty=\"${wmux_bootstrap_tty##*/}\"",
+            "if [ -n \"$wmux_bootstrap_tty\" ] && [ \"$wmux_bootstrap_tty\" != \"not a tty\" ]; then",
             "  mkdir -p \"$HOME/.wmux/relay\" >/dev/null 2>&1 || true",
-            "  printf '%s' \"$cmux_bootstrap_tty\" > \"$HOME/.wmux/relay/\(remoteRelayPort).tty\" 2>/dev/null || true",
-            "  export CMUX_BOOTSTRAP_TTY=\"$cmux_bootstrap_tty\"",
+            "  printf '%s' \"$wmux_bootstrap_tty\" > \"$HOME/.wmux/relay/\(remoteRelayPort).tty\" 2>/dev/null || true",
+            "  export WMUX_BOOTSTRAP_TTY=\"$wmux_bootstrap_tty\"",
         ]
 
         if includeRelayRPC {
             lines += [
-                "  cmux_relay_cli=\"$HOME/.wmux/bin/wmux\"",
-                "  if [ ! -x \"$cmux_relay_cli\" ]; then cmux_relay_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
-                "  if [ -n \"$cmux_relay_cli\" ]; then",
-                "    ( cmux_relay_report_tty='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"tty_name\":\"'$cmux_bootstrap_tty'\",\"terminal_lifecycle_id\":\"__CMUX_TERMINAL_LIFECYCLE_ID__\",\"attempt_id\":\"__CMUX_SSH_ATTEMPT_ID__\"}'",
-                "      cmux_relay_ports_kick='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"reason\":\"command\"}'",
+                "  wmux_relay_cli=\"$HOME/.wmux/bin/wmux\"",
+                "  if [ ! -x \"$wmux_relay_cli\" ]; then wmux_relay_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
+                "  if [ -n \"$wmux_relay_cli\" ]; then",
+                "    ( wmux_relay_report_tty='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"tty_name\":\"'$wmux_bootstrap_tty'\",\"terminal_lifecycle_id\":\"__CMUX_TERMINAL_LIFECYCLE_ID__\",\"attempt_id\":\"__CMUX_SSH_ATTEMPT_ID__\"}'",
+                "      wmux_relay_ports_kick='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"reason\":\"command\"}'",
                 "      if [ -n \"__CMUX_SURFACE_ID__\" ]; then",
-                "        cmux_relay_report_tty='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"surface_id\":\"__CMUX_SURFACE_ID__\",\"tty_name\":\"'$cmux_bootstrap_tty'\",\"terminal_lifecycle_id\":\"__CMUX_TERMINAL_LIFECYCLE_ID__\",\"attempt_id\":\"__CMUX_SSH_ATTEMPT_ID__\"}'",
-                "        cmux_relay_ports_kick='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"surface_id\":\"__CMUX_SURFACE_ID__\",\"reason\":\"command\"}'",
+                "        wmux_relay_report_tty='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"surface_id\":\"__CMUX_SURFACE_ID__\",\"tty_name\":\"'$wmux_bootstrap_tty'\",\"terminal_lifecycle_id\":\"__CMUX_TERMINAL_LIFECYCLE_ID__\",\"attempt_id\":\"__CMUX_SSH_ATTEMPT_ID__\"}'",
+                "        wmux_relay_ports_kick='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"surface_id\":\"__CMUX_SURFACE_ID__\",\"reason\":\"command\"}'",
                 "      fi",
-                "      env -u CMUX_SOCKET CMUX_SOCKET_PATH=\"127.0.0.1:\(remoteRelayPort)\" \"$cmux_relay_cli\" rpc surface.report_tty \"$cmux_relay_report_tty\" >/dev/null 2>&1 || true",
-                "      env -u CMUX_SOCKET CMUX_SOCKET_PATH=\"127.0.0.1:\(remoteRelayPort)\" \"$cmux_relay_cli\" rpc surface.ports_kick \"$cmux_relay_ports_kick\" >/dev/null 2>&1 || true",
-                "    ) </dev/null >/dev/null 2>&1 & unset cmux_relay_cli",
+                "      env -u WMUX_SOCKET WMUX_SOCKET_PATH=\"127.0.0.1:\(remoteRelayPort)\" \"$wmux_relay_cli\" rpc surface.report_tty \"$wmux_relay_report_tty\" >/dev/null 2>&1 || true",
+                "      env -u WMUX_SOCKET WMUX_SOCKET_PATH=\"127.0.0.1:\(remoteRelayPort)\" \"$wmux_relay_cli\" rpc surface.ports_kick \"$wmux_relay_ports_kick\" >/dev/null 2>&1 || true",
+                "    ) </dev/null >/dev/null 2>&1 & unset wmux_relay_cli",
                 "  fi",
             ]
         }
@@ -14740,22 +13426,22 @@ struct WMUXCLI {
         guard remoteRelayPort > 0 else { return [] }
         return [
             "if [ -n \"__CMUX_SURFACE_ID__\" ]; then",
-            "  cmux_relay_terminal_connected='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"surface_id\":\"__CMUX_SURFACE_ID__\",\"relay_port\":\(remoteRelayPort),\"terminal_lifecycle_id\":\"__CMUX_TERMINAL_LIFECYCLE_ID__\",\"attempt_id\":\"__CMUX_SSH_ATTEMPT_ID__\"}'",
-            "  cmux_relay_terminal_connected_acknowledged=0",
-            "  cmux_relay_terminal_connected_retry=0",
-            "  while [ \"$cmux_relay_terminal_connected_retry\" -lt \(maximumAttempts) ]; do",
-            "    cmux_relay_cli=\"$HOME/.wmux/bin/wmux\"",
-            "    if [ ! -x \"$cmux_relay_cli\" ]; then cmux_relay_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
-            "    if [ -n \"$cmux_relay_cli\" ] && env -u CMUX_SOCKET CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 CMUX_SOCKET_PATH=\"127.0.0.1:\(remoteRelayPort)\" \"$cmux_relay_cli\" rpc workspace.remote.terminal_session_connected \"$cmux_relay_terminal_connected\" >/dev/null 2>&1; then",
-            "      cmux_relay_terminal_connected_acknowledged=1",
+            "  wmux_relay_terminal_connected='{\"workspace_id\":\"__CMUX_WORKSPACE_ID__\",\"surface_id\":\"__CMUX_SURFACE_ID__\",\"relay_port\":\(remoteRelayPort),\"terminal_lifecycle_id\":\"__CMUX_TERMINAL_LIFECYCLE_ID__\",\"attempt_id\":\"__CMUX_SSH_ATTEMPT_ID__\"}'",
+            "  wmux_relay_terminal_connected_acknowledged=0",
+            "  wmux_relay_terminal_connected_retry=0",
+            "  while [ \"$wmux_relay_terminal_connected_retry\" -lt \(maximumAttempts) ]; do",
+            "    wmux_relay_cli=\"$HOME/.wmux/bin/wmux\"",
+            "    if [ ! -x \"$wmux_relay_cli\" ]; then wmux_relay_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
+            "    if [ -n \"$wmux_relay_cli\" ] && env -u WMUX_SOCKET WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5 WMUX_SOCKET_PATH=\"127.0.0.1:\(remoteRelayPort)\" \"$wmux_relay_cli\" rpc workspace.remote.terminal_session_connected \"$wmux_relay_terminal_connected\" >/dev/null 2>&1; then",
+            "      wmux_relay_terminal_connected_acknowledged=1",
             "      break",
             "    fi",
-            "    cmux_relay_terminal_connected_retry=$((cmux_relay_terminal_connected_retry + 1))",
-            "    if [ \"$cmux_relay_terminal_connected_retry\" -lt \(maximumAttempts) ]; then /bin/sleep \(retryDelaySeconds); fi",
+            "    wmux_relay_terminal_connected_retry=$((wmux_relay_terminal_connected_retry + 1))",
+            "    if [ \"$wmux_relay_terminal_connected_retry\" -lt \(maximumAttempts) ]; then /bin/sleep \(retryDelaySeconds); fi",
             "  done",
-            "  if [ \"$cmux_relay_terminal_connected_acknowledged\" -ne 1 ]; then exit 255; fi",
+            "  if [ \"$wmux_relay_terminal_connected_acknowledged\" -ne 1 ]; then exit 255; fi",
             "fi",
-            "unset cmux_relay_cli cmux_relay_terminal_connected cmux_relay_terminal_connected_acknowledged cmux_relay_terminal_connected_retry",
+            "unset wmux_relay_cli wmux_relay_terminal_connected wmux_relay_terminal_connected_acknowledged wmux_relay_terminal_connected_retry",
         ]
     }
 
@@ -14947,19 +13633,19 @@ struct WMUXCLI {
         let encodedLiteral = shellQuote(encodedScript)
         var lines = remoteBootstrapTTYCaptureLines(remoteRelayPort: remoteRelayPort, includeRelayRPC: false)
         lines += [
-            "cmux_tmp=$(mktemp \"${TMPDIR:-/tmp}/wmux-ssh-bootstrap.XXXXXX\") || exit 1",
-            "(printf %s \(encodedLiteral) | base64 -d 2>/dev/null || printf %s \(encodedLiteral) | base64 -D 2>/dev/null) > \"$cmux_tmp\" || { rm -f \"$cmux_tmp\"; exit 1; }",
-            "chmod 700 \"$cmux_tmp\" >/dev/null 2>&1 || true",
-            "/bin/sh \"$cmux_tmp\"",
-            "cmux_status=$?",
-            "rm -f \"$cmux_tmp\"",
-            "exit $cmux_status",
+            "wmux_tmp=$(mktemp \"${TMPDIR:-/tmp}/wmux-ssh-bootstrap.XXXXXX\") || exit 1",
+            "(printf %s \(encodedLiteral) | base64 -d 2>/dev/null || printf %s \(encodedLiteral) | base64 -D 2>/dev/null) > \"$wmux_tmp\" || { rm -f \"$wmux_tmp\"; exit 1; }",
+            "chmod 700 \"$wmux_tmp\" >/dev/null 2>&1 || true",
+            "/bin/sh \"$wmux_tmp\"",
+            "wmux_status=$?",
+            "rm -f \"$wmux_tmp\"",
+            "exit $wmux_status",
         ]
         return lines.joined(separator: "\n")
     }
 
     /// Open an interactive cmux-managed shell on a Cloud VM. Automatic opens use
-    /// cmux-tui through the app's user-space WireGuard hub. `cmux vm ssh` is a
+    /// wmux-tui through the app's user-space WireGuard hub. `cmux vm ssh` is a
     /// separate explicit diagnostic command.
     func logVMTiming(
         _ stage: String,
@@ -14989,7 +13675,7 @@ struct WMUXCLI {
     }
 
     /// The workspace an open landed in (nil for SSH sessions, which own their own
-    /// workspace flow) and, for cmux-tui sessions, the pane running the client.
+    /// workspace flow) and, for wmux-tui sessions, the pane running the client.
     struct VMOpenedWorkspace {
         let workspaceId: String
         let terminalSurfaceId: String?
@@ -15040,14 +13726,14 @@ struct WMUXCLI {
                 )
                 return nil
             } catch let error as CLIError where Self.shouldFallbackFromForcedSSH(error) {
-                // `vm ssh` predates the cmux-tui route. A provider may expose
+                // `vm ssh` predates the wmux-tui route. A provider may expose
                 // scoped SSH, but the managed alias must continue through the
                 // shared cmux-remote path when the legacy endpoint is unsupported.
                 cliDebugLog("cli.vm.ssh.alias_fallback vm=\(String(id.prefix(8))) reason=wmux-remote")
             }
         }
 
-        // Every automatic Cloud entrypoint uses the cmux-tui daemon over the
+        // Every automatic Cloud entrypoint uses the wmux-tui daemon over the
         // user-space WireGuard hub. There is no public WebSocket or SSH fallback.
         let attachInfoStartedAt = Date()
         let opened = try openVMTuiWorkspace(
@@ -15451,7 +14137,7 @@ struct WMUXCLI {
             usesDefaultFreestyleSSHD: usesDefaultFreestyleSSHD,
             client: client
         )
-        if ProcessInfo.processInfo.environment["CMUX_CLOUD_RECONNECT_ATTEMPT"] == nil {
+        if ProcessInfo.processInfo.environment["WMUX_CLOUD_RECONNECT_ATTEMPT"] == nil {
             bootstrapFreestyleZshEnvironmentIfPossible(vmID: vmID, username: "wmux", client: client)
         }
         logVMTiming("ssh_info", vmID: vmID, transport: "ssh", startedAt: attachInfoStartedAt)
@@ -15466,7 +14152,7 @@ struct WMUXCLI {
             options,
             remoteBootstrapScript: FreestyleInteractiveShellScript(
                 environment: ProcessInfo.processInfo.environment,
-                suppressWelcome: ProcessInfo.processInfo.environment["CMUX_CLOUD_RECONNECT_ATTEMPT"] != nil
+                suppressWelcome: ProcessInfo.processInfo.environment["WMUX_CLOUD_RECONNECT_ATTEMPT"] != nil
             ).text
         )
         guard let launchPath = sshArguments.first else {
@@ -15509,33 +14195,33 @@ struct WMUXCLI {
         let quotedCLI = shellQuote(executablePath)
         let quotedVMID = shellQuote(vmID)
         let lines = [
-            "cmux_freestyle_cli=\(quotedCLI)",
-            "CMUX_SSH_RECONNECT_LIMIT=\"${CMUX_SSH_RECONNECT_LIMIT:-\(SSHReconnectBudget().maximumLimit)}\"",
-            "CMUX_SSH_RECONNECT_DELAY_SECONDS=\"${CMUX_SSH_RECONNECT_DELAY_SECONDS:-2}\"",
-            "CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT=\"${CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT:-$CMUX_SSH_RECONNECT_LIMIT}\"",
-            "CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS=\"${CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS:-$CMUX_SSH_RECONNECT_DELAY_SECONDS}\"",
-            "export CMUX_SSH_RECONNECT_LIMIT CMUX_SSH_RECONNECT_DELAY_SECONDS",
-            "export CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS",
-            "cmux_freestyle_attach() {",
-            "  if [ -n \"${CMUX_SOCKET_PATH:-}\" ]; then",
-            "    \"$cmux_freestyle_cli\" --socket \"$CMUX_SOCKET_PATH\" vm-pty-attach --id \(quotedVMID) --default-freestyle-sshd",
+            "wmux_freestyle_cli=\(quotedCLI)",
+            "WMUX_SSH_RECONNECT_LIMIT=\"${WMUX_SSH_RECONNECT_LIMIT:-\(SSHReconnectBudget().maximumLimit)}\"",
+            "WMUX_SSH_RECONNECT_DELAY_SECONDS=\"${WMUX_SSH_RECONNECT_DELAY_SECONDS:-2}\"",
+            "WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT=\"${WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT:-$WMUX_SSH_RECONNECT_LIMIT}\"",
+            "WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS=\"${WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS:-$WMUX_SSH_RECONNECT_DELAY_SECONDS}\"",
+            "export WMUX_SSH_RECONNECT_LIMIT WMUX_SSH_RECONNECT_DELAY_SECONDS",
+            "export WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS",
+            "wmux_freestyle_attach() {",
+            "  if [ -n \"${WMUX_SOCKET_PATH:-}\" ]; then",
+            "    \"$wmux_freestyle_cli\" --socket \"$WMUX_SOCKET_PATH\" vm-pty-attach --id \(quotedVMID) --default-freestyle-sshd",
             "  else",
-            "    \"$cmux_freestyle_cli\" vm-pty-attach --id \(quotedVMID) --default-freestyle-sshd",
+            "    \"$wmux_freestyle_cli\" vm-pty-attach --id \(quotedVMID) --default-freestyle-sshd",
             "  fi",
             "}",
-            "cmux_freestyle_retry=0",
+            "wmux_freestyle_retry=0",
             "while :; do",
-            "  if [ \"$cmux_freestyle_retry\" -gt 0 ]; then",
-            "    export CMUX_CLOUD_RECONNECT_ATTEMPT=\"$cmux_freestyle_retry\"",
+            "  if [ \"$wmux_freestyle_retry\" -gt 0 ]; then",
+            "    export WMUX_CLOUD_RECONNECT_ATTEMPT=\"$wmux_freestyle_retry\"",
             "  else",
-            "    unset CMUX_CLOUD_RECONNECT_ATTEMPT",
+            "    unset WMUX_CLOUD_RECONNECT_ATTEMPT",
             "  fi",
-            "  cmux_freestyle_attach",
-            "  cmux_freestyle_status=$?",
-            "  case \"$cmux_freestyle_status\" in 254|255) ;; *) exit \"$cmux_freestyle_status\" ;; esac",
-            "  if [ \"$cmux_freestyle_retry\" -ge \"$CMUX_SSH_RECONNECT_LIMIT\" ]; then exit \"$cmux_freestyle_status\"; fi",
-            "  cmux_freestyle_retry=$((cmux_freestyle_retry + 1))",
-            "  sleep \"$CMUX_SSH_RECONNECT_DELAY_SECONDS\"",
+            "  wmux_freestyle_attach",
+            "  wmux_freestyle_status=$?",
+            "  case \"$wmux_freestyle_status\" in 254|255) ;; *) exit \"$wmux_freestyle_status\" ;; esac",
+            "  if [ \"$wmux_freestyle_retry\" -ge \"$WMUX_SSH_RECONNECT_LIMIT\" ]; then exit \"$wmux_freestyle_status\"; fi",
+            "  wmux_freestyle_retry=$((wmux_freestyle_retry + 1))",
+            "  sleep \"$WMUX_SSH_RECONNECT_DELAY_SECONDS\"",
             "done",
         ]
         return "/bin/sh -c \(shellQuote(lines.joined(separator: "\n")))"
@@ -15570,7 +14256,7 @@ struct WMUXCLI {
     ) throws -> [String: Any] {
         var attempt = 0
         var printedRetryNotice = false
-        let isReconnectAttach = ProcessInfo.processInfo.environment["CMUX_CLOUD_RECONNECT_ATTEMPT"] != nil
+        let isReconnectAttach = ProcessInfo.processInfo.environment["WMUX_CLOUD_RECONNECT_ATTEMPT"] != nil
         let retryLimit = Self.defaultFreestyleAttachRetryLimit()
         let retryDelaySeconds = Self.defaultFreestyleAttachRetryDelaySeconds()
         while true {
@@ -15629,8 +14315,8 @@ struct WMUXCLI {
 
     private static func defaultFreestyleAttachRetryLimit() -> Int {
         let environment = ProcessInfo.processInfo.environment
-        let raw = environment["CMUX_CLOUD_ATTACH_RETRY_LIMIT"]
-            ?? environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"]
+        let raw = environment["WMUX_CLOUD_ATTACH_RETRY_LIMIT"]
+            ?? environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"]
             ?? ""
         guard let parsed = Int(raw), parsed >= 0 else {
             return 120
@@ -15640,8 +14326,8 @@ struct WMUXCLI {
 
     private static func defaultFreestyleAttachRetryDelaySeconds() -> Double {
         let environment = ProcessInfo.processInfo.environment
-        let raw = environment["CMUX_CLOUD_ATTACH_RETRY_DELAY_SECONDS"]
-            ?? environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"]
+        let raw = environment["WMUX_CLOUD_ATTACH_RETRY_DELAY_SECONDS"]
+            ?? environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"]
             ?? ""
         guard let parsed = Double(raw), parsed >= 0 else {
             return 2
@@ -15754,11 +14440,11 @@ struct WMUXCLI {
             message.contains("connection refused") ||
             message.contains("failed to connect") ||
             message.contains("could not connect to the server") ||
-            message.contains("cmuxd websocket health check failed") ||
+            message.contains("wmuxd websocket health check failed") ||
             message.contains("operation was aborted") ||
             message.contains("timed out") ||
             message.contains("timeout") ||
-            message.contains("requires a cmuxd rpc endpoint")
+            message.contains("requires a wmuxd rpc endpoint")
     }
 
     private static func writeStderr(_ text: String) {
@@ -15793,10 +14479,10 @@ struct WMUXCLI {
         return """
         set -u
         export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
-        cmux_user=\(quotedUsername)
-        cmux_home="$(getent passwd "$cmux_user" 2>/dev/null | awk -F: '{print $6}')"
-        if [ -z "$cmux_home" ]; then
-          cmux_home="/home/$cmux_user"
+        wmux_user=\(quotedUsername)
+        wmux_home="$(getent passwd "$wmux_user" 2>/dev/null | awk -F: '{print $6}')"
+        if [ -z "$wmux_home" ]; then
+          wmux_home="/home/$wmux_user"
         fi
 
         if [ ! -f /etc/wmux/zsh-bootstrap-v5 ] || ! command -v gh >/dev/null 2>&1 || ! command -v htop >/dev/null 2>&1 || ! command -v btop >/dev/null 2>&1 || ! command -v tmux >/dev/null 2>&1 || ! command -v wmux >/dev/null 2>&1; then
@@ -15806,19 +14492,19 @@ struct WMUXCLI {
           fi
         fi
 
-        if [ ! -x /usr/local/bin/wmux ] && [ -x /usr/local/bin/cmuxd-remote ]; then
-          ln -sf /usr/local/bin/cmuxd-remote /usr/local/bin/wmux >/dev/null 2>&1 || true
+        if [ ! -x /usr/local/bin/wmux ] && [ -x /usr/local/bin/wmuxd-remote ]; then
+          ln -sf /usr/local/bin/wmuxd-remote /usr/local/bin/wmux >/dev/null 2>&1 || true
         fi
         hash -r 2>/dev/null || true
 
-        mkdir -p /etc/wmux "$cmux_home/.config/wmux"
-        cat > /etc/wmux/zshrc <<'CMUX_ZSHRC'
+        mkdir -p /etc/wmux "$wmux_home/.config/wmux"
+        cat > /etc/wmux/zshrc <<'WMUX_ZSHRC'
         # wmux default zsh profile. Put personal overrides in ~/.zshrc.local.
         export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
         export SHELL="$(command -v zsh)"
         mkdir -p "$HOME/.wmux" 2>/dev/null || true
         printf '%s' '/tmp/wmux-cloud-cli.sock' > "$HOME/.wmux/socket_addr" 2>/dev/null || true
-        export CMUX_SOCKET_PATH="${CMUX_SOCKET_PATH:-/tmp/wmux-cloud-cli.sock}"
+        export WMUX_SOCKET_PATH="${WMUX_SOCKET_PATH:-/tmp/wmux-cloud-cli.sock}"
         autoload -Uz colors 2>/dev/null && colors
         setopt prompt_subst interactivecomments no_beep hist_ignore_dups share_history 2>/dev/null || true
         PROMPT_EOL_MARK=''
@@ -15833,21 +14519,21 @@ struct WMUXCLI {
           ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="${ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE:-fg=8}"
         fi
 
-        : ${CMUX_PROMPT_USER:=wmux-cloud}
-        : ${CMUX_PROMPT_CHAR:=$'\\u03bb'}
-        PROMPT='%F{magenta}${CMUX_PROMPT_USER}%f in %F{green}%~%f ${CMUX_PROMPT_CHAR} '
-        CMUX_ZSHRC
+        : ${WMUX_PROMPT_USER:=wmux-cloud}
+        : ${WMUX_PROMPT_CHAR:=$'\\u03bb'}
+        PROMPT='%F{magenta}${WMUX_PROMPT_USER}%f in %F{green}%~%f ${WMUX_PROMPT_CHAR} '
+        WMUX_ZSHRC
 
-        if [ ! -e "$cmux_home/.zshrc" ] || grep -q "wmux-managed zsh defaults" "$cmux_home/.zshrc" 2>/dev/null; then
-          cat > "$cmux_home/.zshrc" <<'CMUX_USER_ZSHRC'
+        if [ ! -e "$wmux_home/.zshrc" ] || grep -q "wmux-managed zsh defaults" "$wmux_home/.zshrc" 2>/dev/null; then
+          cat > "$wmux_home/.zshrc" <<'WMUX_USER_ZSHRC'
         # wmux-managed zsh defaults. Edit ~/.zshrc.local for personal overrides.
         mkdir -p "$HOME/.wmux" 2>/dev/null || true
         printf '%s' '/tmp/wmux-cloud-cli.sock' > "$HOME/.wmux/socket_addr" 2>/dev/null || true
-        export CMUX_SOCKET_PATH="${CMUX_SOCKET_PATH:-/tmp/wmux-cloud-cli.sock}"
+        export WMUX_SOCKET_PATH="${WMUX_SOCKET_PATH:-/tmp/wmux-cloud-cli.sock}"
         [ -r /etc/wmux/zshrc ] && source /etc/wmux/zshrc
         [ -r "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
-        if [ "${CMUX_CLOUD_WELCOME:-1}" != "0" ] && [ -z "${CMUX_CLOUD_WELCOME_SHOWN:-}" ] && [ -t 1 ]; then
-          export CMUX_CLOUD_WELCOME_SHOWN=1
+        if [ "${WMUX_CLOUD_WELCOME:-1}" != "0" ] && [ -z "${WMUX_CLOUD_WELCOME_SHOWN:-}" ] && [ -t 1 ]; then
+          export WMUX_CLOUD_WELCOME_SHOWN=1
           printf '\\033[38;2;0;212;255m  ::\\033[0m\\n'
           printf '\\033[38;2;24;181;250m    ::::              \\033[38;2;0;212;255mc\\033[38;2;24;181;250mm\\033[38;2;48;150;245mu\\033[38;2;124;58;237mx cloud\\033[0m\\n'
           printf '\\033[38;2;48;150;245m      ::::::\\033[0m\\n'
@@ -15857,30 +14543,30 @@ struct WMUXCLI {
           printf '\\033[38;2;124;58;237m  ::\\033[0m\\n'
           printf '\\n'
         fi
-        CMUX_USER_ZSHRC
+        WMUX_USER_ZSHRC
         fi
 
-        if [ ! -e "$cmux_home/.zshrc.local" ]; then
-          cat > "$cmux_home/.zshrc.local" <<'CMUX_LOCAL_ZSHRC'
+        if [ ! -e "$wmux_home/.zshrc.local" ]; then
+          cat > "$wmux_home/.zshrc.local" <<'WMUX_LOCAL_ZSHRC'
         # Personal zsh overrides for this cloud VM.
         # Examples:
-        #   CMUX_CLOUD_WELCOME=0
-        #   CMUX_PROMPT_USER='wmux-cloud'
-        #   CMUX_PROMPT_CHAR='>'
+        #   WMUX_CLOUD_WELCOME=0
+        #   WMUX_PROMPT_USER='wmux-cloud'
+        #   WMUX_PROMPT_CHAR='>'
         #   PROMPT='%F{cyan}%n%f:%F{green}%~%f %# '
-        CMUX_LOCAL_ZSHRC
+        WMUX_LOCAL_ZSHRC
         fi
 
         if command -v zsh >/dev/null 2>&1; then
-          chsh -s "$(command -v zsh)" "$cmux_user" >/dev/null 2>&1 || true
+          chsh -s "$(command -v zsh)" "$wmux_user" >/dev/null 2>&1 || true
           touch /etc/wmux/zsh-bootstrap-v1 /etc/wmux/zsh-bootstrap-v2 /etc/wmux/zsh-bootstrap-v3 /etc/wmux/zsh-bootstrap-v4 /etc/wmux/zsh-bootstrap-v5 2>/dev/null || true
         fi
-        touch "$cmux_home/.hushlogin" 2>/dev/null || true
-        chown "$cmux_user:$cmux_user" "$cmux_home/.zshrc" "$cmux_home/.zshrc.local" 2>/dev/null || true
-        chown "$cmux_user:$cmux_user" "$cmux_home/.hushlogin" 2>/dev/null || true
-        mkdir -p "$cmux_home/.config" 2>/dev/null || true
-        chown "$cmux_user:$cmux_user" "$cmux_home/.config" 2>/dev/null || true
-        chown -R "$cmux_user:$cmux_user" "$cmux_home/.config/wmux" 2>/dev/null || true
+        touch "$wmux_home/.hushlogin" 2>/dev/null || true
+        chown "$wmux_user:$wmux_user" "$wmux_home/.zshrc" "$wmux_home/.zshrc.local" 2>/dev/null || true
+        chown "$wmux_user:$wmux_user" "$wmux_home/.hushlogin" 2>/dev/null || true
+        mkdir -p "$wmux_home/.config" 2>/dev/null || true
+        chown "$wmux_user:$wmux_user" "$wmux_home/.config" 2>/dev/null || true
+        chown -R "$wmux_user:$wmux_user" "$wmux_home/.config/wmux" 2>/dev/null || true
         """
     }
 
@@ -16345,7 +15031,7 @@ struct WMUXCLI {
         }
         var attempt = 0
         var printedRetryNotice = false
-        let isReconnectAttach = ProcessInfo.processInfo.environment["CMUX_CLOUD_RECONNECT_ATTEMPT"] != nil
+        let isReconnectAttach = ProcessInfo.processInfo.environment["WMUX_CLOUD_RECONNECT_ATTEMPT"] != nil
         let retryLimit = Self.defaultFreestyleAttachRetryLimit()
         let retryDelaySeconds = Self.defaultFreestyleAttachRetryDelaySeconds()
         while true {
@@ -17080,13 +15766,13 @@ struct WMUXCLI {
             let inheritedSurfaceAnchor: String? = {
                 guard surfaceOpt == nil, workspaceOpt == nil,
                       let callerWorkspaceID = Self.normalizedEnvValue(
-                          ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"]
+                          ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"]
                       ),
                       handlesMatch(callerWorkspaceID, workspaceID) ||
                           (workspaceRef.map { handlesMatch(callerWorkspaceID, $0) } ?? false) else {
                     return nil
                 }
-                return ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"]
+                return ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"]
             }()
             let surfaceID = try normalizeSurfaceHandle(
                 surfaceOpt ?? inheritedSurfaceAnchor,
@@ -17118,26 +15804,26 @@ struct WMUXCLI {
     private func sshSessionAttachStartupCommand(sessionID: String) -> String {
         let quotedSessionID = shellQuote(sessionID)
         let currentExecutable = shellQuote(resolvedExecutableURL()?.path ?? (args.first ?? "wmux"))
-        let attachCommand = "\"$cmux_ssh_attach_cli\" --socket \"$CMUX_SOCKET_PATH\" ssh-pty-attach --wait --require-existing --workspace \"$CMUX_WORKSPACE_ID\" --session-id \(quotedSessionID) --lifecycle-id \"$cmux_ssh_attach_lifecycle_id\" --attachment-id \"${CMUX_SURFACE_ID:-}\""
+        let attachCommand = "\"$wmux_ssh_attach_cli\" --socket \"$WMUX_SOCKET_PATH\" ssh-pty-attach --wait --require-existing --workspace \"$WMUX_WORKSPACE_ID\" --session-id \(quotedSessionID) --lifecycle-id \"$wmux_ssh_attach_lifecycle_id\" --attachment-id \"${WMUX_SURFACE_ID:-}\""
         let script = ([
-            "cmux_ssh_attach_cli=\"${CMUX_BUNDLED_CLI_PATH:-}\"",
-            "if [ -z \"$cmux_ssh_attach_cli\" ] || [ ! -x \"$cmux_ssh_attach_cli\" ]; then cmux_ssh_attach_cli=\(currentExecutable); fi",
-            "if [ -z \"$cmux_ssh_attach_cli\" ] || [ ! -x \"$cmux_ssh_attach_cli\" ]; then cmux_ssh_attach_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
-            "if [ -z \"$cmux_ssh_attach_cli\" ]; then printf '%s\\n' '[wmux] bundled CLI not found for SSH PTY attach.' >&2; exit 127; fi",
-            "if [ -z \"${CMUX_SOCKET_PATH:-}\" ]; then printf '%s\\n' '[wmux] required configuration missing for SSH PTY attach.' >&2; exit 1; fi",
-            "if [ -z \"${CMUX_WORKSPACE_ID:-}\" ]; then printf '%s\\n' '[wmux] required workspace context missing for SSH PTY attach.' >&2; exit 1; fi",
-            "cmux_ssh_attach_register_attempt() { cmux_ssh_attach_launch_payload=\"{\\\"workspace_id\\\":\\\"$CMUX_WORKSPACE_ID\\\",\\\"surface_id\\\":\\\"${CMUX_SURFACE_ID:-}\\\",\\\"terminal_lifecycle_id\\\":\\\"${CMUX_TERMINAL_LIFECYCLE_ID:-}\\\",\\\"attempt_id\\\":\\\"$CMUX_SSH_ATTEMPT_ID\\\"}\"; CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=2 \"$cmux_ssh_attach_cli\" --socket \"$CMUX_SOCKET_PATH\" rpc workspace.remote.terminal_session_launching \"$cmux_ssh_attach_launch_payload\" >/dev/null 2>&1; }",
-        ] + SSHPTYAttachRetryScriptBuilder().launchRegistrationRetryLines(functionPrefix: "cmux_ssh_attach") + [
-            "cmux_ssh_attach_attempt() { cmux_ssh_attach_begin_attempt || return \"$?\"; \(attachCommand); }",
-            "cmux_ssh_attach_lifecycle_id=$(/usr/bin/uuidgen | /usr/bin/tr '[:upper:]' '[:lower:]') || exit 1",
-            "cmux_ssh_attach_lifecycle_ended=0",
-            "cmux_ssh_attach_lifecycle_end() { if [ \"$cmux_ssh_attach_lifecycle_ended\" = 1 ]; then return; fi; cmux_ssh_attach_lifecycle_ended=1; \"$cmux_ssh_attach_cli\" --socket \"$CMUX_SOCKET_PATH\" ssh-session-end --lifecycle-only --workspace \"$CMUX_WORKSPACE_ID\" --surface \"${CMUX_SURFACE_ID:-}\" --terminal-lifecycle-id \"${CMUX_TERMINAL_LIFECYCLE_ID:-}\" --session-id \(quotedSessionID) --lifecycle-id \"$cmux_ssh_attach_lifecycle_id\" >/dev/null 2>&1 || true; }",
-            "cmux_ssh_attach_signal_exit() { cmux_ssh_attach_signal_status=\"$1\"; cmux_ssh_attach_signal_name=\"$2\"; if [ -n \"${cmux_ssh_attach_backoff_pid:-}\" ]; then /bin/kill -TERM \"$cmux_ssh_attach_backoff_pid\" >/dev/null 2>&1 || true; wait \"$cmux_ssh_attach_backoff_pid\" 2>/dev/null || true; cmux_ssh_attach_backoff_pid=; elif [ \"${cmux_ssh_attach_backoff_launching:-0}\" = 1 ]; then cmux_ssh_attach_pending_signal=\"$cmux_ssh_attach_signal_status\"; cmux_ssh_attach_pending_signal_name=\"$cmux_ssh_attach_signal_name\"; return; fi; cmux_ssh_attach_restore_terminal; trap - EXIT HUP INT TERM; cmux_ssh_attach_lifecycle_end; exit \"$cmux_ssh_attach_signal_status\"; }",
-            "trap 'cmux_ssh_attach_lifecycle_end' EXIT",
-            "trap 'cmux_ssh_attach_signal_exit 129 HUP' HUP",
-            "trap 'cmux_ssh_attach_signal_exit 130 INT' INT",
-            "trap 'cmux_ssh_attach_signal_exit 143 TERM' TERM",
-        ] + sshPTYAttachRetryLoopLines(command: "cmux_ssh_attach_attempt")).joined(separator: "\n")
+            "wmux_ssh_attach_cli=\"${WMUX_BUNDLED_CLI_PATH:-}\"",
+            "if [ -z \"$wmux_ssh_attach_cli\" ] || [ ! -x \"$wmux_ssh_attach_cli\" ]; then wmux_ssh_attach_cli=\(currentExecutable); fi",
+            "if [ -z \"$wmux_ssh_attach_cli\" ] || [ ! -x \"$wmux_ssh_attach_cli\" ]; then wmux_ssh_attach_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
+            "if [ -z \"$wmux_ssh_attach_cli\" ]; then printf '%s\\n' '[wmux] bundled CLI not found for SSH PTY attach.' >&2; exit 127; fi",
+            "if [ -z \"${WMUX_SOCKET_PATH:-}\" ]; then printf '%s\\n' '[wmux] required configuration missing for SSH PTY attach.' >&2; exit 1; fi",
+            "if [ -z \"${WMUX_WORKSPACE_ID:-}\" ]; then printf '%s\\n' '[wmux] required workspace context missing for SSH PTY attach.' >&2; exit 1; fi",
+            "wmux_ssh_attach_register_attempt() { wmux_ssh_attach_launch_payload=\"{\\\"workspace_id\\\":\\\"$WMUX_WORKSPACE_ID\\\",\\\"surface_id\\\":\\\"${WMUX_SURFACE_ID:-}\\\",\\\"terminal_lifecycle_id\\\":\\\"${WMUX_TERMINAL_LIFECYCLE_ID:-}\\\",\\\"attempt_id\\\":\\\"$WMUX_SSH_ATTEMPT_ID\\\"}\"; WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=2 \"$wmux_ssh_attach_cli\" --socket \"$WMUX_SOCKET_PATH\" rpc workspace.remote.terminal_session_launching \"$wmux_ssh_attach_launch_payload\" >/dev/null 2>&1; }",
+        ] + SSHPTYAttachRetryScriptBuilder().launchRegistrationRetryLines(functionPrefix: "wmux_ssh_attach") + [
+            "wmux_ssh_attach_attempt() { wmux_ssh_attach_begin_attempt || return \"$?\"; \(attachCommand); }",
+            "wmux_ssh_attach_lifecycle_id=$(/usr/bin/uuidgen | /usr/bin/tr '[:upper:]' '[:lower:]') || exit 1",
+            "wmux_ssh_attach_lifecycle_ended=0",
+            "wmux_ssh_attach_lifecycle_end() { if [ \"$wmux_ssh_attach_lifecycle_ended\" = 1 ]; then return; fi; wmux_ssh_attach_lifecycle_ended=1; \"$wmux_ssh_attach_cli\" --socket \"$WMUX_SOCKET_PATH\" ssh-session-end --lifecycle-only --workspace \"$WMUX_WORKSPACE_ID\" --surface \"${WMUX_SURFACE_ID:-}\" --terminal-lifecycle-id \"${WMUX_TERMINAL_LIFECYCLE_ID:-}\" --session-id \(quotedSessionID) --lifecycle-id \"$wmux_ssh_attach_lifecycle_id\" >/dev/null 2>&1 || true; }",
+            "wmux_ssh_attach_signal_exit() { wmux_ssh_attach_signal_status=\"$1\"; wmux_ssh_attach_signal_name=\"$2\"; if [ -n \"${wmux_ssh_attach_backoff_pid:-}\" ]; then /bin/kill -TERM \"$wmux_ssh_attach_backoff_pid\" >/dev/null 2>&1 || true; wait \"$wmux_ssh_attach_backoff_pid\" 2>/dev/null || true; wmux_ssh_attach_backoff_pid=; elif [ \"${wmux_ssh_attach_backoff_launching:-0}\" = 1 ]; then wmux_ssh_attach_pending_signal=\"$wmux_ssh_attach_signal_status\"; wmux_ssh_attach_pending_signal_name=\"$wmux_ssh_attach_signal_name\"; return; fi; wmux_ssh_attach_restore_terminal; trap - EXIT HUP INT TERM; wmux_ssh_attach_lifecycle_end; exit \"$wmux_ssh_attach_signal_status\"; }",
+            "trap 'wmux_ssh_attach_lifecycle_end' EXIT",
+            "trap 'wmux_ssh_attach_signal_exit 129 HUP' HUP",
+            "trap 'wmux_ssh_attach_signal_exit 130 INT' INT",
+            "trap 'wmux_ssh_attach_signal_exit 143 TERM' TERM",
+        ] + sshPTYAttachRetryLoopLines(command: "wmux_ssh_attach_attempt")).joined(separator: "\n")
         return "/bin/sh -c \(shellQuote(script))"
     }
 
@@ -17154,7 +15840,7 @@ struct WMUXCLI {
         if allWorkspaces {
             return ["all_workspaces": true]
         }
-        let workspaceRaw = workspaceOpt ?? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"]
+        let workspaceRaw = workspaceOpt ?? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"]
         guard let workspaceRaw,
               !workspaceRaw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return [:]
@@ -17182,25 +15868,25 @@ struct WMUXCLI {
               !lifecycleID.isEmpty else {
             throw CLIError(message: "Usage: wmux ssh-pty-attach --workspace <workspace> --session-id <id> [--attachment-id <id>] [--command-b64 <base64>] [--require-existing]")
         }
-        let workspaceRaw = workspaceOpt ?? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"]
+        let workspaceRaw = workspaceOpt ?? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"]
         guard let workspaceRaw,
               let workspaceId = try normalizeWorkspaceHandle(workspaceRaw, client: client),
               !workspaceId.isEmpty else {
-            throw CLIError(message: "ssh-pty-attach requires --workspace or CMUX_WORKSPACE_ID")
+            throw CLIError(message: "ssh-pty-attach requires --workspace or WMUX_WORKSPACE_ID")
         }
         guard let sessionID = sessionIDOpt?.trimmingCharacters(in: .whitespacesAndNewlines),
               !sessionID.isEmpty else {
             throw CLIError(message: "ssh-pty-attach requires --session-id <id>")
         }
         let suppressReplay = Self.normalizedEnvValue(
-            ProcessInfo.processInfo.environment["CMUX_SSH_PTY_ATTACH_SUPPRESS_REPLAY"]
+            ProcessInfo.processInfo.environment["WMUX_SSH_PTY_ATTACH_SUPPRESS_REPLAY"]
         ) == "1" && requireExisting
         let replayState = SSHPTYAttachReplayState(
             sessionID: sessionID,
             lifecycleID: lifecycleID
         )
         let previousReplaySnapshot = suppressReplay ? replayState.loadSnapshot() : nil
-        let environmentSurfaceID = Self.normalizedEnvValue(ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"])
+        let environmentSurfaceID = Self.normalizedEnvValue(ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"])
         let explicitAttachmentID = Self.normalizedEnvValue(attachmentIDOpt)
         let surfaceID = environmentSurfaceID ?? (explicitAttachmentID.flatMap { UUID(uuidString: $0) == nil ? nil : $0 })
         let attachmentID = explicitAttachmentID ?? environmentSurfaceID ?? UUID().uuidString.lowercased()
@@ -17396,10 +16082,10 @@ struct WMUXCLI {
             bridgeReadyUptime = ProcessInfo.processInfo.systemUptime
             if let surfaceID,
                let terminalLifecycleID = Self.normalizedEnvValue(
-                   ProcessInfo.processInfo.environment["CMUX_TERMINAL_LIFECYCLE_ID"]
+                   ProcessInfo.processInfo.environment["WMUX_TERMINAL_LIFECYCLE_ID"]
                ),
                let attemptID = Self.normalizedEnvValue(
-                   ProcessInfo.processInfo.environment["CMUX_SSH_ATTEMPT_ID"]
+                   ProcessInfo.processInfo.environment["WMUX_SSH_ATTEMPT_ID"]
                ) {
                 let readinessParams: [String: String] = [
                     "workspace_id": workspaceId,
@@ -17711,28 +16397,28 @@ struct WMUXCLI {
             }
             relayPort = nil
         }
-        let workspaceRaw = optionValue(commandArgs, name: "--workspace") ?? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"]
-        let surfaceRaw = optionValue(commandArgs, name: "--surface") ?? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"]
+        let workspaceRaw = optionValue(commandArgs, name: "--workspace") ?? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"]
+        let surfaceRaw = optionValue(commandArgs, name: "--surface") ?? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"]
         guard let workspaceRaw,
               let workspaceId = try normalizeWorkspaceHandle(workspaceRaw, client: client),
               !workspaceId.isEmpty else {
-            throw CLIError(message: "ssh-session-end requires --workspace or CMUX_WORKSPACE_ID")
+            throw CLIError(message: "ssh-session-end requires --workspace or WMUX_WORKSPACE_ID")
         }
         guard let surfaceRaw,
               let surfaceId = try normalizeSurfaceHandle(surfaceRaw, client: client, workspaceHandle: workspaceId),
               !surfaceId.isEmpty else {
-            throw CLIError(message: "ssh-session-end requires --surface or CMUX_SURFACE_ID")
+            throw CLIError(message: "ssh-session-end requires --surface or WMUX_SURFACE_ID")
         }
         let sessionID = Self.normalizedEnvValue(optionValue(commandArgs, name: "--session-id"))
         let lifecycleID = Self.normalizedEnvValue(optionValue(commandArgs, name: "--lifecycle-id"))
         let terminalLifecycleID = Self.normalizedEnvValue(
             optionValue(commandArgs, name: "--terminal-lifecycle-id") ??
-                ProcessInfo.processInfo.environment["CMUX_TERMINAL_LIFECYCLE_ID"]
+                ProcessInfo.processInfo.environment["WMUX_TERMINAL_LIFECYCLE_ID"]
         )
         if !lifecycleOnly, terminalLifecycleID == nil {
             throw CLIError(
                 message:
-                    "ssh-session-end requires --terminal-lifecycle-id or CMUX_TERMINAL_LIFECYCLE_ID"
+                    "ssh-session-end requires --terminal-lifecycle-id or WMUX_TERMINAL_LIFECYCLE_ID"
             )
         }
         var params: [String: Any] = [
@@ -17781,7 +16467,7 @@ struct WMUXCLI {
         let payload: [String: Any] = [
             "app_version": remoteDaemonVersionString(from: info),
             "build": info["CFBundleVersion"] ?? NSNull(),
-            "commit": info["CMUXCommit"] ?? NSNull(),
+            "commit": info["WMUXCommit"] ?? NSNull(),
             "manifest_present": manifest != nil,
             "release_tag": releaseTag,
             "release_url": manifest?.releaseURL ?? NSNull(),
@@ -17796,7 +16482,7 @@ struct WMUXCLI {
             "cache_exists": cacheExists,
             "cache_sha256": cacheSHA ?? NSNull(),
             "cache_verified": cacheVerified,
-            "dev_local_build_fallback": ProcessInfo.processInfo.environment["CMUX_REMOTE_DAEMON_ALLOW_LOCAL_BUILD"] == "1",
+            "dev_local_build_fallback": ProcessInfo.processInfo.environment["WMUX_REMOTE_DAEMON_ALLOW_LOCAL_BUILD"] == "1",
             "download_command": downloadCommand,
             "download_checksums_command": downloadChecksumsCommand,
             "checksum_verify_command": checksumVerifyCommand,
@@ -17836,7 +16522,7 @@ struct WMUXCLI {
         print("verify checksum: \(checksumVerifyCommand)")
         print("attestation verify: \(verifyCommand)")
         if manifest == nil {
-            print("note: this build has no embedded remote daemon manifest. Set CMUX_REMOTE_DAEMON_ALLOW_LOCAL_BUILD=1 only for dev builds.")
+            print("note: this build has no embedded remote daemon manifest. Set WMUX_REMOTE_DAEMON_ALLOW_LOCAL_BUILD=1 only for dev builds.")
         }
     }
 
@@ -17875,7 +16561,7 @@ struct WMUXCLI {
     private func remoteDaemonManifest() -> RemoteDaemonManifest? {
         for plistURL in candidateInfoPlistURLs() {
             guard let raw = NSDictionary(contentsOf: plistURL) as? [String: Any],
-                  let rawManifest = raw["CMUXRemoteDaemonManifestJSON"] as? String,
+                  let rawManifest = raw["WMUXRemoteDaemonManifestJSON"] as? String,
                   let data = rawManifest.trimmingCharacters(in: .whitespacesAndNewlines).data(using: .utf8),
                   let manifest = try? JSONDecoder().decode(RemoteDaemonManifest.self, from: data) else {
                 continue
@@ -17897,11 +16583,11 @@ struct WMUXCLI {
         // (https://github.com/manaflow-ai/cmux/issues/5146). The app's
         // RemoteDaemonManifestRepository.cachedBinaryURL resolves the same path. The CLI is
         // a composition root, so it names the concrete `FileManager.default` here.
-        return CmuxStateDirectory.url(homeDirectory: FileManager.default.homeDirectoryForCurrentUser)
+        return WmuxStateDirectory.url(homeDirectory: FileManager.default.homeDirectoryForCurrentUser)
             .appendingPathComponent("remote-daemons", isDirectory: true)
             .appendingPathComponent(version, isDirectory: true)
             .appendingPathComponent("\(goOS)-\(goArch)", isDirectory: true)
-            .appendingPathComponent("cmuxd-remote", isDirectory: false)
+            .appendingPathComponent("wmuxd-remote", isDirectory: false)
     }
 
     private func sha256Hex(forFile url: URL) throws -> String {
@@ -17923,27 +16609,27 @@ struct WMUXCLI {
         let preferredCLIPath = localCLIPath?.trimmingCharacters(in: .whitespacesAndNewlines)
         let launch = SSHForegroundAuthenticationLaunch(token: foregroundAuthToken)
         var lines: [String] = [
-            preferredCLIPath.map { "cmux_reconnect_cli=\(shellQuote($0));" } ?? "cmux_reconnect_cli=\"\";",
-            "cmux_reconnect_socket=\"${CMUX_SOCKET_PATH:-${CMUX_SOCKET:-}}\";",
-            "if [ -z \"$cmux_reconnect_cli\" ] && [ -n \"${CMUX_BUNDLED_CLI_PATH:-}\" ]; then cmux_reconnect_cli=\"$CMUX_BUNDLED_CLI_PATH\"; fi;",
-            "if [ ! -x \"$cmux_reconnect_cli\" ]; then cmux_reconnect_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi;",
-            "if [ -n \"${CMUX_WORKSPACE_ID:-}\" ]; then",
-            "if [ -z \"$cmux_reconnect_socket\" ]; then printf '%s\\n' 'wmux: deferred SSH reconnect skipped, local wmux socket not found' >&2;",
-            "elif [ -z \"$cmux_reconnect_cli\" ] || [ ! -x \"$cmux_reconnect_cli\" ]; then printf '%s\\n' 'wmux: deferred SSH reconnect skipped, local wmux CLI not found' >&2;",
+            preferredCLIPath.map { "wmux_reconnect_cli=\(shellQuote($0));" } ?? "wmux_reconnect_cli=\"\";",
+            "wmux_reconnect_socket=\"${WMUX_SOCKET_PATH:-${WMUX_SOCKET:-}}\";",
+            "if [ -z \"$wmux_reconnect_cli\" ] && [ -n \"${WMUX_BUNDLED_CLI_PATH:-}\" ]; then wmux_reconnect_cli=\"$WMUX_BUNDLED_CLI_PATH\"; fi;",
+            "if [ ! -x \"$wmux_reconnect_cli\" ]; then wmux_reconnect_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi;",
+            "if [ -n \"${WMUX_WORKSPACE_ID:-}\" ]; then",
+            "if [ -z \"$wmux_reconnect_socket\" ]; then printf '%s\\n' 'wmux: deferred SSH reconnect skipped, local wmux socket not found' >&2;",
+            "elif [ -z \"$wmux_reconnect_cli\" ] || [ ! -x \"$wmux_reconnect_cli\" ]; then printf '%s\\n' 'wmux: deferred SSH reconnect skipped, local wmux CLI not found' >&2;",
             "else",
         ]
-        lines += launch.tokenLoadShellLines(into: "cmux_reconnect_token")
+        lines += launch.tokenLoadShellLines(into: "wmux_reconnect_token")
         lines += SSHForegroundAuthenticationLaunch.readyShellLines(
-            tokenVariable: "cmux_reconnect_token",
-            payloadVariable: "cmux_reconnect_payload",
-            cliVariable: "cmux_reconnect_cli",
-            socketVariable: "cmux_reconnect_socket",
+            tokenVariable: "wmux_reconnect_token",
+            payloadVariable: "wmux_reconnect_payload",
+            cliVariable: "wmux_reconnect_cli",
+            socketVariable: "wmux_reconnect_socket",
             requireSuccess: false
         )
         lines += [
             "fi;",
             "fi;",
-            "unset cmux_reconnect_socket cmux_reconnect_cli;",
+            "unset wmux_reconnect_socket wmux_reconnect_cli;",
         ]
         return lines.joined(separator: " ")
     }
@@ -18029,7 +16715,7 @@ struct WMUXCLI {
 
     func cliDebugLog(_ message: @autoclosure () -> String) {
 #if DEBUG
-        let trimmedExplicit = ProcessInfo.processInfo.environment["CMUX_DEBUG_LOG"]?
+        let trimmedExplicit = ProcessInfo.processInfo.environment["WMUX_DEBUG_LOG"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let path: String? = {
             if let trimmedExplicit, !trimmedExplicit.isEmpty {
@@ -18879,7 +17565,7 @@ struct WMUXCLI {
             }
             let url = urlArgs.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)
             let respectExternalOpenRules: Bool = {
-                guard let raw = ProcessInfo.processInfo.environment["CMUX_RESPECT_EXTERNAL_OPEN_RULES"] else {
+                guard let raw = ProcessInfo.processInfo.environment["WMUX_RESPECT_EXTERNAL_OPEN_RULES"] else {
                     return false
                 }
                 switch raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
@@ -18920,7 +17606,7 @@ struct WMUXCLI {
             if let sourceSurface = try normalizeSurfaceHandle(surfaceRaw, client: client) {
                 params["surface_id"] = sourceSurface
             }
-            let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+            let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
             if let workspaceRaw {
                 if let workspace = try normalizeWorkspaceHandle(workspaceRaw, client: client) {
                     params["workspace_id"] = workspace
@@ -18985,7 +17671,7 @@ struct WMUXCLI {
         // optionalSurfaceParams() uses for the (optional) explicit --surface: an explicit surface is
         // scoped to explicit --workspace/--window only and does NOT inherit the env-default
         // workspace (it may legitimately target a different workspace than the caller's terminal),
-        // while an implicit surface falls back to the caller's CMUX_WORKSPACE_ID. Scoping a return
+        // while an implicit surface falls back to the caller's WMUX_WORKSPACE_ID. Scoping a return
         // handle to the env workspace when the browser lives in another workspace would index the
         // wrong terminal.
         func returnToRoutingHandles() throws -> (workspace: String?, window: String?) {
@@ -18994,7 +17680,7 @@ struct WMUXCLI {
             let windowHandle = try windowOpt.flatMap { try normalizeWindowHandle($0, client: client) }
             let workspaceRaw = surfaceRaw != nil
                 ? workspaceOpt
-                : (workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil))
+                : (workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil))
             let workspaceHandle = try workspaceRaw.flatMap {
                 try normalizeWorkspaceHandle($0, client: client, windowHandle: windowHandle)
             }
@@ -19039,7 +17725,7 @@ struct WMUXCLI {
             }
             var params: [String: Any] = [:]
             if let windowHandle { params["window_id"] = windowHandle }
-            let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] : nil)
+            let workspaceRaw = workspaceOpt ?? (windowOpt == nil ? ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] : nil)
             if let workspaceHandle = try workspaceRaw.flatMap({
                 try normalizeWorkspaceHandle($0, client: client, windowHandle: windowHandle)
             }) {
@@ -20480,13 +19166,13 @@ struct WMUXCLI {
             .replacingOccurrences(of: "%25", with: "%")
     }
 
-    /// The caller's own workspace, from the `CMUX_WORKSPACE_ID` the app injects into every
+    /// The caller's own workspace, from the `WMUX_WORKSPACE_ID` the app injects into every
     /// terminal surface. Nil when unset/blank/non-UUID, or when an explicit window is
     /// targeted (the caller's workspace may live in another window). Resolvers prefer this
     /// over the focused workspace so a command defaults to where it was invoked from.
     private func callerWorkspaceIdFromEnvironment(windowHandle: String?) -> String? {
         guard windowHandle == nil else { return nil }
-        let value = (ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"] ?? "")
+        let value = (ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"] ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return isUUID(value) ? value : nil
     }
@@ -20588,10 +19274,10 @@ struct WMUXCLI {
         }
 
         // No caller workspace. An explicit but blank selector (the dangerous
-        // `--workspace "${CMUX_WORKSPACE_ID:-}"`-expands-to-empty case) fails closed; only a
+        // `--workspace "${WMUX_WORKSPACE_ID:-}"`-expands-to-empty case) fails closed; only a
         // truly omitted selector, or an explicit --window, uses the window's selection.
         if windowHandle == nil, raw != nil {
-            throw CLIError(message: "No workspace selected: --workspace was blank and CMUX_WORKSPACE_ID is unset")
+            throw CLIError(message: "No workspace selected: --workspace was blank and WMUX_WORKSPACE_ID is unset")
         }
 
         var currentParams: [String: Any] = [:]
@@ -20709,7 +19395,7 @@ struct WMUXCLI {
                         ))
                     }
                     let workspaceRaw = explicitWorkspaceArg
-                        ?? (windowRaw == nil ? environment["CMUX_WORKSPACE_ID"] : nil)
+                        ?? (windowRaw == nil ? environment["WMUX_WORKSPACE_ID"] : nil)
                     let workspaceID = if let explicitWorkspaceID {
                         explicitWorkspaceID
                     } else {
@@ -20752,13 +19438,13 @@ struct WMUXCLI {
             "caller": true,
             "prefer_tty": preferTTYFallback && explicitWorkspaceArg == nil,
         ]
-        let workspaceArg = explicitWorkspaceArg ?? environment["CMUX_WORKSPACE_ID"]
+        let workspaceArg = explicitWorkspaceArg ?? environment["WMUX_WORKSPACE_ID"]
         if let workspaceArg, isUUID(workspaceArg) || explicitWorkspaceArg != nil {
             callerParams["preferred_workspace_id"] = isUUID(workspaceArg)
                 ? workspaceArg
                 : try resolveWorkspaceId(workspaceArg, client: client)
         }
-        if let surfaceID = environment["CMUX_SURFACE_ID"], isUUID(surfaceID) {
+        if let surfaceID = environment["WMUX_SURFACE_ID"], isUUID(surfaceID) {
             callerParams["preferred_surface_id"] = surfaceID
         }
         if let callerTTY = resolveCallerTTYName() {
@@ -21194,8 +19880,8 @@ struct WMUXCLI {
               promote-template <id>     Snapshot a VM with a template-oriented name.
 
             Env:
-              CMUX_VM_API_BASE_URL       Override the backend origin (default: the wmux website).
-                                         `bun run dev` derives this from CMUX_PORT/PORT for
+              WMUX_VM_API_BASE_URL       Override the backend origin (default: the wmux website).
+                                         `bun run dev` derives this from WMUX_PORT/PORT for
                                          local testing from the web worktree.
 
             Example:
@@ -21566,8 +20252,8 @@ struct WMUXCLI {
             Print server identity and caller context details.
 
             Flags:
-              --workspace <id|ref|index>   Caller workspace context (default: $CMUX_WORKSPACE_ID)
-              --surface <id|ref|index>     Caller surface context (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref|index>   Caller workspace context (default: $WMUX_WORKSPACE_ID)
+              --surface <id|ref|index>     Caller surface context (default: $WMUX_SURFACE_ID)
               --window <id|ref|index>      Window context for workspace/surface refs and indexes
               --no-caller                  Omit caller context from the request
             """
@@ -21784,7 +20470,7 @@ struct WMUXCLI {
 
             Flags:
               --action <name>              Action name (required if not positional)
-              --workspace <id|ref|index>   Target workspace (default: current/$CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: current/$WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
               --title <text>               Title for rename
               --color <name|#hex>          Color for set-color (name or #RRGGBB hex)
@@ -21822,9 +20508,9 @@ struct WMUXCLI {
 
             Flags:
               --action <name>              Action name (required if not positional)
-              --tab <id|ref|index>         Target tab (accepts tab:<n> or surface:<n>; default: $CMUX_TAB_ID, then $CMUX_SURFACE_ID, then focused tab)
+              --tab <id|ref|index>         Target tab (accepts tab:<n> or surface:<n>; default: $WMUX_TAB_ID, then $WMUX_SURFACE_ID, then focused tab)
               --surface <id|ref|index>     Alias for --tab (backward compatibility)
-              --workspace <id|ref|index>   Workspace context (default: current/$CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: current/$WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace/tab refs and indexes
               --title <text>               Title for rename (or pass trailing title text)
               --url <url>                  Optional URL for new-browser-right
@@ -21848,11 +20534,11 @@ struct WMUXCLI {
             Resolution order for target tab:
             1) --tab
             2) --surface
-            3) $CMUX_TAB_ID / $CMUX_SURFACE_ID
+            3) $WMUX_TAB_ID / $WMUX_SURFACE_ID
             4) currently focused tab (optionally within --workspace)
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: current/$CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: current/$WMUX_WORKSPACE_ID)
               --tab <id|ref|index>         Tab target (supports tab:<n> or surface:<n>)
               --surface <id|ref|index>     Alias for --tab
               --window <id|ref|index>      Window context for workspace/tab refs and indexes
@@ -21875,7 +20561,7 @@ struct WMUXCLI {
               --cwd <path>         Set the working directory for the new workspace
               --command <text>     \(initialCommandDescription)
               --env KEY=VALUE      Set a workspace environment variable. Repeatable.
-                                   Reserved CMUX_* variables cannot be overridden.
+                                   Reserved WMUX_* variables cannot be overridden.
               --env-file <path>    Load KEY=VALUE lines from a file. Repeatable.
               --layout <json>      Create workspace with a predefined split layout.
                                    Layout surfaces define their own commands.
@@ -22041,7 +20727,7 @@ struct WMUXCLI {
             List persisted wmux ssh PTY sessions for a remote workspace.
 
             Flags:
-              --workspace <id|ref|index>  Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>  Target workspace (default: $WMUX_WORKSPACE_ID)
               --all-workspaces            List sessions in every active remote workspace
 
             Example:
@@ -22056,7 +20742,7 @@ struct WMUXCLI {
             Open a terminal surface attached to a persisted wmux ssh PTY session.
 
             Flags:
-              --workspace <id|ref|index>  Target workspace (default: $CMUX_WORKSPACE_ID/current)
+              --workspace <id|ref|index>  Target workspace (default: $WMUX_WORKSPACE_ID/current)
               --session-id <id>           Persisted SSH PTY session ID
               --pane <id|ref|index>       Target pane for a new surface
               --split <left|right|up|down> Create a new split instead of a surface
@@ -22074,7 +20760,7 @@ struct WMUXCLI {
             Close persisted wmux ssh PTY sessions for a remote workspace.
 
             Flags:
-              --workspace <id|ref|index>  Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>  Target workspace (default: $WMUX_WORKSPACE_ID)
               --all-workspaces            Target every active remote workspace
               --session-id <id>           Close one PTY session
               --all                       Close every persisted PTY session in the target scope
@@ -22088,7 +20774,7 @@ struct WMUXCLI {
             return """
             Usage: wmux remote-daemon-status [--os <darwin|linux>] [--arch <arm64|amd64>]
 
-            Show the embedded cmuxd-remote release manifest, local cache status, checksum verification state,
+            Show the embedded wmuxd-remote release manifest, local cache status, checksum verification state,
             and the GitHub attestation verification command for a target platform.
 
             Example:
@@ -22102,8 +20788,8 @@ struct WMUXCLI {
             Split the current pane in the given direction.
 
             Flags:
-              --workspace <id|ref>   Target workspace (default: $CMUX_WORKSPACE_ID)
-              --surface <id|ref>     Surface to split from (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref>   Target workspace (default: $WMUX_WORKSPACE_ID)
+              --surface <id|ref>     Surface to split from (default: $WMUX_SURFACE_ID)
               --panel <id|ref>       Alias for --surface
               --window <id|ref|index>
                                       Window context for workspace/surface refs and indexes
@@ -22121,7 +20807,7 @@ struct WMUXCLI {
             List panes in a workspace.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22135,7 +20821,7 @@ struct WMUXCLI {
             List surfaces in a pane.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --pane <id|ref|index>        Restrict to a specific pane (default: focused pane)
               --window <id|ref|index>      Window context for workspace/pane refs and indexes
 
@@ -22236,7 +20922,7 @@ struct WMUXCLI {
 
             Flags:
               --pane <id|ref|index>       Pane to focus (required unless passed positionally)
-              --workspace <id|ref|index>  Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>  Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>     Window context for workspace/pane refs and indexes
 
             Example:
@@ -22255,7 +20941,7 @@ struct WMUXCLI {
               --direction <left|right|up|down>    Split direction (default: right)
               --placement <workspace|dock>        Target container (default: workspace).
                                                   dock splits the right-sidebar Dock.
-              --workspace <id|ref|index>          Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>          Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>             Window context for workspace refs and indexes
               --url <url>                         URL for browser panes
               \(String(localized: "cli.newPane.help.profileDescription", defaultValue: "--profile <name|uuid>                Browser profile name or UUID"))
@@ -22280,7 +20966,7 @@ struct WMUXCLI {
               --placement <workspace|dock>  Target container (default: workspace).
                                            dock adds the surface to the right-sidebar Dock
                                            (terminal and browser only).
-              --workspace <id|ref|index>  Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>  Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>     Window context for workspace/pane refs and indexes
               --url <url>                 URL for browser surfaces
               --provider <codex|claude|opencode>
@@ -22304,9 +20990,9 @@ struct WMUXCLI {
             Close a surface. Defaults to the focused surface if none specified.
 
             Flags:
-              --surface <id|ref|index>    Surface to close (default: $CMUX_SURFACE_ID)
+              --surface <id|ref|index>    Surface to close (default: $WMUX_SURFACE_ID)
               --panel <id|ref|index>      Alias for --surface
-              --workspace <id|ref|index>  Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>  Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>     Window context for workspace/surface refs and indexes
               --force                     Close even when a live process would be killed
 
@@ -22371,7 +21057,7 @@ struct WMUXCLI {
             List health details for surfaces in a workspace.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22379,7 +21065,7 @@ struct WMUXCLI {
               wmux surface-health --workspace workspace:2
             """
         case "surface", "surface-resume":
-            return CMUXDiffViewerLocalization.string(
+            return WMUXDiffViewerLocalization.string(
                 "cli.surface.usage",
                 defaultValue: """
             Usage: wmux surface ls [<machine>|local] [--refresh] [--json]
@@ -22409,8 +21095,8 @@ struct WMUXCLI {
             Public CLI bindings are stored for inspection and manual restore.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
-              --surface <id|ref|index>     Surface context (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
+              --surface <id|ref|index>     Surface context (default: $WMUX_SURFACE_ID)
               --window <id|ref|index>      Window context for workspace and surface refs/indexes
               --cwd <path>             Working directory for restore (default: $PWD)
               --name <name>            Display name for the binding
@@ -22439,8 +21125,8 @@ struct WMUXCLI {
             Trigger the unread flash indicator for a surface.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
-              --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
+              --surface <id|ref|index>     Target surface (default: $WMUX_SURFACE_ID)
               --panel <id|ref|index>       Alias for --surface
               --window <id|ref|index>      Window context for workspace/surface refs and indexes
 
@@ -22455,7 +21141,7 @@ struct WMUXCLI {
             List surfaces (panels) in a workspace.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22470,7 +21156,7 @@ struct WMUXCLI {
 
             Flags:
               --panel <id|ref|index>       Panel/surface to focus (required)
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace/panel refs and indexes
 
             Example:
@@ -22512,7 +21198,7 @@ struct WMUXCLI {
             tmux-compatible alias: rename-window
 
             Flags:
-              --workspace <id|ref|index>   Workspace to rename (default: current/$CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace to rename (default: current/$WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22532,8 +21218,8 @@ struct WMUXCLI {
             tmux-compatible alias for reading terminal text from a pane.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
-              --surface <id|ref|index>     Surface context (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
+              --surface <id|ref|index>     Surface context (default: $WMUX_SURFACE_ID)
               --window <id|ref|index>      Window context for workspace/surface refs and indexes
               --scrollback           Include scrollback
               --lines <n>            Return only the last N lines (implies --scrollback)
@@ -22549,7 +21235,7 @@ struct WMUXCLI {
 
             Flags:
               --pane <id|ref|index>        Pane to resize (default: focused pane)
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace/pane refs and indexes
               -L|-R|-U|-D            Direction (default: -R)
               --amount <n>           Resize amount (default: 1)
@@ -22561,7 +21247,7 @@ struct WMUXCLI {
             Capture pane text and pipe it to a shell command via stdin.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --surface <id|ref|index>     Surface context (default: focused surface)
               --window <id|ref|index>      Window context for workspace/surface refs and indexes
               --command <command>    Shell command to run (or pass as trailing text)
@@ -22585,7 +21271,7 @@ struct WMUXCLI {
             Flags:
               --pane <id|ref|index>         Source pane (required)
               --target-pane <id|ref|index>  Target pane (required)
-              --workspace <id|ref|index>    Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>    Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>       Window context for workspace/pane refs and indexes
               --focus <true|false>    Focus the target pane after swapping (default: false)
             """
@@ -22596,7 +21282,7 @@ struct WMUXCLI {
             Move a pane/surface out into its own pane context.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --pane <id|ref|index>        Source pane
               --surface <id|ref|index>     Source surface
               --window <id|ref|index>      Window context for workspace/pane/surface refs and indexes
@@ -22611,7 +21297,7 @@ struct WMUXCLI {
 
             Flags:
               --target-pane <id|ref|index>  Target pane (required)
-              --workspace <id|ref|index>    Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>    Workspace context (default: $WMUX_WORKSPACE_ID)
               --pane <id|ref|index>         Source pane
               --surface <id|ref|index>      Source surface
               --window <id|ref|index>       Window context for workspace/pane/surface refs and indexes
@@ -22631,7 +21317,7 @@ struct WMUXCLI {
             Focus the previously focused pane in a workspace.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
             """
         case "find-window":
@@ -22652,7 +21338,7 @@ struct WMUXCLI {
             Clear terminal scrollback history.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --surface <id|ref|index>     Surface context (default: focused surface)
               --window <id|ref|index>      Window context for workspace/surface refs and indexes
             """
@@ -22696,7 +21382,7 @@ struct WMUXCLI {
             Flags:
               --name <name>         Buffer name (default: default)
               --bracketed           Deliver the buffer as one bracketed paste, like Cmd+V, instead of keystrokes
-              --workspace <id|ref|index>  Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>  Workspace context (default: $WMUX_WORKSPACE_ID)
               --surface <id|ref|index>    Surface context (default: focused surface)
               --window <id|ref|index>     Window context for workspace/surface refs and indexes
             """
@@ -22713,7 +21399,7 @@ struct WMUXCLI {
             Send a command (or default shell restart command) to a surface.
 
             Flags:
-              --workspace <id|ref|index>   Workspace context (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Workspace context (default: $WMUX_WORKSPACE_ID)
               --surface <id|ref|index>     Surface context (default: focused surface)
               --window <id|ref|index>      Window context for workspace/surface refs and indexes
               --command <cmd>        Command text (or pass trailing command text)
@@ -22746,8 +21432,8 @@ struct WMUXCLI {
             Send a key event to a terminal surface.
 
             Flags:
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
-              --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
+              --surface <id|ref|index>     Target surface (default: $WMUX_SURFACE_ID)
               --window <id|ref|index>      Window context for workspace/surface refs and indexes
               --force                      Send even into an open dialog
 
@@ -22763,7 +21449,7 @@ struct WMUXCLI {
 
             Flags:
               --panel <id|ref|index>       Target panel (required)
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace/panel refs and indexes
               --force                      Send even over a draft or into an open dialog
 
@@ -22778,7 +21464,7 @@ struct WMUXCLI {
 
             Flags:
               --panel <id|ref|index>       Target panel (required)
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace/panel refs and indexes
               --force                      Send even into an open dialog
 
@@ -22903,7 +21589,7 @@ struct WMUXCLI {
               --color <#hex>         Pill color (e.g. "#ff9500")
                                      "#4C8DFF" draws as the wmux accent (app.accentColor)
               --priority <n>         Sort priority; higher appears first (default: 0)
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22917,7 +21603,7 @@ struct WMUXCLI {
             Remove a sidebar status entry by key.
 
             Flags:
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22930,7 +21616,7 @@ struct WMUXCLI {
             List all sidebar status entries for a workspace.
 
             Flags:
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22945,7 +21631,7 @@ struct WMUXCLI {
 
             Flags:
               --label <text>         Label shown next to the progress bar
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22959,7 +21645,7 @@ struct WMUXCLI {
             Clear the sidebar progress bar for a workspace.
 
             Flags:
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22974,7 +21660,7 @@ struct WMUXCLI {
             Flags:
               --level <level>        Log level: info, progress, success, warning, error (default: info)
               --source <name>        Source label (e.g. "build", "test")
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -22989,7 +21675,7 @@ struct WMUXCLI {
             Clear all sidebar log entries for a workspace.
 
             Flags:
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -23003,7 +21689,7 @@ struct WMUXCLI {
 
             Flags:
               --limit <n>            Show only the last N entries
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -23018,7 +21704,7 @@ struct WMUXCLI {
             status entries, progress, log entries).
 
             Flags:
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --window <id|ref|index>      Window context for workspace refs and indexes
 
             Example:
@@ -23104,8 +21790,8 @@ struct WMUXCLI {
               prompt-submit   Clear notification and set Running on user prompt
 
             Flags:
-              --workspace <id|ref>   Target workspace (default: $CMUX_WORKSPACE_ID)
-              --surface <id|ref>     Target surface (default: $CMUX_SURFACE_ID)
+              --workspace <id|ref>   Target workspace (default: $WMUX_WORKSPACE_ID)
+              --surface <id|ref>     Target surface (default: $WMUX_SURFACE_ID)
 
             Example:
               echo '{"session_id":"abc"}' | wmux claude-hook session-start
@@ -23131,7 +21817,7 @@ struct WMUXCLI {
 
             Subcommands:
               open|open-split|new [url] [--workspace <id|ref|index>] [--window <id|ref|index>] [--focus <true|false>] \(String(localized: "cli.browser.profile.option", defaultValue: "[--profile <name|uuid>]"))
-                open/open-split/new default to $CMUX_WORKSPACE_ID when --workspace is omitted and --window is not set
+                open/open-split/new default to $WMUX_WORKSPACE_ID when --workspace is omitted and --window is not set
                 --focus defaults to false
               disable | enable | status
               goto|navigate <url> [--snapshot-after]
@@ -23219,7 +21905,7 @@ struct WMUXCLI {
             lists, blockquotes) and automatically updates when the file changes on disk.
 
             Options:
-              --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
+              --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
               --surface <id|ref|index>     Source surface to split from (default: focused surface)
               --window <id|ref|index>      Target window
               --direction <left|right|up|down>  Split direction (default: right)
@@ -23497,7 +22183,7 @@ struct WMUXCLI {
         if let explicit = optionValue(args, name: "--workspace") { return explicit }
         // When --window is explicitly targeted, don't fall back to env workspace from a different window
         if windowOverride != nil || optionValue(args, name: "--window") != nil { return nil }
-        return ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"]
+        return ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"]
     }
 
     private func windowFromArgsOrOverride(_ args: [String], windowOverride: String? = nil) -> String? {
@@ -23511,11 +22197,11 @@ struct WMUXCLI {
         }
 
         let env = ProcessInfo.processInfo.environment
-        let workspaceHandle = try normalizeWorkspaceHandle(env["CMUX_WORKSPACE_ID"], client: client)
+        let workspaceHandle = try normalizeWorkspaceHandle(env["WMUX_WORKSPACE_ID"], client: client)
         if let workspaceHandle {
             params["workspace_id"] = workspaceHandle
         }
-        let surfaceHandle = try normalizeSurfaceHandle(env["CMUX_SURFACE_ID"], client: client, workspaceHandle: workspaceHandle)
+        let surfaceHandle = try normalizeSurfaceHandle(env["WMUX_SURFACE_ID"], client: client, workspaceHandle: workspaceHandle)
         if let surfaceHandle {
             params["surface_id"] = surfaceHandle
         }
@@ -24752,8 +23438,8 @@ struct WMUXCLI {
 
     func treeCallerContextFromEnvironment() -> [String: Any]? {
         let env = ProcessInfo.processInfo.environment
-        let workspaceRaw = env["CMUX_WORKSPACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let surfaceRaw = env["CMUX_SURFACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let workspaceRaw = env["WMUX_WORKSPACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let surfaceRaw = env["WMUX_SURFACE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines)
         var caller: [String: Any] = [:]
         if let workspaceRaw, !workspaceRaw.isEmpty {
             caller["workspace_id"] = workspaceRaw
@@ -25986,19 +24672,19 @@ struct WMUXCLI {
     }
 
     private func tmuxCallerWorkspaceHandle() -> String? {
-        normalizedTmuxTarget(ProcessInfo.processInfo.environment["CMUX_WORKSPACE_ID"])
+        normalizedTmuxTarget(ProcessInfo.processInfo.environment["WMUX_WORKSPACE_ID"])
     }
 
     private func tmuxCallerPaneHandle() -> String? {
         guard let pane = normalizedTmuxTarget(ProcessInfo.processInfo.environment["TMUX_PANE"])
-            ?? normalizedTmuxTarget(ProcessInfo.processInfo.environment["CMUX_PANE_ID"]) else {
+            ?? normalizedTmuxTarget(ProcessInfo.processInfo.environment["WMUX_PANE_ID"]) else {
             return nil
         }
         return pane.hasPrefix("%") ? String(pane.dropFirst()) : pane
     }
 
     private func tmuxCallerSurfaceHandle() -> String? {
-        normalizedTmuxTarget(ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"])
+        normalizedTmuxTarget(ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"])
     }
 
     private func tmuxResolvedCallerWorkspaceId(client: SocketClient) -> String? {
@@ -26260,7 +24946,7 @@ struct WMUXCLI {
         if tmuxPaneSelector(from: raw) != nil {
             let resolved = try tmuxResolvePaneTarget(raw, client: client)
             // When the target pane matches the caller's pane, prefer the caller's
-            // exact surface (CMUX_SURFACE_ID) over the pane's currently selected
+            // exact surface (WMUX_SURFACE_ID) over the pane's currently selected
             // surface. The selected surface can change (e.g. tab switches) after
             // claude-teams started, but the caller surface stays fixed.
             let callerPane = tmuxCallerPaneHandle()
@@ -26540,14 +25226,14 @@ struct WMUXCLI {
         workingDirectory: String? = nil
     ) {
         guard !arguments.isEmpty else { return }
-        setenv("CMUX_AGENT_LAUNCH_KIND", launcher, 1)
-        setenv("CMUX_AGENT_LAUNCH_EXECUTABLE", executablePath, 1)
-        setenv("CMUX_AGENT_LAUNCH_ARGV_B64", Self.nulSeparatedBase64(arguments), 1)
+        setenv("WMUX_AGENT_LAUNCH_KIND", launcher, 1)
+        setenv("WMUX_AGENT_LAUNCH_EXECUTABLE", executablePath, 1)
+        setenv("WMUX_AGENT_LAUNCH_ARGV_B64", Self.nulSeparatedBase64(arguments), 1)
         if let workingDirectory,
            !workingDirectory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            setenv("CMUX_AGENT_LAUNCH_CWD", workingDirectory, 1)
+            setenv("WMUX_AGENT_LAUNCH_CWD", workingDirectory, 1)
         } else {
-            unsetenv("CMUX_AGENT_LAUNCH_CWD")
+            unsetenv("WMUX_AGENT_LAUNCH_CWD")
         }
     }
 
@@ -26594,10 +25280,10 @@ struct WMUXCLI {
         setenv("TMUX", fakeTmuxValue, 1)
         setenv("TMUX_PANE", fakeTmuxPane, 1)
         setenv("TERM", fakeTerm, 1)
-        setenv("CMUX_SOCKET_PATH", socketPath, 1); unsetenv("CMUX_SOCKET")
+        setenv("WMUX_SOCKET_PATH", socketPath, 1); unsetenv("WMUX_SOCKET")
         if let explicitPassword,
            !explicitPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            setenv("CMUX_SOCKET_PASSWORD", explicitPassword, 1)
+            setenv("WMUX_SOCKET_PASSWORD", explicitPassword, 1)
         }
         unsetenv("TERM_PROGRAM")
         for envVar in extraEnvVars {
@@ -26608,11 +25294,11 @@ struct WMUXCLI {
             launchContext: launchContext
         )
         for key in [
-            "CMUX_WORKSPACE_ID",
-            "CMUX_SURFACE_ID",
-            "CMUX_PANEL_ID",
-            "CMUX_TAB_ID",
-            "CMUX_PANE_ID",
+            "WMUX_WORKSPACE_ID",
+            "WMUX_SURFACE_ID",
+            "WMUX_PANEL_ID",
+            "WMUX_TAB_ID",
+            "WMUX_PANE_ID",
         ] {
             if let value = canonicalEnvironment[key] {
                 setenv(key, value, 1)
@@ -26623,14 +25309,14 @@ struct WMUXCLI {
     }
 
     /// Hidden `__debug-tmux-compat-env` seam: runs the real ``configureTmuxCompatEnvironment`` against
-    /// the live socket and prints the resolved CMUX_*/tmux identity, so integration tests can assert
+    /// the live socket and prints the resolved WMUX_*/tmux identity, so integration tests can assert
     /// the launcher stamps its own surface rather than the globally focused pane (#4920, #9009).
     /// Not user-facing. The shim/tmux params here do not affect identity resolution.
     func debugDumpTmuxCompatEnvironment(socketPath: String, explicitPassword: String?) throws {
         var processEnvironment = ProcessInfo.processInfo.environment
         // Resolve launch identity from the SAME socket this command was pointed at, not whatever
-        // CMUX_SOCKET_PATH the process happened to inherit.
-        processEnvironment["CMUX_SOCKET_PATH"] = socketPath
+        // WMUX_SOCKET_PATH the process happened to inherit.
+        processEnvironment["WMUX_SOCKET_PATH"] = socketPath
         let launchContext = try tmuxCompatLaunchContext(
             processEnvironment: processEnvironment,
             explicitPassword: explicitPassword
@@ -26644,33 +25330,33 @@ struct WMUXCLI {
         configureTmuxCompatEnvironment(
             processEnvironment: processEnvironment,
             shimDirectory: shimDirectory,
-            executablePath: processEnvironment["CMUX_BUNDLED_CLI_PATH"] ?? "wmux",
+            executablePath: processEnvironment["WMUX_BUNDLED_CLI_PATH"] ?? "wmux",
             socketPath: socketPath,
             explicitPassword: explicitPassword,
             launchContext: launchContext,
             tmuxPathPrefix: "wmux-debug",
-            cmuxBinEnvVar: "CMUX_BIN",
+            cmuxBinEnvVar: "WMUX_BIN",
             termOverrideEnvVar: "TERM"
         )
         func dump(_ key: String) -> String { getenv(key).map { String(cString: $0) } ?? "" }
-        print("CMUX_WORKSPACE_ID=\(dump("CMUX_WORKSPACE_ID"))")
-        print("CMUX_SURFACE_ID=\(dump("CMUX_SURFACE_ID"))")
-        print("CMUX_PANEL_ID=\(dump("CMUX_PANEL_ID"))")
-        print("CMUX_TAB_ID=\(dump("CMUX_TAB_ID"))")
-        print("CMUX_PANE_ID=\(dump("CMUX_PANE_ID"))")
+        print("WMUX_WORKSPACE_ID=\(dump("WMUX_WORKSPACE_ID"))")
+        print("WMUX_SURFACE_ID=\(dump("WMUX_SURFACE_ID"))")
+        print("WMUX_PANEL_ID=\(dump("WMUX_PANEL_ID"))")
+        print("WMUX_TAB_ID=\(dump("WMUX_TAB_ID"))")
+        print("WMUX_PANE_ID=\(dump("WMUX_PANE_ID"))")
         print("TMUX=\(dump("TMUX"))")
         print("TMUX_PANE=\(dump("TMUX_PANE"))")
     }
 
     private static let claudeNodeOptionsRestoreModule = """
-    const hadOriginalNodeOptions = process.env.CMUX_ORIGINAL_NODE_OPTIONS_PRESENT === "1";
+    const hadOriginalNodeOptions = process.env.WMUX_ORIGINAL_NODE_OPTIONS_PRESENT === "1";
     if (hadOriginalNodeOptions) {
-        process.env.NODE_OPTIONS = process.env.CMUX_ORIGINAL_NODE_OPTIONS ?? "";
+        process.env.NODE_OPTIONS = process.env.WMUX_ORIGINAL_NODE_OPTIONS ?? "";
     } else {
         delete process.env.NODE_OPTIONS;
     }
-    delete process.env.CMUX_ORIGINAL_NODE_OPTIONS;
-    delete process.env.CMUX_ORIGINAL_NODE_OPTIONS_PRESENT;
+    delete process.env.WMUX_ORIGINAL_NODE_OPTIONS;
+    delete process.env.WMUX_ORIGINAL_NODE_OPTIONS_PRESENT;
     """
 
     private func configureClaudeTeamsEnvironment(
@@ -26699,23 +25385,23 @@ struct WMUXCLI {
             explicitPassword: explicitPassword,
             launchContext: launchContext,
             tmuxPathPrefix: "wmux-claude-teams",
-            cmuxBinEnvVar: "CMUX_CLAUDE_TEAMS_CMUX_BIN",
-            termOverrideEnvVar: "CMUX_CLAUDE_TEAMS_TERM",
+            cmuxBinEnvVar: "WMUX_CLAUDE_TEAMS_CMUX_BIN",
+            termOverrideEnvVar: "WMUX_CLAUDE_TEAMS_TERM",
             extraEnvVars: claudeTeamsExtraEnvVars(commandArgs: commandArgs) + [
-                (key: "CMUX_CLAUDE_TEAMS_TMUX_SHIM", value: shimDirectory.appendingPathComponent("tmux").path),
+                (key: "WMUX_CLAUDE_TEAMS_TMUX_SHIM", value: shimDirectory.appendingPathComponent("tmux").path),
             ]
         )
         guard let restoreModuleURL = try? createClaudeNodeOptionsRestoreModule() else {
-            unsetenv("CMUX_ORIGINAL_NODE_OPTIONS_PRESENT")
-            unsetenv("CMUX_ORIGINAL_NODE_OPTIONS")
+            unsetenv("WMUX_ORIGINAL_NODE_OPTIONS_PRESENT")
+            unsetenv("WMUX_ORIGINAL_NODE_OPTIONS")
             return
         }
         if let existing = processEnvironment["NODE_OPTIONS"] {
-            setenv("CMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "1", 1)
-            setenv("CMUX_ORIGINAL_NODE_OPTIONS", normalizedNodeOptionsForRestore(existing), 1)
+            setenv("WMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "1", 1)
+            setenv("WMUX_ORIGINAL_NODE_OPTIONS", normalizedNodeOptionsForRestore(existing), 1)
         } else {
-            setenv("CMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "0", 1)
-            unsetenv("CMUX_ORIGINAL_NODE_OPTIONS")
+            setenv("WMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "0", 1)
+            unsetenv("WMUX_ORIGINAL_NODE_OPTIONS")
         }
         setenv(
             "NODE_OPTIONS",
@@ -26779,10 +25465,10 @@ struct WMUXCLI {
     ) throws {
         let processEnvironment = ProcessInfo.processInfo.environment
         var launcherEnvironment = processEnvironment
-        launcherEnvironment["CMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "CMUX_SOCKET")
+        launcherEnvironment["WMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "WMUX_SOCKET")
         if let explicitPassword,
            !explicitPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            launcherEnvironment["CMUX_SOCKET_PASSWORD"] = explicitPassword
+            launcherEnvironment["WMUX_SOCKET_PASSWORD"] = explicitPassword
         }
         let executablePath = resolvedExecutableURL()?.path ?? (args.first ?? "wmux")
         let launchContext = try tmuxCompatLaunchContext(
@@ -26804,7 +25490,7 @@ struct WMUXCLI {
         // Never fall back to a cmux-bundled provider binary.
         guard let claudeExecutablePath = resolveClaudeExecutable(
             configuredCandidates: [
-                launcherEnvironment["CMUX_CUSTOM_CLAUDE_PATH"],
+                launcherEnvironment["WMUX_CUSTOM_CLAUDE_PATH"],
                 UserDefaults.standard.string(forKey: "claudeCodeCustomClaudePath"),
             ],
             searchPath: launcherEnvironment["PATH"]
@@ -26843,9 +25529,9 @@ struct WMUXCLI {
             // It consumes this one-shot marker while preserving the Teams launch
             // capture above; teammate wrappers do not inherit the marker and
             // therefore record ordinary Claude launches.
-            setenv("CMUX_CLAUDE_TEAMS_WRAPPER_LAUNCH", "1", 1)
+            setenv("WMUX_CLAUDE_TEAMS_WRAPPER_LAUNCH", "1", 1)
         } else {
-            unsetenv("CMUX_CLAUDE_TEAMS_WRAPPER_LAUNCH")
+            unsetenv("WMUX_CLAUDE_TEAMS_WRAPPER_LAUNCH")
         }
         var argv = ([launchPath] + claudeTeamsExecArguments(commandArgs: commandArgs)).map { strdup($0) }
         defer {
@@ -27878,7 +26564,7 @@ struct WMUXCLI {
             parts.append("PATH=\(launchPath)")
         }
         parts += [
-            "CMUX_CODEX_TEAMS_APP_SERVER_URL=\(appServerURL)",
+            "WMUX_CODEX_TEAMS_APP_SERVER_URL=\(appServerURL)",
             "\(managedSubagentEnvironmentKey)=1",
             "\(codexTeamsThreadEnvironmentKey)=\(threadId)",
             "\(codexTeamsParentThreadEnvironmentKey)=\(parentThreadId)",
@@ -27947,11 +26633,11 @@ struct WMUXCLI {
     ) throws {
         let processEnvironment = ProcessInfo.processInfo.environment
         var launcherEnvironment = codexTeamsAugmentedEnvironment(processEnvironment)
-        launcherEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        launcherEnvironment.removeValue(forKey: "CMUX_SOCKET")
+        launcherEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        launcherEnvironment.removeValue(forKey: "WMUX_SOCKET")
         if let explicitPassword,
            !explicitPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            launcherEnvironment["CMUX_SOCKET_PASSWORD"] = explicitPassword
+            launcherEnvironment["WMUX_SOCKET_PASSWORD"] = explicitPassword
         }
 
         if codexTeamsIsInformationalInvocation(commandArgs: commandArgs) {
@@ -28048,14 +26734,14 @@ struct WMUXCLI {
             throw CLIError(message: "\(error)\nCodex app-server log: \(appServerLogURL.path)")
         }
 
-        setenv("CMUX_SOCKET_PATH", socketPath, 1)
-        unsetenv("CMUX_SOCKET")
+        setenv("WMUX_SOCKET_PATH", socketPath, 1)
+        unsetenv("WMUX_SOCKET")
         if let explicitPassword,
            !explicitPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            setenv("CMUX_SOCKET_PASSWORD", explicitPassword, 1)
+            setenv("WMUX_SOCKET_PASSWORD", explicitPassword, 1)
         }
-        setenv("CMUX_CODEX_TEAMS_APP_SERVER_URL", appServerURL, 1)
-        setenv("CMUX_CODEX_TEAMS_MAX_AUTO_DEPTH", String(Self.codexTeamsMaxAutoDepth), 1)
+        setenv("WMUX_CODEX_TEAMS_APP_SERVER_URL", appServerURL, 1)
+        setenv("WMUX_CODEX_TEAMS_MAX_AUTO_DEPTH", String(Self.codexTeamsMaxAutoDepth), 1)
         let launchArguments = [launchExecutable, "codex-teams"] + commandArgs
         exportAgentLaunchCommandEnvironment(
             launcher: "codexTeams",
@@ -28065,16 +26751,16 @@ struct WMUXCLI {
         )
 
         var rootEnvironment = launcherEnvironment
-        rootEnvironment["CMUX_CODEX_TEAMS_APP_SERVER_URL"] = appServerURL
-        rootEnvironment["CMUX_CODEX_TEAMS_MAX_AUTO_DEPTH"] = String(Self.codexTeamsMaxAutoDepth)
-        rootEnvironment["CMUX_AGENT_LAUNCH_KIND"] = "codexTeams"
-        rootEnvironment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = launchExecutable
-        rootEnvironment["CMUX_AGENT_LAUNCH_ARGV_B64"] = Self.nulSeparatedBase64(launchArguments)
+        rootEnvironment["WMUX_CODEX_TEAMS_APP_SERVER_URL"] = appServerURL
+        rootEnvironment["WMUX_CODEX_TEAMS_MAX_AUTO_DEPTH"] = String(Self.codexTeamsMaxAutoDepth)
+        rootEnvironment["WMUX_AGENT_LAUNCH_KIND"] = "codexTeams"
+        rootEnvironment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = launchExecutable
+        rootEnvironment["WMUX_AGENT_LAUNCH_ARGV_B64"] = Self.nulSeparatedBase64(launchArguments)
         if let workingDirectory = launcherEnvironment["PWD"],
            !workingDirectory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            rootEnvironment["CMUX_AGENT_LAUNCH_CWD"] = workingDirectory
+            rootEnvironment["WMUX_AGENT_LAUNCH_CWD"] = workingDirectory
         } else {
-            rootEnvironment.removeValue(forKey: "CMUX_AGENT_LAUNCH_CWD")
+            rootEnvironment.removeValue(forKey: "WMUX_AGENT_LAUNCH_CWD")
         }
 
         rootCodex = try startCodexTeamsProcess(
@@ -28492,7 +27178,7 @@ struct WMUXCLI {
         case "${1:-}" in
           -V|-v) echo "tmux 3.4"; exit 0 ;;
         esac
-        exec "${CMUX_OMO_CMUX_BIN:-wmux}" __tmux-compat "$@"
+        exec "${WMUX_OMO_CMUX_BIN:-wmux}" __tmux-compat "$@"
         """
         let root = try createTmuxCompatShimDirectory(
             directoryName: "omo-bin",
@@ -28513,7 +27199,7 @@ struct WMUXCLI {
             *)        shift ;;
           esac
         done
-        exec "${CMUX_OMO_CMUX_BIN:-wmux}" notify --title "${TITLE:-OpenCode}" --body "${BODY:-}"
+        exec "${WMUX_OMO_CMUX_BIN:-wmux}" notify --title "${TITLE:-OpenCode}" --body "${BODY:-}"
         """
         try writeShimIfChanged(notifierScript, to: notifierURL)
 
@@ -29055,11 +27741,11 @@ struct WMUXCLI {
             explicitPassword: explicitPassword,
             launchContext: launchContext,
             tmuxPathPrefix: "wmux-omo",
-            cmuxBinEnvVar: "CMUX_OMO_CMUX_BIN",
-            termOverrideEnvVar: "CMUX_OMO_TERM",
+            cmuxBinEnvVar: "WMUX_OMO_CMUX_BIN",
+            termOverrideEnvVar: "WMUX_OMO_TERM",
             extraEnvVars: [
                 (key: "OPENCODE_PORT", value: openCodePort),
-                (key: "CMUX_OPENCODE_CMUX_BIN", value: executablePath),
+                (key: "WMUX_OPENCODE_CMUX_BIN", value: executablePath),
             ]
         )
     }
@@ -29071,10 +27757,10 @@ struct WMUXCLI {
     ) throws {
         let processEnvironment = ProcessInfo.processInfo.environment
         var launcherEnvironment = processEnvironment
-        launcherEnvironment["CMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "CMUX_SOCKET")
+        launcherEnvironment["WMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "WMUX_SOCKET")
         if let explicitPassword,
            !explicitPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            launcherEnvironment["CMUX_SOCKET_PASSWORD"] = explicitPassword
+            launcherEnvironment["WMUX_SOCKET_PASSWORD"] = explicitPassword
         }
 
         guard let openCodeExecutablePath = resolveOpenCodeExecutable(searchPath: launcherEnvironment["PATH"]) else {
@@ -29192,7 +27878,7 @@ struct WMUXCLI {
             esac
             ;;
         esac
-        exec "${CMUX_OMX_CMUX_BIN:-wmux}" __tmux-compat "$@"
+        exec "${WMUX_OMX_CMUX_BIN:-wmux}" __tmux-compat "$@"
         """
         return try createTmuxCompatShimDirectory(
             directoryName: "omx-bin",
@@ -29216,8 +27902,8 @@ struct WMUXCLI {
             explicitPassword: explicitPassword,
             launchContext: launchContext,
             tmuxPathPrefix: "wmux-omx",
-            cmuxBinEnvVar: "CMUX_OMX_CMUX_BIN",
-            termOverrideEnvVar: "CMUX_OMX_TERM"
+            cmuxBinEnvVar: "WMUX_OMX_CMUX_BIN",
+            termOverrideEnvVar: "WMUX_OMX_TERM"
         )
     }
 
@@ -29228,10 +27914,10 @@ struct WMUXCLI {
     ) throws {
         let processEnvironment = ProcessInfo.processInfo.environment
         var launcherEnvironment = processEnvironment
-        launcherEnvironment["CMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "CMUX_SOCKET")
+        launcherEnvironment["WMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "WMUX_SOCKET")
         if let explicitPassword,
            !explicitPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            launcherEnvironment["CMUX_SOCKET_PASSWORD"] = explicitPassword
+            launcherEnvironment["WMUX_SOCKET_PASSWORD"] = explicitPassword
         }
 
         guard let omxExecutablePath = resolveOMXExecutable(searchPath: launcherEnvironment["PATH"]) else {
@@ -29294,7 +27980,7 @@ struct WMUXCLI {
         case "${1:-}" in
           -V|-v) echo "tmux 3.4"; exit 0 ;;
         esac
-        exec "${CMUX_OMC_CMUX_BIN:-wmux}" __tmux-compat "$@"
+        exec "${WMUX_OMC_CMUX_BIN:-wmux}" __tmux-compat "$@"
         """
         return try createTmuxCompatShimDirectory(
             directoryName: "omc-bin",
@@ -29318,22 +28004,22 @@ struct WMUXCLI {
             explicitPassword: explicitPassword,
             launchContext: launchContext,
             tmuxPathPrefix: "wmux-omc",
-            cmuxBinEnvVar: "CMUX_OMC_CMUX_BIN",
-            termOverrideEnvVar: "CMUX_OMC_TERM"
+            cmuxBinEnvVar: "WMUX_OMC_CMUX_BIN",
+            termOverrideEnvVar: "WMUX_OMC_TERM"
         )
         clearInheritedClaudeLaunchEnvironment()
         // omc wraps Claude Code, so it needs the same NODE_OPTIONS restore module
         guard let restoreModuleURL = try? createClaudeNodeOptionsRestoreModule() else {
-            unsetenv("CMUX_ORIGINAL_NODE_OPTIONS_PRESENT")
-            unsetenv("CMUX_ORIGINAL_NODE_OPTIONS")
+            unsetenv("WMUX_ORIGINAL_NODE_OPTIONS_PRESENT")
+            unsetenv("WMUX_ORIGINAL_NODE_OPTIONS")
             return
         }
         if let existing = processEnvironment["NODE_OPTIONS"] {
-            setenv("CMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "1", 1)
-            setenv("CMUX_ORIGINAL_NODE_OPTIONS", normalizedNodeOptionsForRestore(existing), 1)
+            setenv("WMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "1", 1)
+            setenv("WMUX_ORIGINAL_NODE_OPTIONS", normalizedNodeOptionsForRestore(existing), 1)
         } else {
-            setenv("CMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "0", 1)
-            unsetenv("CMUX_ORIGINAL_NODE_OPTIONS")
+            setenv("WMUX_ORIGINAL_NODE_OPTIONS_PRESENT", "0", 1)
+            unsetenv("WMUX_ORIGINAL_NODE_OPTIONS")
         }
         setenv(
             "NODE_OPTIONS",
@@ -29352,10 +28038,10 @@ struct WMUXCLI {
     ) throws {
         let processEnvironment = ProcessInfo.processInfo.environment
         var launcherEnvironment = processEnvironment
-        launcherEnvironment["CMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "CMUX_SOCKET")
+        launcherEnvironment["WMUX_SOCKET_PATH"] = socketPath; launcherEnvironment.removeValue(forKey: "WMUX_SOCKET")
         if let explicitPassword,
            !explicitPassword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            launcherEnvironment["CMUX_SOCKET_PASSWORD"] = explicitPassword
+            launcherEnvironment["WMUX_SOCKET_PASSWORD"] = explicitPassword
         }
 
         guard let omcExecutablePath = resolveOMCExecutable(searchPath: launcherEnvironment["PATH"]) else {
@@ -30405,7 +29091,7 @@ struct WMUXCLI {
             let (linesArg, rem3) = parseOption(rem2, name: "--lines")
             let windowRaw = windowOpt ?? windowOverride
             let workspaceArg = wsArg ?? Self.callerWorkspaceForSurfaceHandle(sfArg, windowRaw: windowRaw)
-            let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"] : nil)
+            let surfaceArg = sfArg ?? (wsArg == nil && windowRaw == nil ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"] : nil)
 
             var params: [String: Any] = [:]
             let winId = try normalizeWindowHandle(windowRaw, client: client)
@@ -30870,10 +29556,10 @@ struct WMUXCLI {
             : nil
         let workspaceArg = hookWsFlag
             ?? snapshottedRoute?.workspaceId
-            ?? env["CMUX_WORKSPACE_ID"]
+            ?? env["WMUX_WORKSPACE_ID"]
         let surfaceArg = hookSurfaceFlag
             ?? (hookWsFlag == nil
-                ? snapshottedRoute?.surfaceId ?? env["CMUX_SURFACE_ID"]
+                ? snapshottedRoute?.surfaceId ?? env["WMUX_SURFACE_ID"]
                 : nil)
         // Queued replay may run after the admitted process exits and its PID is
         // recycled. The immutable surface snapshot remains valid across that
@@ -32508,7 +31194,7 @@ struct WMUXCLI {
 
     /// Like `resolvePreferredSurfaceIdForClaudeHook`, but also reports whether the
     /// surface came from the hook's own identity (the session record's surface,
-    /// the --surface/CMUX_SURFACE_ID value, or the calling process's tty binding)
+    /// the --surface/WMUX_SURFACE_ID value, or the calling process's tty binding)
     /// or from the focused/first-surface fallback. Only an identity-derived
     /// surface may participate in cross-surface staleness decisions — a borrowed
     /// fallback surface must not let a stale hook masquerade as another pane's.
@@ -32542,7 +31228,7 @@ struct WMUXCLI {
         if let preferred = nonEmptyClaudeHookIdentifier(preferred) {
             // A mapped surface can be stale after a pane move or close. Do not
             // let the helper's focused-surface fallback consume the live
-            // `CMUX_SURFACE_ID` claim before that claim has had a chance to be
+            // `WMUX_SURFACE_ID` claim before that claim has had a chance to be
             // validated. Preserve the focused fallback only when there is no
             // second identity candidate to try.
             do {
@@ -32968,7 +31654,7 @@ struct WMUXCLI {
 
     func resolveCallerTTYName(includeAmbientTTY: Bool = true) -> String? {
         let env = ProcessInfo.processInfo.environment
-        for key in includeAmbientTTY ? ["CMUX_CLI_TTY_NAME", "CMUX_TTY_NAME", "TTY", "SSH_TTY"] : ["CMUX_CLI_TTY_NAME", "CMUX_TTY_NAME"] {
+        for key in includeAmbientTTY ? ["WMUX_CLI_TTY_NAME", "WMUX_TTY_NAME", "TTY", "SSH_TTY"] : ["WMUX_CLI_TTY_NAME", "WMUX_TTY_NAME"] {
             if let ttyName = normalizedTTYName(env[key]) {
                 return ttyName
             }
@@ -33028,8 +31714,8 @@ struct WMUXCLI {
         client: SocketClient,
         processEnvironment: [String: String]
     ) throws -> [String: Any]? {
-        let workspaceArg = normalizedHandleValue(processEnvironment["CMUX_WORKSPACE_ID"])
-        let surfaceArg = normalizedHandleValue(processEnvironment["CMUX_SURFACE_ID"])
+        let workspaceArg = normalizedHandleValue(processEnvironment["WMUX_WORKSPACE_ID"])
+        let surfaceArg = normalizedHandleValue(processEnvironment["WMUX_SURFACE_ID"])
         guard workspaceArg != nil || surfaceArg != nil else { return nil }
 
         let workspaceID = try normalizeWorkspaceHandle(
@@ -34200,7 +32886,7 @@ struct WMUXCLI {
             monitorArgs += ["--lease", leasePath]
         }
         process.arguments = monitorArgs
-        process.environment = env.merging(["CMUX_CLI_SENTRY_DISABLED": "1"], uniquingKeysWith: { _, new in new })
+        process.environment = env.merging(["WMUX_CLI_SENTRY_DISABLED": "1"], uniquingKeysWith: { _, new in new })
         process.standardInput = FileHandle.nullDevice
         process.standardOutput = FileHandle.nullDevice
         process.standardError = FileHandle.nullDevice
@@ -34232,12 +32918,12 @@ struct WMUXCLI {
             )
             return nil
         }
-        var workspaceId = optionValue(commandArgs, name: "--workspace") ?? env["CMUX_WORKSPACE_ID"] ?? ""
-        let surfaceId = optionValue(commandArgs, name: "--surface") ?? env["CMUX_SURFACE_ID"]
+        var workspaceId = optionValue(commandArgs, name: "--workspace") ?? env["WMUX_WORKSPACE_ID"] ?? ""
+        let surfaceId = optionValue(commandArgs, name: "--surface") ?? env["WMUX_SURFACE_ID"]
         let sessionId = optionValue(commandArgs, name: "--session")
-            ?? env["CMUX_CODEX_SESSION_ID"]
+            ?? env["WMUX_CODEX_SESSION_ID"]
             ?? env["CODEX_SESSION_ID"]
-            ?? env["CMUX_AGENT_SESSION_ID"]
+            ?? env["WMUX_AGENT_SESSION_ID"]
             ?? ""
         let turnId = optionValue(commandArgs, name: "--turn")
         var transcriptPath = optionValue(commandArgs, name: "--transcript")
@@ -34890,7 +33576,7 @@ struct WMUXCLI {
     }
 
     func claudeAgentPID(from env: [String: String]) -> Int? {
-        guard let raw = env["CMUX_CLAUDE_PID"]?
+        guard let raw = env["WMUX_CLAUDE_PID"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
             let pid = Int(raw),
             pid > 0 else {
@@ -34906,7 +33592,7 @@ struct WMUXCLI {
         precomputedNestedDetection: Bool? = nil,
         env: [String: String]
     ) -> Bool {
-        if let override = normalizedHookValue(env["CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"])?.lowercased(),
+        if let override = normalizedHookValue(env["WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"])?.lowercased(),
            Self.parseHookBoolean(override) == true {
             return true
         }
@@ -35006,7 +33692,7 @@ struct WMUXCLI {
 
     private func appDefaultsCandidates(env: [String: String]) -> [UserDefaults] {
         var candidates: [UserDefaults] = []
-        if let bundleId = normalizedHookValue(env["CMUX_BUNDLE_ID"]),
+        if let bundleId = normalizedHookValue(env["WMUX_BUNDLE_ID"]),
            let defaults = UserDefaults(suiteName: bundleId) {
             candidates.append(defaults)
         }
@@ -35225,7 +33911,7 @@ struct WMUXCLI {
     }
 
     private func claudeRawLaunchArguments(env: [String: String], fallbackPID: Int?) -> [String]? {
-        decodeNULSeparatedBase64(env["CMUX_AGENT_LAUNCH_ARGV_B64"])
+        decodeNULSeparatedBase64(env["WMUX_AGENT_LAUNCH_ARGV_B64"])
             ?? (env[agentHookRelayOriginEnvironmentKey] == "1"
                 ? nil
                 : fallbackPID.flatMap { self.processArguments(for: pid_t($0)) })
@@ -35237,12 +33923,12 @@ struct WMUXCLI {
         fallbackKind: String,
         cwd: String?
     ) -> AgentHookLaunchCommandRecord? {
-        // `CMUX_AGENT_LAUNCH_*` leaks to every descendant of an agent process, so an
+        // `WMUX_AGENT_LAUNCH_*` leaks to every descendant of an agent process, so an
         // agent started from inside another agent's session inherits the ANCESTOR's
         // launch capture (codex under claude carries claude's argv). Trust the env
         // capture only when its launcher describes this hook's agent kind; otherwise
         // fall back to the agent's own process argv and kind.
-        let envLauncher = normalizedHookValue(env["CMUX_AGENT_LAUNCH_KIND"])
+        let envLauncher = normalizedHookValue(env["WMUX_AGENT_LAUNCH_KIND"])
         let envCaptureIsTrusted = AgentLaunchCaptureTrust.launcherDescribesKind(
             envLauncher,
             kind: fallbackKind
@@ -35254,7 +33940,7 @@ struct WMUXCLI {
         // the SAME argv are ordered inside AgentLaunchCaptureArgvVerdict.
         var cmuxCaptureRejectionReason: AgentLaunchCaptureRejectionReason?
         var processFallbackRejectionReason: AgentLaunchCaptureRejectionReason?
-        let rawEnvironmentArguments = env["CMUX_AGENT_LAUNCH_ARGV_B64"]
+        let rawEnvironmentArguments = env["WMUX_AGENT_LAUNCH_ARGV_B64"]
         let hasEnvironmentArguments = normalizedHookValue(rawEnvironmentArguments) != nil
         let envArguments = envCaptureIsTrusted
             ? decodeNULSeparatedBase64(rawEnvironmentArguments)
@@ -35292,7 +33978,7 @@ struct WMUXCLI {
         // or default verb remains valid. Only a positive cmux capture rejection
         // quarantines the argv-less record.
         let hasRejectedCandidate = cmuxCaptureRejectionReason?.isPositiveCaptureRejection == true
-        let workingDirectory = (envCaptureIsTrusted ? normalizedHookValue(env["CMUX_AGENT_LAUNCH_CWD"]) : nil)
+        let workingDirectory = (envCaptureIsTrusted ? normalizedHookValue(env["WMUX_AGENT_LAUNCH_CWD"]) : nil)
             ?? normalizedHookValue(cwd)
             ?? normalizedHookValue(env["PWD"])
         var environment = selectedAgentLaunchEnvironment(from: env, kind: launcher)
@@ -35383,7 +34069,7 @@ struct WMUXCLI {
         }
 
         // Fallback when the launch argv is genuinely UNAVAILABLE: plain `codex` with no cmux launcher
-        // (no CMUX_AGENT_LAUNCH_ARGV_B64) and an unresolved/exited PID, so processArguments returns nil.
+        // (no WMUX_AGENT_LAUNCH_ARGV_B64) and an unresolved/exited PID, so processArguments returns nil.
         // The argv is gone, but the agent's launch env may still carry a non-default home that
         // resume/fork MUST reproduce or the session won't be found — above all CODEX_HOME when codex
         // runs under the subrouter account manager (~/.codex-accounts/<account>), also CLAUDE_CONFIG_DIR
@@ -35425,7 +34111,7 @@ struct WMUXCLI {
             )
         }
 
-        let executablePath = (envCaptureIsTrusted ? normalizedHookValue(env["CMUX_AGENT_LAUNCH_EXECUTABLE"]) : nil)
+        let executablePath = (envCaptureIsTrusted ? normalizedHookValue(env["WMUX_AGENT_LAUNCH_EXECUTABLE"]) : nil)
             ?? arguments.first
         guard let sanitizedArguments = sanitizedAgentLaunchArguments(
             arguments,
@@ -35973,8 +34659,8 @@ struct WMUXCLI {
         if kind == "claude" {
             let preservedClaudeKeys = selected.keys.sorted().filter { claudeAuthKeys.contains($0) }
             if !preservedClaudeKeys.isEmpty {
-                resolved["CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV"] = "1"
-                resolved["CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS"] = preservedClaudeKeys.joined(separator: ",")
+                resolved["WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV"] = "1"
+                resolved["WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS"] = preservedClaudeKeys.joined(separator: ",")
             }
         }
         return resolved
@@ -36028,7 +34714,7 @@ struct WMUXCLI {
 
     func agentHookStatePath(sessionStoreSuffix: String, env: [String: String]) -> String {
         let filename = "\(sessionStoreSuffix)-hook-sessions.json"
-        guard let overrideDirectory = normalizedHookValue(env["CMUX_AGENT_HOOK_STATE_DIR"]) else {
+        guard let overrideDirectory = normalizedHookValue(env["WMUX_AGENT_HOOK_STATE_DIR"]) else {
             return "~/.cmuxterm/\(filename)"
         }
         return URL(fileURLWithPath: NSString(string: overrideDirectory).expandingTildeInPath, isDirectory: true)
@@ -36204,7 +34890,7 @@ import { spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-const CMUX_PLUGIN_INSTALLED_KEY = Symbol.for("wmux.session.restore.plugin.installed");
+const WMUX_PLUGIN_INSTALLED_KEY = Symbol.for("wmux.session.restore.plugin.installed");
 const MAX_TRACKED_SESSIONS = 100;
 const messageRoles = new Map();
 const sessions = new Map();
@@ -36421,20 +35107,20 @@ function hookEnvironment(cwd) {
   delete env.AMP_API_KEY;
   // Any inherited capture describes a parent process: another agent, or an
   // OpenCode that started this one. Always describe this process's launch.
-  delete env.CMUX_AGENT_LAUNCH_SUBROUTER_CLAUDE_RESUME_COMMAND;
-  delete env.CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND;
-  delete env.CMUX_AGENT_LAUNCH_ROUTED_CLAUDE_ACCOUNT;
+  delete env.WMUX_AGENT_LAUNCH_SUBROUTER_CLAUDE_RESUME_COMMAND;
+  delete env.WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND;
+  delete env.WMUX_AGENT_LAUNCH_ROUTED_CLAUDE_ACCOUNT;
   const argv = normalizedLaunchArgv();
-  env.CMUX_AGENT_LAUNCH_KIND = "opencode";
-  env.CMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("opencode");
-  env.CMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
-  env.CMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
+  env.WMUX_AGENT_LAUNCH_KIND = "opencode";
+  env.WMUX_AGENT_LAUNCH_EXECUTABLE = argv[0] || resolveExecutable("opencode");
+  env.WMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
+  env.WMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
   return env;
 }
 
 function sendHook(subcommand, ctx, event, extra = {}) {
-  if (process.env.CMUX_OPENCODE_HOOKS_DISABLED === "1") return;
-  if (!process.env.CMUX_SURFACE_ID) return;
+  if (process.env.WMUX_OPENCODE_HOOKS_DISABLED === "1") return;
+  if (!process.env.WMUX_SURFACE_ID) return;
 
   const sessionId = sessionIdFor(event);
   if (!sessionId) return;
@@ -36451,10 +35137,10 @@ function sendHook(subcommand, ctx, event, extra = {}) {
   };
   const context = extra.context || contextForSession(sessionId);
   if (context) payload.context = context;
-  const wmux = process.env.CMUX_OPENCODE_CMUX_BIN || "wmux";
+  const wmux = process.env.WMUX_OPENCODE_CMUX_BIN || "wmux";
   try {
     const child = spawn(wmux, ["hooks", "enqueue", "opencode", subcommand], {
-      env: { ...hookEnvironment(cwd), CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
+      env: { ...hookEnvironment(cwd), WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
       stdio: ["pipe", "ignore", "ignore"],
       detached: true,
     });
@@ -36575,9 +35261,9 @@ const createCMUXSessionRestore = async (ctx) => {
 // V1 callers invoke the named factory directly and need the process-global
 // duplicate guard. V2 owns each setup subscription, so cleanup can be followed
 // by a fresh setup without inheriting the V1 guard's state.
-export const CMUXSessionRestore = async (ctx) => {
-  if (globalThis[CMUX_PLUGIN_INSTALLED_KEY]) return {};
-  globalThis[CMUX_PLUGIN_INSTALLED_KEY] = true;
+export const WMUXSessionRestore = async (ctx) => {
+  if (globalThis[WMUX_PLUGIN_INSTALLED_KEY]) return {};
+  globalThis[WMUX_PLUGIN_INSTALLED_KEY] = true;
   return createCMUXSessionRestore(ctx);
 };
 
@@ -36588,7 +35274,7 @@ function isTUIProcessServerContext(ctx) {
   return Boolean(ctx && typeof ctx === "object" && ctx.client && ctx.serverUrl && ctx.directory);
 }
 
-const CMUX_SESSION_SERVER_SCOPES_KEY = Symbol.for("wmux.session.server.scopes");
+const WMUX_SESSION_SERVER_SCOPES_KEY = Symbol.for("wmux.session.server.scopes");
 
 export default {
   id: "wmux.server",
@@ -36597,10 +35283,10 @@ export default {
     // Every loader in one plugin scope receives the same ctx. OpenCode keeps
     // one scope per directory and disposes a scope's hooks when it tears it
     // down, after which this scope must not send hooks.
-    const scopes = globalThis[CMUX_SESSION_SERVER_SCOPES_KEY] ||= new WeakSet();
+    const scopes = globalThis[WMUX_SESSION_SERVER_SCOPES_KEY] ||= new WeakSet();
     if (scopes.has(ctx)) return {};
     scopes.add(ctx);
-    globalThis[CMUX_PLUGIN_INSTALLED_KEY] = true;
+    globalThis[WMUX_PLUGIN_INSTALLED_KEY] = true;
     const hooks = await createCMUXSessionRestore(ctx);
     let disposed = false;
     return {
@@ -37423,7 +36109,7 @@ export default {
                 } else {
                     existingContent = ""
                 }
-                let trustInstall = CmuxCodexConfigEditor().installingHooks(
+                let trustInstall = WmuxCodexConfigEditor().installingHooks(
                     in: existingContent,
                     trustEntries: codexHookTrustEntries,
                     removingKeyPrefixes: codexHookTrustKeyPrefixes,
@@ -37666,7 +36352,7 @@ export default {
                 } catch {
                     throw CLIError(message: "\(configPath) exists but could not be read. Fix permissions or remove it before uninstalling \(def.displayName) hooks. \(String(describing: error))")
                 }
-                let newContent = CmuxCodexConfigEditor().uninstallingHooks(
+                let newContent = WmuxCodexConfigEditor().uninstallingHooks(
                     from: content,
                     removingHookTrustEntries: codexHookTrustEntriesToRemove,
                     removingKeyPrefixes: codexHookTrustKeyPrefixesToRemove,
@@ -37698,7 +36384,7 @@ export default {
         }
     }
 
-    typealias CodexHookTrustEntry = CmuxCodexConfigEditor.HookTrustEntry
+    typealias CodexHookTrustEntry = WmuxCodexConfigEditor.HookTrustEntry
 
     static func codexHookTrustEntries(
         hooks: [String: Any],
@@ -37770,7 +36456,7 @@ export default {
         func insertHashes(eventLabel: String, command: String, timeouts: [Int]) {
             let commands = [
                 command,
-                "[ -n \"$CMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && command -v wmux >/dev/null 2>&1 && \(command) || echo '{}'",
+                "[ -n \"$WMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && command -v wmux >/dev/null 2>&1 && \(command) || echo '{}'",
             ]
             for command in commands {
                 for timeout in timeouts {
@@ -37979,7 +36665,7 @@ export default {
         if def.name == "rovodev" {
             return RovoDevSessionResolver.inferredRovoDevSessionId(cwd: cwd, env: env) ?? ""
         }
-        return normalizedHookValue(env["CMUX_SURFACE_ID"]) ?? ""
+        return normalizedHookValue(env["WMUX_SURFACE_ID"]) ?? ""
     }
 
     /// Whether a Muse hook payload belongs to an internal child session.
@@ -38066,9 +36752,9 @@ export default {
         monitorReplay: CodexTranscriptMonitorStopReplay? = nil
     ) throws {
         let env = ProcessInfo.processInfo.environment
-        let skipCodexLegacyPromptStop = env["CMUX_CODEX_SETTLED_CHILD_STOP"] == "1"
+        let skipCodexLegacyPromptStop = env["WMUX_CODEX_SETTLED_CHILD_STOP"] == "1"
         let isCodexSettledStopRetry = skipCodexLegacyPromptStop
-        let settledStopTurnID = normalizedHookValue(env["CMUX_CODEX_SETTLED_STOP_TURN_ID"])
+        let settledStopTurnID = normalizedHookValue(env["WMUX_CODEX_SETTLED_STOP_TURN_ID"])
         let subcommand = commandArgs.first?.lowercased() ?? ""
         let hookArgs = Array(commandArgs.dropFirst())
         let cursorShellEvent = def.name == "cursor" && subcommand == "shell-exec"
@@ -38083,7 +36769,7 @@ export default {
         }
         telemetry.breadcrumb("\(def.name)-hook.\(subcommand)")
 
-        if env["CMUX_AGENT_HOOK_DELIVERY_PROCESS_GROUP"] != "1",
+        if env["WMUX_AGENT_HOOK_DELIVERY_PROCESS_GROUP"] != "1",
            subcommand == "session-finalize"
             || (def.name == "codex" && subcommand == "notification") {
             do {
@@ -38139,7 +36825,7 @@ export default {
         }
 
         // Workspace/surface resolution: prefer --workspace/--surface flags,
-        // then env, then the caller process. Grok strips CMUX_* from hook
+        // then env, then the caller process. Grok strips WMUX_* from hook
         // subprocesses, so PID attribution is the only reliable live binding.
         let relayOrigin = env[agentHookRelayOriginEnvironmentKey] == "1"
         let routeWasSnapshotted =
@@ -38166,7 +36852,7 @@ export default {
         let directWorkspaceArg = hookWsFlag
             ?? (monitorReplay == nil
                 ? snapshottedRoute?.workspaceId
-                    ?? normalizedHookValue(env["CMUX_WORKSPACE_ID"])
+                    ?? normalizedHookValue(env["WMUX_WORKSPACE_ID"])
                 : nil)
         let explicitSurfaceFlag = optionValue(hookArgs, name: "--surface")
         let strictPiTarget = def.name == "pi"
@@ -38175,7 +36861,7 @@ export default {
         let directSurfaceArg = explicitSurfaceFlag
             ?? (monitorReplay == nil && hookWsFlag == nil
                 ? snapshottedRoute?.surfaceId
-                    ?? normalizedHookValue(env["CMUX_SURFACE_ID"])
+                    ?? normalizedHookValue(env["WMUX_SURFACE_ID"])
                 : nil)
         func resolveAccessibleWorkspaceId(_ raw: String?) -> String? {
             guard let raw = nonEmptyClaudeHookIdentifier(raw) else {
@@ -38222,7 +36908,7 @@ export default {
         let resolvedDirectWorkspaceArg = strictPiTarget?.workspaceId
             ?? resolveAccessibleWorkspaceId(directWorkspaceArg)
         // Only an EXPLICIT --workspace flag that fails to resolve is a hard, hook-dropping error. A
-        // stale/invalid AMBIENT CMUX_WORKSPACE_ID must not abort routing — treated as absent, it falls
+        // stale/invalid AMBIENT WMUX_WORKSPACE_ID must not abort routing — treated as absent, it falls
         // through to the PID/TTY binding below, which is ground truth.
         let hasInvalidDirectWorkspaceArg = hookWsFlag != nil && resolvedDirectWorkspaceArg == nil
         var processBindingCache: AgentHookProcessBindingResult?
@@ -38274,7 +36960,7 @@ export default {
             return resolveAccessibleSurfaceId(directSurfaceArg, workspaceId: workspaceId)
         }()
         // Same asymmetry for the surface: an explicit --surface flag that fails to resolve is a hard
-        // error, but a stale/invalid ambient CMUX_SURFACE_ID (a surface that was closed, or belongs to
+        // error, but a stale/invalid ambient WMUX_SURFACE_ID (a surface that was closed, or belongs to
         // another workspace) must fall through to the PID/TTY binding instead of dropping the hook —
         // that is the stale-env variant of the codex jumble.
         let hasInvalidDirectSurfaceArg = explicitSurfaceFlag != nil && resolvedDirectSurfaceArg == nil
@@ -38305,7 +36991,7 @@ export default {
 
         let store = ClaudeHookSessionStore(
             processEnv: env.merging(
-                ["CMUX_CLAUDE_HOOK_STATE_PATH": agentHookStatePath(sessionStoreSuffix: def.sessionStoreSuffix, env: env)],
+                ["WMUX_CLAUDE_HOOK_STATE_PATH": agentHookStatePath(sessionStoreSuffix: def.sessionStoreSuffix, env: env)],
                 uniquingKeysWith: { _, new in new }
             )
         )
@@ -38313,7 +36999,7 @@ export default {
         let hookCwd = relayOrigin
             ? nil
             : input.cwd
-                ?? normalizedHookValue(env["CMUX_AGENT_LAUNCH_CWD"])
+                ?? normalizedHookValue(env["WMUX_AGENT_LAUNCH_CWD"])
                 ?? normalizedHookValue(env["PWD"])
                 ?? (def.name == "codex" ? normalizedHookValue(FileManager.default.currentDirectoryPath) : nil)
         let hookTranscriptPath = relayOrigin ? nil : input.transcriptPath
@@ -38527,7 +37213,7 @@ export default {
         }
 #if DEBUG
         agentHookDebugLog(
-            "agentHook.start agent=\(def.name) subcommand=\(subcommand) session=\(agentHookDebugShort(sessionId)) inputSession=\(agentHookDebugShort(input.sessionId)) resumed=\(env["CMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) rawBytes=\(rawInput.utf8.count) hasCwd=\(hookCwd == nil ? 0 : 1) envWorkspace=\(env["CMUX_WORKSPACE_ID"] == nil ? 0 : 1) envSurface=\(env["CMUX_SURFACE_ID"] == nil ? 0 : 1) directWorkspace=\(directWorkspaceArg == nil ? 0 : 1) directSurface=\(directSurfaceArg == nil ? 0 : 1) invalidDirect=\(hasUnusableDirectBinding ? 1 : 0) processBinding=\(processBindingDebugState()) socketName=\(agentHookDebugSocketName(client.socketPath))",
+            "agentHook.start agent=\(def.name) subcommand=\(subcommand) session=\(agentHookDebugShort(sessionId)) inputSession=\(agentHookDebugShort(input.sessionId)) resumed=\(env["WMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) rawBytes=\(rawInput.utf8.count) hasCwd=\(hookCwd == nil ? 0 : 1) envWorkspace=\(env["WMUX_WORKSPACE_ID"] == nil ? 0 : 1) envSurface=\(env["WMUX_SURFACE_ID"] == nil ? 0 : 1) directWorkspace=\(directWorkspaceArg == nil ? 0 : 1) directSurface=\(directSurfaceArg == nil ? 0 : 1) invalidDirect=\(hasUnusableDirectBinding ? 1 : 0) processBinding=\(processBindingDebugState()) socketName=\(agentHookDebugSocketName(client.socketPath))",
             socketPath: client.socketPath,
             env: env
         )
@@ -39564,8 +38250,8 @@ export default {
                 && env[CodexHookInvocation.forkSessionEnvironmentKey] == "1"
             func printCodexForkSessionStartResult(bound: Bool) {
                 if isCodexForkSession {
-                    if bound { hookResponse = "{\"cmux_fork_binding\":\"bound\"}" } else {
-                        let result = ["cmux_fork_binding": "failed"]
+                    if bound { hookResponse = "{\"wmux_fork_binding\":\"bound\"}" } else {
+                        let result = ["wmux_fork_binding": "failed"]
                         if let data = try? JSONSerialization.data(withJSONObject: result),
                            let line = String(data: data, encoding: .utf8) {
                             print(line)
@@ -40623,8 +39309,8 @@ export default {
                 category: stopNotificationStatus == .idle ? .turnComplete : .other,
                 body: body
             )
-            let stopNotificationAlreadyRouted = (input.rawObject?["cmux_notification_routed"] as? Bool) == true
-                || (input.object?["cmux_notification_routed"] as? Bool) == true
+            let stopNotificationAlreadyRouted = (input.rawObject?["wmux_notification_routed"] as? Bool) == true
+                || (input.object?["wmux_notification_routed"] as? Bool) == true
             // Antigravity's integration defines a stop with active background work
             // (fullyIdle=false) as an intermediate event, not a completed turn: its
             // completion ping arrives at the later fullyIdle stop. Deliberately NOT
@@ -40672,7 +39358,7 @@ export default {
                     rawObject: input.rawObject, payload: payload, pendingWork: hasActiveBackgroundWork)
 #if DEBUG
                 agentHookDebugLog(
-                    "agentHook.stop.notify agent=\(def.name) session=\(agentHookDebugShort(sessionId)) resumed=\(env["CMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) fallback=\(shouldPublishGrokStopFallbackNotification ? 1 : 0) workspace=\(agentHookDebugShort(workspaceId)) surface=\(agentHookDebugShort(surfaceId)) subtitleLen=\(subtitle.count) bodyLen=\(body.count)",
+                    "agentHook.stop.notify agent=\(def.name) session=\(agentHookDebugShort(sessionId)) resumed=\(env["WMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) fallback=\(shouldPublishGrokStopFallbackNotification ? 1 : 0) workspace=\(agentHookDebugShort(workspaceId)) surface=\(agentHookDebugShort(surfaceId)) subtitleLen=\(subtitle.count) bodyLen=\(body.count)",
                     socketPath: client.socketPath,
                     env: env
                 )
@@ -40690,7 +39376,7 @@ export default {
                     }
 #if DEBUG
                     agentHookDebugLog(
-                        "agentHook.stop.notify.sent agent=\(def.name) session=\(agentHookDebugShort(sessionId)) resumed=\(env["CMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) response=\(response)",
+                        "agentHook.stop.notify.sent agent=\(def.name) session=\(agentHookDebugShort(sessionId)) resumed=\(env["WMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) response=\(response)",
                         socketPath: client.socketPath,
                         env: env
                     )
@@ -40710,7 +39396,7 @@ export default {
             } else if shouldPublishStopAlert {
 #if DEBUG
                 agentHookDebugLog(
-                    "agentHook.stop.notify.skipDuplicate agent=\(def.name) session=\(agentHookDebugShort(sessionId)) resumed=\(env["CMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) fallback=\(shouldPublishGrokStopFallbackNotification ? 1 : 0) fingerprint=\(agentHookDebugShort(notificationFingerprint))",
+                    "agentHook.stop.notify.skipDuplicate agent=\(def.name) session=\(agentHookDebugShort(sessionId)) resumed=\(env["WMUX_AGENT_RESUME_LAUNCH"] == "1" ? 1 : 0) fallback=\(shouldPublishGrokStopFallbackNotification ? 1 : 0) fingerprint=\(agentHookDebugShort(notificationFingerprint))",
                     socketPath: client.socketPath,
                     env: env
                 )
@@ -40836,7 +39522,7 @@ export default {
             resolveCursorShellHook(failed: true)
 
         case .approvalResponse:
-            let idleDialogResolution = (input.rawObject?["cmux_pi_idle_dialog"] as? Bool) == true
+            let idleDialogResolution = (input.rawObject?["wmux_pi_idle_dialog"] as? Bool) == true
             let mapped = sessionId.isEmpty ? nil : (try? store.lookup(sessionId: sessionId))
             guard let target = resolveAgentHookTarget(mapped: mapped) else {
                 reportTargetResolutionFailure()
@@ -41435,7 +40121,7 @@ export default {
             if def.sessionEndIsTurnBoundary {
                 if let mapped = sessionId.isEmpty ? nil : (try? store.lookup(sessionId: sessionId)) {
                     // These providers use session-end as their per-turn
-                    // boundary (the cmux-tui mapping table's antigravity /
+                    // boundary (the wmux-tui mapping table's antigravity /
                     // hermes special case), so it journals as a completed
                     // turn, not a session teardown.
                     emitJournal(
@@ -41911,17 +40597,17 @@ export default {
         }
         let envKey: String
         switch source {
-        case "claude": envKey = "CMUX_CLAUDE_PID"
-        case "codex": envKey = "CMUX_CODEX_PID"
-        case "omp": envKey = "CMUX_OMP_PID"
-        case "cursor": envKey = "CMUX_CURSOR_PID"
-        case "gemini": envKey = "CMUX_GEMINI_PID"
-        case "antigravity": envKey = "CMUX_ANTIGRAVITY_PID"
-        case "rovodev": envKey = "CMUX_ROVODEV_PID"
-        case "hermes-agent": envKey = "CMUX_HERMES_AGENT_PID"
-        case "amp": envKey = "CMUX_AMP_PID"
-        case "copilot": envKey = "CMUX_COPILOT_PID"
-        case "kiro": envKey = "CMUX_KIRO_PID"
+        case "claude": envKey = "WMUX_CLAUDE_PID"
+        case "codex": envKey = "WMUX_CODEX_PID"
+        case "omp": envKey = "WMUX_OMP_PID"
+        case "cursor": envKey = "WMUX_CURSOR_PID"
+        case "gemini": envKey = "WMUX_GEMINI_PID"
+        case "antigravity": envKey = "WMUX_ANTIGRAVITY_PID"
+        case "rovodev": envKey = "WMUX_ROVODEV_PID"
+        case "hermes-agent": envKey = "WMUX_HERMES_AGENT_PID"
+        case "amp": envKey = "WMUX_AMP_PID"
+        case "copilot": envKey = "WMUX_COPILOT_PID"
+        case "kiro": envKey = "WMUX_KIRO_PID"
         default: envKey = ""
         }
         if !envKey.isEmpty,
@@ -42592,7 +41278,7 @@ export default {
         )
         let implementation = try parseFeedTUIImplementation(arguments: arguments)
         if implementation == .help { return }
-        if implementation == .legacy || ProcessInfo.processInfo.environment["CMUX_FEED_TUI_LEGACY"] == "1" {
+        if implementation == .legacy || ProcessInfo.processInfo.environment["WMUX_FEED_TUI_LEGACY"] == "1" {
             try runLegacyFeedTUI(socketPath: socketPath, socketPassword: resolvedSocketPassword)
             return
         }
@@ -42653,13 +41339,13 @@ export default {
             isDirectory: true
         )
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath; environment.removeValue(forKey: "CMUX_SOCKET")
+        environment["WMUX_SOCKET_PATH"] = socketPath; environment.removeValue(forKey: "WMUX_SOCKET")
         if let socketPassword {
-            environment["CMUX_SOCKET_PASSWORD"] = socketPassword
+            environment["WMUX_SOCKET_PASSWORD"] = socketPassword
         }
         environment["OTUI_USE_CONSOLE"] = environment["OTUI_USE_CONSOLE"] ?? "0"
         environment["OTUI_USE_ALTERNATE_SCREEN"] = "1"
-        environment["CMUX_FEED_TUI_PATH"] = "opentui"
+        environment["WMUX_FEED_TUI_PATH"] = "opentui"
         process.environment = environment
         process.standardInput = FileHandle.standardInput
         process.standardOutput = FileHandle.standardOutput
@@ -42695,7 +41381,7 @@ export default {
     }
 
     private func resolveBunExecutable() -> String? {
-        if let path = ProcessInfo.processInfo.environment["CMUX_FEED_TUI_BUN_PATH"]?
+        if let path = ProcessInfo.processInfo.environment["WMUX_FEED_TUI_BUN_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !path.isEmpty,
            FileManager.default.isExecutableFile(atPath: path) {
@@ -42945,7 +41631,7 @@ export default {
     }
 
     private func writeFeedTUIReadyMarker(stage: String) {
-        guard let path = ProcessInfo.processInfo.environment["CMUX_FEED_TUI_READY_PATH"]?
+        guard let path = ProcessInfo.processInfo.environment["WMUX_FEED_TUI_READY_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               !path.isEmpty else {
             return
@@ -43657,7 +42343,7 @@ export default {
         appendIfExisting(Bundle.main.url(forResource: resourceName, withExtension: "js"))
         appendIfExisting(Bundle.main.resourceURL?.appendingPathComponent(filename, isDirectory: false))
 
-        if let runtimeRoot = ProcessInfo.processInfo.environment["CMUX_CI_RUNTIME_SOURCE_ROOT"],
+        if let runtimeRoot = ProcessInfo.processInfo.environment["WMUX_CI_RUNTIME_SOURCE_ROOT"],
            !runtimeRoot.isEmpty {
             appendIfExisting(
                 URL(fileURLWithPath: runtimeRoot, isDirectory: true)
@@ -43804,8 +42490,8 @@ export default {
         socketPath: String?,
         socketPassword: String?
     ) {
-        let ambientWorkspaceId = (eventDict["workspace_id"] as? String) ?? env["CMUX_WORKSPACE_ID"]
-        let ambientSurfaceId = (eventDict["surface_id"] as? String) ?? env["CMUX_SURFACE_ID"]
+        let ambientWorkspaceId = (eventDict["workspace_id"] as? String) ?? env["WMUX_WORKSPACE_ID"]
+        let ambientSurfaceId = (eventDict["surface_id"] as? String) ?? env["WMUX_SURFACE_ID"]
         let deadline = Date().addingTimeInterval(Self.feedAttentionAcknowledgeTimeoutSeconds)
         func remainingBudget() -> TimeInterval {
             max(deadline.timeIntervalSinceNow, 0.05)
@@ -44042,7 +42728,7 @@ export default {
 
         // Capture the agent's PID (not our subprocess PID) so the
         // Feed can auto-expire pending cards when the agent is
-        // killed/crashed. Agent wrappers export CMUX_<AGENT>_PID.
+        // killed/crashed. Agent wrappers export WMUX_<AGENT>_PID.
         // Other agents fall back to getppid() which walks up one
         // level — close enough to catch most kill scenarios.
         let agentPid = agentPidForFeedSource(source, env: env)
@@ -44051,7 +42737,7 @@ export default {
                 commandArgs: commandArgs,
                 rawObject: stdinObj,
                 agentPid: agentPid,
-                fallbackWorkspaceId: env["CMUX_WORKSPACE_ID"],
+                fallbackWorkspaceId: env["WMUX_WORKSPACE_ID"],
                 client: client,
                 socketPath: socketPath,
                 socketPassword: socketPassword
@@ -44085,13 +42771,13 @@ export default {
             let lifecycle = CodexTurnLifecycleCoordinator(environment: env, cli: self)
             let feedLifecycleTarget: (workspaceId: String, surfaceId: String)? = {
                 guard let rawSurfaceId = firstString(in: stdinObj, keys: ["surface_id", "surfaceId"])
-                          ?? env["CMUX_SURFACE_ID"],
+                          ?? env["WMUX_SURFACE_ID"],
                       let activeClient = client ?? makeLifecycleProbeClient() else {
                     return nil
                 }
                 let rawWorkspaceId = feedWorkspaceId(
                     rawObject: stdinObj,
-                    fallback: env["CMUX_WORKSPACE_ID"]
+                    fallback: env["WMUX_WORKSPACE_ID"]
                 )
                 let workspaceId = rawWorkspaceId.flatMap { raw in
                     guard isUUID(raw) else {
@@ -44228,9 +42914,9 @@ export default {
                 return
             }
         }
-        let claimedWorkspaceId = feedWorkspaceId(rawObject: stdinObj, fallback: env["CMUX_WORKSPACE_ID"])
+        let claimedWorkspaceId = feedWorkspaceId(rawObject: stdinObj, fallback: env["WMUX_WORKSPACE_ID"])
         let claimedSurfaceId = firstString(in: stdinObj, keys: ["surface_id", "surfaceId"])
-            ?? normalizedHookValue(env["CMUX_SURFACE_ID"])
+            ?? normalizedHookValue(env["WMUX_SURFACE_ID"])
         // Telemetry must not wait for a routing response. Carry its scope to
         // the host, where Computer Use checks live local ownership before
         // presenting setup. Blocking decisions resolve their target first.
@@ -44725,11 +43411,11 @@ export default {
         env: [String: String]
     ) -> Bool {
         guard source == "kiro" else { return false }
-        guard env["CMUX_KIRO_NOTIFICATION_LEVEL"] != nil || hookEventName == "PreToolUse" || hookEventName == "PostToolUse" else {
+        guard env["WMUX_KIRO_NOTIFICATION_LEVEL"] != nil || hookEventName == "PreToolUse" || hookEventName == "PostToolUse" else {
             return false
         }
         guard !isActionable else { return false }
-        let level = env["CMUX_KIRO_NOTIFICATION_LEVEL"]?
+        let level = env["WMUX_KIRO_NOTIFICATION_LEVEL"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased() ?? "standard"
         switch level {
@@ -45192,7 +43878,7 @@ export default {
         guard let def = Self.agentDef(named: first) else { return false }
         let action = commandArgs.dropFirst().first?.lowercased()
         if def.name == "pi", action == "extension-source" { return false }
-        // Grok and Muse clear CMUX_* from hook subprocesses; their pinned
+        // Grok and Muse clear WMUX_* from hook subprocesses; their pinned
         // hooks resolve the surface from the agent process instead.
         if def.name == "grok" || def.name == "muse" {
             return false
@@ -45464,7 +44150,7 @@ export default {
 
     func versionSummary() -> String {
         let info = resolvedVersionInfo()
-        let commit = info["CMUXCommit"].flatMap { normalizedCommitHash($0) }
+        let commit = info["WMUXCommit"].flatMap { normalizedCommitHash($0) }
         let baseSummary: String
         if let version = info["CFBundleShortVersionString"], let build = info["CFBundleVersion"] {
             baseSummary = "wmux \(version) (\(build))"
@@ -45517,7 +44203,7 @@ export default {
         \(c7)  ::\(reset)
         """
 
-        // List factory defaults from the shared CmuxSettings table and display
+        // List factory defaults from the shared WmuxSettings table and display
         // names, so a changed default updates this screen. Welcome describes a
         // fresh install and never reads the user's settings; the last line
         // points at where rebound shortcuts are shown.
@@ -45577,7 +44263,7 @@ export default {
         let needsPlistFallback =
             info["CFBundleShortVersionString"] == nil ||
             info["CFBundleVersion"] == nil ||
-            info["CMUXCommit"] == nil
+            info["WMUXCommit"] == nil
         if needsPlistFallback {
             for plistURL in candidateInfoPlistURLs() {
                 guard let data = try? Data(contentsOf: plistURL),
@@ -45590,7 +44276,7 @@ export default {
                 info.merge(parsed, uniquingKeysWith: { current, _ in current })
                 if info["CFBundleShortVersionString"] != nil,
                    info["CFBundleVersion"] != nil,
-                   info["CMUXCommit"] != nil {
+                   info["WMUXCommit"] != nil {
                     break
                 }
             }
@@ -45599,14 +44285,14 @@ export default {
         let needsProjectFallback =
             info["CFBundleShortVersionString"] == nil ||
             info["CFBundleVersion"] == nil ||
-            info["CMUXCommit"] == nil
+            info["WMUXCommit"] == nil
         if needsProjectFallback, let fromProject = versionInfoFromProjectFile() {
             info.merge(fromProject, uniquingKeysWith: { current, _ in current })
         }
 
-        if info["CMUXCommit"] == nil,
-           let commit = normalizedCommitHash(ProcessInfo.processInfo.environment["CMUX_COMMIT"]) {
-            info["CMUXCommit"] = commit
+        if info["WMUXCommit"] == nil,
+           let commit = normalizedCommitHash(ProcessInfo.processInfo.environment["WMUX_COMMIT"]) {
+            info["WMUXCommit"] = commit
         }
 
         return info
@@ -45628,9 +44314,9 @@ export default {
                 info["CFBundleVersion"] = trimmed
             }
         }
-        if let commit = dictionary["CMUXCommit"] as? String,
+        if let commit = dictionary["WMUXCommit"] as? String,
            let normalizedCommit = normalizedCommitHash(commit) {
-            info["CMUXCommit"] = normalizedCommit
+            info["WMUXCommit"] = normalizedCommit
         }
         return info.isEmpty ? nil : info
     }
@@ -45655,7 +44341,7 @@ export default {
                     info["CFBundleVersion"] = build
                 }
                 if let commit = gitCommitHash(at: current) {
-                    info["CMUXCommit"] = commit
+                    info["WMUXCommit"] = commit
                 }
                 if !info.isEmpty {
                     return info
@@ -45830,7 +44516,7 @@ export default {
         return URL(fileURLWithPath: expanded).standardizedFileURL
     }
 }
-private enum CMUXCLIOutput {
+private enum WMUXCLIOutput {
     static func writeStandardError(_ message: String) {
         cliWriteStderr(message)
     }
@@ -45844,7 +44530,7 @@ enum CLIStandardDescriptors {
 }
 
 @main
-struct CMUXTermMain {
+struct WMUXTermMain {
     static func main() async {
         // Record the caller's standard descriptors before anything can open a
         // file that reuses a closed standard number.
@@ -45861,7 +44547,7 @@ struct CMUXTermMain {
         } catch {
             if !cli.shouldSuppressSSHPTYAttachRetryError(error) {
                 // Error text can carry strings from the app on the socket.
-                CMUXCLIOutput.writeStandardError(
+                WMUXCLIOutput.writeStandardError(
                     "Error: \(CLITerminalText.printable(String(describing: error), keepingLineBreaks: true))\n"
                 )
             }

@@ -1,7 +1,7 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
-struct CmuxCLIPathInstaller {
+struct WmuxCLIPathInstaller {
     struct InstallOutcome {
         let usedAdministratorPrivileges: Bool
         let destinationURL: URL
@@ -54,9 +54,9 @@ struct CmuxCLIPathInstaller {
         fileManager: FileManager = .default,
         destinationURL: URL = URL(fileURLWithPath: "/usr/local/bin/cmux"),
         bundledCLIURLProvider: @escaping () -> URL? = {
-            CmuxCLIPathInstaller.defaultBundledCLIURL()
+            WmuxCLIPathInstaller.defaultBundledCLIURL()
         },
-        expectedBundledCLIPath: String = CmuxCLIPathInstaller.defaultBundledCLIExpectedPath(),
+        expectedBundledCLIPath: String = WmuxCLIPathInstaller.defaultBundledCLIExpectedPath(),
         privilegedInstaller: PrivilegedInstallHandler? = nil,
         privilegedUninstaller: PrivilegedUninstallHandler? = nil
     ) {

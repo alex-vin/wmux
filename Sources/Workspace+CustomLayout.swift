@@ -6,10 +6,10 @@ import Foundation
 
 extension Workspace {
 
-    func applyCustomLayout(_ layout: CmuxLayoutNode, baseCwd: String, setupCommand: String? = nil) {
+    func applyCustomLayout(_ layout: WmuxLayoutNode, baseCwd: String, setupCommand: String? = nil) {
         guard let rootPaneId = bonsplitController.allPaneIds.first else { return }
 
-        var leaves: [(paneId: PaneID, surfaces: [CmuxSurfaceDefinition])] = []
+        var leaves: [(paneId: PaneID, surfaces: [WmuxSurfaceDefinition])] = []
         buildCustomLayoutTree(layout, inPane: rootPaneId, leaves: &leaves)
 
         // First leaf reuses the initial terminal created by addWorkspace;
@@ -54,9 +54,9 @@ extension Workspace {
     }
 
     private func buildCustomLayoutTree(
-        _ node: CmuxLayoutNode,
+        _ node: WmuxLayoutNode,
         inPane paneId: PaneID,
-        leaves: inout [(paneId: PaneID, surfaces: [CmuxSurfaceDefinition])]
+        leaves: inout [(paneId: PaneID, surfaces: [WmuxSurfaceDefinition])]
     ) {
         switch node {
         case .pane(let pane):
@@ -65,7 +65,7 @@ extension Workspace {
         case .split(let split):
             guard split.children.count == 2 else {
                 #if DEBUG
-                NSLog("[CmuxConfig] split node requires exactly 2 children, got %d", split.children.count)
+                NSLog("[WmuxConfig] split node requires exactly 2 children, got %d", split.children.count)
                 #endif
                 leaves.append((paneId: paneId, surfaces: []))
                 return
@@ -99,7 +99,7 @@ extension Workspace {
 
     private func populateCustomPane(
         _ paneId: PaneID,
-        surfaces: [CmuxSurfaceDefinition],
+        surfaces: [WmuxSurfaceDefinition],
         baseCwd: String,
         focusPanelId: inout UUID?,
         pendingSetup: inout String?
@@ -161,7 +161,7 @@ extension Workspace {
     private func configureExistingSurface(
         panelId: UUID,
         inPane paneId: PaneID,
-        surface: CmuxSurfaceDefinition,
+        surface: WmuxSurfaceDefinition,
         baseCwd: String,
         focusPanelId: inout UUID?,
         pendingSetup: inout String?
@@ -169,7 +169,7 @@ extension Workspace {
         switch surface.type {
         case .terminal where surface.cwd != nil || surface.env != nil:
             // Placeholder can't change cwd/env — replace it
-            let resolvedCwd = CmuxConfigStore.resolveCwd(surface.cwd, relativeTo: baseCwd)
+            let resolvedCwd = WmuxConfigStore.resolveCwd(surface.cwd, relativeTo: baseCwd)
             if let panel = newTerminalSurface(
                 inPane: paneId,
                 focus: false,
@@ -212,7 +212,7 @@ extension Workspace {
         case .project:
             if let panel = newProjectSurface(
                 inPane: paneId,
-                projectPath: CmuxConfigStore.resolveCwd(surface.url ?? surface.cwd, relativeTo: baseCwd),
+                projectPath: WmuxConfigStore.resolveCwd(surface.url ?? surface.cwd, relativeTo: baseCwd),
                 focus: false
             ) {
                 _ = closePanel(panelId, force: true)
@@ -224,14 +224,14 @@ extension Workspace {
 
     private func createNewSurface(
         inPane paneId: PaneID,
-        surface: CmuxSurfaceDefinition,
+        surface: WmuxSurfaceDefinition,
         baseCwd: String,
         focusPanelId: inout UUID?,
         pendingSetup: inout String?
     ) {
         switch surface.type {
         case .terminal:
-            let resolvedCwd = CmuxConfigStore.resolveCwd(surface.cwd, relativeTo: baseCwd)
+            let resolvedCwd = WmuxConfigStore.resolveCwd(surface.cwd, relativeTo: baseCwd)
             if let panel = newTerminalSurface(
                 inPane: paneId,
                 focus: false,
@@ -264,7 +264,7 @@ extension Workspace {
         case .project:
             if let panel = newProjectSurface(
                 inPane: paneId,
-                projectPath: CmuxConfigStore.resolveCwd(surface.url ?? surface.cwd, relativeTo: baseCwd),
+                projectPath: WmuxConfigStore.resolveCwd(surface.url ?? surface.cwd, relativeTo: baseCwd),
                 focus: false
             ) {
                 if let name = surface.name { setPanelCustomTitle(panelId: panel.id, title: name) }
@@ -274,7 +274,7 @@ extension Workspace {
     }
 
     private func applyCustomDividerPositions(
-        configNode: CmuxLayoutNode,
+        configNode: WmuxLayoutNode,
         liveNode: ExternalTreeNode
     ) {
         switch (configNode, liveNode) {

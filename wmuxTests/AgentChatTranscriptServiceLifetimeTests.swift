@@ -1,13 +1,13 @@
-import CMUXAgentLaunch
-import CmuxAgentChat
-@testable import CmuxMobileHost
-import CmuxTerminal
-import CmuxTerminalCore
+import WMUXAgentLaunch
+import WmuxAgentChat
+@testable import WmuxMobileHost
+import WmuxTerminal
+import WmuxTerminalCore
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

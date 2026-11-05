@@ -1,11 +1,11 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 import Testing
-@testable import CmuxSettingsUI
+@testable import WmuxSettingsUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -239,16 +239,16 @@ extension GlobalSearchShortcutBehaviorTests {
 
         let store = JSONConfigStore(fileURL: directory.appendingPathComponent("cmux.json"))
         let catalog = SettingCatalog()
-        let action = CmuxSettings.ShortcutAction.globalSearch
-        let chord = CmuxSettings.StoredShortcut(
-            first: CmuxSettings.ShortcutStroke(
+        let action = WmuxSettings.ShortcutAction.globalSearch
+        let chord = WmuxSettings.StoredShortcut(
+            first: WmuxSettings.ShortcutStroke(
                 key: "j",
                 command: true,
                 shift: true,
                 option: true,
                 control: true
             ),
-            second: CmuxSettings.ShortcutStroke(key: "media.playPause")
+            second: WmuxSettings.ShortcutStroke(key: "media.playPause")
         )
         let model = ShortcutListModel(
             jsonStore: store,

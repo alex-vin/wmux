@@ -13,7 +13,7 @@ enum TextViewUndoRegistrationLifetime {
     private static let didInstall: Void = {
         let targetClass: AnyClass = NSTextView.self
         let originalSelector = #selector(NSView.viewWillMove(toWindow:))
-        let swizzledSelector = #selector(NSTextView.cmux_undoLifetimeViewWillMove(toWindow:))
+        let swizzledSelector = #selector(NSTextView.wmux_undoLifetimeViewWillMove(toWindow:))
         guard let originalMethod = class_getInstanceMethod(targetClass, originalSelector),
               let swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector) else {
             return
@@ -129,12 +129,12 @@ private final class TextViewUndoPendingCleanup {
 
 @MainActor
 extension NSTextView {
-    @objc func cmux_undoLifetimeViewWillMove(toWindow newWindow: NSWindow?) {
+    @objc func wmux_undoLifetimeViewWillMove(toWindow newWindow: NSWindow?) {
         if let currentWindow = window, newWindow !== currentWindow {
             cmuxRemoveUndoRegistrationsBeforeLeaving(currentWindow)
         }
         // Calls the original implementation after the exchange.
-        cmux_undoLifetimeViewWillMove(toWindow: newWindow)
+        wmux_undoLifetimeViewWillMove(toWindow: newWindow)
     }
 
     /// Removes registrations for this view and its storage while membership

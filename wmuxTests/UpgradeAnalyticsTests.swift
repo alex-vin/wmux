@@ -1,13 +1,13 @@
 import AppKit
-import CMUXMobileCore
-import CmuxCloud
-import CmuxProductAnalytics
+import WMUXMobileCore
+import WmuxCloud
+import WmuxProductAnalytics
 import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -103,11 +103,11 @@ struct MachineCreateAnalyticsTests {
         launches.complete(status: 0, output: "OK machine=m1", machineID: "m1")
         await analytics.drain()
 
-        let failed = sink.named("cmux_cloud_machine_create_failed")
+        let failed = sink.named("wmux_cloud_machine_create_failed")
         #expect(failed.count == 1)
         #expect(failed.first?["error_code"] == .string("vm_active_limit_exceeded"))
         #expect(failed.first?["error_class"] == .string("plan_limit"))
-        #expect(sink.named("cmux_cloud_plan_limit_hit").compactMap { $0["limit"] } == [AnalyticsValue.string("active_machines")])
-        #expect(sink.named("cmux_cloud_machine_create_succeeded").count == 1)
+        #expect(sink.named("wmux_cloud_plan_limit_hit").compactMap { $0["limit"] } == [AnalyticsValue.string("active_machines")])
+        #expect(sink.named("wmux_cloud_machine_create_succeeded").count == 1)
     }
 }

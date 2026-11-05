@@ -55,8 +55,8 @@ final class CodexAppServerSession {
             method: "initialize",
             params: [
                 "clientInfo": [
-                    "name": "cmux",
-                    "title": "cmux",
+                    "name": "wmux",
+                    "title": "wmux",
                     "version": Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
                 ],
                 "capabilities": [
@@ -124,7 +124,7 @@ final class CodexAppServerSession {
         guard let data = line.data(using: .utf8),
               let decoded = try? JSONSerialization.jsonObject(with: data),
               let object = decoded as? [String: Any] else {
-            outputSink("stderr", String(localized: "agentSession.codex.error.invalidJSON", defaultValue: "cmux could not read the response from Codex. Try again."))
+            outputSink("stderr", String(localized: "agentSession.codex.error.invalidJSON", defaultValue: "wmux could not read the response from Codex. Try again."))
             return
         }
 
@@ -542,7 +542,7 @@ final class CodexAppServerSession {
         }
         guard threadID == nil, threadStartRequestID == nil else { return }
         var params: [String: Any] = [
-            "serviceName": "cmux",
+            "serviceName": "wmux",
             "threadSource": "user"
         ]
         if let workingDirectory {

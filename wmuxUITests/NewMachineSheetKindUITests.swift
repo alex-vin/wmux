@@ -15,7 +15,7 @@ final class NewMachineSheetKindUITests: XCTestCase {
             // command included, hides behind it.
             "-cloud.beta.machines.enabled", "YES",
         ]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
         addTeardownBlock { app.terminate() }
         launchAndActivate(app)
         XCTAssertTrue(

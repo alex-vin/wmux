@@ -1,12 +1,12 @@
 import Foundation
 import Testing
-import CmuxSettingsUI
-import CmuxSidebarProviderKit
-import CmuxSettings
-import CmuxSwiftRenderUI
+import WmuxSettingsUI
+import WmuxSidebarProviderKit
+import WmuxSettings
+import WmuxSwiftRenderUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -59,7 +59,7 @@ struct SidebarProviderMenuRegressionTests {
 
     private func withSelectedProvider(_ providerId: String, _ body: () -> Void) {
         let defaults = UserDefaults.standard
-        let key = CmuxExtensionSidebarSelection.defaultsKey
+        let key = WmuxExtensionSidebarSelection.defaultsKey
         let previous = defaults.object(forKey: key)
         defaults.set(providerId, forKey: key)
         defer { restore(previous, forKey: key) }
@@ -80,7 +80,7 @@ struct SidebarProviderMenuRegressionTests {
     @Test
     func builtInViewsAvailableWhenExtensionsBetaDisabled() {
         withExtensionsBeta(false) {
-            let availableIDs = Set(CmuxExtensionSidebarSelection.descriptors.map(\.id))
+            let availableIDs = Set(WmuxExtensionSidebarSelection.descriptors.map(\.id))
             for builtInID in Self.builtInViewIDs {
                 #expect(
                     availableIDs.contains(builtInID),
@@ -93,32 +93,32 @@ struct SidebarProviderMenuRegressionTests {
     @Test
     func conversationSidebarRequiresBetaAndReleaseGate() {
         withConversationBeta(false) {
-            #expect(!CmuxExtensionSidebarSelection.descriptors.map(\.id).contains(
-                CmuxExtensionSidebarSelection.conversationSidebarProviderId
+            #expect(!WmuxExtensionSidebarSelection.descriptors.map(\.id).contains(
+                WmuxExtensionSidebarSelection.conversationSidebarProviderId
             ))
             #expect(
-                CmuxExtensionSidebarSelection.effectiveProviderId(
-                    CmuxExtensionSidebarSelection.conversationSidebarProviderId,
+                WmuxExtensionSidebarSelection.effectiveProviderId(
+                    WmuxExtensionSidebarSelection.conversationSidebarProviderId,
                     extensionsEnabled: false,
                     customSidebarsEnabled: true,
                     conversationSidebarEnabled: false
-                ) == CmuxExtensionSidebarSelection.defaultProviderId
+                ) == WmuxExtensionSidebarSelection.defaultProviderId
             )
         }
         // The local toggle cannot bypass the remote release gate. The explicit
         // resolver overload remains covered so a remotely enabled rollout can
         // preserve an existing selection while the beta setting is on.
         withConversationBeta(true) {
-            #expect(!CmuxExtensionSidebarSelection.descriptors.map(\.id).contains(
-                CmuxExtensionSidebarSelection.conversationSidebarProviderId
+            #expect(!WmuxExtensionSidebarSelection.descriptors.map(\.id).contains(
+                WmuxExtensionSidebarSelection.conversationSidebarProviderId
             ))
             #expect(
-                CmuxExtensionSidebarSelection.effectiveProviderId(
-                    CmuxExtensionSidebarSelection.conversationSidebarProviderId,
+                WmuxExtensionSidebarSelection.effectiveProviderId(
+                    WmuxExtensionSidebarSelection.conversationSidebarProviderId,
                     extensionsEnabled: false,
                     customSidebarsEnabled: true,
                     conversationSidebarEnabled: true
-                ) == CmuxExtensionSidebarSelection.conversationSidebarProviderId
+                ) == WmuxExtensionSidebarSelection.conversationSidebarProviderId
             )
         }
     }
@@ -183,13 +183,13 @@ struct SidebarProviderMenuRegressionTests {
         withExtensionsBeta(false) {
             for builtInID in Self.builtInViewIDs {
                 withSelectedProvider(builtInID) {
-                    let persisted = UserDefaults.standard.string(forKey: CmuxExtensionSidebarSelection.defaultsKey)
-                        ?? CmuxExtensionSidebarSelection.defaultProviderId
-                    let effective = CmuxExtensionSidebarSelection.effectiveProviderId(
+                    let persisted = UserDefaults.standard.string(forKey: WmuxExtensionSidebarSelection.defaultsKey)
+                        ?? WmuxExtensionSidebarSelection.defaultProviderId
+                    let effective = WmuxExtensionSidebarSelection.effectiveProviderId(
                         persisted,
-                        extensionsEnabled: CmuxExtensionSidebarSelection.isEnabled
+                        extensionsEnabled: WmuxExtensionSidebarSelection.isEnabled
                     )
-                    let checkedID = CmuxExtensionSidebarSelection.descriptor(for: effective).id
+                    let checkedID = WmuxExtensionSidebarSelection.descriptor(for: effective).id
                     #expect(
                         checkedID == builtInID,
                         "Persisted selection \(builtInID) did not drive the menu checkmark (got \(checkedID))"
@@ -208,18 +208,18 @@ struct SidebarProviderMenuRegressionTests {
     func effectiveSelectionGatesHostedExtensionButNotBuiltInViews() {
         let projectWorktrees = "com.example.cmux.sidebar.project-worktrees"
         #expect(
-            CmuxExtensionSidebarSelection.effectiveProviderId(projectWorktrees, extensionsEnabled: false) == projectWorktrees
+            WmuxExtensionSidebarSelection.effectiveProviderId(projectWorktrees, extensionsEnabled: false) == projectWorktrees
         )
         #expect(
-            CmuxExtensionSidebarSelection.effectiveProviderId(projectWorktrees, extensionsEnabled: true) == projectWorktrees
+            WmuxExtensionSidebarSelection.effectiveProviderId(projectWorktrees, extensionsEnabled: true) == projectWorktrees
         )
 
-        let hosted = CmuxExtensionSidebarSelection.hostedExtensionsProviderId
+        let hosted = WmuxExtensionSidebarSelection.hostedExtensionsProviderId
         #expect(
-            CmuxExtensionSidebarSelection.effectiveProviderId(hosted, extensionsEnabled: true) == hosted
+            WmuxExtensionSidebarSelection.effectiveProviderId(hosted, extensionsEnabled: true) == hosted
         )
         #expect(
-            CmuxExtensionSidebarSelection.effectiveProviderId(hosted, extensionsEnabled: false) == CmuxExtensionSidebarSelection.defaultProviderId
+            WmuxExtensionSidebarSelection.effectiveProviderId(hosted, extensionsEnabled: false) == WmuxExtensionSidebarSelection.defaultProviderId
         )
     }
 
@@ -236,19 +236,19 @@ struct SidebarProviderMenuRegressionTests {
         let projectWorktrees = "com.example.cmux.sidebar.project-worktrees"
 
         defaults.set(projectWorktrees, forKey: legacyKey)
-        CmuxExtensionSidebarSelection.migrateLegacyDefaultsKeyIfNeeded(defaults: defaults)
-        #expect(defaults.string(forKey: CmuxExtensionSidebarSelection.defaultsKey) == projectWorktrees)
+        WmuxExtensionSidebarSelection.migrateLegacyDefaultsKeyIfNeeded(defaults: defaults)
+        #expect(defaults.string(forKey: WmuxExtensionSidebarSelection.defaultsKey) == projectWorktrees)
         #expect(defaults.object(forKey: legacyKey) == nil)
 
         defaults.set("com.example.cmux.sidebar.attention-queue", forKey: legacyKey)
-        CmuxExtensionSidebarSelection.migrateLegacyDefaultsKeyIfNeeded(defaults: defaults)
-        #expect(defaults.string(forKey: CmuxExtensionSidebarSelection.defaultsKey) == projectWorktrees)
+        WmuxExtensionSidebarSelection.migrateLegacyDefaultsKeyIfNeeded(defaults: defaults)
+        #expect(defaults.string(forKey: WmuxExtensionSidebarSelection.defaultsKey) == projectWorktrees)
         #expect(defaults.object(forKey: legacyKey) == nil)
     }
 
     /// The host renders the selected view through an
-    /// `any CmuxSidebarProvider` existential
-    /// (`CmuxExtensionSidebarSelection.provider(for:)?.render(snapshot:)`).
+    /// `any WmuxSidebarProvider` existential
+    /// (`WmuxExtensionSidebarSelection.provider(for:)?.render(snapshot:)`).
     /// `render(snapshot:)` must dynamic-dispatch to the concrete view; if it
     /// instead hits the empty protocol-extension default, every built-in view
     /// renders an empty sidebar even though the provider and workspaces are
@@ -257,7 +257,7 @@ struct SidebarProviderMenuRegressionTests {
     @Test
     func builtInProviderRendersRowsThroughHostExistential() {
         let snapshot = Self.populatedSnapshot(workspaceCount: 3)
-        let provider = CmuxExtensionSidebarSelection.provider(for: "com.example.cmux.sidebar.super-compact")
+        let provider = WmuxExtensionSidebarSelection.provider(for: "com.example.cmux.sidebar.super-compact")
         #expect(provider != nil, "Super Compact provider should be registered")
         let model = provider?.render(snapshot: snapshot)
         #expect(
@@ -280,9 +280,9 @@ struct SidebarProviderMenuRegressionTests {
         for betaEnabled in [false, true] {
             withExtensionsBeta(betaEnabled) {
                 for builtInID in Self.builtInViewIDs {
-                    let cheap = CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: builtInID)
-                    let viaDescriptor = CmuxExtensionSidebarSelection.descriptor(for: builtInID).id
-                        == CmuxSidebarProviderDescriptor.defaultWorkspacesID
+                    let cheap = WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: builtInID)
+                    let viaDescriptor = WmuxExtensionSidebarSelection.descriptor(for: builtInID).id
+                        == WmuxSidebarProviderDescriptor.defaultWorkspacesID
                     #expect(
                         cheap == viaDescriptor,
                         "Routing mismatch for \(builtInID) (extensionsBeta=\(betaEnabled)): cheap=\(cheap) descriptor=\(viaDescriptor)"
@@ -291,13 +291,13 @@ struct SidebarProviderMenuRegressionTests {
                 // The default view routes to the workspaces sidebar; every bundled
                 // preset routes to an extension sidebar.
                 #expect(
-                    CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(
-                        effectiveProviderId: CmuxExtensionSidebarSelection.defaultProviderId
+                    WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(
+                        effectiveProviderId: WmuxExtensionSidebarSelection.defaultProviderId
                     )
                 )
                 for presetID in Self.builtInViewIDs.dropFirst() {
                     #expect(
-                        !CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: presetID),
+                        !WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: presetID),
                         "Bundled preset \(presetID) must route to an extension sidebar, not the default"
                     )
                 }
@@ -311,12 +311,12 @@ struct SidebarProviderMenuRegressionTests {
     @Test
     func resolvesToDefaultSidebarRoutesHostedExtensionToExtensionSidebar() {
         withExtensionsBeta(true) {
-            let hosted = CmuxExtensionSidebarSelection.hostedExtensionsProviderId
-            #expect(!CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: hosted))
+            let hosted = WmuxExtensionSidebarSelection.hostedExtensionsProviderId
+            #expect(!WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: hosted))
             #expect(
-                CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: hosted)
-                    == (CmuxExtensionSidebarSelection.descriptor(for: hosted).id
-                        == CmuxSidebarProviderDescriptor.defaultWorkspacesID)
+                WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: hosted)
+                    == (WmuxExtensionSidebarSelection.descriptor(for: hosted).id
+                        == WmuxSidebarProviderDescriptor.defaultWorkspacesID)
             )
         }
     }
@@ -328,18 +328,18 @@ struct SidebarProviderMenuRegressionTests {
     func resolvesToDefaultSidebarFallsBackForUnknownProvider() {
         withExtensionsBeta(true) {
             let unknown = "com.example.cmux.sidebar.does-not-exist-\(UUID().uuidString)"
-            #expect(CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: unknown))
+            #expect(WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: unknown))
             #expect(
-                CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: unknown)
-                    == (CmuxExtensionSidebarSelection.descriptor(for: unknown).id
-                        == CmuxSidebarProviderDescriptor.defaultWorkspacesID)
+                WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: unknown)
+                    == (WmuxExtensionSidebarSelection.descriptor(for: unknown).id
+                        == WmuxSidebarProviderDescriptor.defaultWorkspacesID)
             )
 
             // A custom-prefixed selection whose backing file does not exist also
             // falls back to the default sidebar.
-            let missingCustom = CmuxExtensionSidebarSelection.customSidebarProviderPrefix
+            let missingCustom = WmuxExtensionSidebarSelection.customSidebarProviderPrefix
                 + "missing-\(UUID().uuidString)"
-            #expect(CmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: missingCustom))
+            #expect(WmuxExtensionSidebarSelection.resolvesToDefaultSidebar(effectiveProviderId: missingCustom))
         }
     }
 
@@ -358,8 +358,8 @@ struct SidebarProviderMenuRegressionTests {
         let validURL = sidebarsDirectory.appendingPathComponent("\(validName).swift", isDirectory: false)
         try Data().write(to: validURL)
         #expect(
-            CmuxExtensionSidebarSelection.customSidebarFileURL(
-                forProviderId: CmuxExtensionSidebarSelection.customSidebarProviderPrefix + validName,
+            WmuxExtensionSidebarSelection.customSidebarFileURL(
+                forProviderId: WmuxExtensionSidebarSelection.customSidebarProviderPrefix + validName,
                 sidebarsDirectory: sidebarsDirectory
             ) == validURL
         )
@@ -368,8 +368,8 @@ struct SidebarProviderMenuRegressionTests {
         let escapedURL = root.appendingPathComponent("\(escapedName).swift", isDirectory: false)
         try Data().write(to: escapedURL)
         #expect(
-            CmuxExtensionSidebarSelection.customSidebarFileURL(
-                forProviderId: CmuxExtensionSidebarSelection.customSidebarProviderPrefix + "../\(escapedName)",
+            WmuxExtensionSidebarSelection.customSidebarFileURL(
+                forProviderId: WmuxExtensionSidebarSelection.customSidebarProviderPrefix + "../\(escapedName)",
                 sidebarsDirectory: sidebarsDirectory
             ) == nil
         )
@@ -383,7 +383,7 @@ struct SidebarProviderMenuRegressionTests {
         defer { try? FileManager.default.removeItem(at: root) }
 
         #expect(!FileManager.default.fileExists(atPath: directory.path))
-        let created = try CmuxExtensionSidebarSelection.ensureCustomSidebarsDirectory(directory)
+        let created = try WmuxExtensionSidebarSelection.ensureCustomSidebarsDirectory(directory)
         var isDirectory: ObjCBool = false
         #expect(created == directory)
         #expect(FileManager.default.fileExists(atPath: directory.path, isDirectory: &isDirectory))
@@ -398,7 +398,7 @@ struct SidebarProviderMenuRegressionTests {
         defer { try? FileManager.default.removeItem(at: root) }
 
         let template = try #require(CustomSidebarOnboardingAssets().starterTemplate())
-        let first = CmuxExtensionSidebarSelection.writeCustomSidebar(
+        let first = WmuxExtensionSidebarSelection.writeCustomSidebar(
             named: "my-sidebar.swift",
             fileExtension: template.fileExtension,
             source: template.source,
@@ -414,12 +414,12 @@ struct SidebarProviderMenuRegressionTests {
         #expect(fileURL.lastPathComponent == "my-sidebar.swift")
         #expect(CustomSidebarValidator().validate(fileURL: fileURL).errorMessage == nil)
         #expect(
-            CmuxExtensionSidebarSelection.discoveredCustomSidebarNames(sidebarsDirectory: directory)
+            WmuxExtensionSidebarSelection.discoveredCustomSidebarNames(sidebarsDirectory: directory)
                 == ["my-sidebar"]
         )
 
         #expect(
-            CmuxExtensionSidebarSelection.writeCustomSidebar(
+            WmuxExtensionSidebarSelection.writeCustomSidebar(
                 named: "my-sidebar",
                 fileExtension: template.fileExtension,
                 source: template.source,
@@ -428,7 +428,7 @@ struct SidebarProviderMenuRegressionTests {
             ) == .alreadyExists
         )
         #expect(
-            CmuxExtensionSidebarSelection.writeCustomSidebar(
+            WmuxExtensionSidebarSelection.writeCustomSidebar(
                 named: "../escape",
                 fileExtension: template.fileExtension,
                 source: template.source,
@@ -447,14 +447,14 @@ struct SidebarProviderMenuRegressionTests {
         defer { try? FileManager.default.removeItem(at: root) }
 
         let template = try #require(CustomSidebarOnboardingAssets().exampleTemplate(id: "agents-board"))
-        let first = CmuxExtensionSidebarSelection.writeCustomSidebar(
+        let first = WmuxExtensionSidebarSelection.writeCustomSidebar(
             named: template.suggestedName,
             fileExtension: template.fileExtension,
             source: template.source,
             uniquingIfNeeded: true,
             sidebarsDirectory: directory
         )
-        let second = CmuxExtensionSidebarSelection.writeCustomSidebar(
+        let second = WmuxExtensionSidebarSelection.writeCustomSidebar(
             named: template.suggestedName,
             fileExtension: template.fileExtension,
             source: template.source,
@@ -474,7 +474,7 @@ struct SidebarProviderMenuRegressionTests {
         #expect(CustomSidebarValidator().validate(fileURL: firstURL).errorMessage == nil)
         #expect(CustomSidebarValidator().validate(fileURL: secondURL).errorMessage == nil)
         #expect(
-            CmuxExtensionSidebarSelection.discoveredCustomSidebarNames(sidebarsDirectory: directory)
+            WmuxExtensionSidebarSelection.discoveredCustomSidebarNames(sidebarsDirectory: directory)
                 == ["agents-board", "agents-board-2"]
         )
     }
@@ -488,7 +488,7 @@ struct SidebarProviderMenuRegressionTests {
         let existing = directory.appendingPathComponent("Focus.swift")
         let original = "Text(\"User-authored sidebar\")"
         try original.write(to: existing, atomically: true, encoding: .utf8)
-        let result = CmuxExtensionSidebarSelection.writeCustomSidebar(
+        let result = WmuxExtensionSidebarSelection.writeCustomSidebar(
             named: "focus", fileExtension: "swift", source: "Text(\"New sidebar\")",
             uniquingIfNeeded: uniquing, sidebarsDirectory: directory
         )
@@ -508,7 +508,7 @@ struct SidebarProviderMenuRegressionTests {
         defer { try? FileManager.default.removeItem(at: directory) }
         let link = directory.appendingPathComponent("focus.swift")
         try FileManager.default.createSymbolicLink(atPath: link.path, withDestinationPath: "missing.swift")
-        let result = CmuxExtensionSidebarSelection.writeCustomSidebar(
+        let result = WmuxExtensionSidebarSelection.writeCustomSidebar(
             named: "focus", fileExtension: "swift", source: "Text(\"New sidebar\")",
             uniquingIfNeeded: true, sidebarsDirectory: directory
         )
@@ -516,9 +516,9 @@ struct SidebarProviderMenuRegressionTests {
         #expect(result == .created(name: "focus-2", fileURL: directory.appendingPathComponent("focus-2.swift")))
     }
 
-    private static func populatedSnapshot(workspaceCount: Int) -> CmuxSidebarProviderSnapshot {
+    private static func populatedSnapshot(workspaceCount: Int) -> WmuxSidebarProviderSnapshot {
         let workspaces = (0..<workspaceCount).map { index in
-            CmuxSidebarProviderWorkspace(
+            WmuxSidebarProviderWorkspace(
                 id: UUID(),
                 title: "Workspace \(index)",
                 customDescription: nil,
@@ -533,7 +533,7 @@ struct SidebarProviderMenuRegressionTests {
                 listeningPorts: []
             )
         }
-        return CmuxSidebarProviderSnapshot(
+        return WmuxSidebarProviderSnapshot(
             sequence: 1,
             selectedWorkspaceId: nil,
             workspaces: workspaces

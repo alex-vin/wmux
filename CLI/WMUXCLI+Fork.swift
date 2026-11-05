@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 
@@ -108,7 +108,7 @@ extension WMUXCLI {
                     bindingPayload: bindingPayload,
                     surfaceID: surfaceID,
                     workspaceID: payload["workspace_id"] as? String
-                        ?? processEnvironment["CMUX_WORKSPACE_ID"],
+                        ?? processEnvironment["WMUX_WORKSPACE_ID"],
                     client: client,
                     workingDirectoryBeforeFork: workingDirectoryBeforeFork
                 )
@@ -131,7 +131,7 @@ extension WMUXCLI {
                 bindingPayload: bindingPayload,
                 surfaceID: surfaceID,
                 workspaceID: payload["workspace_id"] as? String
-                    ?? processEnvironment["CMUX_WORKSPACE_ID"],
+                    ?? processEnvironment["WMUX_WORKSPACE_ID"],
                 client: client,
                 workingDirectoryBeforeFork: workingDirectoryBeforeFork
             )
@@ -153,7 +153,7 @@ extension WMUXCLI {
             let clearOutcome = clearAgentSurfaceResumeBindingOutcome(
                 client: client,
                 workspaceId: payload["workspace_id"] as? String
-                    ?? processEnvironment["CMUX_WORKSPACE_ID"]
+                    ?? processEnvironment["WMUX_WORKSPACE_ID"]
                     ?? "",
                 surfaceId: surfaceID,
                 sessionId: checkpointID,
@@ -284,7 +284,7 @@ extension WMUXCLI {
                 bindingPayload: bindingPayload,
                 surfaceID: surfaceID,
                 workspaceID: payload["workspace_id"] as? String
-                    ?? processEnvironment["CMUX_WORKSPACE_ID"],
+                    ?? processEnvironment["WMUX_WORKSPACE_ID"],
                 client: client,
                 workingDirectoryBeforeFork: workingDirectoryBeforeFork
             )

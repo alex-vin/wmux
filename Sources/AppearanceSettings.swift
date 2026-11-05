@@ -1,7 +1,7 @@
-import CmuxFoundation
+import WmuxFoundation
 import AppKit
 import SwiftUI
-import CmuxTerminalCore
+import WmuxTerminalCore
 
 enum AppearanceMode: String, CaseIterable, Identifiable {
     case system
@@ -76,7 +76,7 @@ enum AppearanceSettings {
     }
 
     /// The system interface-style snapshot used by terminal color-scheme
-    /// resolution. Lifted to ``TerminalSystemAppearance`` in CmuxTerminalCore so
+    /// resolution. Lifted to ``TerminalSystemAppearance`` in WmuxTerminalCore so
     /// the terminal config type no longer reaches up into the app's appearance
     /// settings; this alias keeps the `AppearanceSettings.SystemAppearance`
     /// call-site name byte-identical.
@@ -115,7 +115,7 @@ enum AppearanceSettings {
 
     // Ghostty split-theme resolution follows cmux's persisted appearance mode.
     // AppKit view/window appearances can lag during live mode changes.
-    // The resolution itself now lives in CmuxTerminalCore
+    // The resolution itself now lives in WmuxTerminalCore
     // (TerminalColorSchemePreference.resolve); this forwards the app's
     // normalized appearance mode into it so both surfaces share one source of
     // truth.
@@ -383,17 +383,17 @@ private struct AppearanceColorSchemeModifier: ViewModifier {
 
 /// Injects the resolved cmux accent (``EnvironmentValues/cmuxAccentColor``)
 /// for a SwiftUI root and keeps it current from the app delegate's
-/// ``CmuxAccentColorObserver``. Window roots get it through
+/// ``WmuxAccentColorObserver``. Window roots get it through
 /// `cmuxAppearanceColorScheme`; hosting views mounted outside a window root
 /// (search overlays, titlebar accessories, popovers) apply it directly.
-struct CmuxAccentColorEnvironmentModifier: ViewModifier {
-    @State private var accentColor = AppDelegate.shared?.accentColor ?? CmuxAccentColor()
+struct WmuxAccentColorEnvironmentModifier: ViewModifier {
+    @State private var accentColor = AppDelegate.shared?.accentColor ?? WmuxAccentColor()
 
     func body(content: Content) -> some View {
         content
             .environment(\.cmuxAccentColor, accentColor)
-            .onReceive(NotificationCenter.default.publisher(for: CmuxAccentColor.didChangeNotification)) { notification in
-                if let observer = notification.object as? CmuxAccentColorObserver {
+            .onReceive(NotificationCenter.default.publisher(for: WmuxAccentColor.didChangeNotification)) { notification in
+                if let observer = notification.object as? WmuxAccentColorObserver {
                     accentColor = observer.current
                 }
             }
@@ -401,8 +401,8 @@ struct CmuxAccentColorEnvironmentModifier: ViewModifier {
 }
 
 extension View {
-    func cmuxAccentColorEnvironment() -> ModifiedContent<Self, CmuxAccentColorEnvironmentModifier> {
-        modifier(CmuxAccentColorEnvironmentModifier())
+    func cmuxAccentColorEnvironment() -> ModifiedContent<Self, WmuxAccentColorEnvironmentModifier> {
+        modifier(WmuxAccentColorEnvironmentModifier())
     }
 
     func cmuxAppearanceColorScheme(_ rawValue: String?) -> some View {

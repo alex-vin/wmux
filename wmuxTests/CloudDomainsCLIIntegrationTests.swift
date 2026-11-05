@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-extension CMUXCLIErrorOutputRegressionTests {
+extension WMUXCLIErrorOutputRegressionTests {
     @Test func cloudDomainsDefaultsToListAndPrintsCustomerDNSInstructions() throws {
         let cliPath = try bundledCLIPath()
         let socketPath = "/tmp/cmux-domains-list-\(UUID().uuidString.prefix(8)).sock"
@@ -393,12 +393,12 @@ extension CMUXCLIErrorOutputRegressionTests {
 
     private func cloudDomainsEnvironment(socketPath: String) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         return environment
     }
 

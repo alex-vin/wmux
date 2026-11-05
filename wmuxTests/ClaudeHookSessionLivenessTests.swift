@@ -1,9 +1,9 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -37,7 +37,7 @@ struct ClaudeHookSessionLivenessTests {
             startMicroseconds: 891_303
         )
         try writeHookRecord(fixture: fixture, identity: identity)
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
                 processInfo(fixture: fixture, pid: shellPID, parentPID: 1, name: "zsh", path: "/bin/zsh"),
                 processInfo(
@@ -55,12 +55,12 @@ struct ClaudeHookSessionLivenessTests {
         let index = SharedLiveAgentIndexLoader(
             homeDirectory: fixture.root.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             processSnapshotProvider: { processSnapshot },
             capturedAtProvider: { fixture.capturedAt },
             processArgumentsProvider: { pid in
                 guard pid == agentPID else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: liveArguments(fixture: fixture),
                     environment: liveEnvironment(fixture: fixture)
                 )
@@ -110,19 +110,19 @@ struct ClaudeHookSessionLivenessTests {
             workspaceId: fixture.workspaceId,
             panelId: fixture.panelId
         )
-        let sampler = CmuxTopProcessSampler(reader: reader)
+        let sampler = WmuxTopProcessSampler(reader: reader)
         let processSnapshot = try sampler.enrich(sampler.capture(), fields: [.details, .scope]).snapshot
         #expect(processSnapshot.enumerationIsComplete)
         #expect(processSnapshot.process(pid: 7_752) == nil)
         let index = SharedLiveAgentIndexLoader(
             homeDirectory: fixture.root.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             processSnapshotProvider: { processSnapshot },
             capturedAtProvider: { fixture.capturedAt },
             processArgumentsProvider: { pid in
                 guard pid == agentPID else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: liveArguments(fixture: fixture),
                     environment: liveEnvironment(fixture: fixture)
                 )
@@ -281,7 +281,7 @@ struct ClaudeHookSessionLivenessTests {
             workspaceId: fixture.workspaceId,
             panelId: fixture.panelId
         )
-        let sampler = CmuxTopProcessSampler(reader: reader)
+        let sampler = WmuxTopProcessSampler(reader: reader)
         let processSnapshot = try sampler.enrich(sampler.capture(), fields: [.details, .scope]).snapshot
         #expect(processSnapshot.enumerationIsComplete)
         #expect(processSnapshot.process(pid: exitedPID) == nil)
@@ -289,12 +289,12 @@ struct ClaudeHookSessionLivenessTests {
         let index = SharedLiveAgentIndexLoader(
             homeDirectory: fixture.root.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             processSnapshotProvider: { processSnapshot },
             capturedAtProvider: { fixture.capturedAt },
             processArgumentsProvider: { pid in
                 guard pid == agentPID, processSnapshot.process(pid: pid) != nil else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: liveArguments(fixture: fixture),
                     environment: liveEnvironment(fixture: fixture)
                 )
@@ -400,11 +400,11 @@ struct ClaudeHookSessionLivenessTests {
 
     private func loadIndex(
         fixture: Fixture,
-        processes: [CmuxTopProcessInfo],
+        processes: [WmuxTopProcessInfo],
         agentPID: Int,
         identities: [Int: AgentPIDProcessIdentity]
     ) -> RestorableAgentSessionIndex {
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: processes,
             sampledAt: Date(timeIntervalSince1970: fixture.capturedAt),
             includesProcessDetails: true
@@ -412,12 +412,12 @@ struct ClaudeHookSessionLivenessTests {
         return SharedLiveAgentIndexLoader(
             homeDirectory: fixture.root.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             processSnapshotProvider: { processSnapshot },
             capturedAtProvider: { fixture.capturedAt },
             processArgumentsProvider: { pid in
                 guard pid == agentPID else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: liveArguments(fixture: fixture),
                     environment: liveEnvironment(fixture: fixture)
                 )
@@ -448,12 +448,12 @@ struct ClaudeHookSessionLivenessTests {
 
     private func liveEnvironment(fixture: Fixture) -> [String: String] {
         [
-            "CMUX_WORKSPACE_ID": fixture.workspaceId.uuidString,
-            "CMUX_TAB_ID": fixture.workspaceId.uuidString,
-            "CMUX_SURFACE_ID": fixture.panelId.uuidString,
-            "CMUX_PANEL_ID": fixture.panelId.uuidString,
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": fixture.executablePath,
+            "WMUX_WORKSPACE_ID": fixture.workspaceId.uuidString,
+            "WMUX_TAB_ID": fixture.workspaceId.uuidString,
+            "WMUX_SURFACE_ID": fixture.panelId.uuidString,
+            "WMUX_PANEL_ID": fixture.panelId.uuidString,
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": fixture.executablePath,
             "CLAUDE_CONFIG_DIR": fixture.root.path,
             "PWD": fixture.root.path,
         ]
@@ -501,9 +501,9 @@ struct ClaudeHookSessionLivenessTests {
         name: String,
         path: String,
         processGroupID: Int? = nil
-    ) -> CmuxTopProcessInfo {
+    ) -> WmuxTopProcessInfo {
         let resolvedProcessGroupID = processGroupID ?? (parentPID == 1 ? pid : parentPID)
-        return CmuxTopProcessInfo(
+        return WmuxTopProcessInfo(
             pid: pid,
             parentPID: parentPID,
             name: name,

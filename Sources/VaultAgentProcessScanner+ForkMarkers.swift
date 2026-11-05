@@ -1,6 +1,6 @@
 import Foundation
 
-extension CmuxVaultAgentRegistration {
+extension WmuxVaultAgentRegistration {
     func processArgumentsCarryForkParentFlag(_ arguments: [String]) -> Bool {
         let markers = forkParentMarkerTokens()
         guard !markers.isEmpty else { return false }

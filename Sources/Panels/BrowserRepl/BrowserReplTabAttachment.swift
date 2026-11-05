@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import WebKit
 
 /// Receives events for one REPL session: `(name, payload)`; the payload
@@ -656,7 +656,7 @@ final class BrowserReplTabAttachment {
         mouseState.reset()
         let dragState = drag
         drag = nil
-        guard let webView = panel?.webView as? CmuxWebView else { return }
+        guard let webView = panel?.webView as? WmuxWebView else { return }
         webView.cancelPendingAutomationContextMenus()
         webView.automationDragCapture = nil
         if webView.window != nil {
@@ -952,7 +952,7 @@ final class BrowserReplTabAttachment {
         // depend on the controller.
         configuration.userContentController = WKUserContentController()
         BrowserPanel.configureWebViewConfiguration(configuration, websiteDataStore: panel.websiteDataStore)
-        let webView = CmuxWebView(frame: .zero, configuration: configuration, host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: configuration, host: WmuxWebViewAppHost())
         webView.allowsBackForwardNavigationGestures = true
         webView.pageZoom = panel.webView.pageZoom
         webView.underPageBackgroundColor = GhosttyBackgroundTheme.currentColor()
@@ -1066,7 +1066,7 @@ final class BrowserReplTabAttachment {
 /// in other worlds still see `null`. Without the SPI the world is a plain
 /// named world and closed roots stay hidden.
 enum BrowserReplAgentWorld {
-    static let name = "cmux-agent"
+    static let name = "wmux-agent"
 
     @MainActor static let world = WKContentWorld.browserReplWorld(seeingClosedShadowRoots: name)
 }

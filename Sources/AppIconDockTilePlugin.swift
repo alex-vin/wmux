@@ -25,10 +25,10 @@ private enum DockTileAppIconMode: String {
     }
 }
 
-final class CmuxDockTilePlugin: NSObject, NSDockTilePlugIn {
+final class WmuxDockTilePlugin: NSObject, NSDockTilePlugIn {
     // The plugin can stay alive while the app remains in the Dock, even after quit.
     // Keep the state minimal and derive everything from the enclosing app bundle.
-    private let pluginBundle = Bundle(for: CmuxDockTilePlugin.self)
+    private let pluginBundle = Bundle(for: WmuxDockTilePlugin.self)
     private var iconChangeObserver: NSObjectProtocol?
     private var appearanceObservation: NSKeyValueObservation?
 
@@ -165,14 +165,14 @@ final class CmuxDockTilePlugin: NSObject, NSDockTilePlugIn {
 
 private extension NSDockTile {
     func showDefaultAppIcon() {
-        CmuxDockTilePlugin.assertMainQueue()
+        WmuxDockTilePlugin.assertMainQueue()
 
         contentView = nil
         display()
     }
 
     func showIcon(_ newIcon: NSImage) {
-        CmuxDockTilePlugin.assertMainQueue()
+        WmuxDockTilePlugin.assertMainQueue()
 
         let iconView = NSImageView(frame: CGRect(origin: .zero, size: size))
         iconView.wantsLayer = true

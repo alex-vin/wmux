@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -36,11 +36,11 @@ struct CloudSidebarConsistencyTests {
             },
             "browsers": [], "agents": []
         ]
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
     }
 
     private func install(_ state: CloudVMState, in catalog: SurfaceCatalog, incremental: Bool = false) {
-        let resources = CmuxTuiSnapshotParser.resources(from: state)
+        let resources = WmuxTuiSnapshotParser.resources(from: state)
         let info = SurfaceMachineInfo(
             id: machine, name: "Fixture", status: "running", image: nil, hasDesktop: false,
             memoryMb: nil, diskMb: nil, linkState: .connected, linkError: nil,
@@ -136,7 +136,7 @@ struct CloudSidebarConsistencyTests {
         var document = try #require(state(tabs: ["a"]).snapshotObject())
         document["tabs"] = [["id": "tab_a", "pane_id": "pane_main", "content_kind": "browser", "content_id": "browser_a"]]
         document["browsers"] = [["id": "browser_a", "tab_id": "tab_a", "title": "Docs", "url": "https://cmux.com/docs"]]
-        let graph = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        let graph = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
         install(graph, in: catalog)
         let row = try #require(workspaceRows(catalog).first)
         #expect(row.dragGroup?.placements == catalog.cloudWorkspaceLayout(machine: machine, workspaceID: "ws_main")?.placements)
@@ -175,7 +175,7 @@ struct CloudSidebarConsistencyTests {
     @Test("The terminal inventory reflects a common explicit name without conflating different aliases")
     func inventoryNameParity() throws {
         let graph = try state(tabs: ["a"])
-        var resource = try #require(CmuxTuiSnapshotParser.resources(from: graph).first { $0.id.key == "term_a" })
+        var resource = try #require(WmuxTuiSnapshotParser.resources(from: graph).first { $0.id.key == "term_a" })
         let row = CloudTreeTerminalRow(resource: resource, isOpen: false)
         #expect(row.displayTitle == "Explicit a")
         var other = try #require(resource.remoteViews?.first)
@@ -203,7 +203,7 @@ struct CloudSidebarConsistencyTests {
         var tabs = try #require(document["tabs"] as? [[String: Any]])
         tabs[1]["pane_id"] = "pane_other"
         document["tabs"] = tabs
-        let graph = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        let graph = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
         install(graph, in: catalog)
         let row = try #require(workspaceRows(catalog).first)
         let layout = try #require(catalog.cloudWorkspaceLayout(machine: machine, workspaceID: "ws_main"))
@@ -246,7 +246,7 @@ struct CloudSidebarConsistencyTests {
         for (provider, asset) in expected {
             let badge = SurfaceAgentBadge(state: "working", source: "hook", agent: provider)
             #expect(badge.agent == provider)
-            #expect(CmuxTaskManagerCodingAgentDefinition.builtIns.first(where: { $0.id == provider })?.assetName == asset)
+            #expect(WmuxTaskManagerCodingAgentDefinition.builtIns.first(where: { $0.id == provider })?.assetName == asset)
         }
         #expect(TerminalTabAgentIconResolver().assetName(forStatusKey: "codex") == "AgentIcons/Codex")
         #expect(TerminalTabAgentIconResolver().assetName(forStatusKey: "gemini") == "AgentIcons/Gemini")

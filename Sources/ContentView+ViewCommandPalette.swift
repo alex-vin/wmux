@@ -1,7 +1,7 @@
 import AppKit
 import Bonsplit
-import CmuxCommandPalette
-import CmuxFoundation
+import WmuxCommandPalette
+import WmuxFoundation
 import Foundation
 
 extension ContentView {
@@ -16,7 +16,7 @@ extension ContentView {
                 title: constant(String(localized: "command.browseSidebarTemplates.title", defaultValue: "Browse Sidebar Templates")),
                 subtitle: constant(String(localized: "command.browseSidebarTemplates.subtitle", defaultValue: "Custom Sidebars")),
                 keywords: ["sidebar", "template", "gallery", "custom", "try", "browse"],
-                when: { _ in CmuxExtensionSidebarSelection.customSidebarsEnabled }
+                when: { _ in WmuxExtensionSidebarSelection.customSidebarsEnabled }
             ),
             CommandPaletteCommandContribution(
                 commandId: "palette.triggerFlash",
@@ -26,8 +26,8 @@ extension ContentView {
             ),
             CommandPaletteCommandContribution(
                 commandId: "palette.swapWithSession",
-                title: constant(CmuxPaneSwapStrings().swapWithSession),
-                subtitle: constant(CmuxPaneSwapStrings().terminalPane),
+                title: constant(WmuxPaneSwapStrings().swapWithSession),
+                subtitle: constant(WmuxPaneSwapStrings().terminalPane),
                 keywords: ["swap", "pane", "session", "terminal", "exchange"],
                 when: { context in
                     context.bool(CommandPaletteContextKeys.panelIsTerminal)
@@ -51,7 +51,7 @@ extension ContentView {
                 title: constant(String(localized: "agentInbox.command.title", defaultValue: "Show Agent Inbox")),
                 subtitle: constant(String(localized: "agentInbox.command.subtitle", defaultValue: "Agents")),
                 keywords: ["agent", "inbox", "message", "question", "permission", "feed"],
-                when: { _ in CmuxFeatureFlags.shared.isAgentInboxQuickViewEnabled }
+                when: { _ in WmuxFeatureFlags.shared.isAgentInboxQuickViewEnabled }
             ),
         ]
     }

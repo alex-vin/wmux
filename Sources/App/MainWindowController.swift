@@ -1,5 +1,5 @@
 import AppKit
-import CmuxWindowing
+import WmuxWindowing
 
 @MainActor
 final class MainWindowController: ReleasingWindowController {
@@ -9,7 +9,7 @@ final class MainWindowController: ReleasingWindowController {
     /// Reports AppKit geometry callbacks for this window to its lifecycle owner.
     var onGeometryChanged: ((NSWindow) -> Void)?
     /// Lifecycle policy for treating a non-live-resize callback as deliberate placement.
-    var shouldRetireZoomIntentForProgrammaticResize: ((CmuxMainWindow) -> Bool) = { _ in true }
+    var shouldRetireZoomIntentForProgrammaticResize: ((WmuxMainWindow) -> Bool) = { _ in true }
 
     private var isFullScreenTransitionInProgress = false
     private var clearsFullscreenTilingOptOutOnPresentation = false
@@ -140,8 +140,8 @@ final class MainWindowController: ReleasingWindowController {
     }
 
     func windowWillUseStandardFrame(_ window: NSWindow, defaultFrame newFrame: NSRect) -> NSRect {
-        guard window is CmuxMainWindow else { return newFrame }
-        return CmuxMainWindow.standardFrame(forDefaultFrame: newFrame)
+        guard window is WmuxMainWindow else { return newFrame }
+        return WmuxMainWindow.standardFrame(forDefaultFrame: newFrame)
     }
 
     private func handleFrameRestorationCheckpoint(
@@ -161,7 +161,7 @@ final class MainWindowController: ReleasingWindowController {
     /// Retires stale zoom intent for external/programmatic frame assignment while
     /// preserving cmux-owned repair and native fullscreen transition frames.
     private func handleProgrammaticResizePlacement(_ notification: Notification) {
-        guard let placedWindow = notification.object as? CmuxMainWindow,
+        guard let placedWindow = notification.object as? WmuxMainWindow,
               placedWindow === window,
               placedWindow.cmuxWantsZoomedFrame else {
             return
@@ -201,7 +201,7 @@ final class MainWindowController: ReleasingWindowController {
 
     /// Applies user placement only to the window owned by this controller.
     private func handleUserPlacement(_ notification: Notification) {
-        guard let placedWindow = notification.object as? CmuxMainWindow,
+        guard let placedWindow = notification.object as? WmuxMainWindow,
               placedWindow === window else {
             return
         }

@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 /// Resolves Feed workstream identities to the cmux surface recorded by an
@@ -248,6 +248,6 @@ actor FeedSessionStoreLookup {
 }
 
 extension Notification.Name {
-    static let feedRequestFocus = Notification.Name("cmux.feedRequestFocus")
-    static let feedRequestSendText = Notification.Name("cmux.feedRequestSendText")
+    static let feedRequestFocus = Notification.Name("wmux.feedRequestFocus")
+    static let feedRequestSendText = Notification.Name("wmux.feedRequestSendText")
 }

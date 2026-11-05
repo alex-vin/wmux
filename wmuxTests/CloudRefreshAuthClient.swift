@@ -1,15 +1,15 @@
-import CMUXAuthCore
-import CmuxAuthRuntime
+import WMUXAuthCore
+import WmuxAuthRuntime
 import Foundation
 
 actor CloudRefreshAuthClient: AuthClient {
     func accessToken() async -> String? { "fixture-access" }
     func refreshToken() async -> String? { "fixture-refresh" }
     func forceRefreshAccessToken() async -> String? { "fixture-access" }
-    func currentUser(throwOnMissing: Bool) async throws -> CMUXAuthUser? {
-        CMUXAuthUser(id: "fixture", primaryEmail: "fixture@example.test", displayName: "Fixture")
+    func currentUser(throwOnMissing: Bool) async throws -> WMUXAuthUser? {
+        WMUXAuthUser(id: "fixture", primaryEmail: "fixture@example.test", displayName: "Fixture")
     }
-    func listTeams() async throws -> [CMUXAuthTeam] { [] }
+    func listTeams() async throws -> [WMUXAuthTeam] { [] }
     func sendMagicLinkEmail(email: String, callbackURL: String) async throws -> String { "fixture" }
     func signInWithMagicLink(code: String) async throws {}
     func signInWithCredential(email: String, password: String) async throws {}

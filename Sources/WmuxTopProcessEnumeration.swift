@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 
 private nonisolated let cmuxTopPIDPathBufferSize = 4096
 
-extension CmuxTopProcessSnapshot {
+extension WmuxTopProcessSnapshot {
     static func deviceIdentifier(forTTYName ttyName: String) -> Int64? {
         let trimmed = ttyName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, trimmed != "not a tty" else {

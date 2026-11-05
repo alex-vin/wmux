@@ -1,5 +1,5 @@
 import XCTest
-import CmuxBrowser
+import WmuxBrowser
 import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
@@ -8,8 +8,8 @@ import ObjectiveC.runtime
 import Bonsplit
 import UserNotifications
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1079,7 +1079,7 @@ final class BrowserOmnibarFieldEditorResolutionTests: XCTestCase {
         let contentView = NSView(frame: window.contentRect(forFrameRect: window.frame))
         window.contentView = contentView
 
-        let staleWebView = CmuxWebView(frame: NSRect(x: 0, y: 0, width: 420, height: 80), configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let staleWebView = WmuxWebView(frame: NSRect(x: 0, y: 0, width: 420, height: 80), configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         contentView.addSubview(staleWebView)
 
         let field = OmnibarNativeTextField(frame: NSRect(x: 8, y: 28, width: 300, height: 24))

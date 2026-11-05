@@ -1,15 +1,15 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 extension RestorableAgentSessionIndex {
     /// Fallback identity only: the caller merges these with `{ existing, _ in existing }`
     /// so a fork process never displaces an explicit same-pane detection
     /// (e.g. an OpenCode pane hosting a nested claude/codex fork process).
     static func processDetectedForkParentFallbackSnapshots(
-        processSnapshot: CmuxTopProcessSnapshot,
+        processSnapshot: WmuxTopProcessSnapshot,
         capturedAt: TimeInterval,
         scopedProcessIDsByPanelKey: [PanelKey: Set<Int>],
-        processArgumentsProvider: (Int) -> CmuxTopProcessArguments?
+        processArgumentsProvider: (Int) -> WmuxTopProcessArguments?
     ) -> [PanelKey: ProcessDetectedSnapshotEntry] {
         var resolved: [PanelKey: ProcessDetectedSnapshotEntry] = [:]
 
@@ -31,7 +31,7 @@ extension RestorableAgentSessionIndex {
                 continue
             }
 
-            let cwd = normalized(environment["CMUX_AGENT_LAUNCH_CWD"] ?? environment["PWD"])
+            let cwd = normalized(environment["WMUX_AGENT_LAUNCH_CWD"] ?? environment["PWD"])
             let key = PanelKey(workspaceId: workspaceId, panelId: panelId)
             let snapshot = SessionRestorableAgentSnapshot(
                 kind: fallback.kind,
@@ -163,7 +163,7 @@ extension RestorableAgentSessionIndex {
            executableBasename(processPath).compare("codex", options: [.caseInsensitive, .literal]) == .orderedSame {
             return processPath
         }
-        if let launchExecutable = normalized(environment["CMUX_AGENT_LAUNCH_EXECUTABLE"]),
+        if let launchExecutable = normalized(environment["WMUX_AGENT_LAUNCH_EXECUTABLE"]),
            executableBasename(launchExecutable).compare("codex", options: [.caseInsensitive, .literal]) == .orderedSame {
             return launchExecutable
         }
@@ -195,7 +195,7 @@ extension RestorableAgentSessionIndex {
         if executableBasename(processName).compare("codex", options: [.caseInsensitive, .literal]) == .orderedSame {
             return arguments[0].hasPrefix("-") ? arguments : Array(arguments.dropFirst())
         }
-        if let launchExecutable = normalized(environment["CMUX_AGENT_LAUNCH_EXECUTABLE"]) {
+        if let launchExecutable = normalized(environment["WMUX_AGENT_LAUNCH_EXECUTABLE"]) {
             let launchBasename = executableBasename(launchExecutable)
             if executableBasename(arguments[0]).compare(launchBasename, options: [.caseInsensitive, .literal]) == .orderedSame {
                 return Array(arguments.dropFirst())
@@ -231,7 +231,7 @@ extension RestorableAgentSessionIndex {
     }
 
     static func environmentLaunchKind(_ environment: [String: String]) -> String? {
-        normalized(environment["CMUX_AGENT_LAUNCH_KIND"])?
+        normalized(environment["WMUX_AGENT_LAUNCH_KIND"])?
             .replacingOccurrences(of: "-", with: "")
             .lowercased()
     }

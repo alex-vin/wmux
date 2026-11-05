@@ -1,5 +1,5 @@
-import CMUXAgentLaunch
-import CmuxFoundation
+import WMUXAgentLaunch
+import WmuxFoundation
 import Foundation
 
 extension WMUXCLI {
@@ -281,7 +281,7 @@ extension WMUXCLI {
     /// from the respawn command text (a `--dangerously-skip-permissions` substring
     /// can appear in a cwd, quoted value, or other non-flag position): the `cmux
     /// claude-teams` launcher makes that decision once from its own argv and records
-    /// it in `CMUX_CLAUDE_TEAMS_SANDBOXED` (see `claudeTeamsExtraEnvVars`). That
+    /// it in `WMUX_CLAUDE_TEAMS_SANDBOXED` (see `claudeTeamsExtraEnvVars`). That
     /// launcher env is propagated by the tmux shim to this `__tmux-compat` process,
     /// and is set only inside an opted-in claude-teams session, so OMO and the
     /// public `respawn-pane` command never see it and are unaffected.
@@ -299,7 +299,7 @@ extension WMUXCLI {
         var environment = transport.decodedEnvironment(
             from: processEnvironment[ClaudeTeamsRespawnEnvironmentTransport.environmentKey]
         )
-        if processEnvironment["CMUX_CLAUDE_TEAMS_SANDBOXED"] == "1" {
+        if processEnvironment["WMUX_CLAUDE_TEAMS_SANDBOXED"] == "1" {
             environment["CLAUDE_CODE_SANDBOXED"] = "1"
         }
         return environment.keys.sorted().compactMap { key in
@@ -560,7 +560,7 @@ extension WMUXCLI {
     }
 
     func prependPathEntries(_ newEntries: [String], to currentPath: String?) -> String {
-        CmuxPathEnvironment().prependingUniqueEntries(newEntries, to: currentPath)
+        WmuxPathEnvironment().prependingUniqueEntries(newEntries, to: currentPath)
     }
 
 }

@@ -1,7 +1,7 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
-extension CmuxTopProcessSnapshot {
+extension WmuxTopProcessSnapshot {
     /// Children an agent starts within this many seconds of its own start (MCP
     /// servers, launch hooks) are its baseline and do not count as work.
     static let agentBackgroundWorkBaselineSeconds: Int64 = 30

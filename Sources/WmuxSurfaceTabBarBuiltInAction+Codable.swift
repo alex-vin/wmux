@@ -1,6 +1,6 @@
 import Foundation
 
-extension CmuxSurfaceTabBarBuiltInAction {
+extension WmuxSurfaceTabBarBuiltInAction {
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)

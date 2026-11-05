@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxCloudTui
+import WmuxCloud
+import WmuxCloudTui
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -81,7 +81,7 @@ struct CloudTerminalMutationLifecycleTests {
             _ = try await commands.runTuiCommand(arguments: CloudTuiRequest("pane.split"), deadline: .seconds(30))
             published = true
         }
-        var replacement: CmuxTuiSurfaceProvider?
+        var replacement: WmuxTuiSurfaceProvider?
         defer {
             provider.suspendForFeatureFlag()
             replacement?.suspendForFeatureFlag()
@@ -108,7 +108,7 @@ struct CloudTerminalMutationLifecycleTests {
     func staleProviderNeverConnects(change: String) async {
         let catalog = SurfaceCatalog()
         let provider = makeProvider(catalog: catalog)
-        var replacement: CmuxTuiSurfaceProvider?
+        var replacement: WmuxTuiSurfaceProvider?
         switch change {
         case "suspend": provider.suspendForFeatureFlag()
         case "replace": replacement = makeProvider(catalog: catalog, machineID: provider.machineID)
@@ -139,7 +139,7 @@ struct CloudTerminalMutationLifecycleTests {
         let blockingTurn = provider.terminalMutationQueue.enqueue {
             try await transport.runTuiCommand(arguments: CloudTuiRequest("workspace.run"), deadline: .seconds(30))
         }
-        var replacement: CmuxTuiSurfaceProvider?
+        var replacement: WmuxTuiSurfaceProvider?
         defer {
             provider.suspendForFeatureFlag()
             replacement?.suspendForFeatureFlag()
@@ -202,7 +202,7 @@ struct CloudTerminalMutationLifecycleTests {
     func registryQuiescesAllProvidersBeforeJoining() async throws {
         let catalog = SurfaceCatalog()
         let summaries = (0..<3).map { machine("lifecycle-\(UUID())-\($0)") }
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             allowsBackgroundWork: { false },
             listPage: { VMListPage(vms: summaries, limits: nil) },
@@ -252,7 +252,7 @@ struct CloudTerminalMutationLifecycleTests {
     func deletionQuiescesProviderSynchronously() async throws {
         let catalog = SurfaceCatalog()
         let summary = machine("delete-\(UUID())")
-        let registry = CmuxTuiSurfaceProviderRegistry(
+        let registry = WmuxTuiSurfaceProviderRegistry(
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             allowsBackgroundWork: { false },
             listPage: { VMListPage(vms: [summary], limits: nil) },
@@ -271,8 +271,8 @@ struct CloudTerminalMutationLifecycleTests {
         await registry.accessDidEnd()
     }
 
-    private func makeProvider(catalog: SurfaceCatalog, machineID: String = "mutation-\(UUID())") -> CmuxTuiSurfaceProvider {
-        let provider = CmuxTuiSurfaceProvider(
+    private func makeProvider(catalog: SurfaceCatalog, machineID: String = "mutation-\(UUID())") -> WmuxTuiSurfaceProvider {
+        let provider = WmuxTuiSurfaceProvider(
             summary: machine(machineID),
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             catalog: catalog

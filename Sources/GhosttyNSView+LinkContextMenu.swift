@@ -1,5 +1,5 @@
 import AppKit
-import CmuxTerminalCore
+import WmuxTerminalCore
 import GhosttyKit
 
 /// Carries both spellings of the link from the menu item to its action: the

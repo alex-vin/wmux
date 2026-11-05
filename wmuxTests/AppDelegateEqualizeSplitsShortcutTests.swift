@@ -1,14 +1,14 @@
-import CmuxBrowser
+import WmuxBrowser
 import AppKit
 import Bonsplit
-import CmuxFoundation
-import CmuxRemoteSession
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxRemoteSession
+import WmuxTerminalCore
 import Testing
-@testable import CmuxTerminal
+@testable import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -667,7 +667,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                     continue
                 }
                 let beforeRuntimePoints = beforeLineage.map {
-                    CmuxSurfaceConfigTemplate.runtimeFontSize(
+                    WmuxSurfaceConfigTemplate.runtimeFontSize(
                         fromBasePoints: $0.basePoints,
                         percent: GlobalFontMagnification.storedPercent
                     )
@@ -675,7 +675,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                 let expectedRuntimePoints = TerminalFontSizePolicy().clampedRuntimePoints(
                     beforeRuntimePoints - 1
                 )
-                let afterRuntimePoints = CmuxSurfaceConfigTemplate.runtimeFontSize(
+                let afterRuntimePoints = WmuxSurfaceConfigTemplate.runtimeFontSize(
                     fromBasePoints: afterLineage.basePoints,
                     percent: GlobalFontMagnification.storedPercent
                 )
@@ -803,7 +803,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
             )
             let beforeLineage = panel.surface.fontSizeLineageSnapshot()
             let beforeRuntimePoints = beforeLineage.map {
-                CmuxSurfaceConfigTemplate.runtimeFontSize(
+                WmuxSurfaceConfigTemplate.runtimeFontSize(
                     fromBasePoints: $0.basePoints,
                     percent: GlobalFontMagnification.storedPercent
                 )
@@ -823,7 +823,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                 XCTFail("Expected adjusted font-size lineage")
                 return
             }
-            let afterRuntimePoints = CmuxSurfaceConfigTemplate.runtimeFontSize(
+            let afterRuntimePoints = WmuxSurfaceConfigTemplate.runtimeFontSize(
                 fromBasePoints: afterLineage.basePoints,
                 percent: GlobalFontMagnification.storedPercent
             )
@@ -1075,7 +1075,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
             let windowDock = appDelegate.windowDock(forWindowId: windowId)
             let dockPanels = (0..<12).map { _ in
-                var configTemplate = CmuxSurfaceConfigTemplate()
+                var configTemplate = WmuxSurfaceConfigTemplate()
                 configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                     basePoints: 20,
                     isExplicitOverride: true
@@ -1139,7 +1139,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
             let windowDock = appDelegate.windowDock(forWindowId: windowId)
             @MainActor
             func dormantPanel(id: UUID, basePoints: Float32 = 20) -> TerminalPanel {
-                var configTemplate = CmuxSurfaceConfigTemplate()
+                var configTemplate = WmuxSurfaceConfigTemplate()
                 configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                     basePoints: basePoints,
                     isExplicitOverride: true
@@ -1275,7 +1275,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                 return
             }
 
-            var inheritanceSourceConfig = CmuxSurfaceConfigTemplate()
+            var inheritanceSourceConfig = WmuxSurfaceConfigTemplate()
             inheritanceSourceConfig.fontSizeLineage = TerminalFontSizeLineage(
                 basePoints: 20,
                 isExplicitOverride: true
@@ -1291,7 +1291,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                 inheritanceSource
             )
             for suffix in 102...112 {
-                var configTemplate = CmuxSurfaceConfigTemplate()
+                var configTemplate = WmuxSurfaceConfigTemplate()
                 configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                     basePoints: 20,
                     isExplicitOverride: true
@@ -1382,7 +1382,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                 }
 
                 let windowDock = appDelegate.windowDock(forWindowId: windowId)
-                var maximumConfig = CmuxSurfaceConfigTemplate()
+                var maximumConfig = WmuxSurfaceConfigTemplate()
                 maximumConfig.fontSizeLineage = TerminalFontSizeLineage(
                     basePoints: TerminalFontSizePolicy.maximumRuntimePoints,
                     isExplicitOverride: true
@@ -1394,7 +1394,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                 )
                 windowDock.panels[maximumPanel.id] = maximumPanel
 
-                var minimumConfig = CmuxSurfaceConfigTemplate()
+                var minimumConfig = WmuxSurfaceConfigTemplate()
                 minimumConfig.fontSizeLineage = TerminalFontSizeLineage(
                     basePoints: TerminalFontSizePolicy.minimumRuntimePoints,
                     isExplicitOverride: true
@@ -1722,7 +1722,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         }
 
         let testPanels = (1...20).map { suffix in
-            var configTemplate = CmuxSurfaceConfigTemplate()
+            var configTemplate = WmuxSurfaceConfigTemplate()
             configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                 basePoints: 20,
                 isExplicitOverride: true
@@ -1806,7 +1806,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         let testPanels = workspace.panels.values.compactMap {
             $0 as? TerminalPanel
         } + (1...20).map { suffix in
-            var configTemplate = CmuxSurfaceConfigTemplate()
+            var configTemplate = WmuxSurfaceConfigTemplate()
             configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                 basePoints: minimum,
                 isExplicitOverride: true
@@ -1913,7 +1913,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         }
         let minimum =
             TerminalFontSizePolicy.minimumRuntimePoints
-        var template = CmuxSurfaceConfigTemplate()
+        var template = WmuxSurfaceConfigTemplate()
         template.setFontSize(
             minimum,
             isExplicitOverride: true
@@ -2015,7 +2015,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         }
         let minimum =
             TerminalFontSizePolicy.minimumRuntimePoints
-        var template = CmuxSurfaceConfigTemplate()
+        var template = WmuxSurfaceConfigTemplate()
         template.setFontSize(
             minimum,
             isExplicitOverride: true
@@ -2109,7 +2109,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
         }
         let minimum =
             TerminalFontSizePolicy.minimumRuntimePoints
-        var template = CmuxSurfaceConfigTemplate()
+        var template = WmuxSurfaceConfigTemplate()
         template.setFontSize(
             minimum,
             isExplicitOverride: true
@@ -4292,7 +4292,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
         var movablePanels: [TerminalPanel] = []
         for suffix in 1...20 {
-            var configTemplate = CmuxSurfaceConfigTemplate()
+            var configTemplate = WmuxSurfaceConfigTemplate()
             configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                 basePoints: 20,
                 isExplicitOverride: true
@@ -6579,7 +6579,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
     @Test
     func testHibernatedFontFollowerPredictsFromConfiguredBaseline() {
-        var template = CmuxSurfaceConfigTemplate()
+        var template = WmuxSurfaceConfigTemplate()
         template.setFontSize(12, isExplicitOverride: false)
         let panel = TerminalPanel(
             workspaceId: UUID(),
@@ -6833,7 +6833,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
             return
         }
         let maximumBasePoints =
-            CmuxSurfaceConfigTemplate.baseFontSize(
+            WmuxSurfaceConfigTemplate.baseFontSize(
                 fromRuntimePoints:
                     TerminalFontSizePolicy.maximumRuntimePoints,
                 percent: GlobalFontMagnification.storedPercent
@@ -7322,7 +7322,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
         var dockPanels: [TerminalPanel] = []
         for suffix in 1...20 {
-            var configTemplate = CmuxSurfaceConfigTemplate()
+            var configTemplate = WmuxSurfaceConfigTemplate()
             configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                 basePoints: 20,
                 isExplicitOverride: true
@@ -7493,7 +7493,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
 
             let windowDock = appDelegate.windowDock(forWindowId: windowId)
             let dockPanels = (0..<12).map { _ in
-                var configTemplate = CmuxSurfaceConfigTemplate()
+                var configTemplate = WmuxSurfaceConfigTemplate()
                 configTemplate.fontSizeLineage = TerminalFontSizeLineage(
                     basePoints: 20,
                     isExplicitOverride: true
@@ -7651,7 +7651,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                         ).fontSize
                     )
                     let beforeRuntimePoints = panel.surface.fontSizeLineageSnapshot().map {
-                        CmuxSurfaceConfigTemplate.runtimeFontSize(
+                        WmuxSurfaceConfigTemplate.runtimeFontSize(
                             fromBasePoints: $0.basePoints,
                             percent: GlobalFontMagnification.storedPercent
                         )
@@ -7668,7 +7668,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                         XCTFail("Expected adjusted font-size lineage")
                         return
                     }
-                    let afterRuntimePoints = CmuxSurfaceConfigTemplate.runtimeFontSize(
+                    let afterRuntimePoints = WmuxSurfaceConfigTemplate.runtimeFontSize(
                         fromBasePoints: afterLineage.basePoints,
                         percent: GlobalFontMagnification.storedPercent
                     )
@@ -7778,7 +7778,7 @@ final class AppDelegateEqualizeSplitsShortcutTests {
                     XCTFail("Expected reset font-size lineage")
                     continue
                 }
-                let resetRuntimePoints = CmuxSurfaceConfigTemplate.runtimeFontSize(
+                let resetRuntimePoints = WmuxSurfaceConfigTemplate.runtimeFontSize(
                     fromBasePoints: resetLineage.basePoints,
                     percent: GlobalFontMagnification.storedPercent
                 )

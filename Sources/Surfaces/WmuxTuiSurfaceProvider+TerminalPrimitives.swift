@@ -1,9 +1,9 @@
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
 @MainActor
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Binds a reservation's early input to the stable remote terminal before
     /// its native mirror has resolved a numeric surface id.
     @discardableResult

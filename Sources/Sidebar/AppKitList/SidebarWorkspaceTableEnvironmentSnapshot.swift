@@ -1,5 +1,5 @@
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import SwiftUI
 
 /// Value-only SwiftUI environment forwarded into each independently hosted table cell.

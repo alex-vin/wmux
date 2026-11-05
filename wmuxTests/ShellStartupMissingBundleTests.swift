@@ -1,9 +1,9 @@
 import Foundation
 import Testing
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -24,8 +24,8 @@ struct ShellStartupMissingBundleTests {
         let duration: TimeInterval
     }
 
-    // The spawn-env call site only advertises CMUX_SHELL_INTEGRATION /
-    // CMUX_SHELL_INTEGRATION_DIR when the bundled dir actually exists, so a
+    // The spawn-env call site only advertises WMUX_SHELL_INTEGRATION /
+    // WMUX_SHELL_INTEGRATION_DIR when the bundled dir actually exists, so a
     // deleted app bundle never leaks a dangling integration path into the
     // shell environment.
     @Test
@@ -129,7 +129,7 @@ struct ShellStartupMissingBundleTests {
         let home = root.appendingPathComponent("home")
         try fileManager.createDirectory(at: home, withIntermediateDirectories: true)
         defer { try? fileManager.removeItem(at: root) }
-        try "export CMUX_TEST_USER_ZSHRC=1\n"
+        try "export WMUX_TEST_USER_ZSHRC=1\n"
             .write(to: home.appendingPathComponent(".zshrc"), atomically: true, encoding: .utf8)
         let missingIntegrationDir = root
             .appendingPathComponent("deleted-bundle/Contents/Resources/shell-integration")
@@ -155,7 +155,7 @@ struct ShellStartupMissingBundleTests {
         let arguments = ["-i"] + environment.map { "\($0.key)=\($0.value)" } + [
             "/bin/zsh",
             "-ic",
-            "print -rn -- \"user_zshrc_loaded=${CMUX_TEST_USER_ZSHRC:-no}\"",
+            "print -rn -- \"user_zshrc_loaded=${WMUX_TEST_USER_ZSHRC:-no}\"",
         ]
         let result = runProcess(
             executablePath: "/usr/bin/env",

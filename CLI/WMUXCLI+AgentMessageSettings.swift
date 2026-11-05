@@ -78,8 +78,8 @@ extension WMUXCLI {
         if let enabled = parsed.enabled { params["enabled"] = enabled }
         if let target = parsed.target { params["target"] = target }
         let env = ProcessInfo.processInfo.environment
-        if let surface = env["CMUX_SURFACE_ID"], !surface.isEmpty { params["surface_id"] = surface }
-        if let workspace = env["CMUX_WORKSPACE_ID"], !workspace.isEmpty { params["workspace_id"] = workspace }
+        if let surface = env["WMUX_SURFACE_ID"], !surface.isEmpty { params["surface_id"] = surface }
+        if let workspace = env["WMUX_WORKSPACE_ID"], !workspace.isEmpty { params["workspace_id"] = workspace }
 
         let payload = try client.sendV2(method: "agent.message.settings", params: params)
         if jsonOutput {

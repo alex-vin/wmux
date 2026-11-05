@@ -1,9 +1,9 @@
 import Darwin
 import Foundation
 import Testing
-@testable import CmuxControlSocket
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+@testable import WmuxControlSocket
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -57,14 +57,14 @@ extension SocketACLReloadRegressionTests {
     @Test func idleEventStreamClosesWhenPolicyGenerationChanges() throws {
         let controller = TerminalController.shared
         controller.stop(cleanupDiscoveryState: true)
-        CmuxEventBus.shared.resetForTesting()
+        WmuxEventBus.shared.resetForTesting()
 
         let directory = shortTemporaryDirectory(prefix: "sals")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let socketPath = directory.appendingPathComponent("cmux.sock").path
         defer {
             controller.stop(cleanupDiscoveryState: true)
-            CmuxEventBus.shared.resetForTesting()
+            WmuxEventBus.shared.resetForTesting()
             try? FileManager.default.removeItem(at: directory)
         }
 

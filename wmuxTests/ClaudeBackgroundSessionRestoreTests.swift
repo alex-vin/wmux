@@ -1,10 +1,10 @@
-import CMUXAgentLaunch
-import CmuxControlSocket
+import WMUXAgentLaunch
+import WmuxControlSocket
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -105,8 +105,8 @@ struct ClaudeBackgroundSessionRestoreTests {
         [
             "ANTHROPIC_BASE_URL": "http://127.0.0.1:31415",
             "CLAUDE_CONFIG_DIR": fixture.configDirectory.path,
-            "CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV": "1",
-            "CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS": "ANTHROPIC_BASE_URL,CLAUDE_CONFIG_DIR",
+            "WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV": "1",
+            "WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV_KEYS": "ANTHROPIC_BASE_URL,CLAUDE_CONFIG_DIR",
         ]
     }
 
@@ -241,7 +241,7 @@ struct ClaudeBackgroundSessionRestoreTests {
         #expect(input.contains("'\(executable)' 'attach' '\(jobID)'"), Comment(rawValue: input))
         #expect(input.contains("'CLAUDE_CONFIG_DIR=\(fixture.configDirectory.path)'"), Comment(rawValue: input))
         #expect(input.contains("'ANTHROPIC_BASE_URL=http://127.0.0.1:31415'"), Comment(rawValue: input))
-        #expect(input.contains("'CMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1'"), Comment(rawValue: input))
+        #expect(input.contains("'WMUX_PRESERVE_CLAUDE_AUTH_SELECTION_ENV=1'"), Comment(rawValue: input))
         #expect(!input.contains("--resume"), Comment(rawValue: input))
         #expect(!input.contains(" restore "), Comment(rawValue: input))
         // The manual binding stays for the daemon-gone case on a later relaunch.
@@ -613,8 +613,8 @@ struct ClaudeBackgroundSessionRestoreTests {
 
     /// `claude attach <job>` as the pane's foreground process reports its argv
     /// and environment.
-    private func viewerProcess(_ fixture: Fixture) -> CmuxTopProcessArguments {
-        CmuxTopProcessArguments(
+    private func viewerProcess(_ fixture: Fixture) -> WmuxTopProcessArguments {
+        WmuxTopProcessArguments(
             arguments: [executable, "attach", jobID],
             environment: [
                 "ANTHROPIC_BASE_URL": "http://127.0.0.1:31415",
@@ -625,7 +625,7 @@ struct ClaudeBackgroundSessionRestoreTests {
     }
 
     /// A Dock whose terminals report `foreground` as their foreground process.
-    private func makeDock(_ fixture: Fixture, foreground: CmuxTopProcessArguments? = nil) -> DockSplitStore {
+    private func makeDock(_ fixture: Fixture, foreground: WmuxTopProcessArguments? = nil) -> DockSplitStore {
         let viewerProcessID = viewerProcessID
         return DockSplitStore(
             workspaceId: UUID(),

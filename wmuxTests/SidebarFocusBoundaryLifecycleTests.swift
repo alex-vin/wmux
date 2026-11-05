@@ -1,6 +1,6 @@
 import AppKit
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 @Suite
 @MainActor

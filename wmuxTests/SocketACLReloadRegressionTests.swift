@@ -1,10 +1,10 @@
 import Darwin
 import Foundation
 import Testing
-@testable import CmuxControlSocket
-import CmuxSettings
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+@testable import WmuxControlSocket
+import WmuxSettings
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -296,10 +296,10 @@ struct SocketACLReloadRegressionTests {
         let defaults = UserDefaults.standard
         let originalMode = defaults.object(forKey: SocketControlSettings.appStorageKey)
         let environmentKeys = [
-            "CMUX_SOCKET_PATH",
+            "WMUX_SOCKET_PATH",
             SocketControlSettings.allowSocketPathOverrideKey,
-            "CMUX_SOCKET_ENABLE",
-            "CMUX_SOCKET_MODE",
+            "WMUX_SOCKET_ENABLE",
+            "WMUX_SOCKET_MODE",
         ]
         let processEnvironment = ProcessInfo.processInfo.environment
         let originalEnvironment = environmentKeys.map { ($0, processEnvironment[$0]) }
@@ -328,10 +328,10 @@ struct SocketACLReloadRegressionTests {
         }
 
         defaults.set(SocketControlMode.automation.rawValue, forKey: SocketControlSettings.appStorageKey)
-        setenv("CMUX_SOCKET_PATH", configuredPath, 1)
+        setenv("WMUX_SOCKET_PATH", configuredPath, 1)
         setenv(SocketControlSettings.allowSocketPathOverrideKey, "1", 1)
-        unsetenv("CMUX_SOCKET_ENABLE")
-        setenv("CMUX_SOCKET_MODE", SocketControlMode.automation.rawValue, 1)
+        unsetenv("WMUX_SOCKET_ENABLE")
+        setenv("WMUX_SOCKET_MODE", SocketControlMode.automation.rawValue, 1)
 
         controller.start(tabManager: TabManager(), socketPath: stalePath, accessMode: .automation)
         #expect(controller.socketServer.isRunning)

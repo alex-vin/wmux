@@ -1,5 +1,5 @@
 import Foundation
-import CmuxSettings
+import WmuxSettings
 
 enum PanelTitleUpdateCoalescingSettings {
     private nonisolated static let terminalSettings = SettingCatalog().terminal

@@ -12,7 +12,7 @@
 // taxonomy, [9]: edits others can see).
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
 
   // Runs in a blank page (for DecompressionStream): unzips base64 bytes and

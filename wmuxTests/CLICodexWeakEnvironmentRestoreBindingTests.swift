@@ -43,19 +43,19 @@ extension CLINotifyProcessIntegrationRegressionTests {
             }
         }
 
-        var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("CMUX_CODEX_") }
+        var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("WMUX_CODEX_") }
         environment["HOME"] = root.path
         environment["PWD"] = workspace.path
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = workspaceId
-        environment["CMUX_SURFACE_ID"] = surfaceId
-        environment.removeValue(forKey: "CMUX_CLI_TTY_NAME")
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = root.path
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = workspaceId
+        environment["WMUX_SURFACE_ID"] = surfaceId
+        environment.removeValue(forKey: "WMUX_CLI_TTY_NAME")
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["ANTHROPIC_BASE_URL"] = "http://subrouter-team:31415"
         environment["CLAUDE_CONFIG_DIR"] = root.appendingPathComponent(".codex-accounts/claude/work", isDirectory: true).path
         environment.removeValue(forKey: "CODEX_HOME")
-        for key in ["CMUX_AGENT_LAUNCH_KIND", "CMUX_AGENT_LAUNCH_EXECUTABLE", "CMUX_AGENT_LAUNCH_ARGV_B64", "CMUX_AGENT_LAUNCH_CWD"] {
+        for key in ["WMUX_AGENT_LAUNCH_KIND", "WMUX_AGENT_LAUNCH_EXECUTABLE", "WMUX_AGENT_LAUNCH_ARGV_B64", "WMUX_AGENT_LAUNCH_CWD"] {
             environment.removeValue(forKey: key)
         }
 
@@ -187,25 +187,25 @@ extension CLINotifyProcessIntegrationRegressionTests {
             }
         }
 
-        var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("CMUX_CODEX_") }
+        var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("WMUX_CODEX_") }
         environment["HOME"] = root.path
         environment["PWD"] = worktree.path
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = workspaceId
-        environment["CMUX_SURFACE_ID"] = surfaceId
-        environment["CMUX_CLI_TTY_NAME"] = ttyName
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = root.path
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = workspaceId
+        environment["WMUX_SURFACE_ID"] = surfaceId
+        environment["WMUX_CLI_TTY_NAME"] = ttyName
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["ANTHROPIC_BASE_URL"] = "http://subrouter-team:31415"
         environment["CLAUDE_CONFIG_DIR"] = root.appendingPathComponent(".codex-accounts/claude/work", isDirectory: true).path
         environment.removeValue(forKey: "CODEX_HOME")
         if let currentArguments {
-            environment["CMUX_AGENT_LAUNCH_KIND"] = "codex"
-            environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
-            environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated(currentArguments)
-            environment["CMUX_AGENT_LAUNCH_CWD"] = worktree.path
+            environment["WMUX_AGENT_LAUNCH_KIND"] = "codex"
+            environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
+            environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated(currentArguments)
+            environment["WMUX_AGENT_LAUNCH_CWD"] = worktree.path
         } else {
-            for key in ["CMUX_AGENT_LAUNCH_KIND", "CMUX_AGENT_LAUNCH_EXECUTABLE", "CMUX_AGENT_LAUNCH_ARGV_B64", "CMUX_AGENT_LAUNCH_CWD"] {
+            for key in ["WMUX_AGENT_LAUNCH_KIND", "WMUX_AGENT_LAUNCH_EXECUTABLE", "WMUX_AGENT_LAUNCH_ARGV_B64", "WMUX_AGENT_LAUNCH_CWD"] {
                 environment.removeValue(forKey: key)
             }
         }
@@ -307,16 +307,16 @@ extension CLINotifyProcessIntegrationRegressionTests {
             }
         }
 
-        var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("CMUX_CODEX_") }
+        var environment = ProcessInfo.processInfo.environment.filter { !$0.key.hasPrefix("WMUX_CODEX_") }
         environment["HOME"] = root.path
         environment["PWD"] = repo.path
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = workspaceId
-        environment["CMUX_SURFACE_ID"] = surfaceId
-        environment["CMUX_CLI_TTY_NAME"] = ttyName
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = root.path
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        for key in ["ANTHROPIC_BASE_URL", "CLAUDE_CONFIG_DIR", "CODEX_HOME", "CMUX_AGENT_LAUNCH_KIND", "CMUX_AGENT_LAUNCH_EXECUTABLE", "CMUX_AGENT_LAUNCH_ARGV_B64", "CMUX_AGENT_LAUNCH_CWD"] {
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = workspaceId
+        environment["WMUX_SURFACE_ID"] = surfaceId
+        environment["WMUX_CLI_TTY_NAME"] = ttyName
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = root.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        for key in ["ANTHROPIC_BASE_URL", "CLAUDE_CONFIG_DIR", "CODEX_HOME", "WMUX_AGENT_LAUNCH_KIND", "WMUX_AGENT_LAUNCH_EXECUTABLE", "WMUX_AGENT_LAUNCH_ARGV_B64", "WMUX_AGENT_LAUNCH_CWD"] {
             environment.removeValue(forKey: key)
         }
 

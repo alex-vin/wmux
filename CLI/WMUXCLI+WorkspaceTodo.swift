@@ -2,7 +2,7 @@ import Foundation
 
 /// `cmux workspace status [...]` and the `cmux todo` namespace: the CLI face
 /// of the `workspace.status.*` / `workspace.todo.*` socket verbs. Both default
-/// to the caller's workspace (CMUX_WORKSPACE_ID, the same ambient resolution
+/// to the caller's workspace (WMUX_WORKSPACE_ID, the same ambient resolution
 /// `workspace env` uses) with `--workspace <id|ref|index>` override.
 extension WMUXCLI {
     // MARK: - Shared target resolution

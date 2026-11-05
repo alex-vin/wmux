@@ -1,10 +1,10 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -21,7 +21,7 @@ final class CloudDesktopNavigationFixture {
     let server: CloudBrowserProxyTestServer
     let store = CloudPortAccessStore()
     let readiness = CloudLinkFirstValue<CloudBrowserProxyEndpoint>()
-    let provider: CmuxTuiSurfaceProvider
+    let provider: WmuxTuiSurfaceProvider
     let model: CloudPortAccessModel
 
     init(machineID: String = "desktop-navigation-\(UUID().uuidString)") throws {
@@ -58,7 +58,7 @@ final class CloudDesktopNavigationFixture {
             image: "cmux-devbox", createdAt: 0, base: nil)
         summary.kind = .desktop
         summary.addressIPv4 = address
-        provider = CmuxTuiSurfaceProvider(
+        provider = WmuxTuiSurfaceProvider(
             summary: summary,
             links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
             catalog: app.catalog, portAccessStore: store,

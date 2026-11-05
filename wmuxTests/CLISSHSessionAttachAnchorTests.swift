@@ -3,7 +3,7 @@ import Foundation
 import Testing
 
 /// Regression coverage for issue #7367: `ssh-session-attach --workspace <B> --split`
-/// must not anchor the split to the caller's `CMUX_SURFACE_ID` from workspace A.
+/// must not anchor the split to the caller's `WMUX_SURFACE_ID` from workspace A.
 /// Runs in the timed app-host shard. CI aggregates every XCTest/Swift Testing
 /// summary and rejects ordinary assertion failures and incomplete crash/restart
 /// runs, so this regression remains a required failure signal without a duplicate
@@ -307,14 +307,14 @@ struct CLISSHSessionAttachAnchorTests {
 
     private func cliEnvironment(socketPath: String) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
-        environment.removeValue(forKey: "CMUX_SOCKET")
-        environment.removeValue(forKey: "CMUX_SOCKET_PASSWORD")
-        environment.removeValue(forKey: "CMUX_WINDOW_ID")
-        environment["CMUX_WORKSPACE_ID"] = Self.callerWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.callerSurfaceId
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment.removeValue(forKey: "WMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET_PASSWORD")
+        environment.removeValue(forKey: "WMUX_WINDOW_ID")
+        environment["WMUX_WORKSPACE_ID"] = Self.callerWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.callerSurfaceId
         return environment
     }
 

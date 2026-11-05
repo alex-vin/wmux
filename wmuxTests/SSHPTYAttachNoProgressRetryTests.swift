@@ -1,9 +1,9 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -36,8 +36,8 @@ struct SSHPTYAttachNoProgressRetryTests {
     @Test("The no-progress loop is valid POSIX shell for compound attach commands")
     func noProgressLoopAcceptsCompoundCommands() throws {
         let compoundCommand = [
-            "if [ \"$cmux_ssh_attach_no_progress_retry\" -gt 0 ]; then : || exit 1; fi",
-            "printf '%s/%s\\n' \"$CMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY\" \"$CMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT\" >> \"$CMUX_TEST_POLICY_LOG\"",
+            "if [ \"$wmux_ssh_attach_no_progress_retry\" -gt 0 ]; then : || exit 1; fi",
+            "printf '%s/%s\\n' \"$WMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY\" \"$WMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT\" >> \"$WMUX_TEST_POLICY_LOG\"",
             "exit 0",
         ].joined(separator: "\n")
         let script = SSHPTYAttachExitCode.noProgressRetryLoopLines(
@@ -62,7 +62,7 @@ struct SSHPTYAttachNoProgressRetryTests {
         // The loop must still hand the budget to the command it runs.
         let execution = Self.run(
             command: "/bin/sh \(Self.shellQuote(scriptFile.path))",
-            environment: ["CMUX_TEST_POLICY_LOG": policyLog.path]
+            environment: ["WMUX_TEST_POLICY_LOG": policyLog.path]
         )
         #expect(execution.status == 0, "\(execution.stderr)")
         let loggedBudget = try String(contentsOf: policyLog, encoding: .utf8)
@@ -229,10 +229,10 @@ struct SSHPTYAttachNoProgressRetryTests {
             "#!/bin/sh",
             "case \" $* \" in",
             "  *\" ssh-pty-attach \"*)",
-            "    count=$(cat \"$CMUX_TEST_ATTEMPT_FILE\" 2>/dev/null || printf 0)",
+            "    count=$(cat \"$WMUX_TEST_ATTEMPT_FILE\" 2>/dev/null || printf 0)",
             "    count=$((count + 1))",
-            "    printf '%s' \"$count\" > \"$CMUX_TEST_ATTEMPT_FILE\"",
-            "    printf '%s/%s\\n' \"${CMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY:-missing}\" \"${CMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT:-missing}\" >> \"$CMUX_TEST_POLICY_LOG\"",
+            "    printf '%s' \"$count\" > \"$WMUX_TEST_ATTEMPT_FILE\"",
+            "    printf '%s/%s\\n' \"${WMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY:-missing}\" \"${WMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT:-missing}\" >> \"$WMUX_TEST_POLICY_LOG\"",
         ] + decisionLines + [
             "    ;;",
             "  *) exit 0 ;;",
@@ -245,16 +245,16 @@ struct SSHPTYAttachNoProgressRetryTests {
 
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_POLICY_LOG"] = policyLog.path
-        environment["CMUX_SSH_PTY_NO_PROGRESS_RETRY_LIMIT"] = String(retryLimit)
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "1"
-        environment["CMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "1"
-        environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_POLICY_LOG"] = policyLog.path
+        environment["WMUX_SSH_PTY_NO_PROGRESS_RETRY_LIMIT"] = String(retryLimit)
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "1"
+        environment["WMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "1"
+        environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
 
         let process = Self.run(
             command: commandBuilder?(fakeCLI) ??

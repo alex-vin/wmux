@@ -1,5 +1,5 @@
 import Foundation
-import CmuxMemoryPressure
+import WmuxMemoryPressure
 
 struct MemoryPressureFootprintThresholds: Equatable, Sendable {
     static let `default` = MemoryPressureFootprintThresholds(

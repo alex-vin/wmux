@@ -8,7 +8,7 @@ import Foundation
 /// open with the last-used layout and options-menu toggles (#5284). The app's
 /// `DiffViewerPreferencesStore` owns the write side and the same sanitizer.
 extension WMUXCLI {
-    static let diffViewerPreferencesPathEnvironmentKey = "CMUX_DIFF_VIEWER_PREFS_PATH"
+    static let diffViewerPreferencesPathEnvironmentKey = "WMUX_DIFF_VIEWER_PREFS_PATH"
     private static let validDiffViewerLayouts: Set<String> = ["split", "unified"]
     private static let validDiffViewerIndicators: Set<String> = ["bars", "classic", "none"]
     private static let diffViewerBooleanPreferenceKeys = [
@@ -45,7 +45,7 @@ extension WMUXCLI {
 
     /// Reads the persisted viewer preferences, sanitized to known keys and
     /// values. Returns an empty dictionary when the file is missing or
-    /// unreadable. `CMUX_DIFF_VIEWER_PREFS_PATH` overrides the location.
+    /// unreadable. `WMUX_DIFF_VIEWER_PREFS_PATH` overrides the location.
     func persistedDiffViewerPreferences(
         environment: [String: String] = ProcessInfo.processInfo.environment
     ) -> [String: Any] {

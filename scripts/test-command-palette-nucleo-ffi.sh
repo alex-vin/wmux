@@ -40,8 +40,8 @@ NSUnbufferedIO=YES CMUX_NUCLEO_FFI_LIB="${LIB_PATH}" \
   CMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS=1 \
   TEST_RUNNER_CMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS=1 \
   xcodebuild \
-    -project "${ROOT}/cmux.xcodeproj" \
-    -scheme cmux-unit \
+    -project "${ROOT}/wmux.xcodeproj" \
+    -scheme wmux-unit \
     -configuration Debug \
     -destination 'platform=macOS' \
     -derivedDataPath "${DERIVED_DATA}" \

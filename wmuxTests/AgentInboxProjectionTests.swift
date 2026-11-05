@@ -1,11 +1,11 @@
 import AppKit
 import Foundation
 import Testing
-import CMUXAgentLaunch
-import CmuxAgentJournal
+import WMUXAgentLaunch
+import WmuxAgentJournal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

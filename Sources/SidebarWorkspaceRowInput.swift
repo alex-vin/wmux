@@ -1,6 +1,6 @@
-import CmuxCore
-import CmuxSidebar
-import CmuxWorkspaces
+import WmuxCore
+import WmuxSidebar
+import WmuxWorkspaces
 import Foundation
 
 /// Immutable inputs used to assemble one workspace row when a lazy stack realizes it.

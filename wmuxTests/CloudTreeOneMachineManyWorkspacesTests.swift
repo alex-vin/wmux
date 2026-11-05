@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -126,7 +126,7 @@ struct CloudTreeOneMachineManyWorkspacesTests {
         )).withoutCoderouterSection
     }
 
-    /// Exercise the shipped CLI binary through its socket boundary. `CMUXCLI` belongs to
+    /// Exercise the shipped CLI binary through its socket boundary. `WMUXCLI` belongs to
     /// the separate executable target and cannot be imported by the app-hosted test target;
     /// running the bundled helper keeps this assertion behavioral and compile-safe.
     private func runCLICloudTree(
@@ -170,12 +170,12 @@ struct CloudTreeOneMachineManyWorkspacesTests {
         defer { responder.stop() }
 
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let process = Process()
         let outputPipe = Pipe()
@@ -506,8 +506,8 @@ struct CloudTreeOneMachineManyWorkspacesTests {
             ],
             "browsers": [], "agents": [],
         ]
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
-        let initial = CmuxTuiSnapshotParser.resources(from: state)
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        let initial = WmuxTuiSnapshotParser.resources(from: state)
         var renamedTab = tabs[1]
         renamedTab["name"] = "renamed"
         let delta: [String: Any] = [
@@ -515,11 +515,11 @@ struct CloudTreeOneMachineManyWorkspacesTests {
             "changes": [["kind": "upsert", "resource": "tab", "id": "tab_b", "value": renamedTab]],
         ]
         let deltaData = try JSONSerialization.data(withJSONObject: delta)
-        let next = try #require(CmuxTuiSnapshotParser.applying(
+        let next = try #require(WmuxTuiSnapshotParser.applying(
             deltaPayload: deltaData,
             cursor: CloudVMCursor(generation: "layout-test", revision: 2), to: state
         ))
-        let updated = try #require(CmuxTuiSnapshotParser.resources(
+        let updated = try #require(WmuxTuiSnapshotParser.resources(
             from: next, matching: [SurfaceResourceID(machine: machine, kind: .terminal, key: "term_b")]
         ).first)
         let rowLocal = initial.map { $0.id == updated.id ? updated : $0 }
@@ -529,7 +529,7 @@ struct CloudTreeOneMachineManyWorkspacesTests {
         }
         let before = try workspaceRow(initial)
         let after = try workspaceRow(rowLocal)
-        let refreshed = try workspaceRow(CmuxTuiSnapshotParser.resources(from: next))
+        let refreshed = try workspaceRow(WmuxTuiSnapshotParser.resources(from: next))
         #expect(before.children.count == 2)
         #expect(before.children.allSatisfy { $0.children.isEmpty })
         #expect(after.children.map(\.id) == before.children.map(\.id))

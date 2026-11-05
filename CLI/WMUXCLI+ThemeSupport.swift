@@ -1,5 +1,5 @@
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
 extension WMUXCLI {
     func availableThemeNames() -> [String] {
@@ -75,7 +75,7 @@ extension WMUXCLI {
             }
         }
 
-        for appSupportDirectory in CmuxApplicationSupportDirectories(
+        for appSupportDirectory in WmuxApplicationSupportDirectories(
             environment: ProcessInfo.processInfo.environment
         ).userDirectories {
             let ghosttyDirectory = appSupportDirectory.appendingPathComponent(
@@ -94,7 +94,7 @@ extension WMUXCLI {
                 append(legacyGhosttyConfigURL)
             }
 
-            for url in CmuxGhosttyConfigPathResolver().loadConfigURLs(
+            for url in WmuxGhosttyConfigPathResolver().loadConfigURLs(
                 currentBundleIdentifier: targetBundleIdentifier,
                 appSupportDirectory: appSupportDirectory,
                 fileManager: fileManager
@@ -167,7 +167,7 @@ extension WMUXCLI {
         guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             throw CLIError(message: "Failed to locate the Application Support directory")
         }
-        return CmuxGhosttyConfigPathResolver().editableConfigURL(
+        return WmuxGhosttyConfigPathResolver().editableConfigURL(
             currentBundleIdentifier: targetBundleIdentifier,
             appSupportDirectory: appSupport
         )
@@ -178,13 +178,13 @@ extension WMUXCLI {
         targetBundleIdentifier: String
     ) throws -> URL {
         let configURL = try cmuxThemeOverrideConfigURL(targetBundleIdentifier: targetBundleIdentifier)
-        try CmuxManagedThemeConfigFile(url: configURL).write(rawThemeValue: rawThemeValue)
+        try WmuxManagedThemeConfigFile(url: configURL).write(rawThemeValue: rawThemeValue)
         return configURL
     }
 
     func clearManagedThemeOverride(targetBundleIdentifier: String) throws -> URL {
         let configURL = try cmuxThemeOverrideConfigURL(targetBundleIdentifier: targetBundleIdentifier)
-        try CmuxManagedThemeConfigFile(url: configURL).clear()
+        try WmuxManagedThemeConfigFile(url: configURL).clear()
         return configURL
     }
 
@@ -262,7 +262,7 @@ extension WMUXCLI {
     }
 
     func currentCmuxAppBundleIdentifier() -> String? {
-        if let bundleIdentifier = ProcessInfo.processInfo.environment["CMUX_BUNDLE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines),
+        if let bundleIdentifier = ProcessInfo.processInfo.environment["WMUX_BUNDLE_ID"]?.trimmingCharacters(in: .whitespacesAndNewlines),
            !bundleIdentifier.isEmpty {
             return bundleIdentifier
         }

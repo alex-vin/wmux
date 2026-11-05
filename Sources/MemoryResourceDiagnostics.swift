@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 
 /// App adapter that projects only records from one captured descendant topology.
 typealias MemoryResourceDiagnostics = ProcessMemoryDiagnostics
 
 extension ProcessMemoryDiagnostics {
-    init(snapshot: CmuxTopProcessSnapshot, appPID: Int) {
+    init(snapshot: WmuxTopProcessSnapshot, appPID: Int) {
         let pids = snapshot.expandedPIDs(rootPIDs: [appPID]).subtracting([appPID])
         self.init(
             descendants: pids.lazy.compactMap { pid in

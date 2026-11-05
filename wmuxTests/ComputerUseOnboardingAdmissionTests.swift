@@ -1,13 +1,13 @@
-#if canImport(CmuxComputerUse)
-import CmuxControlSocket
-import CmuxFoundation
-@testable import CmuxComputerUse
-import CmuxSettingsUI
+#if canImport(WmuxComputerUse)
+import WmuxControlSocket
+import WmuxFoundation
+@testable import WmuxComputerUse
+import WmuxSettingsUI
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

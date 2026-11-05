@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 
 /// Owns a transient warning above AppKit portals without taking keyboard focus.

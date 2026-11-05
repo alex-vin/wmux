@@ -1,5 +1,5 @@
-import CmuxControlSocket
-import CmuxSettings
+import WmuxControlSocket
+import WmuxSettings
 import Darwin
 import Foundation
 
@@ -45,7 +45,7 @@ extension TerminalController {
         guard !pointer.isEmpty else { return }
 
         var ownedCLIPaths: [String] = []
-        if let bundledPath = environment["CMUX_BUNDLED_CLI_PATH"]?
+        if let bundledPath = environment["WMUX_BUNDLED_CLI_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !bundledPath.isEmpty {
             ownedCLIPaths.append(bundledPath)

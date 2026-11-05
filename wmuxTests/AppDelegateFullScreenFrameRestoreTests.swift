@@ -1,8 +1,8 @@
 import AppKit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -22,7 +22,7 @@ struct AppDelegateFullScreenFrameRestoreTests {
 
         let appDelegate = AppDelegate.shared ?? AppDelegate()
         let windowId = appDelegate.createMainWindow(shouldActivate: false)
-        let window = try #require(appDelegate.mainWindow(for: windowId) as? CmuxMainWindow)
+        let window = try #require(appDelegate.mainWindow(for: windowId) as? WmuxMainWindow)
 #if DEBUG
         let previousConfirmationHandler = appDelegate.debugCloseMainWindowConfirmationHandler
         appDelegate.debugCloseMainWindowConfirmationHandler = { _ in true }

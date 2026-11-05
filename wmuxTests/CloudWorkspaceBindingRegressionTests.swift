@@ -1,8 +1,8 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,7 +14,7 @@ struct CloudWorkspaceBindingRegressionTests {
     private static let workspace = SurfaceRemoteWorkspace(id: "ws_api", name: "api", index: 0, focused: true)
 
     private static func state(workspaces: [[String: Any]]) throws -> CloudVMState {
-        try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": "g", "revision": "12"],
             "workspaces": workspaces,
             "screens": [["id": "screen", "workspace_id": workspaces[0]["id"] as? String ?? ""]],
@@ -180,9 +180,9 @@ struct CloudWorkspaceBindingRegressionTests {
     }
 
     @Test func cloudCreationErrorsNameTheMissingWorkspaceAndPlacementSeparately() {
-        let workspace = CmuxTuiSurfaceProvider.ProviderError.remoteWorkspaceNotFound("ws_deleted")
-        let placement = CmuxTuiSurfaceProvider.ProviderError.remotePlacementUnavailable("ws_api")
-        let tab = CmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab_gone")
+        let workspace = WmuxTuiSurfaceProvider.ProviderError.remoteWorkspaceNotFound("ws_deleted")
+        let placement = WmuxTuiSurfaceProvider.ProviderError.remotePlacementUnavailable("ws_api")
+        let tab = WmuxTuiSurfaceProvider.ProviderError.remoteTabNotFound("tab_gone")
 
         #expect(workspace.errorDescription?.lowercased().contains("remote workspace ws_deleted") == true)
         #expect(placement.errorDescription?.lowercased().contains("remote workspace ws_api has no available terminal placement") == true)

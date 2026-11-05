@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -18,14 +18,14 @@ struct RestorableAgentSessionStalePIDTests {
         defer { try? fm.removeItem(at: root) }
         let dir = root.appendingPathComponent("repo", isDirectory: true)
         try fm.createDirectory(at: dir, withIntermediateDirectories: true)
-        let previousHookStateDir = getenv("CMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
+        let previousHookStateDir = getenv("WMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
         let stateDir = root.appendingPathComponent(".cmuxterm", isDirectory: true)
-        setenv("CMUX_AGENT_HOOK_STATE_DIR", stateDir.path, 1)
+        setenv("WMUX_AGENT_HOOK_STATE_DIR", stateDir.path, 1)
         defer {
             if let previousHookStateDir {
-                setenv("CMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
+                setenv("WMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
             } else {
-                unsetenv("CMUX_AGENT_HOOK_STATE_DIR")
+                unsetenv("WMUX_AGENT_HOOK_STATE_DIR")
             }
         }
 
@@ -51,7 +51,7 @@ struct RestorableAgentSessionStalePIDTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fm,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { _ in nil },
             processPresenceProvider: { _ in .absent }
@@ -75,14 +75,14 @@ struct RestorableAgentSessionStalePIDTests {
         defer { try? fm.removeItem(at: root) }
         let dir = root.appendingPathComponent("repo", isDirectory: true)
         try fm.createDirectory(at: dir, withIntermediateDirectories: true)
-        let previousHookStateDir = getenv("CMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
+        let previousHookStateDir = getenv("WMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
         let stateDir = root.appendingPathComponent(".cmuxterm", isDirectory: true)
-        setenv("CMUX_AGENT_HOOK_STATE_DIR", stateDir.path, 1)
+        setenv("WMUX_AGENT_HOOK_STATE_DIR", stateDir.path, 1)
         defer {
             if let previousHookStateDir {
-                setenv("CMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
+                setenv("WMUX_AGENT_HOOK_STATE_DIR", previousHookStateDir, 1)
             } else {
-                unsetenv("CMUX_AGENT_HOOK_STATE_DIR")
+                unsetenv("WMUX_AGENT_HOOK_STATE_DIR")
             }
         }
 
@@ -130,15 +130,15 @@ struct RestorableAgentSessionStalePIDTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fm,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { pid in
                 guard pid == livePID else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: ["/usr/local/bin/codex"],
                     environment: [
-                        "CMUX_WORKSPACE_ID": ws.uuidString,
-                        "CMUX_SURFACE_ID": panel.uuidString,
+                        "WMUX_WORKSPACE_ID": ws.uuidString,
+                        "WMUX_SURFACE_ID": panel.uuidString,
                     ]
                 )
             },

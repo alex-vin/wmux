@@ -1,13 +1,13 @@
 import AppKit
-import CmuxCommandPalette
-import CmuxSettings
+import WmuxCommandPalette
+import WmuxSettings
 import Foundation
 import Testing
-@testable import CmuxSettingsUI
+@testable import WmuxSettingsUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-private typealias SimulatorStoredShortcut = cmux_DEV.StoredShortcut
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+private typealias SimulatorStoredShortcut = wmux_DEV.StoredShortcut
 #elseif canImport(cmux)
 @testable import cmux
 private typealias SimulatorStoredShortcut = cmux.StoredShortcut
@@ -481,11 +481,11 @@ struct KeyboardShortcutContextSwiftTests {
     }
 }
 
-extension CMUXCLIErrorOutputRegressionTests {
+extension WMUXCLIErrorOutputRegressionTests {
     @Test func testGeneralHelpListsSimulatorNamespace() throws {
         let cliPath = try bundledCLIPath()
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         let result = runProcess(
             executablePath: cliPath,
             arguments: ["--help"],

@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 
 extension TerminalController {

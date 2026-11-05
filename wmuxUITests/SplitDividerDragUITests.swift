@@ -132,16 +132,16 @@ final class SplitDividerDragUITests: SettingsUITestCase {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += settingsLaunchArguments
         app.launchArguments += ["-workspacePresentationMode", "standard"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-split-drag-\(UUID().uuidString.prefix(8))"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-split-drag-\(UUID().uuidString.prefix(8))"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
         if cloudWorkspace {
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_CLOUD_WORKSPACE"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_CLOUD_WORKSPACE"] = "1"
         }
         // The app's drag log explains a drag that never started.
         let logPath = "/tmp/cmux-ui-test-split-drag-log-\(UUID().uuidString).log"
-        app.launchEnvironment["CMUX_DEBUG_LOG"] = logPath
+        app.launchEnvironment["WMUX_DEBUG_LOG"] = logPath
         launchAndActivate(app)
         defer {
             app.terminate()
@@ -350,14 +350,14 @@ final class SplitDividerDragUITests: SettingsUITestCase {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += settingsLaunchArguments
         app.launchArguments += ["-workspacePresentationMode", "standard"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-split-drag-\(id.prefix(8))"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
-        app.launchEnvironment["CMUX_DEBUG_LOG"] = logPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-split-drag-\(id.prefix(8))"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
+        app.launchEnvironment["WMUX_DEBUG_LOG"] = logPath
         if let rightSidebarMode {
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_RIGHT_SIDEBAR_MODE"] = rightSidebarMode
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_RIGHT_SIDEBAR_MODE"] = rightSidebarMode
         }
         launchAndActivate(app)
         var ready: [String: String] = [:]
@@ -379,8 +379,8 @@ final class SplitDividerDragUITests: SettingsUITestCase {
     private func launchSplitApp() -> XCUIApplication {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += settingsLaunchArguments
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-split-drag-\(UUID().uuidString.prefix(8))"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-split-drag-\(UUID().uuidString.prefix(8))"
         launchAndActivate(app)
         return app
     }

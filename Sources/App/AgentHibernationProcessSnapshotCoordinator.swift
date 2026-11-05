@@ -1,13 +1,13 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 
 /// Coalesces authoritative process-table refreshes across hibernating panels.
 actor AgentHibernationProcessSnapshotCoordinator {
-    typealias SnapshotCapture = @Sendable () async -> CmuxTopProcessSnapshot
+    typealias SnapshotCapture = @Sendable () async -> WmuxTopProcessSnapshot
     typealias CaptureScheduler = @Sendable () async -> Void
     typealias ProcessArgumentsProvider =
-        @Sendable (Int) -> CmuxTopProcessArguments?
+        @Sendable (Int) -> WmuxTopProcessArguments?
     typealias ProcessIdentityProvider =
         @Sendable (pid_t) -> AgentPIDProcessIdentity?
     typealias ProcessGroupProvider = @Sendable (pid_t) -> pid_t
@@ -18,9 +18,9 @@ actor AgentHibernationProcessSnapshotCoordinator {
     private let processIdentityProvider: ProcessIdentityProvider
     private let processGroupProvider: ProcessGroupProvider
     private var activeSnapshotWaiters:
-        [UUID: CheckedContinuation<CmuxTopProcessSnapshot?, Never>] = [:]
+        [UUID: CheckedContinuation<WmuxTopProcessSnapshot?, Never>] = [:]
     private var queuedSnapshotWaiters:
-        [UUID: CheckedContinuation<CmuxTopProcessSnapshot?, Never>] = [:]
+        [UUID: CheckedContinuation<WmuxTopProcessSnapshot?, Never>] = [:]
     private var captureTask: Task<Void, Never>?
     private var captureHasStarted = false
 
@@ -36,7 +36,7 @@ actor AgentHibernationProcessSnapshotCoordinator {
             await AgentHibernationProcessSnapshotCoordinator.captureFreshSnapshot()
         },
         processArgumentsProvider: @escaping ProcessArgumentsProvider = {
-            CmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
+            WmuxTopProcessSnapshot.processArgumentsAndEnvironment(for: $0)
         },
         processIdentityProvider: @escaping ProcessIdentityProvider = {
             AgentPIDProcessIdentity(pid: $0)
@@ -53,7 +53,7 @@ actor AgentHibernationProcessSnapshotCoordinator {
     }
 
     /// Returns one fresh snapshot shared by requests already queued for this capture epoch.
-    func nextSnapshot() async -> CmuxTopProcessSnapshot? {
+    func nextSnapshot() async -> WmuxTopProcessSnapshot? {
         let waiterID = UUID()
         return await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
@@ -140,15 +140,15 @@ actor AgentHibernationProcessSnapshotCoordinator {
     #if compiler(>=6.2)
     @concurrent
     #endif
-    private nonisolated static func captureFreshSnapshot() async -> CmuxTopProcessSnapshot {
-        await CmuxTopProcessSnapshot.capture(
+    private nonisolated static func captureFreshSnapshot() async -> WmuxTopProcessSnapshot {
+        await WmuxTopProcessSnapshot.capture(
             includeProcessDetails: false,
             includeCMUXScope: false, includeResources: false
         )
     }
 
     private nonisolated static func exitEpoch(
-        in snapshot: CmuxTopProcessSnapshot,
+        in snapshot: WmuxTopProcessSnapshot,
         processGroupLeaders: [pid_t: AgentPIDProcessIdentity],
         processScopeKey: AgentHibernationPanelKey?,
         ttyDevice: Int64?,

@@ -4,8 +4,8 @@ import Foundation
 import XCTest
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -37,8 +37,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         let result = runProcess(
             executablePath: cliPath,
             arguments: ["vm", "rm", "brave-otter", "unexpected"],
@@ -146,7 +146,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
                 return self.v2Response(id: id, ok: false, error: ["code": "unexpected", "message": "missing command"])
             }
             if command.hasPrefix("p=") {
-                return self.vmExecOKResponse(id: id, stdout: "CMUX_FILE\n")
+                return self.vmExecOKResponse(id: id, stdout: "WMUX_FILE\n")
             }
             if command.hasPrefix("wc -c < ") {
                 return self.vmExecOKResponse(id: id, stdout: "\(remoteData.count)\n\(remoteDigest)  report.bin\n")
@@ -175,8 +175,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -256,8 +256,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["HOME"] = isolatedHome.path
 
         let result = runProcess(
@@ -336,8 +336,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["HOME"] = isolatedHome.path
 
         let result = runProcess(
@@ -412,8 +412,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["HOME"] = isolatedHome.path
 
         let result = runProcess(
@@ -487,8 +487,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["HOME"] = isolatedHome.path
 
         let first = runProcess(
@@ -584,8 +584,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["HOME"] = isolatedHome.path
 
         let first = runProcess(
@@ -679,8 +679,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         var results: [ProcessRunResult] = []
         for socket in sockets {
             var environment = ProcessInfo.processInfo.environment
-            environment["CMUX_SOCKET_PATH"] = socket.path
-            environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+            environment["WMUX_SOCKET_PATH"] = socket.path
+            environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
             environment["HOME"] = isolatedHome.path
             group.enter()
             DispatchQueue.global().async {
@@ -765,8 +765,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment["HOME"] = isolatedHome.path
 
         let result = runProcess(
@@ -818,10 +818,10 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         // The mock answers instantly, so do not wait out the three second poll.
-        environment["CMUX_VM_WAIT_POLL_SECONDS"] = "0.05"
+        environment["WMUX_VM_WAIT_POLL_SECONDS"] = "0.05"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -871,11 +871,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         // Exercise the shipped CLI's bounded override. The mock answers instantly,
         // so the fallback cadence allows the second poll before this deadline.
-        environment["CMUX_VM_WAIT_POLL_SECONDS"] = "3600"
+        environment["WMUX_VM_WAIT_POLL_SECONDS"] = "3600"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -956,8 +956,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
     private func vmTransferEnvironment(socketPath: String, home: URL? = nil) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         if let home { environment["HOME"] = home.path }
         return environment
     }
@@ -1327,8 +1327,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
             }
         }
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let listed = runProcess(executablePath: cliPath, arguments: ["vm", "snapshot", "ls", "brave-otter"], environment: environment, timeout: 30)
         XCTAssertEqual(listed.status, 0, "stdout=\(listed.stdout) stderr=\(listed.stderr)")
@@ -1383,8 +1383,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
             return self.v2Response(id: id, ok: true, result: ["machine": machine, "snapshot_id": snapshotID, "deleted": true])
         }
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let deleted = runProcess(executablePath: cliPath, arguments: ["vm", "snapshot", "rm", "brave-otter", "snap_old"], environment: environment, timeout: 30)
         XCTAssertEqual(deleted.status, 0, "stdout=\(deleted.stdout) stderr=\(deleted.stderr)")

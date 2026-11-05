@@ -1,9 +1,9 @@
 import Foundation
 import Testing
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -36,11 +36,11 @@ struct FishShellIntegrationTests {
         )
 
         expectEqual(environment["XDG_CONFIG_HOME"], "/Users/example/.config")
-        expectEqual(environment["CMUX_FISH_INTEGRATION_FILE"], "/Applications/cmux.app/Contents/Resources/shell-integration/fish/config.fish")
-        expectEqual(environment["CMUX_FISH_USER_CONFIG_ALREADY_LOADED"], "1")
+        expectEqual(environment["WMUX_FISH_INTEGRATION_FILE"], "/Applications/cmux.app/Contents/Resources/shell-integration/fish/config.fish")
+        expectEqual(environment["WMUX_FISH_USER_CONFIG_ALREADY_LOADED"], "1")
         expectFalse(protectedKeys.contains("XDG_CONFIG_HOME"))
-        expectTrue(protectedKeys.contains("CMUX_FISH_INTEGRATION_FILE"))
-        expectTrue(protectedKeys.contains("CMUX_FISH_USER_CONFIG_ALREADY_LOADED"))
+        expectTrue(protectedKeys.contains("WMUX_FISH_INTEGRATION_FILE"))
+        expectTrue(protectedKeys.contains("WMUX_FISH_USER_CONFIG_ALREADY_LOADED"))
     }
 
     @Test
@@ -55,18 +55,18 @@ struct FishShellIntegrationTests {
         )
 
         expectEqual(environment["XDG_CONFIG_HOME"], "/Applications/cmux.app/Contents/Resources/shell-integration/")
-        expectEqual(environment["CMUX_FISH_INTEGRATION_FILE"], "/Applications/cmux.app/Contents/Resources/shell-integration/fish/config.fish")
-        expectEqual(environment["CMUX_FISH_USER_CONFIG_ALREADY_LOADED"], "1")
+        expectEqual(environment["WMUX_FISH_INTEGRATION_FILE"], "/Applications/cmux.app/Contents/Resources/shell-integration/fish/config.fish")
+        expectEqual(environment["WMUX_FISH_USER_CONFIG_ALREADY_LOADED"], "1")
         expectFalse(protectedKeys.contains("XDG_CONFIG_HOME"))
-        expectTrue(protectedKeys.contains("CMUX_FISH_INTEGRATION_FILE"))
-        expectTrue(protectedKeys.contains("CMUX_FISH_USER_CONFIG_ALREADY_LOADED"))
+        expectTrue(protectedKeys.contains("WMUX_FISH_INTEGRATION_FILE"))
+        expectTrue(protectedKeys.contains("WMUX_FISH_USER_CONFIG_ALREADY_LOADED"))
     }
 
     @Test
     func testManagedFishShellCommandLetsGhosttyApplyLoginExecWrapper() {
         let command = TerminalSurface.managedFishShellCommand(shell: "/Applications/cmux DEV fishsh.app/fish")
 
-        expectEqual(command, "'/Applications/cmux DEV fishsh.app/fish' -il --init-command 'source \"$CMUX_FISH_INTEGRATION_FILE\"'")
+        expectEqual(command, "'/Applications/cmux DEV fishsh.app/fish' -il --init-command 'source \"$WMUX_FISH_INTEGRATION_FILE\"'")
         expectFalse(command.hasPrefix("exec "))
     }
 
@@ -109,30 +109,30 @@ struct FishShellIntegrationTests {
             end
             functions -e _cmux_send_bg
             function _cmux_send_bg
-                printf '%s\\n' $argv[1] >> "$CMUX_TEST_LOG"
+                printf '%s\\n' $argv[1] >> "$WMUX_TEST_LOG"
             end
             set -g _CMUX_TTY_NAME ttys777
             set -g _CMUX_TTY_REPORTED 0
             _cmux_preexec
             _cmux_prompt
-            printf 'USER_CONFIG=%s\\n' "$CMUX_USER_FISH_CONFIG_SOURCED"
-            printf 'USER_CONFD=%s\\n' "$CMUX_USER_FISH_CONFD_SOURCED"
+            printf 'USER_CONFIG=%s\\n' "$WMUX_USER_FISH_CONFIG_SOURCED"
+            printf 'USER_CONFD=%s\\n' "$WMUX_USER_FISH_CONFD_SOURCED"
             printf 'XDG_CONFIG_HOME=%s\\n' "$XDG_CONFIG_HOME"
             printf 'FUNCTION_PATH=%s\\n' (string join : $fish_function_path)
             printf 'COMPLETION_PATH=%s\\n' (string join : $fish_complete_path)
-            printf 'FUNCTION_RESULT=%s\\n' (cmux_test_function)
+            printf 'FUNCTION_RESULT=%s\\n' (wmux_test_function)
             printf 'CLAUDE_RESULT=%s\\n' (claude test)
             printf 'GROK_RESULT=%s\\n' (grok test)
-            printf 'UNIVERSAL=%s\\n' "$CMUX_UNIVERSAL_TEST"
-            cat "$CMUX_TEST_LOG"
+            printf 'UNIVERSAL=%s\\n' "$WMUX_UNIVERSAL_TEST"
+            cat "$WMUX_TEST_LOG"
             """,
             extraEnvironment: [
-                "CMUX_TEST_USER_CONFIG_HOME": userConfigHome.path,
-                "CMUX_TEST_LOG": logPath.path,
-                "CMUX_SOCKET_PATH": root.appendingPathComponent("cmux-test.sock").path,
-                "CMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
-                "CMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
-                "CMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
+                "WMUX_TEST_USER_CONFIG_HOME": userConfigHome.path,
+                "WMUX_TEST_LOG": logPath.path,
+                "WMUX_SOCKET_PATH": root.appendingPathComponent("cmux-test.sock").path,
+                "WMUX_TAB_ID": "11111111-1111-1111-1111-111111111111",
+                "WMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_TERMINAL_LIFECYCLE_ID": "33333333-3333-3333-3333-333333333333",
             ]
         )
 
@@ -172,7 +172,7 @@ struct FishShellIntegrationTests {
         else
             printf 'function=0\\n'
         end
-        if set -q CMUX_CLAUDE_WRAPPER_SHIM; and test -x "$CMUX_CLAUDE_WRAPPER_SHIM"
+        if set -q WMUX_CLAUDE_WRAPPER_SHIM; and test -x "$WMUX_CLAUDE_WRAPPER_SHIM"
             printf 'shim=1\\n'
         else
             printf 'shim=0\\n'
@@ -185,7 +185,7 @@ struct FishShellIntegrationTests {
 
         let disabled = try runInteractiveFish(
             command: probe,
-            extraEnvironment: ["CMUX_CLAUDE_INTEGRATION_DISABLED": "1"]
+            extraEnvironment: ["WMUX_CLAUDE_INTEGRATION_DISABLED": "1"]
         )
         expectTrue(disabled.stdout.contains("function=0"), disabled.stdout)
         expectTrue(disabled.stdout.contains("shim=0"), disabled.stdout)
@@ -229,11 +229,11 @@ struct FishShellIntegrationTests {
             cat "\(logPath.path)"
             """,
             extraEnvironment: [
-                "CMUX_SOCKET_PATH": "127.0.0.1:64011",
-                "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
-                "CMUX_TAB_ID": "22222222-2222-2222-2222-222222222222",
-                "CMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
-                "CMUX_BUNDLED_CLI_PATH": cmuxPath.path,
+                "WMUX_SOCKET_PATH": "127.0.0.1:64011",
+                "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+                "WMUX_TAB_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_PANEL_ID": "22222222-2222-2222-2222-222222222222",
+                "WMUX_BUNDLED_CLI_PATH": cmuxPath.path,
             ]
         )
 
@@ -251,26 +251,26 @@ struct FishShellIntegrationTests {
             function tmux
                 if test "$argv[1]" = show-environment
                     if test "$argv[2]" = -g
-                        printf '%s\\n' 'CMUX_SOCKET_PATH=127.0.0.1:63135' 'CMUX_SSH_ATTEMPT_ID=stale-attempt' 'CMUX_TAB_ID=stale-workspace' 'CMUX_TERMINAL_LIFECYCLE_ID=stale-lifecycle' 'CMUX_WORKSPACE_ID=stale-workspace'
+                        printf '%s\\n' 'WMUX_SOCKET_PATH=127.0.0.1:63135' 'WMUX_SSH_ATTEMPT_ID=stale-attempt' 'WMUX_TAB_ID=stale-workspace' 'WMUX_TERMINAL_LIFECYCLE_ID=stale-lifecycle' 'WMUX_WORKSPACE_ID=stale-workspace'
                     else
-                        printf '%s\\n' 'CMUX_SOCKET_PATH=127.0.0.1:55272' 'CMUX_SSH_ATTEMPT_ID=current-attempt' 'CMUX_TAB_ID=current-workspace' 'CMUX_TERMINAL_LIFECYCLE_ID=current-lifecycle' 'CMUX_WORKSPACE_ID=current-workspace'
+                        printf '%s\\n' 'WMUX_SOCKET_PATH=127.0.0.1:55272' 'WMUX_SSH_ATTEMPT_ID=current-attempt' 'WMUX_TAB_ID=current-workspace' 'WMUX_TERMINAL_LIFECYCLE_ID=current-lifecycle' 'WMUX_WORKSPACE_ID=current-workspace'
                     end
                 end
             end
             _cmux_tmux_sync_cmux_environment
             printf 'workspace=%s\\nsocket=%s\\nlifecycle=%s\\nattempt=%s\\nsurface=%s\\npanel=%s\\n' \
-                "$CMUX_WORKSPACE_ID" "$CMUX_SOCKET_PATH" "$CMUX_TERMINAL_LIFECYCLE_ID" "$CMUX_SSH_ATTEMPT_ID" \
-                (set -q CMUX_SURFACE_ID; and printf %s "$CMUX_SURFACE_ID"; or printf %s '<unset>') \
-                (set -q CMUX_PANEL_ID; and printf %s "$CMUX_PANEL_ID"; or printf %s '<unset>')
+                "$WMUX_WORKSPACE_ID" "$WMUX_SOCKET_PATH" "$WMUX_TERMINAL_LIFECYCLE_ID" "$WMUX_SSH_ATTEMPT_ID" \
+                (set -q WMUX_SURFACE_ID; and printf %s "$WMUX_SURFACE_ID"; or printf %s '<unset>') \
+                (set -q WMUX_PANEL_ID; and printf %s "$WMUX_PANEL_ID"; or printf %s '<unset>')
             """,
             extraEnvironment: [
-                "CMUX_PANEL_ID": "stale-surface",
-                "CMUX_SOCKET_PATH": "127.0.0.1:63135",
-                "CMUX_SURFACE_ID": "stale-surface",
-                "CMUX_TAB_ID": "stale-workspace",
-                "CMUX_TERMINAL_LIFECYCLE_ID": "stale-lifecycle",
-                "CMUX_SSH_ATTEMPT_ID": "stale-attempt",
-                "CMUX_WORKSPACE_ID": "stale-workspace",
+                "WMUX_PANEL_ID": "stale-surface",
+                "WMUX_SOCKET_PATH": "127.0.0.1:63135",
+                "WMUX_SURFACE_ID": "stale-surface",
+                "WMUX_TAB_ID": "stale-workspace",
+                "WMUX_TERMINAL_LIFECYCLE_ID": "stale-lifecycle",
+                "WMUX_SSH_ATTEMPT_ID": "stale-attempt",
+                "WMUX_WORKSPACE_ID": "stale-workspace",
                 "TMUX": "/tmp/tmux-test,1,0",
             ]
         )
@@ -303,13 +303,13 @@ struct FishShellIntegrationTests {
             #!/bin/sh
             {
               printf 'XDG_CONFIG_HOME=%s\\n' "$XDG_CONFIG_HOME"
-              printf 'CMUX_FISH_INTEGRATION_FILE=%s\\n' "$CMUX_FISH_INTEGRATION_FILE"
-              printf 'CMUX_FISH_USER_CONFIG_ALREADY_LOADED=%s\\n' "$CMUX_FISH_USER_CONFIG_ALREADY_LOADED"
+              printf 'WMUX_FISH_INTEGRATION_FILE=%s\\n' "$WMUX_FISH_INTEGRATION_FILE"
+              printf 'WMUX_FISH_USER_CONFIG_ALREADY_LOADED=%s\\n' "$WMUX_FISH_USER_CONFIG_ALREADY_LOADED"
               printf 'ARGS=%s\\n' "$*"
               printf 'CONFIG<<EOF\\n'
-              cat "$CMUX_FISH_INTEGRATION_FILE"
+              cat "$WMUX_FISH_INTEGRATION_FILE"
               printf '\\nEOF\\n'
-            } > "$CMUX_CAPTURE_FISH"
+            } > "$WMUX_CAPTURE_FISH"
             """
         )
         let persistentPTYExecHelper = bin.appendingPathComponent("persistent-pty-exec-helper")
@@ -331,7 +331,7 @@ struct FishShellIntegrationTests {
         let script = RemoteInteractiveShellBootstrapBuilder.script(
             remoteRelayPort: 0,
             shellFeatures: "",
-            bundledFishIntegration: "set -gx CMUX_FISH_TEST_INTEGRATION 1"
+            bundledFishIntegration: "set -gx WMUX_FISH_TEST_INTEGRATION 1"
         )
         let result = runProcess(
             executablePath: "/usr/bin/env",
@@ -342,8 +342,8 @@ struct FishShellIntegrationTests {
                 "TERM=xterm-256color",
                 "USER=\(NSUserName())",
                 "XDG_CONFIG_HOME=\(userConfigHome.path)",
-                "CMUX_CAPTURE_FISH=\(capturePath.path)",
-                "CMUX_PERSISTENT_PTY_EXEC_HELPER=\(persistentPTYExecHelper.path)",
+                "WMUX_CAPTURE_FISH=\(capturePath.path)",
+                "WMUX_PERSISTENT_PTY_EXEC_HELPER=\(persistentPTYExecHelper.path)",
                 "/bin/sh",
                 "-c",
                 script,
@@ -356,16 +356,16 @@ struct FishShellIntegrationTests {
 
         let output = try String(contentsOf: capturePath, encoding: .utf8)
         expectTrue(output.contains("XDG_CONFIG_HOME=\(userConfigHome.path)"), output)
-        expectTrue(output.contains("CMUX_FISH_INTEGRATION_FILE=\(home.path)/.cmux/relay/0.shell/fish/config.fish"), output)
-        expectTrue(output.contains("CMUX_FISH_USER_CONFIG_ALREADY_LOADED=1"), output)
-        expectTrue(output.contains("ARGS=-il --init-command source \"$CMUX_FISH_INTEGRATION_FILE\""), output)
-        expectTrue(output.contains("set -gx CMUX_FISH_TEST_INTEGRATION 1"), output)
+        expectTrue(output.contains("WMUX_FISH_INTEGRATION_FILE=\(home.path)/.cmux/relay/0.shell/fish/config.fish"), output)
+        expectTrue(output.contains("WMUX_FISH_USER_CONFIG_ALREADY_LOADED=1"), output)
+        expectTrue(output.contains("ARGS=-il --init-command source \"$WMUX_FISH_INTEGRATION_FILE\""), output)
+        expectTrue(output.contains("set -gx WMUX_FISH_TEST_INTEGRATION 1"), output)
     }
 
     private func writeUserFishConfig(at userConfigHome: URL) throws {
         let userFishConfig = userConfigHome.appendingPathComponent("fish/config.fish", isDirectory: false)
         let userFishConfD = userConfigHome.appendingPathComponent("fish/conf.d/cmux-test.fish", isDirectory: false)
-        let userFishFunction = userConfigHome.appendingPathComponent("fish/functions/cmux_test_function.fish", isDirectory: false)
+        let userFishFunction = userConfigHome.appendingPathComponent("fish/functions/wmux_test_function.fish", isDirectory: false)
         let userFishCompletion = userConfigHome.appendingPathComponent("fish/completions/cmux-test.fish", isDirectory: false)
         let userFishVariables = userConfigHome.appendingPathComponent("fish/fish_variables", isDirectory: false)
         let fileManager = FileManager.default
@@ -380,7 +380,7 @@ struct FishShellIntegrationTests {
             try fileManager.createDirectory(at: $0.deletingLastPathComponent(), withIntermediateDirectories: true)
         }
         try """
-        set -gx CMUX_USER_FISH_CONFIG_SOURCED 1
+        set -gx WMUX_USER_FISH_CONFIG_SOURCED 1
         function claude
             echo user-claude $argv
         end
@@ -389,10 +389,10 @@ struct FishShellIntegrationTests {
         end
         """
             .write(to: userFishConfig, atomically: true, encoding: .utf8)
-        try "set -gx CMUX_USER_FISH_CONFD_SOURCED 1\n"
+        try "set -gx WMUX_USER_FISH_CONFD_SOURCED 1\n"
             .write(to: userFishConfD, atomically: true, encoding: .utf8)
         try """
-        function cmux_test_function
+        function wmux_test_function
             echo function-loaded
         end
         """.write(to: userFishFunction, atomically: true, encoding: .utf8)
@@ -401,7 +401,7 @@ struct FishShellIntegrationTests {
         try """
         # This file contains fish universal variable definitions.
         # VERSION: 3.0
-        SETUVAR CMUX_UNIVERSAL_TEST:universal\\x2dloaded
+        SETUVAR WMUX_UNIVERSAL_TEST:universal\\x2dloaded
         """.write(to: userFishVariables, atomically: true, encoding: .utf8)
     }
 
@@ -441,18 +441,18 @@ struct FishShellIntegrationTests {
             "TERM": "xterm-256color",
             "SHELL": fishExecutable,
             "USER": NSUserName(),
-            "XDG_CONFIG_HOME": extraEnvironment["CMUX_TEST_USER_CONFIG_HOME"] ?? root.appendingPathComponent("user-config").path,
-            "CMUX_SHELL_INTEGRATION": "1",
-            "CMUX_SHELL_INTEGRATION_DIR": testIntegrationDir.path,
-            "CMUX_FISH_INTEGRATION_FILE": integrationFile.path,
-            "CMUX_FISH_USER_CONFIG_ALREADY_LOADED": "1",
+            "XDG_CONFIG_HOME": extraEnvironment["WMUX_TEST_USER_CONFIG_HOME"] ?? root.appendingPathComponent("user-config").path,
+            "WMUX_SHELL_INTEGRATION": "1",
+            "WMUX_SHELL_INTEGRATION_DIR": testIntegrationDir.path,
+            "WMUX_FISH_INTEGRATION_FILE": integrationFile.path,
+            "WMUX_FISH_USER_CONFIG_ALREADY_LOADED": "1",
         ]
         extraEnvironment.forEach { environment[$0] = $1 }
-        environment.removeValue(forKey: "CMUX_TEST_USER_CONFIG_HOME")
+        environment.removeValue(forKey: "WMUX_TEST_USER_CONFIG_HOME")
 
         let result = runProcess(
             executablePath: fishExecutable,
-            arguments: ["-i", "--init-command", #"source "$CMUX_FISH_INTEGRATION_FILE""#, "-c", command],
+            arguments: ["-i", "--init-command", #"source "$WMUX_FISH_INTEGRATION_FILE""#, "-c", command],
             environment: environment,
             timeout: 5
         )

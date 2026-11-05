@@ -8,12 +8,12 @@ import Bonsplit
 import UserNotifications
 import Darwin
 import Testing
-import CMUXMobileCore
-import CmuxBrowser
-import CmuxCore
+import WMUXMobileCore
+import WmuxBrowser
+import WmuxCore
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -823,7 +823,7 @@ final class BrowserPanelInitialNavigationTests: XCTestCase {
     }
 
     func testDiffViewerURLIsNotPersistedForSessionRestore() throws {
-        let schemeURL = try XCTUnwrap(URL(string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://token/index.html"))
+        let schemeURL = try XCTUnwrap(URL(string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://token/index.html"))
         let schemePanel = BrowserPanel(
             workspaceId: UUID(),
             initialURL: schemeURL,
@@ -874,7 +874,7 @@ final class BrowserPanelInitialNavigationTests: XCTestCase {
             try? FileManager.default.removeItem(at: fileURL)
         }
 
-        let schemeURL = try XCTUnwrap(URL(string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://token/index.html"))
+        let schemeURL = try XCTUnwrap(URL(string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://token/index.html"))
         let loopbackURL = try XCTUnwrap(URL(string: "http://127.0.0.1:49152/token/diff.html#cmux-diff-viewer"))
         let aliasURL = try XCTUnwrap(URL(string: "http://cmux-loopback.localtest.me:49152/token/diff.html#cmux-diff-viewer"))
         let normalURL = try XCTUnwrap(URL(string: "https://example.com/page"))
@@ -901,8 +901,8 @@ final class BrowserPanelDiffViewerSchemeTests: XCTestCase {
     func testDiffViewerSchemeRegistrationIsIdempotentForCopiedConfiguration() {
         let config = WKWebViewConfiguration()
         config.setURLSchemeHandler(
-            CmuxDiffViewerURLSchemeHandler.shared,
-            forURLScheme: CmuxDiffViewerURLSchemeHandler.scheme
+            WmuxDiffViewerURLSchemeHandler.shared,
+            forURLScheme: WmuxDiffViewerURLSchemeHandler.scheme
         )
 
         BrowserPanel.configureWebViewConfiguration(
@@ -910,7 +910,7 @@ final class BrowserPanelDiffViewerSchemeTests: XCTestCase {
             websiteDataStore: .nonPersistent()
         )
 
-        XCTAssertNotNil(config.urlSchemeHandler(forURLScheme: CmuxDiffViewerURLSchemeHandler.scheme))
+        XCTAssertNotNil(config.urlSchemeHandler(forURLScheme: WmuxDiffViewerURLSchemeHandler.scheme))
     }
 
     func testDiffViewerSchemeLoadsSameOriginModuleFromAllowlist() async throws {
@@ -958,7 +958,7 @@ final class BrowserPanelDiffViewerSchemeTests: XCTestCase {
         let patchURL = rootURL.appendingPathComponent("index.patch", isDirectory: false)
         try "diff --git a/a b/a\n".write(to: patchURL, atomically: true, encoding: .utf8)
 
-        try await CmuxDiffViewerURLSchemeHandler.shared.register(
+        try await WmuxDiffViewerURLSchemeHandler.shared.register(
             token: token,
             files: [
                 .init(requestPath: "/index.html", fileURL: indexURL, mimeType: "text/html"),
@@ -967,16 +967,16 @@ final class BrowserPanelDiffViewerSchemeTests: XCTestCase {
                 .init(requestPath: "/index.patch", fileURL: patchURL, mimeType: "text/x-diff"),
             ]
         )
-        let allowedURL = try XCTUnwrap(URL(string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html"))
-        let allowedPatchURL = try XCTUnwrap(URL(string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.patch"))
-        let rejectedURLs = try ["\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/not-allowed.html", "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html?copy=1", "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html#route", "\(CmuxDiffViewerURLSchemeHandler.scheme)://user@\(token)/index.html", "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token):42/index.html"].map { try XCTUnwrap(URL(string: $0)) }
-        XCTAssertNotNil(CmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: allowedURL))
-        XCTAssertNotNil(CmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: allowedPatchURL))
-        XCTAssertNil(CmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: rejectedURLs[0]))
-        XCTAssertNil(CmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: rejectedURLs[1]))
-        XCTAssertTrue(CmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: allowedURL))
+        let allowedURL = try XCTUnwrap(URL(string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html"))
+        let allowedPatchURL = try XCTUnwrap(URL(string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.patch"))
+        let rejectedURLs = try ["\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/not-allowed.html", "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html?copy=1", "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/index.html#route", "\(WmuxDiffViewerURLSchemeHandler.scheme)://user@\(token)/index.html", "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token):42/index.html"].map { try XCTUnwrap(URL(string: $0)) }
+        XCTAssertNotNil(WmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: allowedURL))
+        XCTAssertNotNil(WmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: allowedPatchURL))
+        XCTAssertNil(WmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: rejectedURLs[0]))
+        XCTAssertNil(WmuxDiffViewerURLSchemeHandler.shared.registeredFile(for: rejectedURLs[1]))
+        XCTAssertTrue(WmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: allowedURL))
         for rejectedURL in rejectedURLs {
-            XCTAssertFalse(CmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: rejectedURL))
+            XCTAssertFalse(WmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: rejectedURL))
         }
         let config = WKWebViewConfiguration()
         let contentController = WKUserContentController()
@@ -985,8 +985,8 @@ final class BrowserPanelDiffViewerSchemeTests: XCTestCase {
         contentController.add(moduleHandler, name: "moduleLoaded")
         config.userContentController = contentController
         config.setURLSchemeHandler(
-            CmuxDiffViewerURLSchemeHandler.shared,
-            forURLScheme: CmuxDiffViewerURLSchemeHandler.scheme
+            WmuxDiffViewerURLSchemeHandler.shared,
+            forURLScheme: WmuxDiffViewerURLSchemeHandler.scheme
         )
         defer {
             contentController.removeScriptMessageHandler(forName: "moduleLoaded")
@@ -1027,14 +1027,14 @@ final class BrowserPanelDiffViewerSchemeTests: XCTestCase {
         try FileManager.default.createSymbolicLink(at: linkURL, withDestinationURL: outsideURL)
 
         do {
-            try await CmuxDiffViewerURLSchemeHandler.shared.register(
+            try await WmuxDiffViewerURLSchemeHandler.shared.register(
                 token: token,
                 files: [
                     .init(requestPath: "/link.html", fileURL: linkURL, mimeType: "text/html"),
                 ]
             )
             XCTFail("Expected a symlink escape to be rejected")
-        } catch let error as CmuxDiffViewerSessionError {
+        } catch let error as WmuxDiffViewerSessionError {
             XCTAssertEqual(error, .unreadableFile)
         }
     }
@@ -1049,14 +1049,14 @@ final class BrowserPanelDiffViewerSchemeTests: XCTestCase {
         try "diff --git a/a b/a\n".write(to: patchURL, atomically: true, encoding: .utf8)
 
         do {
-            try await CmuxDiffViewerURLSchemeHandler.shared.register(
+            try await WmuxDiffViewerURLSchemeHandler.shared.register(
                 token: token,
                 files: [
                     .init(requestPath: "/diff.patch", fileURL: patchURL, mimeType: "text/html"),
                 ]
             )
             XCTFail("Expected a mismatched path and MIME type to be rejected")
-        } catch let error as CmuxDiffViewerSessionError {
+        } catch let error as WmuxDiffViewerSessionError {
             XCTAssertEqual(error, .invalidEntry)
         }
     }
@@ -3648,8 +3648,8 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
 
         let portal = WindowBrowserPortal(window: window)
         defer { portal.tearDown() }
-        let mainWebView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
-        let dockWebView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let mainWebView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
+        let dockWebView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let dockContext = BrowserPaneDropContext(
             workspaceId: UUID(),
             panelId: UUID(),
@@ -3864,7 +3864,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
 
         let anchor = NSView(frame: NSRect(x: 20, y: 20, width: 160, height: 120))
         contentView.addSubview(anchor)
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         portal.synchronizeWebViewForAnchor(anchor)
 
@@ -3894,7 +3894,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
     // `objc_copyWeak` ops, so at the crash-time load of 166 browser panes the
     // lookup did ~498 weak-table-locked operations on EVERY key event and EVERY
     // first-responder change (the reproduced stack showed the scan reached from
-    // both `cmux_performKeyEquivalent` and `cmux_makeFirstResponder` ->
+    // both `wmux_performKeyEquivalent` and `wmux_makeFirstResponder` ->
     // `BrowserPanel.ownedFocusIntent`). That per-call O(panes) weak-copy churn,
     // stacked on top of the WebKit `doneWithKeyEvent` re-dispatch nesting, is the
     // bug class that exhausted the 8 MB main-thread stack.
@@ -3970,7 +3970,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         contentView.addSubview(anchor1)
         contentView.addSubview(anchor2)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor1, visibleInUI: true)
         let firstSuperview = webView.superview
 
@@ -4013,7 +4013,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 120, y: 20, width: 260, height: 150))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         contentView.layoutSubtreeIfNeeded()
         portal.synchronizeWebViewForAnchor(anchor)
@@ -4052,7 +4052,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: -30, y: 0, width: 220, height: 120))
         clipView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         contentView.layoutSubtreeIfNeeded()
         clipView.layoutSubtreeIfNeeded()
@@ -4088,7 +4088,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 40, y: 20, width: 220, height: 160))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         contentView.layoutSubtreeIfNeeded()
         portal.synchronizeWebViewForAnchor(anchor)
@@ -4111,7 +4111,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
 
     func testPortalSlotPinPreservesSideDockedInspectorManagedWebViewFrameOnRehost() {
         let slot = WindowBrowserSlotView(frame: NSRect(x: 0, y: 0, width: 240, height: 160))
-        let webView = CmuxWebView(frame: NSRect(x: 0, y: 0, width: 132, height: 160), configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: NSRect(x: 0, y: 0, width: 132, height: 160), configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let inspectorContainer = NSView(frame: NSRect(x: 132, y: 0, width: 108, height: 160))
         let inspectorView = WKInspectorProbeView(frame: inspectorContainer.bounds)
         inspectorView.autoresizingMask = [.width, .height]
@@ -4154,7 +4154,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 40, y: 24, width: 260, height: 180))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         contentView.layoutSubtreeIfNeeded()
         portal.synchronizeWebViewForAnchor(anchor)
@@ -4356,7 +4356,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 40, y: 24, width: 260, height: 180))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         contentView.layoutSubtreeIfNeeded()
         portal.synchronizeWebViewForAnchor(anchor)
@@ -4471,7 +4471,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 40, y: 24, width: 260, height: 180))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         contentView.layoutSubtreeIfNeeded()
         portal.synchronizeWebViewForAnchor(anchor)
@@ -4540,7 +4540,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 40, y: 24, width: 220, height: 160))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         portal.synchronizeWebViewForAnchor(anchor)
 
@@ -4571,7 +4571,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
         let anchor = NSView(frame: NSRect(x: 40, y: 24, width: 220, height: 160))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         portal.bind(webView: webView, to: anchor, visibleInUI: true)
         portal.synchronizeWebViewForAnchor(anchor)
 
@@ -4843,7 +4843,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
 
         let anchor = NSView(frame: NSRect(x: 20, y: 20, width: 180, height: 120))
         contentView.addSubview(anchor)
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
 
         BrowserWindowPortalRegistry.bind(webView: webView, to: anchor, visibleInUI: true)
         XCTAssertNotNil(webView.superview)
@@ -4868,7 +4868,7 @@ final class BrowserWindowPortalLifecycleTests: XCTestCase {
 
         let anchor = NSView(frame: NSRect(x: 20, y: 20, width: 180, height: 120))
         contentView.addSubview(anchor)
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
 
         BrowserWindowPortalRegistry.bind(webView: webView, to: anchor, visibleInUI: true)
         BrowserWindowPortalRegistry.synchronizeForAnchor(anchor)

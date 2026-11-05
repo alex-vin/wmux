@@ -1,9 +1,9 @@
-import CmuxFoundation
+import WmuxFoundation
 import AppKit
 import Bonsplit
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Combine
-import CmuxAgentSessionStore
+import WmuxAgentSessionStore
 import Darwin
 import Foundation
 import os
@@ -631,7 +631,7 @@ final class SessionIndexStore: ObservableObject {
 
     struct LoadedAgentOrder: Sendable {
         let agents: [SessionAgent]
-        let registry: CmuxVaultAgentRegistry
+        let registry: WmuxVaultAgentRegistry
     }
 
     nonisolated static func defaultAgentOrder(workingDirectory: String?) async -> LoadedAgentOrder {
@@ -642,16 +642,16 @@ final class SessionIndexStore: ObservableObject {
 
     nonisolated private static func defaultAgentOrderSync(workingDirectory: String?) -> LoadedAgentOrder {
         let builtInIDs = Set(SessionAgent.builtInCases.map(\.rawValue))
-        let registry = CmuxVaultAgentRegistry.load(workingDirectory: workingDirectory)
+        let registry = WmuxVaultAgentRegistry.load(workingDirectory: workingDirectory)
         let agents = SessionAgent.builtInCases + registry.registrations.compactMap {
             builtInIDs.contains($0.id) ? nil : .registered(RegisteredSessionAgent(registration: $0))
         }
         return LoadedAgentOrder(agents: agents, registry: registry)
     }
 
-    nonisolated static func vaultAgentRegistry(workingDirectory: String?) async -> CmuxVaultAgentRegistry {
+    nonisolated static func vaultAgentRegistry(workingDirectory: String?) async -> WmuxVaultAgentRegistry {
         await Task.detached(priority: .utility) {
-            CmuxVaultAgentRegistry.load(workingDirectory: workingDirectory)
+            WmuxVaultAgentRegistry.load(workingDirectory: workingDirectory)
         }.value
     }
 
@@ -1408,7 +1408,7 @@ final class SessionIndexStore: ObservableObject {
     ) async -> [SessionEntry] {
         switch scope {
         case .agent(let a):
-            let registry: CmuxVaultAgentRegistry
+            let registry: WmuxVaultAgentRegistry
             let cwdFilter: String?
             if case .registered = a {
                 let scopedCwd = currentDirectory?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -1422,7 +1422,7 @@ final class SessionIndexStore: ObservableObject {
                 )
             } else {
                 cwdFilter = nil
-                registry = CmuxVaultAgentRegistry(registrations: [])
+                registry = WmuxVaultAgentRegistry(registrations: [])
             }
             return await Self.searchAgent(
                 needle: needle, agent: a, cwdFilter: cwdFilter,
@@ -1456,7 +1456,7 @@ final class SessionIndexStore: ObservableObject {
 
     nonisolated static func loadAgents(
         _ agents: [SessionAgent],
-        registry: CmuxVaultAgentRegistry,
+        registry: WmuxVaultAgentRegistry,
         ampSessionRepository: any AmpHookSessionReading,
         needle: String,
         cwdFilter: String?,
@@ -1490,7 +1490,7 @@ final class SessionIndexStore: ObservableObject {
     nonisolated private static func timedAgent(
         needle: String, agent: SessionAgent, cwdFilter: String?,
         offset: Int, limit: Int, errorBag: ErrorBag,
-        registry: CmuxVaultAgentRegistry,
+        registry: WmuxVaultAgentRegistry,
         ampSessionRepository: any AmpHookSessionReading
     ) async -> [SessionEntry] {
         #if DEBUG
@@ -1530,7 +1530,7 @@ final class SessionIndexStore: ObservableObject {
     nonisolated static func searchAgent(
         needle: String, agent: SessionAgent, cwdFilter: String?,
         offset: Int, limit: Int, errorBag: ErrorBag,
-        registry: CmuxVaultAgentRegistry,
+        registry: WmuxVaultAgentRegistry,
         ampSessionRepository: any AmpHookSessionReading
     ) async -> [SessionEntry] {
         switch agent {
@@ -1949,7 +1949,7 @@ final class SessionIndexStore: ObservableObject {
     ) -> [SessionEntry] {
         let snapshot: OpenCodeDatabaseSnapshot.Snapshot
         do {
-            guard let madeSnapshot = try OpenCodeDatabaseSnapshot.make(prefix: "cmux-opencode-search") else {
+            guard let madeSnapshot = try OpenCodeDatabaseSnapshot.make(prefix: "wmux-opencode-search") else {
                 return []
             }
             snapshot = madeSnapshot

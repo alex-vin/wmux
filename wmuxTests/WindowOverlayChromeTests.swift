@@ -1,15 +1,15 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxCommandPalette
+import WmuxAppKitSupportUI
+import WmuxCommandPalette
 import Foundation
 import SwiftUI
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -27,7 +27,7 @@ struct WindowOverlayChromeTests {
         defer { browser.tearDown() }
 
         for _ in 0..<3 {
-            let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+            let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
             browser.bind(webView: webView, to: anchor, visibleInUI: true)
             content.layoutSubtreeIfNeeded()
             browser.synchronizeWebViewForAnchor(anchor)
@@ -138,7 +138,7 @@ struct WindowOverlayChromeTests {
         let browser = WindowBrowserPortal(window: window)
         let terminal = WindowTerminalPortal(window: window)
         defer { browser.tearDown(); terminal.tearDown() }
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let terminalView = GhosttySurfaceScrollView(surfaceView: GhosttyNSView(frame: .zero))
         browser.bind(webView: webView, to: browserAnchor, visibleInUI: true)
         terminal.bind(hostedView: terminalView, to: terminalAnchor, visibleInUI: true)

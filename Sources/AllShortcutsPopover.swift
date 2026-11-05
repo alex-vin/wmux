@@ -1,5 +1,5 @@
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 import SwiftUI
 
 /// Scrollable, grouped list of every settings-visible keyboard shortcut and its
@@ -11,7 +11,7 @@ import SwiftUI
 /// `Action.label` for the localized display name, and
 /// `Action.displayedShortcutString(for: KeyboardShortcutSettings.shortcut(for:))`
 /// for the formatted key-cap string of the effective binding. Category grouping
-/// reuses the `CmuxSettings.ShortcutAction.group` metadata by mapping each
+/// reuses the `WmuxSettings.ShortcutAction.group` metadata by mapping each
 /// action through its shared raw value.
 ///
 /// Snapshot-boundary rule: the `LazyVStack`/`ForEach` below only ever receives

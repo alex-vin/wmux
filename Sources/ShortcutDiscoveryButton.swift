@@ -1,4 +1,4 @@
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import SwiftUI
 
 /// Sidebar-footer button that reveals the full keyboard-shortcut list in a
@@ -25,7 +25,7 @@ struct ShortcutDiscoveryButton: View {
         Button {
             isPopoverPresented.toggle()
         } label: {
-            CmuxSystemSymbolImage(systemName: "keyboard", pointSize: iconSize, weight: .medium, tint: Color(nsColor: .secondaryLabelColor))
+            WmuxSystemSymbolImage(systemName: "keyboard", pointSize: iconSize, weight: .medium, tint: Color(nsColor: .secondaryLabelColor))
                 .frame(width: buttonSize, height: buttonSize, alignment: .center)
         }
         .buttonStyle(SidebarFooterIconButtonStyle())

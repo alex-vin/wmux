@@ -33,16 +33,16 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = workspaceId
-        environment["CMUX_SURFACE_ID"] = surfaceId
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = root.path
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "codex"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated(["/usr/local/bin/codex", "--model", "gpt-5.4"])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = "/tmp/repo"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = workspaceId
+        environment["WMUX_SURFACE_ID"] = surfaceId
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = root.path
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "codex"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/codex"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated(["/usr/local/bin/codex", "--model", "gpt-5.4"])
+        environment["WMUX_AGENT_LAUNCH_CWD"] = "/tmp/repo"
         environment["CODEX_HOME"] = root.appendingPathComponent("codex-home", isDirectory: true).path
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -70,10 +70,10 @@ extension CLINotifyProcessIntegrationRegressionTests {
     func testLegacyFeedHookAliasReturnsJSONWithoutHelpOutsideCmuxTerminal() throws {
         let cliPath = try bundledCLIPath()
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = makeSocketPath("legacy-feed")
-        environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
-        environment.removeValue(forKey: "CMUX_SURFACE_ID")
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = makeSocketPath("legacy-feed")
+        environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
+        environment.removeValue(forKey: "WMUX_SURFACE_ID")
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,

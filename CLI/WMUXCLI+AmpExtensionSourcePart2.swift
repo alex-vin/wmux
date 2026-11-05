@@ -7,7 +7,7 @@ export default function (amp: PluginAPI) {
   // managed wrapper captures the terminal's project directory explicitly;
   // use that trusted value and fall back to the process cwd for older launches.
   const cwdFromEnv = (): string => firstString(
-    process.env.CMUX_AGENT_LAUNCH_CWD,
+    process.env.WMUX_AGENT_LAUNCH_CWD,
     process.cwd(),
   ) || process.cwd();
   const titleByThread = new Map<string, string>();

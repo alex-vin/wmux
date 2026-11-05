@@ -1,4 +1,4 @@
-import CmuxCore
+import WmuxCore
 import Foundation
 
 @MainActor

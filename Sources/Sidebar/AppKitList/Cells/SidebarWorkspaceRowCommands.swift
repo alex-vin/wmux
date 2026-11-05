@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxWorkspaces
+import WmuxFoundation
+import WmuxWorkspaces
 import Foundation
 import SwiftUI
 

@@ -1,15 +1,14 @@
 import Testing
 import AppKit
 import Combine
-import CmuxNotifications
-import CmuxUpdater
+import WmuxNotifications
 import CoreGraphics
 import Observation
 import SwiftUI
 import Bonsplit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -263,7 +262,7 @@ final class WorkspaceContentViewVisibilityTests {
             .environmentObject(SidebarState())
             .environmentObject(SidebarSelectionState())
             .environmentObject(fileExplorerState)
-            .environmentObject(CmuxConfigStore())
+            .environmentObject(WmuxConfigStore())
             .environment(
                 \.minimalModeInvalidationProbe,
                 MinimalModeInvalidationProbe(
@@ -337,8 +336,8 @@ final class WorkspaceContentViewVisibilityTests {
             defaults.removePersistentDomain(forName: suiteName)
         }
         defaults.set(
-            CmuxExtensionSidebarSelection.defaultProviderId,
-            forKey: CmuxExtensionSidebarSelection.defaultsKey
+            WmuxExtensionSidebarSelection.defaultProviderId,
+            forKey: WmuxExtensionSidebarSelection.defaultsKey
         )
 
         // Loading-card workspaces, as in the minimal-mode test above. A terminal
@@ -369,7 +368,7 @@ final class WorkspaceContentViewVisibilityTests {
             .environmentObject(SidebarState())
             .environmentObject(SidebarSelectionState())
             .environmentObject(FileExplorerState())
-            .environmentObject(CmuxConfigStore())
+            .environmentObject(WmuxConfigStore())
             .environment(
                 \.minimalModeInvalidationProbe,
                 MinimalModeInvalidationProbe(

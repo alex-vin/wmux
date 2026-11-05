@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 
 /// Type of panel content
 public enum PanelType: String, Codable, CaseIterable, Sendable {
@@ -134,7 +134,7 @@ public enum WorkspaceAttentionFlashReason: String, Equatable, Sendable {
 enum WorkspaceAttentionFlashAccent: Equatable, Sendable {
     case cmuxAccent
 
-    func strokeColor(accent: CmuxAccentColor) -> NSColor {
+    func strokeColor(accent: WmuxAccentColor) -> NSColor {
         switch self {
         case .cmuxAccent:
             return accent.dynamicNSColor

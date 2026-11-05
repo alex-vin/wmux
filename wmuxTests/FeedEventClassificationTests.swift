@@ -3,7 +3,7 @@ import Testing
 // `FeedEventClassifier` lives in `CLI/FeedEventClassifier.swift`, which is
 // compiled into both the `cmux-cli` target and this test target — so the pure
 // classification decision can be unit-tested directly, without `@testable`
-// importing the `cmux_cli` executable module (whose symbols the app-hosted
+// importing the `wmux_cli` executable module (whose symbols the app-hosted
 // test bundle cannot link).
 
 /// Regression coverage for the feed-event → user-attention classification.

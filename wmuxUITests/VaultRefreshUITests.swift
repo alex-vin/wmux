@@ -26,10 +26,10 @@ final class VaultRefreshUITests: XCTestCase {
 
         let app = XCUIApplication.cmuxTestApplication()
         let setupURL = root.appendingPathComponent("setup.json")
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = setupURL.path
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = setupURL.path
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
         app.launchEnvironment["CLAUDE_CONFIG_DIR"] = config.path
         app.launchArguments += [
             "-AppleLanguages", "(en)", "-AppleLocale", "en_US",

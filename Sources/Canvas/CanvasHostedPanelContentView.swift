@@ -1,7 +1,7 @@
 import SwiftUI
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxSettingsUI
+import WmuxAppKitSupportUI
+import WmuxSettingsUI
 
 /// SwiftUI fallback content for canvas panes whose panel kind is not yet
 /// direct-hosted (browser, markdown, file preview, agent session, ...).

@@ -1,16 +1,16 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
-extension CmuxVaultAgentRegistration {
-    static var builtInHermes: CmuxVaultAgentRegistration {
-        CmuxVaultAgentRegistration(
+extension WmuxVaultAgentRegistration {
+    static var builtInHermes: WmuxVaultAgentRegistration {
+        WmuxVaultAgentRegistration(
             id: "hermes-agent",
             name: String(
                 localized: "sessionIndex.agent.hermesAgent",
                 defaultValue: "Hermes Agent"
             ),
             iconAssetName: "AgentIcons/HermesAgent",
-            detect: CmuxVaultAgentDetectRule(
+            detect: WmuxVaultAgentDetectRule(
                 processNames: ["hermes", "hermes-agent"],
                 alternateProcessNames: ["python", "python3"],
                 alternateArgvBasenamesAny: ["hermes", "hermes-agent"]
@@ -25,7 +25,7 @@ extension CmuxVaultAgentRegistration {
     ///
     /// Keeping this separate from the decoded `sessionIdSource` prevents a custom Vault
     /// registration from claiming the built-in Hermes argument and indexing contract.
-    var persistedSessionStoreCapability: CmuxVaultAgentPersistedSessionStore? {
+    var persistedSessionStoreCapability: WmuxVaultAgentPersistedSessionStore? {
         self == Self.builtInHermes ? .hermesStateDB : nil
     }
 }

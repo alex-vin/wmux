@@ -1,8 +1,8 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import ObjectiveC
 import SwiftUI
 import WebKit

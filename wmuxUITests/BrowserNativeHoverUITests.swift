@@ -19,7 +19,7 @@ final class BrowserNativeHoverUITests: XCTestCase {
         continueAfterFailure = false
         let environment = ProcessInfo.processInfo.environment
         let app: XCUIApplication
-        if let bundleID = environment["CMUX_HOVER_TEST_APP_BUNDLE_ID"] {
+        if let bundleID = environment["WMUX_HOVER_TEST_APP_BUNDLE_ID"] {
             // A standalone runner can test the reporter's OS against a
             // cloud-built tagged app without rebuilding or launching main.
             XCTAssertTrue(bundleID.hasPrefix("com.cmuxterm.app.debug."))
@@ -27,10 +27,10 @@ final class BrowserNativeHoverUITests: XCTestCase {
             app.activate()
         } else {
             app = XCUIApplication.cmuxTestApplication()
-            app.launchEnvironment["CMUX_TAG"] = "hover-ui-\(UUID().uuidString.prefix(8))"
-            app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-            app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_SETUP"] = "1"
-            app.launchEnvironment["CMUX_UI_TEST_GOTO_SPLIT_BROWSER_URL"] = URL(fileURLWithPath: #filePath)
+            app.launchEnvironment["WMUX_TAG"] = "hover-ui-\(UUID().uuidString.prefix(8))"
+            app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_SETUP"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_GOTO_SPLIT_BROWSER_URL"] = URL(fileURLWithPath: #filePath)
                 .deletingLastPathComponent()
                 .appendingPathComponent("BrowserFixtures/hover-popover.html")
                 .absoluteString

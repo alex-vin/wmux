@@ -1,54 +1,54 @@
 import Bonsplit
 import Foundation
 
-enum CmuxSurfaceTabBarBuiltInAction: String, Codable, Sendable, CaseIterable, Hashable {
-    case newWorkspace = "cmux.newWorkspace"
-    case newAgentChat = "cmux.newAgentChat"
-    case cloudVM = "cmux.cloudvm"
-    case newCloudWorkspace = "cmux.newCloudWorkspace"
-    case newCloudMachine = "cmux.newCloudMachine"
-    case mobileConnect = "cmux.mobileconnect"
-    case newTerminal = "cmux.newTerminal"
-    case newBrowser = "cmux.newBrowser"
-    case newSimulator = "cmux.newSimulator"
-    case splitRight = "cmux.splitRight"
-    case splitDown = "cmux.splitDown"
-    case copyWorkingDirectory = "cmux.copyWorkingDirectory"
-    case copyProjectRoot = "cmux.copyProjectRoot"
-    case copyScreen = "cmux.copyScreen"
+enum WmuxSurfaceTabBarBuiltInAction: String, Codable, Sendable, CaseIterable, Hashable {
+    case newWorkspace = "wmux.newWorkspace"
+    case newAgentChat = "wmux.newAgentChat"
+    case cloudVM = "wmux.cloudvm"
+    case newCloudWorkspace = "wmux.newCloudWorkspace"
+    case newCloudMachine = "wmux.newCloudMachine"
+    case mobileConnect = "wmux.mobileconnect"
+    case newTerminal = "wmux.newTerminal"
+    case newBrowser = "wmux.newBrowser"
+    case newSimulator = "wmux.newSimulator"
+    case splitRight = "wmux.splitRight"
+    case splitDown = "wmux.splitDown"
+    case copyWorkingDirectory = "wmux.copyWorkingDirectory"
+    case copyProjectRoot = "wmux.copyProjectRoot"
+    case copyScreen = "wmux.copyScreen"
 
     init?(configID: String) {
         switch configID {
-        case "cmux.newWorkspace", "newWorkspace":
+        case "wmux.newWorkspace", "newWorkspace":
             self = .newWorkspace
-        case "cmux.newAgentChat", "cmux.agentChat", "newAgentChat", "new-agent-chat", "agentChat":
+        case "wmux.newAgentChat", "wmux.agentChat", "newAgentChat", "new-agent-chat", "agentChat":
             self = .newAgentChat
-        case "cmux.cloudvm", "cmux.cloudVM", "cloudVM", "cloudvm",
-             "cmux.newCloudVM", "cmux.newCloudVm", "newCloudVM", "newCloudVm",
-             "cmux.startCloudVM", "cmux.startCloudVm", "startCloudVM", "startCloudVm":
+        case "wmux.cloudvm", "wmux.cloudVM", "cloudVM", "cloudvm",
+             "wmux.newCloudVM", "wmux.newCloudVm", "newCloudVM", "newCloudVm",
+             "wmux.startCloudVM", "wmux.startCloudVm", "startCloudVM", "startCloudVm":
             self = .cloudVM
-        case "cmux.newCloudWorkspace", "newCloudWorkspace":
+        case "wmux.newCloudWorkspace", "newCloudWorkspace":
             self = .newCloudWorkspace
-        case "cmux.newCloudMachine", "newCloudMachine":
+        case "wmux.newCloudMachine", "newCloudMachine":
             self = .newCloudMachine
-        case "cmux.mobileconnect", "cmux.mobileConnect", "mobileConnect", "mobileconnect",
-             "cmux.connectPhone", "connectPhone":
+        case "wmux.mobileconnect", "wmux.mobileConnect", "mobileConnect", "mobileconnect",
+             "wmux.connectPhone", "connectPhone":
             self = .mobileConnect
-        case "cmux.newTerminal", "newTerminal":
+        case "wmux.newTerminal", "newTerminal":
             self = .newTerminal
-        case "cmux.newBrowser", "newBrowser":
+        case "wmux.newBrowser", "newBrowser":
             self = .newBrowser
-        case "cmux.newSimulator", "newSimulator", "new-simulator", "simulator":
+        case "wmux.newSimulator", "newSimulator", "new-simulator", "simulator":
             self = .newSimulator
-        case "cmux.splitRight", "splitRight":
+        case "wmux.splitRight", "splitRight":
             self = .splitRight
-        case "cmux.splitDown", "splitDown":
+        case "wmux.splitDown", "splitDown":
             self = .splitDown
-        case "cmux.copyWorkingDirectory", "copyWorkingDirectory":
+        case "wmux.copyWorkingDirectory", "copyWorkingDirectory":
             self = .copyWorkingDirectory
-        case "cmux.copyProjectRoot", "copyProjectRoot":
+        case "wmux.copyProjectRoot", "copyProjectRoot":
             self = .copyProjectRoot
-        case "cmux.copyScreen", "copyScreen":
+        case "wmux.copyScreen", "copyScreen":
             self = .copyScreen
         default:
             return nil
@@ -145,7 +145,7 @@ enum CmuxSurfaceTabBarBuiltInAction: String, Codable, Sendable, CaseIterable, Ha
     }
 }
 
-extension CmuxSurfaceTabBarBuiltInAction {
+extension WmuxSurfaceTabBarBuiltInAction {
     /// The user-editable shortcut that triggers the same behavior as this
     /// built-in action. Menus that list built-in actions read the live
     /// `KeyboardShortcutSettings` value through this mapping, so a rebind or
@@ -172,6 +172,6 @@ extension CmuxSurfaceTabBarBuiltInAction {
 }
 
 @MainActor
-func surfaceTabBarBuiltInActionIsAvailable(_ action: CmuxSurfaceTabBarBuiltInAction) -> Bool {
+func surfaceTabBarBuiltInActionIsAvailable(_ action: WmuxSurfaceTabBarBuiltInAction) -> Bool {
     Workspace.surfaceTabBarBuiltInActionIsAvailable(action)
 }

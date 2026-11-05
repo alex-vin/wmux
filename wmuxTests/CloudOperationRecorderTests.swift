@@ -1,12 +1,12 @@
-import CmuxCloud
-import CmuxAuthRuntime
+import WmuxCloud
+import WmuxAuthRuntime
 import AppKit
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 
 @MainActor
 struct CloudOperationRecorderTests {
@@ -33,7 +33,7 @@ struct CloudOperationRecorderTests {
         let recorder = CloudOperationRecorder(uploader: uploader, identity: { identity })
         let operation = recorder.begin(.open)
         await PlacementReceiptURLProtocol.resetCapture(status: status)
-        await recorder.finish(operation, error: CmuxTuiSurfaceProvider.ProviderError.remotePlacementUnavailable("fixture-machine"))
+        await recorder.finish(operation, error: WmuxTuiSurfaceProvider.ProviderError.remotePlacementUnavailable("fixture-machine"))
         let deadline = ContinuousClock.now.advanced(by: .seconds(10))
         var acknowledged = false
         while ContinuousClock.now < deadline {
@@ -80,7 +80,7 @@ struct CloudOperationRecorderTests {
         for text in ["Cloud could not connect.", String(repeating: "Cloud connection failed\n", count: 100)] {
             let alert = NSAlert()
             alert.messageText = "Cloud error"
-            CmuxAlertContent.scrollingAll(text).apply(to: alert, visibleFrame: NSRect(x: 0, y: 0, width: 1024, height: 768))
+            WmuxAlertContent.scrollingAll(text).apply(to: alert, visibleFrame: NSRect(x: 0, y: 0, width: 1024, height: 768))
             CloudErrorCopy.install(in: alert, text: text)
             defer { alert.window.close() }
             let root = try #require(alert.window.contentView)
@@ -181,7 +181,7 @@ struct CloudOperationRecorderTests {
         let child = recorder.beginChild(of: root, phase: .request, attempt: 1)
         await recorder.finish(child, httpStatus: 503)
         await recorder.finish(root)
-        let client = CloudTelemetryClient.current(info: ["CFBundleShortVersionString": "1.2.3", "CFBundleVersion": "45", "CMUXCommit": "abcdef123"], flavor: .nightly)
+        let client = CloudTelemetryClient.current(info: ["CFBundleShortVersionString": "1.2.3", "CFBundleVersion": "45", "WMUXCommit": "abcdef123"], flavor: .nightly)
         let report = CloudDiagnosticReport.text(operations: recorder.operations, client: client)
         #expect(report.contains("nightly"))
         #expect(report.contains("abcdef123"))
@@ -272,13 +272,13 @@ struct CloudOperationRecorderTests {
     }
 
     @Test func metadataSeparatesNightlyFromItsBackend() {
-        let info: [String: Any] = ["CFBundleShortVersionString": "1.2.3", "CFBundleVersion": "45", "CMUXCommit": "abcdef123"]
+        let info: [String: Any] = ["CFBundleShortVersionString": "1.2.3", "CFBundleVersion": "45", "WMUXCommit": "abcdef123"]
         #expect(CloudTelemetryClient.current(info: info, flavor: .nightly).channel == "nightly")
         #expect(CloudTelemetryClient.current(info: info, flavor: .rc).channel == "rc")
         #expect(CloudTelemetryClient.current(info: info, flavor: .stable).channel == "production")
         #expect(CloudTelemetryClient.current(info: info, flavor: .dev).channel == "dev")
         #expect(CloudTelemetryClient.current(info: info, flavor: .nightly).revision == "abcdef123")
-        #expect(CloudTelemetryClient.current(info: info, flavor: .dev, environment: ["CMUX_TAG": "pr-123-cloud"]).tag == "pr-123-cloud")
+        #expect(CloudTelemetryClient.current(info: info, flavor: .dev, environment: ["WMUX_TAG": "pr-123-cloud"]).tag == "pr-123-cloud")
     }
 
     @Test func machineUsageFailuresKeepTheirActionableCategories() {

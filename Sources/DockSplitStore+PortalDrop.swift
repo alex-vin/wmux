@@ -1,7 +1,7 @@
 import AppKit
 import Bonsplit
-import CmuxTerminal
-import CmuxWorkspaces
+import WmuxTerminal
+import WmuxWorkspaces
 import Foundation
 
 /// Portal pane-drop routing for the Dock — the Dock equivalent of

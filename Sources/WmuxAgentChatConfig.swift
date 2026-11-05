@@ -1,6 +1,6 @@
 import Foundation
 
-struct CmuxAgentChatConfigDefinition: Codable, Sendable, Hashable {
+struct WmuxAgentChatConfigDefinition: Codable, Sendable, Hashable {
     var url: String?
     var startCommand: String?
 
@@ -64,7 +64,7 @@ struct CmuxAgentChatConfigDefinition: Codable, Sendable, Hashable {
     }
 }
 
-enum CmuxAgentChatConfigurationSource: Sendable, Hashable {
+enum WmuxAgentChatConfigurationSource: Sendable, Hashable {
     case local(path: String)
     case global(path: String)
     case defaults
@@ -90,9 +90,9 @@ enum AgentChatServerMode: Sendable, Hashable {
     case legacyDefaultURL
 }
 
-struct CmuxAgentChatConfiguration: Sendable, Hashable {
+struct WmuxAgentChatConfiguration: Sendable, Hashable {
     static let defaultURLString = "http://127.0.0.1:7739"
-    static let `default` = CmuxAgentChatConfiguration(
+    static let `default` = WmuxAgentChatConfiguration(
         url: URL(string: defaultURLString)!,
         startCommand: nil,
         source: .defaults,
@@ -101,7 +101,7 @@ struct CmuxAgentChatConfiguration: Sendable, Hashable {
 
     var url: URL
     var startCommand: String?
-    var source: CmuxAgentChatConfigurationSource
+    var source: WmuxAgentChatConfigurationSource
     var hasExplicitURL: Bool
 
     var startCommandRequiresTrust: Bool {
@@ -127,9 +127,9 @@ struct CmuxAgentChatConfiguration: Sendable, Hashable {
     }
 
     static func resolved(
-        local: CmuxAgentChatConfigDefinition?,
-        global: CmuxAgentChatConfigDefinition?
-    ) -> CmuxAgentChatConfiguration {
+        local: WmuxAgentChatConfigDefinition?,
+        global: WmuxAgentChatConfigDefinition?
+    ) -> WmuxAgentChatConfiguration {
         resolved(
             local: local,
             global: global,
@@ -139,13 +139,13 @@ struct CmuxAgentChatConfiguration: Sendable, Hashable {
     }
 
     static func resolved(
-        local: CmuxAgentChatConfigDefinition?,
-        global: CmuxAgentChatConfigDefinition?,
+        local: WmuxAgentChatConfigDefinition?,
+        global: WmuxAgentChatConfigDefinition?,
         localSourcePath: String?,
         globalSourcePath: String?
-    ) -> CmuxAgentChatConfiguration {
-        let definition: CmuxAgentChatConfigDefinition?
-        let source: CmuxAgentChatConfigurationSource
+    ) -> WmuxAgentChatConfiguration {
+        let definition: WmuxAgentChatConfigDefinition?
+        let source: WmuxAgentChatConfigurationSource
         if let local, local.hasServerFields {
             definition = local
             source = localSourcePath.map { .local(path: $0) } ?? .defaults
@@ -157,7 +157,7 @@ struct CmuxAgentChatConfiguration: Sendable, Hashable {
             source = .defaults
         }
         let rawURL = definition?.url ?? Self.defaultURLString
-        return CmuxAgentChatConfiguration(
+        return WmuxAgentChatConfiguration(
             url: URL(string: rawURL) ?? Self.default.url,
             startCommand: definition?.startCommand,
             source: source,

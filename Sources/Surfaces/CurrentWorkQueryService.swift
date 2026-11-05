@@ -1,8 +1,8 @@
-import CmuxCloud
-import CmuxAgentChat
-import CmuxMobileHost
-import CmuxNotifications
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxAgentChat
+import WmuxMobileHost
+import WmuxNotifications
+import WmuxSurfaceCatalogModel
 import Foundation
 
 /// Captures current owners in one actor turn. Reading never refreshes or discovers work.

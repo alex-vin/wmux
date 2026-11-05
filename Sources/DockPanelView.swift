@@ -1,8 +1,8 @@
 import AppKit
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxNotifications
-import CmuxTerminal
+import WmuxAppKitSupportUI
+import WmuxNotifications
+import WmuxTerminal
 import SwiftUI
 
 /// Right-sidebar Dock. Renders the window's own Dock `BonsplitController` tree

@@ -1,12 +1,12 @@
 import AppKit
 import Combine
-import CmuxSettings
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-private typealias AppStoredShortcut = cmux_DEV.StoredShortcut
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+private typealias AppStoredShortcut = wmux_DEV.StoredShortcut
 #elseif canImport(cmux)
 @testable import cmux
 private typealias AppStoredShortcut = cmux.StoredShortcut
@@ -665,7 +665,7 @@ struct ReopenLastClosedTests {
         )
         #expect(
             settingsAction.defaultStroke ==
-                CmuxSettings.ShortcutStroke(key: "t", command: true, shift: true)
+                WmuxSettings.ShortcutStroke(key: "t", command: true, shift: true)
         )
         #expect(settingsAction.group == .navigation)
         #expect(

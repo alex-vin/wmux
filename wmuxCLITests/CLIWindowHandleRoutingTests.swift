@@ -175,12 +175,12 @@ struct CLIWindowHandleRoutingTests {
 
     private static func cliEnvironment(socketPath: String) -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = "2"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC"] = "2"
         return environment
     }
 

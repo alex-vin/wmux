@@ -1,10 +1,10 @@
 import Darwin
 import Foundation
 import Testing
-import CmuxFoundation
+import WmuxFoundation
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -115,12 +115,12 @@ struct CodexSessionStartDeadTurnTests {
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
                 "CODEX_HOME": codexHome.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceID,
-                "CMUX_SURFACE_ID": surfaceID,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CODEX_PID": String(incomingPID),
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceID,
+                "WMUX_SURFACE_ID": surfaceID,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CODEX_PID": String(incomingPID),
             ],
             standardInput: #"{"session_id":"\#(sessionID)","cwd":"\#(root.path)","transcript_path":"\#(transcriptURL.path)","hook_event_name":"SessionStart"}"#,
             timeout: 5

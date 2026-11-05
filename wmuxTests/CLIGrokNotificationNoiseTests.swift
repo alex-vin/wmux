@@ -216,11 +216,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": root.path,
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceId,
-            "CMUX_SURFACE_ID": surfaceId,
-            "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceId,
+            "WMUX_SURFACE_ID": surfaceId,
+            "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
             "GROK_HOME": grokHome.path,
         ]
 

@@ -1,13 +1,13 @@
 import AppKit
-import CmuxCore
-import CmuxControlSocket
+import WmuxCore
+import WmuxControlSocket
 import Darwin
 import Foundation
 import Testing
-import CmuxTerminal
-import struct CmuxSettings.IntegrationsCatalogSection
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+import WmuxTerminal
+import struct WmuxSettings.IntegrationsCatalogSection
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1335,7 +1335,7 @@ final class TerminalControllerSocketSecurityTests {
         let surfaceID = try #require(sourceWorkspace.focusedTerminalPanel?.id)
         let terminalLifecycleID = try #require(
             sourceWorkspace.focusedTerminalPanel?.surface.startupEnvironmentValue(
-                "CMUX_TERMINAL_LIFECYCLE_ID"
+                "WMUX_TERMINAL_LIFECYCLE_ID"
             ).flatMap(UUID.init(uuidString:))
         )
         let windowDock = appDelegate.windowDock(forWindowId: windowID)
@@ -1729,7 +1729,7 @@ final class TerminalControllerSocketSecurityTests {
                 "surface_id": sourcePanelId.uuidString,
                 "direction": "right",
                 "startup_environment": [
-                    "CMUX_AGENT_MANAGED_SUBAGENT": "1"
+                    "WMUX_AGENT_MANAGED_SUBAGENT": "1"
                 ]
             ],
             to: socketPath
@@ -1741,7 +1741,7 @@ final class TerminalControllerSocketSecurityTests {
         let newSurfaceID = try XCTUnwrap(UUID(uuidString: newSurfaceIDString))
         let newPanel = try XCTUnwrap(workspace.panels[newSurfaceID] as? TerminalPanel)
 
-        XCTAssertEqual(newPanel.surface.startupEnvironmentValue("CMUX_AGENT_MANAGED_SUBAGENT"), "1")
+        XCTAssertEqual(newPanel.surface.startupEnvironmentValue("WMUX_AGENT_MANAGED_SUBAGENT"), "1")
         XCTAssertTrue(workspace.suppressesRawTerminalNotification(panelId: newSurfaceID))
         XCTAssertFalse(workspace.suppressesRawTerminalNotification(panelId: sourcePanelId))
     }
@@ -1957,7 +1957,7 @@ final class TerminalControllerSocketSecurityTests {
         let response = try handleV2Request(
             method: "browser.open_split",
             params: [
-                "url": "\(CmuxDiffViewerURLSchemeHandler.scheme)://\(token)/diff.html",
+                "url": "\(WmuxDiffViewerURLSchemeHandler.scheme)://\(token)/diff.html",
                 "diff_viewer_token": token
             ]
         )

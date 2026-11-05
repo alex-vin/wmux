@@ -1,21 +1,21 @@
 import XCTest
-import CmuxSettings
-@testable import CmuxSettingsUI
+import WmuxSettings
+@testable import WmuxSettingsUI
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-// The app target still declares legacy duplicates of these CmuxSettings
-// value types; with CmuxSettings imported unconditionally the names are
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+// The app target still declares legacy duplicates of these WmuxSettings
+// value types; with WmuxSettings imported unconditionally the names are
 // ambiguous. These tests exercise the app-side paths, so pin the app types.
-private typealias StoredShortcut = cmux_DEV.StoredShortcut
+private typealias StoredShortcut = wmux_DEV.StoredShortcut
 #elseif canImport(cmux)
 @testable import cmux
 private typealias StoredShortcut = cmux.StoredShortcut
 #endif
 
-// Line ~253 compares CmuxSettings.ShortcutAction.defaultStroke, so the
+// Line ~253 compares WmuxSettings.ShortcutAction.defaultStroke, so the
 // package stroke is the intended type here (unlike StoredShortcut above).
-private typealias ShortcutStroke = CmuxSettings.ShortcutStroke
+private typealias ShortcutStroke = WmuxSettings.ShortcutStroke
 
 final class KeyboardShortcutContextTests: XCTestCase {
     func testSimulatorShortcutsYieldToTextEditors() {
@@ -308,7 +308,7 @@ final class KeyboardShortcutContextTests: XCTestCase {
         guard let settingsAction = ShortcutAction(
             rawValue: KeyboardShortcutSettings.Action.newBrowserWorkspace.rawValue
         ) else {
-            XCTFail("Expected CmuxSettings.ShortcutAction for newBrowserWorkspace")
+            XCTFail("Expected WmuxSettings.ShortcutAction for newBrowserWorkspace")
             return
         }
         XCTAssertEqual(settingsAction.defaultStroke, ShortcutStroke(key: "n", command: true, option: true))

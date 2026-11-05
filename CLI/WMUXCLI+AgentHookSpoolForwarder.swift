@@ -1,6 +1,6 @@
 import Darwin
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 extension WMUXCLI {
     /// Admits events a session's hooks published to its spool before a direct
@@ -17,7 +17,7 @@ extension WMUXCLI {
         processEnvironment: [String: String]
     ) {
         guard !client.isRelayBacked,
-              processEnvironment["CMUX_AGENT_HOOK_DELIVERY_PROCESS_GROUP"] != "1",
+              processEnvironment["WMUX_AGENT_HOOK_DELIVERY_PROCESS_GROUP"] != "1",
               let path = processEnvironment[
                   AgentHookSpoolProducer(agent: agent).spoolDirectoryEnvironmentKey
               ],
@@ -218,7 +218,7 @@ extension WMUXCLI {
         }
         var environment = record.environment
         if agentExited,
-           let surfaceID = environment["CMUX_SURFACE_ID"],
+           let surfaceID = environment["WMUX_SURFACE_ID"],
            UUID(uuidString: surfaceID) != nil {
             // The agent PID no longer identifies its terminal. Deliver by the
             // surface instead, which the app re-homes if the pane moved.

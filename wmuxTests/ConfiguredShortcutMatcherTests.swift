@@ -1,9 +1,9 @@
 import AppKit
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-private typealias MatcherStoredShortcut = cmux_DEV.StoredShortcut
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+private typealias MatcherStoredShortcut = wmux_DEV.StoredShortcut
 #elseif canImport(cmux)
 @testable import cmux
 private typealias MatcherStoredShortcut = cmux.StoredShortcut

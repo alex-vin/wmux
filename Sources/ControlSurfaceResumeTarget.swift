@@ -1,6 +1,6 @@
 import AppKit
-import CMUXAgentLaunch
-import CmuxControlSocket
+import WMUXAgentLaunch
+import WmuxControlSocket
 import Foundation
 
 @MainActor
@@ -155,7 +155,7 @@ enum ControlSurfaceResumeTarget {
     }
 
     /// Relay-originated registrations named a persistent-SSH daemon slot. TTY
-    /// SSH runs through cmux-tui without one, so no relay binding can resume.
+    /// SSH runs through wmux-tui without one, so no relay binding can resume.
     func registeredBinding(
         _ binding: SurfaceResumeBindingSnapshot,
         inputs: ControlSurfaceResumeSetInputs

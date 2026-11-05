@@ -1,7 +1,7 @@
 import XCTest
 
 /// Behavioral UI tests for the Settings → **Browser** section
-/// (`Packages/macOS/CmuxSettingsUI/.../Sections/BrowserSection.swift`).
+/// (`Packages/macOS/WmuxSettingsUI/.../Sections/BrowserSection.swift`).
 ///
 /// The goal of each test here is behavioral: change a setting or press a
 /// control, then drive the surface it affects and assert the *effect*
@@ -19,7 +19,7 @@ import XCTest
 /// `BrowserDataImportCoordinator.shared.presentImportDialog()`, which
 /// opens the import wizard window. That wizard is the same surface the
 /// existing `BrowserImportProfilesUITests` drives, and it honors the
-/// `CMUX_UI_TEST_BROWSER_IMPORT_FIXTURE` env seam, so we can launch with a
+/// `WMUX_UI_TEST_BROWSER_IMPORT_FIXTURE` env seam, so we can launch with a
 /// fake installed browser and assert the wizard appears after pressing the
 /// Settings button.
 final class SettingsBrowserBehaviorUITests: SettingsUITestCase {
@@ -99,11 +99,11 @@ final class SettingsBrowserBehaviorUITests: SettingsUITestCase {
     private func makeLaunchedAppWithImportFixture() -> XCUIApplication {
         let app = XCUIApplication.cmuxTestApplication()
         app.launchArguments += settingsLaunchArguments
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_FIXTURE"] =
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_FIXTURE"] =
             #"{"browserName":"Helium","profiles":["You","austin"]}"#
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_DESTINATIONS"] = #"["Default"]"#
-        app.launchEnvironment["CMUX_UI_TEST_BROWSER_IMPORT_MODE"] = "capture-only"
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_DESTINATIONS"] = #"["Default"]"#
+        app.launchEnvironment["WMUX_UI_TEST_BROWSER_IMPORT_MODE"] = "capture-only"
         launchAndActivate(app)
         XCTAssertTrue(
             waitForWindowCount(atLeast: 1, app: app, timeout: 8.0),
@@ -168,7 +168,7 @@ final class SettingsBrowserBehaviorUITests: SettingsUITestCase {
     //   rendered on a blank embedded-browser tab. Asserting the effect
     //   requires opening a blank browser tab and inspecting WebView-hosted
     //   chrome; `BrowserImportProfilesUITests` exercises that hint surface
-    //   only via dedicated CMUX_UI_TEST_BROWSER_IMPORT_HINT_* launch seams,
+    //   only via dedicated WMUX_UI_TEST_BROWSER_IMPORT_HINT_* launch seams,
     //   not by flipping this Settings toggle at runtime.
     //
     // TIER 2 (needs runtime seam): React Grab Version

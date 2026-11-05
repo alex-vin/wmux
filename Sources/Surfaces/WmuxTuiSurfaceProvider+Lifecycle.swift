@@ -1,8 +1,8 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 
 @MainActor
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     var isAwake: Bool { summary.status == "running" }
     var providerID: String { summary.provider }
     /// Port rows are openable only when the machine advertises a preview

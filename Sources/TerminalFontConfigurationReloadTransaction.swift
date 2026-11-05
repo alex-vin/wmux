@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 
 /// One configuration transaction's font-scale boundary.
 ///

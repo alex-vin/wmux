@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -98,7 +98,7 @@ struct BrowserWindowPortalRegistryNotificationTests {
 
         let anchor = NSView(frame: NSRect(x: 20, y: 20, width: 180, height: 120))
         contentView.addSubview(anchor)
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
 
         var notificationCount = 0
         let observer = NotificationCenter.default.addObserver(
@@ -360,7 +360,7 @@ struct BrowserWindowPortalRegistryNotificationTests {
         NSLayoutConstraint.activate(firstHostConstraints)
         firstHost.layoutSubtreeIfNeeded()
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         defer { BrowserWindowPortalRegistry.detach(webView: webView) }
         BrowserWindowPortalRegistry.bind(webView: webView, to: anchor, visibleInUI: true)
         await waitForNextMainTurn()
@@ -519,7 +519,7 @@ struct BrowserWindowPortalRegistryNotificationTests {
         let anchor = NSView(frame: NSRect(x: 24, y: 24, width: 360, height: 220))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         defer { BrowserWindowPortalRegistry.detach(webView: webView) }
         BrowserWindowPortalRegistry.bind(webView: webView, to: anchor, visibleInUI: true)
         BrowserWindowPortalRegistry.synchronizeForAnchor(anchor)

@@ -1,4 +1,4 @@
-import CmuxTerminal
+import WmuxTerminal
 import Foundation
 
 extension TerminalSurface {
@@ -96,7 +96,7 @@ extension TerminalSurface {
         // (`nil` rather than `false`), keep the async lookup so an unknown job
         // is never assumed local.
         if let surfaceDevice = controllingTTYDeviceIdentifier,
-           surfaceDevice == CmuxTopProcessSnapshot.deviceIdentifier(forTTYName: ttyName),
+           surfaceDevice == WmuxTopProcessSnapshot.deviceIdentifier(forTTYName: ttyName),
            let processGroupID = foregroundProcessID(),
            TerminalSSHSessionDetector.foregroundJobHasRemoteShell(
                processGroupID: Int32(processGroupID),

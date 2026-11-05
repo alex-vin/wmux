@@ -89,10 +89,10 @@ def tmux_call(context, *args):
 
 def report(context, state):
     # A late hook from an older invocation must not overwrite its replacement.
-    if tmux_call(context, 'show-options', '-pqv', '-t', context['pane'], '@cmux_agent_owner') != context['owner']:
+    if tmux_call(context, 'show-options', '-pqv', '-t', context['pane'], '@wmux_agent_owner') != context['owner']:
         return
     payload = '' if state == 'clear' else json.dumps({'agent': context['agent'], 'state': state}, separators=(',', ':'))
-    tmux_call(context, 'set-option', '-p', '-t', context['pane'], '@cmux_agent', payload)
+    tmux_call(context, 'set-option', '-p', '-t', context['pane'], '@wmux_agent', payload)
 
 
 def hook_command(context, state):
@@ -116,7 +116,7 @@ def launch(agent, args):
         tmux = shutil.which('tmux')
         if re.fullmatch(r'%[0-9]+', pane) and socket and tmux and session_launch(agent, args):
             context = dict(agent=agent, pane=pane, socket=socket, tmux=tmux, owner=uuid.uuid4().hex)
-            tmux_call(context, 'set-option', '-p', '-t', pane, '@cmux_agent_owner', context['owner'])
+            tmux_call(context, 'set-option', '-p', '-t', pane, '@wmux_agent_owner', context['owner'])
             if agent == 'codex':
                 injected = ['--enable', 'hooks']
                 # Codex splits a -c key on every '.', even inside quotes, so the
@@ -164,14 +164,14 @@ def install(session, encoded):
     stable.write_text('. ' + shlex.quote(str(integration)) + '\n')
     context = dict(tmux=shutil.which('tmux'), socket=os.environ['TMUX'].rsplit(',', 2)[0])
     previous = tmux_call(context, 'show-options', '-Aqv', '-t', session, 'default-command')
-    owned = tmux_call(context, 'show-options', '-Aqv', '-t', session, '@cmux_agent_default_command')
+    owned = tmux_call(context, 'show-options', '-Aqv', '-t', session, '@wmux_agent_default_command')
     shell = tmux_call(context, 'show-options', '-Aqv', '-t', session, 'default-shell') or os.environ.get('SHELL', '/bin/sh')
     if previous and previous != owned:
         source_existing_shells(context, session, shell, stable, bin_dir)
         return  # Preserve a deliberate user command.
     command = shlex.join([sys.executable, str(script), '--shell', shell])
     tmux_call(context, 'set-option', '-t', session, 'default-command', command)
-    tmux_call(context, 'set-option', '-t', session, '@cmux_agent_default_command', command)
+    tmux_call(context, 'set-option', '-t', session, '@wmux_agent_default_command', command)
     source_existing_shells(context, session, shell, stable, bin_dir)
 
 

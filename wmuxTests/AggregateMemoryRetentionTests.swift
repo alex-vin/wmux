@@ -1,11 +1,11 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import Darwin
 import Testing
-import CmuxMemoryPressure
+import WmuxMemoryPressure
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -23,7 +23,7 @@ struct AggregateMemoryRetentionTests {
     func retainedDescendantsStayAccounted(coalitionBytes: UInt64) async {
         // A small app remains after its large child's parent exits. The child
         // retains coalition membership, but a PPID walk can no longer find it.
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 process(pid: 42, parentPID: 1, bytes: 2 << 30),
                 process(pid: 43, parentPID: 1, bytes: 20 << 30)
@@ -49,7 +49,7 @@ struct AggregateMemoryRetentionTests {
 
     @Test("An unreadable process-table edge never authorizes hibernation")
     func incompleteListingFailsClosed() async {
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [process(pid: 42, parentPID: 1, bytes: 9_000)],
             sampledAt: .distantPast,
             includesProcessDetails: false,
@@ -75,7 +75,7 @@ struct AggregateMemoryRetentionTests {
     @Test("Resource telemetry excludes process names, paths and workspace IDs")
     func resourceTelemetryIsBoundedAndPrivate() throws {
         let privateWorkspace = UUID()
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 process(pid: 42, parentPID: 1, bytes: 1_000),
                 process(pid: 43, parentPID: 42, bytes: 2_000, name: "private-project", workspace: privateWorkspace),
@@ -114,7 +114,7 @@ struct AggregateMemoryRetentionTests {
         // This PID was unrelated in the captured table. A fresh OS child query
         // must not attach its old metrics to the app (e.g. after PID reuse).
         let rootPID = Int(getpid())
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [
                 process(pid: rootPID, parentPID: 1, bytes: 100),
                 process(pid: Int(child.processIdentifier), parentPID: 1, bytes: 9_000)
@@ -145,7 +145,7 @@ struct AggregateMemoryRetentionTests {
         let processes = [process(pid: 42, parentPID: 1, bytes: 100)] + (1...1_000).map {
             process(pid: 10_000 + $0, parentPID: 42, bytes: Int64($0), workspace: UUID())
         }
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: processes, sampledAt: .distantPast, includesProcessDetails: false
         )
         let diagnostics = MemoryResourceDiagnostics(snapshot: snapshot, appPID: 42)
@@ -156,14 +156,14 @@ struct AggregateMemoryRetentionTests {
 
     @Test("Hibernation requires complete topology even when the known group is exclusive")
     func hibernationRejectsIncompleteTopology() {
-        let agent = CmuxTopProcessInfo(
+        let agent = WmuxTopProcessInfo(
             pid: 42, parentPID: 1, name: "fixture", path: nil,
             ttyDevice: 0x123, cmuxWorkspaceID: nil, cmuxSurfaceID: nil,
             cmuxAttributionReason: nil, processGroupID: 42, terminalProcessGroupID: 42,
             cpuPercent: 0, residentBytes: 100, virtualBytes: 100, threadCount: 1
         )
         for (complete, missing) in [(true, 0), (false, 0), (true, 1)] {
-            let snapshot = CmuxTopProcessSnapshot(
+            let snapshot = WmuxTopProcessSnapshot(
                 processes: [agent], sampledAt: .now, includesProcessDetails: false,
                 enumerationIsComplete: complete, enumerationMissingProcessCount: missing
             )
@@ -190,7 +190,7 @@ struct AggregateMemoryRetentionTests {
         let identity = AgentPIDProcessIdentity(pid: 42, startSeconds: 1, startMicroseconds: 0)
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path, fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [key: (snapshot, 1, [42], [42], .explicit)],
             environment: [:],
             processArgumentsProvider: { _ in nil },
@@ -206,8 +206,8 @@ struct AggregateMemoryRetentionTests {
     private func process(
         pid: Int, parentPID: Int, bytes: Int64,
         name: String = "fixture", workspace: UUID? = nil
-    ) -> CmuxTopProcessInfo {
-        CmuxTopProcessInfo(
+    ) -> WmuxTopProcessInfo {
+        WmuxTopProcessInfo(
             pid: pid, parentPID: parentPID, name: name, path: "/private/project/tool",
             ttyDevice: nil, cmuxWorkspaceID: workspace, cmuxSurfaceID: nil,
             cmuxAttributionReason: nil, processGroupID: nil, terminalProcessGroupID: nil,

@@ -1,4 +1,4 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
 
 extension AppDelegate {

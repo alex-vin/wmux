@@ -1,12 +1,12 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -39,7 +39,7 @@ struct CloudTreeCompactLayoutTests {
             host.needsLayout = true
             host.layoutSubtreeIfNeeded()
 
-            let resolvedViews = descendants(of: host).compactMap { $0 as? CmuxResolvedIconImageView }
+            let resolvedViews = descendants(of: host).compactMap { $0 as? WmuxResolvedIconImageView }
             #expect(!resolvedViews.isEmpty, "\(style.id) must use the resolved AppKit icon renderer")
             #expect(visiblePixelCount(in: host) > 0, "\(style.id) must keep visible glyph pixels")
         }
@@ -144,7 +144,7 @@ struct CloudTreeCompactLayoutTests {
             // the second run belongs to the title.
             let iconBounds = try #require(
                 descendants(of: cell).compactMap { view -> CGRect? in
-                    guard view is CmuxResolvedIconImageView else { return nil }
+                    guard view is WmuxResolvedIconImageView else { return nil }
                     return cell.convert(view.bounds, from: view)
                 }.min(by: { $0.minX < $1.minX }),
                 "Expected an appearance-resolved row icon"

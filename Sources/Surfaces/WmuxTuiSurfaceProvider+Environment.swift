@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     /// Delivers `entries` to the machine's `~/.config/cmux/env` over the link — see
     /// `CloudEnvDelivery` for the protocol and why no other channel is acceptable.
     /// Returns what the receiver reported; throws with the receiver's own reason when
@@ -69,7 +69,7 @@ extension CmuxTuiSurfaceProvider {
             empty: true
         ))
         guard let object = try JSONSerialization.jsonObject(with: result) as? [String: Any],
-              let workspaceID = CmuxTuiSnapshotParser.createdWorkspace(fromResult: object) else {
+              let workspaceID = WmuxTuiSnapshotParser.createdWorkspace(fromResult: object) else {
             throw ProviderError.noWorkspaceOnMachine(machineID)
         }
         return workspaceID

@@ -1,14 +1,14 @@
 import XCTest
 import Darwin
-import CmuxFoundation
-import CmuxGit
-import CmuxSettings
-import CmuxSidebarGit
+import WmuxFoundation
+import WmuxGit
+import WmuxSettings
+import WmuxSidebarGit
 
-import CmuxSidebar
+import WmuxSidebar
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1197,7 +1197,7 @@ final class WorkspacePullRequestSidebarTests: XCTestCase {
     // it asserted the branch's batched/cursor git-metadata polling
     // (backgroundGitMetadataPollBatchLimit), which main's refactor replaced with
     // a full sweep (refreshTrackedWorkspaceGitMetadata now returns Void). Git
-    // metadata behavior is covered by CmuxGit/GitMetadataServiceTests; restoring
+    // metadata behavior is covered by WmuxGit/GitMetadataServiceTests; restoring
     // the batched throttle + this test is a deliberate follow-up if mobile-host
     // scale needs it.
 
@@ -1796,9 +1796,9 @@ final class WorkspacePullRequestSidebarTests: XCTestCase {
     }
 
     // Git-metadata resolution, watched-path derivation (including submodule
-    // gitlinks), and remote-slug parsing now live in the CmuxGit package and are
-    // unit-tested there (CmuxGitTests: GitMetadataServiceTests / GitConfigIncludeTests).
-    // The watcher's leading-edge coalescing is verified in CmuxFileWatch's package
+    // gitlinks), and remote-slug parsing now live in the WmuxGit package and are
+    // unit-tested there (WmuxGitTests: GitMetadataServiceTests / GitConfigIncludeTests).
+    // The watcher's leading-edge coalescing is verified in WmuxFileWatch's package
     // tests (RecursivePathWatcherTests) with an injected clock and no real waiting.
     // The tests below keep exercising the end-to-end refresh path through TabManager.
 

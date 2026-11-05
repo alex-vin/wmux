@@ -71,7 +71,7 @@ cp -R ghostty/macos/GhosttyKit.xcframework GhosttyKit.xcframework
 # --- Build app (Release, unsigned) ---
 echo "Building app..."
 rm -rf build/
-xcodebuild -scheme cmux -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO build 2>&1 | tail -5
+xcodebuild -scheme wmux -configuration Release -derivedDataPath build CODE_SIGNING_ALLOWED=NO build 2>&1 | tail -5
 echo "Build succeeded"
 
 HELPER_PATH="$APP_PATH/Contents/Resources/bin/ghostty"

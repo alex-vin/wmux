@@ -1,4 +1,4 @@
-import CmuxWorkspaces
+import WmuxWorkspaces
 
 extension TerminalPanel {
     func updateShellActivityState(_ state: PanelShellActivityState) {

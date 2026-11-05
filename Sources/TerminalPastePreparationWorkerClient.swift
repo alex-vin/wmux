@@ -1,4 +1,4 @@
-import CmuxTerminal
+import WmuxTerminal
 import Foundation
 
 /// Launches one killable paste worker and adopts its validated output files.
@@ -9,7 +9,7 @@ struct TerminalPastePreparationWorkerClient: Sendable {
     static let requestFilename = "request.json"
     static let responseFilename = "response.json"
     static let maximumResponseSize = 12 * 1024 * 1024
-    static let workingDirectoryPrefix = "cmux-paste-preparation-"
+    static let workingDirectoryPrefix = "wmux-paste-preparation-"
 
     private let executableURL: URL
     private let pasteboardService: TerminalPasteboardService?

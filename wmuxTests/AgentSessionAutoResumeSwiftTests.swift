@@ -1,13 +1,13 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
-import CMUXAgentLaunch
-import CmuxCore
-import CmuxSidebar
+import WMUXAgentLaunch
+import WmuxCore
+import WmuxSidebar
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -971,10 +971,10 @@ struct AgentSessionAutoResumeSwiftTests {
             defer { try? FileManager.default.removeItem(atPath: projectDir) }
 
             let sessionId = "session-ignore-\(UUID().uuidString)"
-            let registration = CmuxVaultAgentRegistration(
+            let registration = WmuxVaultAgentRegistration(
                 id: "acme-ignore",
                 name: "Acme Ignore",
-                detect: CmuxVaultAgentDetectRule(processName: "acme-agent"),
+                detect: WmuxVaultAgentDetectRule(processName: "acme-agent"),
                 sessionIdSource: .argvOption("--session"),
                 resumeCommand: "acme-agent --session {{sessionId}}",
                 cwd: .ignore
@@ -1900,7 +1900,7 @@ struct RemoteAgentRestoreWorkingDirectoryTests {
         let trustedRemoteDirectory = "/repo-b"
         let cases: [(
             kind: RestorableAgentKind,
-            registration: CmuxVaultAgentRegistration,
+            registration: WmuxVaultAgentRegistration,
             executable: String,
             cwdOption: String,
             cwdArgument: String,
@@ -1962,7 +1962,7 @@ struct RemoteAgentRestoreWorkingDirectoryTests {
         let trustedRemoteDirectory = "/repo-b"
         let cases: [(
             kind: RestorableAgentKind,
-            registration: CmuxVaultAgentRegistration?,
+            registration: WmuxVaultAgentRegistration?,
             executable: String,
             attachedCwdOption: String
         )] = [
@@ -2049,7 +2049,7 @@ struct RemoteAgentRestoreWorkingDirectoryTests {
     /// A user-edited Kimi registration is a user-authored template, so its own `-w`
     /// survives an exact remote restore.
     @Test func exactSelectionKeepsUserEditedKimiTemplateCwdArgument() throws {
-        var registration = CmuxVaultAgentRegistration.builtInKimi
+        var registration = WmuxVaultAgentRegistration.builtInKimi
         registration.resumeCommand = "{{executable}} -w /srv/kimi-owned --resume {{sessionId}}"
         #expect(registration != .builtInKimi)
 
@@ -2149,9 +2149,9 @@ struct RemoteAgentRestoreWorkingDirectoryTests {
         #expect(!startupInput.contains(firstRemoteDirectory), Comment(rawValue: startupInput))
         #expect(!startupInput.contains(localDirectory), Comment(rawValue: startupInput))
         // A remote workspace's local surface never takes a remote path as its own cwd; the
-        // directory travels to the remote side as CMUX_REMOTE_INITIAL_CWD.
+        // directory travels to the remote side as WMUX_REMOTE_INITIAL_CWD.
         #expect(restoredPanel.requestedWorkingDirectory == nil)
-        #expect(restoredPanel.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == latestRemoteDirectory)
+        #expect(restoredPanel.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == latestRemoteDirectory)
     }
 
     @MainActor
@@ -2215,9 +2215,9 @@ struct RemoteAgentRestoreWorkingDirectoryTests {
         #expect(!startupInput.contains(latestRemoteDirectory), Comment(rawValue: startupInput))
         #expect(!startupInput.contains(localDirectory), Comment(rawValue: startupInput))
         // A remote workspace's local surface never takes a remote path as its own cwd; the
-        // directory travels to the remote side as CMUX_REMOTE_INITIAL_CWD.
+        // directory travels to the remote side as WMUX_REMOTE_INITIAL_CWD.
         #expect(restoredPanel.requestedWorkingDirectory == nil)
-        #expect(restoredPanel.surface.startupEnvironmentValue("CMUX_REMOTE_INITIAL_CWD") == launchRemoteDirectory)
+        #expect(restoredPanel.surface.startupEnvironmentValue("WMUX_REMOTE_INITIAL_CWD") == launchRemoteDirectory)
     }
 
     @MainActor

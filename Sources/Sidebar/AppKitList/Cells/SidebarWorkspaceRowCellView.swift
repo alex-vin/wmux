@@ -1,9 +1,9 @@
 import AppKit
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 import Combine
-import CmuxFoundation
-import CmuxSidebar
-import CmuxWorkspaces
+import WmuxFoundation
+import WmuxSidebar
+import WmuxWorkspaces
 import SwiftUI
 
 /// Pure-AppKit workspace row cell: renders every TabItemView slot without
@@ -759,7 +759,7 @@ final class SidebarWorkspaceRowTableCellView: NSTableCellView {
     func paintControllerDropIndicator(top: Bool, bottom: Bool) {
         let colorScheme = model.map { $0.colorSchemeIsDark ? ColorScheme.dark : .light }
             ?? SidebarAppearanceColorResolver().currentColorScheme()
-        let accent = (model?.settings.accentColor ?? CmuxAccentColor()).nsColor(for: colorScheme)
+        let accent = (model?.settings.accentColor ?? WmuxAccentColor()).nsColor(for: colorScheme)
         topDropIndicator.layer?.backgroundColor = accent.cgColor
         bottomDropIndicator.layer?.backgroundColor = accent.cgColor
         topDropIndicator.isHidden = !top

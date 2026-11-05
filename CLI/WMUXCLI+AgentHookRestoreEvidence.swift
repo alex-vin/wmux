@@ -1,5 +1,5 @@
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 extension WMUXCLI {
     private static let codexPermissionEvidenceChunkBytes = 64 * 1024
@@ -116,7 +116,7 @@ extension WMUXCLI {
         transcriptPath: String? = nil,
         currentPID: Int? = nil
     ) -> AgentHookLaunchCommandRecord? {
-        guard ProcessInfo.processInfo.environment["CMUX_AGENT_HOOK_RELAY_ORIGIN"] != "1" else {
+        guard ProcessInfo.processInfo.environment["WMUX_AGENT_HOOK_RELAY_ORIGIN"] != "1" else {
             return nil
         }
         return selectedAgentHookResumeLaunchCommand(
@@ -195,7 +195,7 @@ extension WMUXCLI {
         currentCwd: String?,
         mapped: ClaudeHookSessionRecord?
     ) -> String? {
-        guard ProcessInfo.processInfo.environment["CMUX_AGENT_HOOK_RELAY_ORIGIN"] != "1" else {
+        guard ProcessInfo.processInfo.environment["WMUX_AGENT_HOOK_RELAY_ORIGIN"] != "1" else {
             return nil
         }
         let ompCaptureUnavailable = kind.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "omp"

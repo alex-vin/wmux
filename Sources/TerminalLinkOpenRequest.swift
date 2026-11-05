@@ -1,5 +1,5 @@
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 
 /// Immutable context captured when Ghostty asks cmux to open a terminal link.
 struct TerminalLinkOpenRequest: Sendable {

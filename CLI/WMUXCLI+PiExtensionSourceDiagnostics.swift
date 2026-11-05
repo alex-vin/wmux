@@ -17,7 +17,7 @@ const maximumPiFeedCommandTimeoutMilliseconds = 5_000;
 const piHookDiagnosticWriteDeadlineMilliseconds = 100;
 
 function piHookTimeoutMilliseconds(
-  rawValue: string | undefined = process.env.CMUX_PI_HOOK_TIMEOUT_MS,
+  rawValue: string | undefined = process.env.WMUX_PI_HOOK_TIMEOUT_MS,
 ): number {
   const normalized = rawValue?.trim();
   if (!normalized || !/^\d+$/.test(normalized)) return defaultPiHookTimeoutMilliseconds;
@@ -28,7 +28,7 @@ function piHookTimeoutMilliseconds(
 
 function piCommandTimeoutMilliseconds(
   args: string[],
-  rawValue: string | undefined = process.env.CMUX_PI_HOOK_TIMEOUT_MS,
+  rawValue: string | undefined = process.env.WMUX_PI_HOOK_TIMEOUT_MS,
 ): number {
   const configured = piHookTimeoutMilliseconds(rawValue);
   return args[0] === "hooks" && args[1] === "feed"
@@ -113,10 +113,10 @@ function piHookDiagnosticPath(
   lastDebugLogPathFile = "/tmp/wmux-last-debug-log-path",
   fallbackLogPath = "/tmp/wmux-debug.log",
 ): string {
-  const explicit = firstString(environment.CMUX_DEBUG_LOG);
+  const explicit = firstString(environment.WMUX_DEBUG_LOG);
   if (explicit) return expandedPiHookLogPath(explicit, environment.HOME);
 
-  const socketPath = firstString(environment.CMUX_SOCKET_PATH, environment.CMUX_SOCKET);
+  const socketPath = firstString(environment.WMUX_SOCKET_PATH, environment.WMUX_SOCKET);
   if (socketPath) {
     const socketName = path.basename(socketPath);
     if (socketName.startsWith("wmux-debug-") && socketName.endsWith(".sock")) {

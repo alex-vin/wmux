@@ -2,8 +2,8 @@ import AppKit
 import Bonsplit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -199,8 +199,8 @@ struct SplitSpaceTests {
             initialDividerPosition: 0.9
         ) == nil)
 
-        let flags = CmuxFeatureFlags.shared
-        let simulatorFlag = CmuxFeatureFlags.simulatorFlag
+        let flags = WmuxFeatureFlags.shared
+        let simulatorFlag = WmuxFeatureFlags.simulatorFlag
         let previousSimulatorOverride = flags.overrideValue(for: simulatorFlag)
         flags.setOverride(true, for: simulatorFlag)
         defer { flags.setOverride(previousSimulatorOverride, for: simulatorFlag) }

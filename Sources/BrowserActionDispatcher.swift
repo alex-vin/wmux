@@ -1,6 +1,6 @@
 import AppKit
-import CmuxCanvas
-import CmuxPanes
+import WmuxCanvas
+import WmuxPanes
 
 /// Executes browser commands against an explicitly captured panel target.
 @MainActor

@@ -1,6 +1,6 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
 /// Foreground-process evidence that a restored or hook-published agent is
 /// still the command running in its pane.
@@ -21,8 +21,8 @@ enum RestoredAgentForegroundProcess {
     static func matches(
         _ agent: SessionRestorableAgentSnapshot,
         foregroundProcessID: Int?,
-        processArguments: (Int) -> CmuxTopProcessArguments? =
-            CmuxTopProcessSnapshot.processArgumentsAndEnvironment(for:),
+        processArguments: (Int) -> WmuxTopProcessArguments? =
+            WmuxTopProcessSnapshot.processArgumentsAndEnvironment(for:),
         processIdentity: ((pid_t) -> AgentPIDProcessIdentity?)? = nil,
         validator: CachedAgentProcessIdentityValidator = CachedAgentProcessIdentityValidator()
     ) -> Bool {

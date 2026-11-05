@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -14,7 +14,7 @@ final class CloudNameAuthorityTestProvider: SurfaceAgentNaming {
     let machine: SurfaceMachineID
     let catalog: SurfaceCatalog
     let renameService: CloudWorkspaceRenameService
-    let receiver: CmuxTuiSurfaceProvider
+    let receiver: WmuxTuiSurfaceProvider
     var info: SurfaceMachineInfo
     var graph: CloudVMState
     var writes: [(String, String)] = []
@@ -27,7 +27,7 @@ final class CloudNameAuthorityTestProvider: SurfaceAgentNaming {
         info = SurfaceMachineInfo(id: machine, name: machine.rawValue, status: "running", image: nil,
                                   hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected,
                                   linkError: nil, cpuPercent: nil, memoryUsedMb: nil, diskUsedMb: nil)
-        receiver = CmuxTuiSurfaceProvider(
+        receiver = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: machine.rawValue, provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: catalog
         )
@@ -44,7 +44,7 @@ final class CloudNameAuthorityTestProvider: SurfaceAgentNaming {
             "terminals": ["a", "b"].map { ["id": "term_" + $0, "title": "terminal", "lifecycle": "running"] },
             "browsers": [], "agents": []
         ]
-        let state = CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine)
+        let state = WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: machine)
         graph = try #require(state)
     }
 
@@ -52,7 +52,7 @@ final class CloudNameAuthorityTestProvider: SurfaceAgentNaming {
     func install(_ state: CloudVMState) -> Bool {
         guard receiver.installSnapshotIfNewer(state) else { return false }
         graph = state
-        catalog.replaceCloudState(state, resources: CmuxTuiSnapshotParser.resources(from: state), info: info)
+        catalog.replaceCloudState(state, resources: WmuxTuiSnapshotParser.resources(from: state), info: info)
         renameService.reconcileRemoteState(machine: machine, state: state, catalog: catalog, observation: .current)
         return true
     }
@@ -87,7 +87,7 @@ final class CloudNameAuthorityTestProvider: SurfaceAgentNaming {
         }
         document[collection] = values
         writes.append((id, name))
-        #expect(install(try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))))
+        #expect(install(try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))))
     }
 
     func refresh() async { _ = install(graph) }

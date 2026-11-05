@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -32,20 +32,20 @@ struct CloudEqualCursorConflictRecoveryTests {
         ]
     }
 
-    private func makeProvider() -> CmuxTuiSurfaceProvider {
+    private func makeProvider() -> WmuxTuiSurfaceProvider {
         let summary = VMSummary(id: "equal-cursor", provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil)
-        return CmuxTuiSurfaceProvider(
+        return WmuxTuiSurfaceProvider(
             summary: summary,
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }),
             catalog: catalog
         )
     }
 
-    private func state(_ provider: CmuxTuiSurfaceProvider, _ name: String, revision: Int = 3) throws -> CloudVMState {
-        try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: name, revision: revision), machine: provider.machine))
+    private func state(_ provider: WmuxTuiSurfaceProvider, _ name: String, revision: Int = 3) throws -> CloudVMState {
+        try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot(workspaceName: name, revision: revision), machine: provider.machine))
     }
 
-    private func name(_ provider: CmuxTuiSurfaceProvider) -> String? {
+    private func name(_ provider: WmuxTuiSurfaceProvider) -> String? {
         provider.cloudState?.lookupIndex.workspace(id: "ws_main")?.name
     }
 
@@ -153,7 +153,7 @@ struct CloudEqualCursorConflictRecoveryTests {
         // disagrees with the delta-built graph at the installed cursor.
         let fresh = try state(provider, "Daemon")
         var reads: [Bool] = []
-        let opened = await CmuxTuiSurfaceProvider.refreshResolvingEqualCursorConflict(
+        let opened = await WmuxTuiSurfaceProvider.refreshResolvingEqualCursorConflict(
             refresh: { force in
                 reads.append(force)
                 return provider.installSnapshotIfNewer(fresh, requestVersion: 1)
@@ -171,7 +171,7 @@ struct CloudEqualCursorConflictRecoveryTests {
         let provider = makeProvider()
         #expect(provider.installSnapshotIfNewer(try state(provider, "Applied")))
         var reads: [Bool] = []
-        let opened = await CmuxTuiSurfaceProvider.refreshResolvingEqualCursorConflict(
+        let opened = await WmuxTuiSurfaceProvider.refreshResolvingEqualCursorConflict(
             refresh: { force in
                 reads.append(force)
                 return false

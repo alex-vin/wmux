@@ -1,5 +1,5 @@
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 extension WMUXCLI {
     /// Emits the complete cmux-owned Claude settings object without contacting
@@ -7,7 +7,7 @@ extension WMUXCLI {
     /// app-owned ordered queue, through the session's hook spool when the
     /// wrapper started a forwarder; decision hooks remain direct and synchronous.
     func emitClaudeWrapperInjectSettings() throws {
-        let hookCLI = #""${CMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}""#
+        let hookCLI = #""${WMUX_CLAUDE_HOOK_CMUX_BIN:-cmux}""#
         let lifecycleDefinitions: [(
             event: String,
             matcher: String,

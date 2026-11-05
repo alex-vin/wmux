@@ -36,7 +36,7 @@ final class DraggableFolderNSView: NSView, NSDraggingSource {
     init(directory: String) {
         self.directory = directory
         super.init(frame: .zero)
-        identifier = NSUserInterfaceItemIdentifier("cmux.folderDragIcon")
+        identifier = NSUserInterfaceItemIdentifier("wmux.folderDragIcon")
         setupImageView()
     }
 

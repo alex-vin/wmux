@@ -1,5 +1,5 @@
 import Foundation
-import CmuxAgentSessionStore
+import WmuxAgentSessionStore
 
 /// Socket v2 surface for the Vault session index, so terminal agents can
 /// browse, search, checkpoint, and fork sessions exactly like the UI

@@ -11,7 +11,7 @@ struct SwiftTestingAssertions {
         let fileID = String(describing: file)
         let environment = ProcessInfo.processInfo.environment
         var roots: [URL] = []
-        for key in ["CMUX_CI_RUNTIME_SOURCE_ROOT", "TEST_RUNNER_CMUX_CI_RUNTIME_SOURCE_ROOT"] {
+        for key in ["WMUX_CI_RUNTIME_SOURCE_ROOT", "TEST_RUNNER_CMUX_CI_RUNTIME_SOURCE_ROOT"] {
             if let runtimeRoot = environment[key], !runtimeRoot.isEmpty {
                 roots.append(URL(fileURLWithPath: runtimeRoot, isDirectory: true)
                     .appendingPathComponent("src", isDirectory: true))

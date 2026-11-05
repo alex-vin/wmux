@@ -1,6 +1,6 @@
 import Darwin
 import Foundation
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
 /// Bounds the wall-clock time of one `cmux hooks enqueue` process.
 ///
@@ -20,7 +20,7 @@ final class AgentHookEnqueueWallClock: @unchecked Sendable {
     static let shared = AgentHookEnqueueWallClock()
 
     /// Test harnesses may lower the budget, never raise it.
-    static let budgetOverrideEnvironmentKey = "CMUX_AGENT_HOOK_ENQUEUE_BUDGET_SEC"
+    static let budgetOverrideEnvironmentKey = "WMUX_AGENT_HOOK_ENQUEUE_BUDGET_SEC"
 
     private let lock = NSLock()
     private var responded = false
@@ -161,10 +161,10 @@ extension WMUXCLI {
         let pidEnvironmentVariable = agentHookPIDEnvironmentVariable(agentName: agent)
         let executableExpression = agentHookCLIExecutableExpression(agent: agent)
         var commandParts = [
-            "cmux_cli=\"\(executableExpression)\"",
-            "if [ -z \"$cmux_cli\" ] || [ ! -x \"$cmux_cli\" ]; then cmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
+            "wmux_cli=\"\(executableExpression)\"",
+            "if [ -z \"$wmux_cli\" ] || [ ! -x \"$wmux_cli\" ]; then wmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
             "agent_pid=\"${\(pidEnvironmentVariable):-${PPID:-}}\"",
-            "if [ -n \"$CMUX_SURFACE_ID\" ] && [ \"$\(disableEnvironmentVariable)\" != \"1\" ] && [ -n \"$cmux_cli\" ]; then if [ -n \"${CMUX_SOCKET_PATH:-}\" ]; then \(pidEnvironmentVariable)=\"$agent_pid\" CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=\(agentHookAdmissionResponseTimeoutSeconds) \"$cmux_cli\" --socket \"$CMUX_SOCKET_PATH\" hooks enqueue \(agent) \(subcommand) 2>/dev/null || { cat >/dev/null; echo '{}'; }; else \(pidEnvironmentVariable)=\"$agent_pid\" CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=\(agentHookAdmissionResponseTimeoutSeconds) \"$cmux_cli\" hooks enqueue \(agent) \(subcommand) 2>/dev/null || { cat >/dev/null; echo '{}'; }; fi; else cat >/dev/null; echo '{}'; fi",
+            "if [ -n \"$WMUX_SURFACE_ID\" ] && [ \"$\(disableEnvironmentVariable)\" != \"1\" ] && [ -n \"$wmux_cli\" ]; then if [ -n \"${WMUX_SOCKET_PATH:-}\" ]; then \(pidEnvironmentVariable)=\"$agent_pid\" WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=\(agentHookAdmissionResponseTimeoutSeconds) \"$wmux_cli\" --socket \"$WMUX_SOCKET_PATH\" hooks enqueue \(agent) \(subcommand) 2>/dev/null || { cat >/dev/null; echo '{}'; }; else \(pidEnvironmentVariable)=\"$agent_pid\" WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=\(agentHookAdmissionResponseTimeoutSeconds) \"$wmux_cli\" hooks enqueue \(agent) \(subcommand) 2>/dev/null || { cat >/dev/null; echo '{}'; }; fi; else cat >/dev/null; echo '{}'; fi",
         ]
         if let identityMarker {
             commandParts.insert(": \(identityMarker)", at: 0)
@@ -175,11 +175,11 @@ extension WMUXCLI {
     static func agentHookCLIExecutableExpression(agent: String) -> String {
         switch agent {
         case "claude":
-            return "${CMUX_CLAUDE_HOOK_CMUX_BIN:-${CMUX_BUNDLED_CLI_PATH:-}}"
+            return "${WMUX_CLAUDE_HOOK_CMUX_BIN:-${WMUX_BUNDLED_CLI_PATH:-}}"
         case "codex":
-            return "${CMUX_CODEX_HOOK_CMUX_BIN:-${CMUX_BUNDLED_CLI_PATH:-}}"
+            return "${WMUX_CODEX_HOOK_CMUX_BIN:-${WMUX_BUNDLED_CLI_PATH:-}}"
         default:
-            return "${CMUX_BUNDLED_CLI_PATH:-}"
+            return "${WMUX_BUNDLED_CLI_PATH:-}"
         }
     }
 
@@ -206,7 +206,7 @@ extension WMUXCLI {
         // A relayed hook can be replayed through a local socket. Its surface
         // scope is already admitted; local PID inference or resolution would
         // move the ordering barrier into an unrelated terminal's lane.
-        if !client.isRelayBacked, processEnvironment["CMUX_AGENT_HOOK_RELAY_ORIGIN"] == "1" {
+        if !client.isRelayBacked, processEnvironment["WMUX_AGENT_HOOK_RELAY_ORIGIN"] == "1" {
             return environment
         }
         let pidEnvironmentKey = Self.agentHookPIDEnvironmentVariable(agentName: agent)
@@ -240,8 +240,8 @@ extension WMUXCLI {
                    client: client,
                    socketPassword: socketPassword
                ) {
-                environment["CMUX_WORKSPACE_ID"] = binding.workspaceId
-                environment["CMUX_SURFACE_ID"] = binding.surfaceId
+                environment["WMUX_WORKSPACE_ID"] = binding.workspaceId
+                environment["WMUX_SURFACE_ID"] = binding.surfaceId
                 environment[Self.agentHookRouteSnapshotEnvironmentKey] = "1"
             } else if !routeWasAlreadySnapshotted {
                 environment.removeValue(forKey: Self.agentHookRouteSnapshotEnvironmentKey)
@@ -250,18 +250,18 @@ extension WMUXCLI {
         }
 
         let relayEnvironmentKeys: Set<String> = [
-            "CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
-            "CMUX_AGENT_MANAGED_SUBAGENT",
-            "CMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
-            "CMUX_SURFACE_ID",
-            "CMUX_WORKSPACE_ID",
+            "WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
+            "WMUX_AGENT_MANAGED_SUBAGENT",
+            "WMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
+            "WMUX_SURFACE_ID",
+            "WMUX_WORKSPACE_ID",
             pidEnvironmentKey,
         ]
         return environment.filter { key, value in
             guard relayEnvironmentKeys.contains(key), !value.contains("\0") else {
                 return false
             }
-            let maximumBytes = key == "CMUX_SURFACE_ID" || key == "CMUX_WORKSPACE_ID"
+            let maximumBytes = key == "WMUX_SURFACE_ID" || key == "WMUX_WORKSPACE_ID"
                 ? 256
                 : 32
             return value.utf8.count <= maximumBytes
@@ -341,14 +341,14 @@ extension WMUXCLI {
     ) -> CallerTerminalBinding? {
         guard environment[Self.agentHookRouteSnapshotEnvironmentKey] == "1",
               let surfaceID = normalizedHandleValue(
-                  environment["CMUX_SURFACE_ID"]
+                  environment["WMUX_SURFACE_ID"]
               ),
               UUID(uuidString: surfaceID) != nil else {
             return nil
         }
         var params: [String: Any] = ["surface_id": surfaceID]
         if let workspaceID = normalizedHandleValue(
-            environment["CMUX_WORKSPACE_ID"]
+            environment["WMUX_WORKSPACE_ID"]
         ),
         UUID(uuidString: workspaceID) != nil {
             params["workspace_id"] = workspaceID
@@ -654,10 +654,10 @@ extension WMUXCLI {
         processEnvironment: [String: String]
     ) -> String? {
         guard normalizedHookValue(
-            processEnvironment["CMUX_AGENT_LAUNCH_KIND"]
+            processEnvironment["WMUX_AGENT_LAUNCH_KIND"]
         )?.lowercased() == "claude",
         let encodedArguments = normalizedHookValue(
-            processEnvironment["CMUX_AGENT_LAUNCH_ARGV_B64"]
+            processEnvironment["WMUX_AGENT_LAUNCH_ARGV_B64"]
         ),
         let data = Data(base64Encoded: encodedArguments) else {
             return nil
@@ -840,7 +840,7 @@ extension WMUXCLI {
         }
         for key in [
             "fullyIdle",
-            "cmux_notification_routed",
+            "wmux_notification_routed",
             Self.relayClaudeForkSessionPayloadKey,
         ] {
             if let value = rawObject[key] as? Bool {
@@ -952,11 +952,11 @@ extension WMUXCLI {
         let routedLaunchKeys = agent == "claude" ? SubrouterClaudeResumeRouting.hookCapturedEnvironmentKeys : []
         return [
             "PWD",
-            "CMUX_AGENT_HOOK_STATE_DIR", "CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
-            "CMUX_AGENT_LAUNCH_ARGV_B64", "CMUX_AGENT_LAUNCH_CWD",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE", "CMUX_AGENT_LAUNCH_KIND",
-            "CMUX_AGENT_MANAGED_SUBAGENT", "CMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
-            "CMUX_SURFACE_ID", "CMUX_WORKSPACE_ID", agentHookRouteSnapshotEnvironmentKey,
+            "WMUX_AGENT_HOOK_STATE_DIR", "WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS",
+            "WMUX_AGENT_LAUNCH_ARGV_B64", "WMUX_AGENT_LAUNCH_CWD",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE", "WMUX_AGENT_LAUNCH_KIND",
+            "WMUX_AGENT_MANAGED_SUBAGENT", "WMUX_SUPPRESS_SUBAGENT_NOTIFICATIONS",
+            "WMUX_SURFACE_ID", "WMUX_WORKSPACE_ID", agentHookRouteSnapshotEnvironmentKey,
             agentHookPIDEnvironmentVariable(agentName: agent),
             AgentHookDeliveryPolicy.invokerPIDEnvironmentKey,
         ] + routedLaunchKeys

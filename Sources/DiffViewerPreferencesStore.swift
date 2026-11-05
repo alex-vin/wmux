@@ -27,7 +27,7 @@ final class DiffViewerPreferencesStore: @unchecked Sendable {
     }
 
     /// `~/Library/Application Support/cmux/diff-viewer/preferences.json`, the
-    /// path the CLI reads (`CMUX_DIFF_VIEWER_PREFS_PATH` overrides it there and
+    /// path the CLI reads (`WMUX_DIFF_VIEWER_PREFS_PATH` overrides it there and
     /// here). Nil under automated tests so suites never touch the user's file.
     nonisolated static func defaultFileURL(
         environment: [String: String] = ProcessInfo.processInfo.environment,
@@ -38,13 +38,13 @@ final class DiffViewerPreferencesStore: @unchecked Sendable {
         isRunningUnderAutomatedTests: Bool = SessionRestorePolicy.isRunningUnderAutomatedTests()
     ) -> URL? {
         guard !isRunningUnderAutomatedTests else { return nil }
-        if let override = environment["CMUX_DIFF_VIEWER_PREFS_PATH"]?
+        if let override = environment["WMUX_DIFF_VIEWER_PREFS_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines), !override.isEmpty {
             return URL(fileURLWithPath: override, isDirectory: false)
         }
         guard let appSupportDirectory else { return nil }
         return appSupportDirectory
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("diff-viewer", isDirectory: true)
             .appendingPathComponent("preferences.json", isDirectory: false)
     }

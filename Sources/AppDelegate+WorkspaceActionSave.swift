@@ -73,7 +73,7 @@ struct ActionsAndLaunchersDiscoveryModel: Equatable {
     let entries: [Entry]
 
     static func build(
-        actions: [CmuxResolvedConfigAction],
+        actions: [WmuxResolvedConfigAction],
         resolvedNewWorkspaceActionID: String?,
         newWorkspaceMenuActionIDs: Set<String>,
         surfaceTabBarActionIDs: Set<String>
@@ -122,7 +122,7 @@ struct ActionsAndLaunchersDiscoveryModel: Equatable {
         .joined(separator: "\n\n")
     }
 
-    private static func actionType(_ action: CmuxSurfaceTabBarButtonAction) -> String {
+    private static func actionType(_ action: WmuxSurfaceTabBarButtonAction) -> String {
         switch action {
         case .builtIn:
             return "builtin"
@@ -168,11 +168,11 @@ extension AppDelegate {
         .compactMap { contextForMainWindow($0) }
         .first
 
-        let cmuxConfigStore: CmuxConfigStore
+        let cmuxConfigStore: WmuxConfigStore
         if let activeStore = context?.cmuxConfigStore {
             cmuxConfigStore = activeStore
         } else {
-            let globalStore = CmuxConfigStore()
+            let globalStore = WmuxConfigStore()
             globalStore.loadAll()
             cmuxConfigStore = globalStore
         }
@@ -283,8 +283,8 @@ extension AppDelegate {
     /// write) are deletable from the UI; project-local and built-in actions
     /// are not.
     func isDeletableGlobalAction(
-        _ action: CmuxResolvedConfigAction,
-        cmuxConfigStore: CmuxConfigStore
+        _ action: WmuxResolvedConfigAction,
+        cmuxConfigStore: WmuxConfigStore
     ) -> Bool {
         guard let sourcePath = action.actionSourcePath else { return false }
         func canonical(_ path: String) -> String {
@@ -360,7 +360,7 @@ extension AppDelegate {
         alert.beginSheetModal(for: window) { [weak cmuxConfigStore] response in
             guard response == .alertFirstButtonReturn, let cmuxConfigStore else { return }
             do {
-                try CmuxConfigActionSaver.deleteAction(
+                try WmuxConfigActionSaver.deleteAction(
                     id: box.actionID,
                     globalConfigPath: cmuxConfigStore.globalConfigPath
                 )
@@ -404,7 +404,7 @@ extension AppDelegate {
             return
         }
         do {
-            try CmuxConfigActionSaver.setNewWorkspaceDefaultAction(
+            try WmuxConfigActionSaver.setNewWorkspaceDefaultAction(
                 id: box.actionID,
                 globalConfigPath: cmuxConfigStore.globalConfigPath
             )
@@ -439,7 +439,7 @@ extension AppDelegate {
 
     private func presentSaveWorkspaceActionDialog(
         workspace: Workspace,
-        cmuxConfigStore: CmuxConfigStore,
+        cmuxConfigStore: WmuxConfigStore,
         window: NSWindow
     ) async {
         let snapshot: WorkspaceConfigActionSnapshot
@@ -509,7 +509,7 @@ extension AppDelegate {
             var definition = snapshot.definition
             definition.name = title
             do {
-                let result = try CmuxConfigActionSaver.saveWorkspaceAction(
+                let result = try WmuxConfigActionSaver.saveWorkspaceAction(
                     title: title,
                     definition: definition,
                     globalConfigPath: globalConfigPath,
@@ -521,7 +521,7 @@ extension AppDelegate {
                 var defaultUpdateError: Error?
                 if accessory.makeDefaultCheckbox.state == .on {
                     do {
-                        try CmuxConfigActionSaver.setNewWorkspaceDefaultAction(
+                        try WmuxConfigActionSaver.setNewWorkspaceDefaultAction(
                             id: result.actionID,
                             globalConfigPath: globalConfigPath
                         )

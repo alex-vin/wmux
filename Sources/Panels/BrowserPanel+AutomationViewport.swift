@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 
 extension BrowserPanel {
     @discardableResult
@@ -36,7 +36,7 @@ extension BrowserPanel {
         }
 
         viewportModel.setViewport(viewport)
-        if let webView = webView as? CmuxWebView {
+        if let webView = webView as? WmuxWebView {
             webView.browserViewportModel = viewportModel
         }
         if viewport != nil {

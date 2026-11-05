@@ -1,16 +1,16 @@
 import Darwin
 import Foundation
 import os
-@testable import CmuxFoundation
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+@testable import WmuxFoundation
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #else
 @testable import cmux
 #endif
 
 /// Injects process syscalls into the real enumeration and enrichment pipeline.
 /// No live PIDs, argv, session files or user settings are read.
-final class SyntheticProcessSnapshotReader: CmuxTopProcessReading, Sendable {
+final class SyntheticProcessSnapshotReader: WmuxTopProcessReading, Sendable {
     struct Counts: Sendable {
         var enumerations = 0
         var bsd = 0
@@ -118,15 +118,15 @@ final class SyntheticProcessSnapshotReader: CmuxTopProcessReading, Sendable {
         return "/synthetic/workspace-\(pid % 125)/bin/agent-\(pid)"
     }
 
-    func scope(for pid: Int, key: CmuxTopProcessScopeCacheKey) -> CmuxTopProcessScope? {
+    func scope(for pid: Int, key: WmuxTopProcessScopeCacheKey) -> WmuxTopProcessScope? {
         guard state.withLock({ $0.counts.scope += 1; return $0.hasScope }) else { return nil }
-        return CmuxTopProcessSnapshot.cmuxScope(arguments: ["agent", "--session", "fixture-\(pid)"], environment: [
-            "CMUX_WORKSPACE_ID": workspaces[pid % 125].uuidString,
-            "CMUX_SURFACE_ID": surfaces[pid % 427].uuidString
+        return WmuxTopProcessSnapshot.cmuxScope(arguments: ["agent", "--session", "fixture-\(pid)"], environment: [
+            "WMUX_WORKSPACE_ID": workspaces[pid % 125].uuidString,
+            "WMUX_SURFACE_ID": surfaces[pid % 427].uuidString
         ])
     }
 
-    func matches(pid: Int, key: CmuxTopProcessScopeCacheKey) -> Bool {
+    func matches(pid: Int, key: WmuxTopProcessScopeCacheKey) -> Bool {
         state.withLock { value in
             value.counts.identity += 1
             return value.replacedPID != pid && key.startSeconds == 100

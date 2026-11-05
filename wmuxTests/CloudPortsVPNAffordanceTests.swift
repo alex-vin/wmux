@@ -1,12 +1,12 @@
 import AppKit
-import CmuxCloud
-import CmuxSettings
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSettings
+import WmuxSurfaceCatalogModel
 import SwiftUI
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -24,7 +24,7 @@ struct CloudPortsVPNAffordanceTests {
             hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected, linkError: nil,
             cpuPercent: nil, memoryUsedMb: nil, diskUsedMb: nil,
             privateAddress: "10.16.170.174", portDiscoveryState: .available)
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
             directURL: "http://10.16.170.174:33015")
         let tree = CloudTreeOutlineView(
             machines: [MachineSnapshot(id: machine.rawValue, provider: "freestyle", image: "base",
@@ -67,7 +67,7 @@ struct CloudPortsVPNAffordanceTests {
             hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected, linkError: nil,
             cpuPercent: nil, memoryUsedMb: nil, diskUsedMb: nil,
             privateAddress: "10.16.170.174", portDiscoveryState: .available)
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
             directURL: "http://10.16.170.174:33015")
         var inputs = CloudTreeBuildInputs(
             machines: [MachineSnapshot(id: machine.rawValue, provider: "freestyle", image: "base",
@@ -90,7 +90,7 @@ struct CloudPortsVPNAffordanceTests {
             hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected, linkError: nil,
             cpuPercent: nil, memoryUsedMb: nil, diskUsedMb: nil,
             privateAddress: "127.0.0.1", portDiscoveryState: .available)
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000,
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000,
             directURL: "http://127.0.0.1:3000")
         let children = CloudTreeNodeBuilder.portChildren(machine: machine, info: info, resources: [port],
             projectionIndex: CloudTreeNodeBuilder.LocalProjectionIndex(
@@ -109,7 +109,7 @@ struct CloudPortsVPNAffordanceTests {
             hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected, linkError: nil,
             cpuPercent: nil, memoryUsedMb: nil, diskUsedMb: nil,
             privateAddress: "10.16.170.164", portDiscoveryState: scan.state)
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
             directURL: "http://10.16.170.164:33015")
         let children = CloudTreeNodeBuilder.portChildren(machine: machine, info: info, resources: [port],
             projectionIndex: CloudTreeNodeBuilder.LocalProjectionIndex(
@@ -137,7 +137,7 @@ struct CloudPortsVPNAffordanceTests {
             hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected, linkError: nil,
             cpuPercent: nil, memoryUsedMb: nil, diskUsedMb: nil,
             privateAddress: "10.16.170.164", portDiscoveryState: state)
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 33015,
             directURL: "http://10.16.170.164:33015")
         for resources in [[port], []] {
             let children = CloudTreeNodeBuilder.portChildren(machine: machine, info: info, resources: resources,

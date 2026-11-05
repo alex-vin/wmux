@@ -3,11 +3,11 @@ import Foundation
 
 nonisolated let cmuxTopMemoryDiagnosticDefaultGroupLimit = 12
 
-extension CmuxTopProcessSnapshot {
+extension WmuxTopProcessSnapshot {
     func memoryDiagnosticPayload(
         appPID: Int = Int(Darwin.getpid()),
         topGroupLimit: Int = cmuxTopMemoryDiagnosticDefaultGroupLimit,
-        attributionByPID: [Int: CmuxTopProcessAttribution] = [:]
+        attributionByPID: [Int: WmuxTopProcessAttribution] = [:]
     ) -> [String: Any] {
         let appResources = summaryPayload(for: [appPID], rootPIDs: [appPID])
         let appProcess = processesByPID[appPID]
@@ -25,13 +25,13 @@ extension CmuxTopProcessSnapshot {
             "sampled_at": ISO8601DateFormatter().string(from: sampledAt),
             "app": [
                 "pid": appPID,
-                "name": appProcess?.name ?? "cmux",
+                "name": appProcess?.name ?? "wmux",
                 "path": appProcess?.path as Any? ?? NSNull(),
                 "resources": appResources,
                 "physical_footprint_bytes": appProcess?.memoryBytes ?? 0,
                 "resident_bytes": appProcess?.residentBytes ?? 0,
-                "memory_source": appProcess?.memorySource.rawValue ?? CmuxTopProcessMemorySource.unavailable.rawValue,
-                "resident_memory_source": appProcess?.residentMemorySource.rawValue ?? CmuxTopProcessMemorySource.unavailable.rawValue
+                "memory_source": appProcess?.memorySource.rawValue ?? WmuxTopProcessMemorySource.unavailable.rawValue,
+                "resident_memory_source": appProcess?.residentMemorySource.rawValue ?? WmuxTopProcessMemorySource.unavailable.rawValue
             ] as [String: Any],
             "children": [
                 "root_pid": appPID,
@@ -51,16 +51,16 @@ extension CmuxTopProcessSnapshot {
     private func memoryDiagnosticGroups(
         for pids: Set<Int>,
         topGroupLimit: Int,
-        attributionByPID: [Int: CmuxTopProcessAttribution]
+        attributionByPID: [Int: WmuxTopProcessAttribution]
     ) -> [[String: Any]] {
-        var groups: [String: CmuxTopMemoryDiagnosticGroupAccumulator] = [:]
+        var groups: [String: WmuxTopMemoryDiagnosticGroupAccumulator] = [:]
         for pid in pids.sorted() {
             guard let process = processesByPID[pid] else { continue }
             let name = process.name.trimmingCharacters(in: .whitespacesAndNewlines)
             let displayName = name.isEmpty ? "pid-\(pid)" : name
             let key = displayName.lowercased()
             if groups[key] == nil {
-                groups[key] = CmuxTopMemoryDiagnosticGroupAccumulator(id: key, name: displayName)
+                groups[key] = WmuxTopMemoryDiagnosticGroupAccumulator(id: key, name: displayName)
             }
             groups[key]?.append(
                 process: process,
@@ -85,8 +85,8 @@ extension CmuxTopProcessSnapshot {
 
     private func nearestCMUXAttribution(
         for pid: Int,
-        attributionByPID: [Int: CmuxTopProcessAttribution]
-    ) -> CmuxTopProcessAttribution? {
+        attributionByPID: [Int: WmuxTopProcessAttribution]
+    ) -> WmuxTopProcessAttribution? {
         var visited: Set<Int> = []
         var currentPID = pid
         while currentPID > 0, visited.insert(currentPID).inserted {
@@ -95,7 +95,7 @@ extension CmuxTopProcessSnapshot {
             }
             guard let process = processesByPID[currentPID] else { return nil }
             if process.cmuxWorkspaceID != nil || process.cmuxSurfaceID != nil {
-                return CmuxTopProcessAttribution(
+                return WmuxTopProcessAttribution(
                     workspaceID: process.cmuxWorkspaceID,
                     workspaceRef: nil,
                     paneID: nil,
@@ -103,7 +103,7 @@ extension CmuxTopProcessSnapshot {
                     surfaceID: process.cmuxSurfaceID,
                     surfaceRef: nil,
                     surfaceType: nil,
-                    reason: process.cmuxAttributionReason ?? "cmux-process-scope"
+                    reason: process.cmuxAttributionReason ?? "wmux-process-scope"
                 )
             }
             currentPID = process.parentPID

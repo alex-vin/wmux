@@ -1,14 +1,14 @@
 import Bonsplit
-import CmuxBrowser
-import CmuxFoundation
-import CmuxAppKitSupportUI
-import CmuxSettings
-import CmuxSettingsUI
+import WmuxBrowser
+import WmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxSettings
+import WmuxSettingsUI
 import SwiftUI
 import WebKit
 import AppKit
 
-let browserOmnibarTextFieldIdentifier = NSUserInterfaceItemIdentifier("cmux.browserOmnibarTextField")
+let browserOmnibarTextFieldIdentifier = NSUserInterfaceItemIdentifier("wmux.browserOmnibarTextField")
 
 enum BrowserDevToolsIconOption: String, CaseIterable, Identifiable {
     case wrenchAndScrewdriver = "wrench.and.screwdriver"
@@ -69,7 +69,7 @@ enum BrowserDevToolsIconColorOption: String, CaseIterable, Identifiable {
         }
     }
 
-    func color(accent: CmuxAccentColor) -> Color {
+    func color(accent: WmuxAccentColor) -> Color {
         switch self {
         case .bonsplitInactive:
             // Matches Bonsplit tab icon tint for inactive tabs.
@@ -421,12 +421,12 @@ struct BrowserPanelView: View {
     private var remoteSuggestionsEnabled: Bool {
         // Deterministic UI-test hook: force remote path on even if a persisted
         // setting disabled suggestions in previous sessions.
-        if ProcessInfo.processInfo.environment["CMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON"] != nil ||
-            UserDefaults.standard.string(forKey: "CMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON") != nil {
+        if ProcessInfo.processInfo.environment["WMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON"] != nil ||
+            UserDefaults.standard.string(forKey: "WMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON") != nil {
             return true
         }
         // Keep UI tests deterministic by disabling network suggestions when requested.
-        if ProcessInfo.processInfo.environment["CMUX_UI_TEST_DISABLE_REMOTE_SUGGESTIONS"] == "1" {
+        if ProcessInfo.processInfo.environment["WMUX_UI_TEST_DISABLE_REMOTE_SUGGESTIONS"] == "1" {
             return false
         }
         return searchSuggestionsEnabled
@@ -789,7 +789,7 @@ struct BrowserPanelView: View {
     }
 
     private func handleBrowserWebViewClickIntent(_ notification: Notification) {
-        guard let webView = notification.object as? CmuxWebView,
+        guard let webView = notification.object as? WmuxWebView,
               webView === panel.webView else {
             return
         }
@@ -1269,7 +1269,7 @@ struct BrowserPanelView: View {
                 #endif
                 panel.goBack()
             }) {
-                CmuxSystemSymbolImage(systemName: "chevron.left", pointSize: chromeMetrics.navigationIconFontSize, weight: .medium, tint: .primary)
+                WmuxSystemSymbolImage(systemName: "chevron.left", pointSize: chromeMetrics.navigationIconFontSize, weight: .medium, tint: .primary)
                     .frame(width: addressBarButtonHitSize, height: addressBarButtonHitSize, alignment: .center)
                     .contentShape(Rectangle())
             }
@@ -1285,7 +1285,7 @@ struct BrowserPanelView: View {
                 #endif
                 panel.goForward()
             }) {
-                CmuxSystemSymbolImage(systemName: "chevron.right", pointSize: chromeMetrics.navigationIconFontSize, weight: .medium, tint: .primary)
+                WmuxSystemSymbolImage(systemName: "chevron.right", pointSize: chromeMetrics.navigationIconFontSize, weight: .medium, tint: .primary)
                     .frame(width: addressBarButtonHitSize, height: addressBarButtonHitSize, alignment: .center)
                     .contentShape(Rectangle())
             }
@@ -1296,7 +1296,7 @@ struct BrowserPanelView: View {
             .accessibilityLabel(String(localized: "browser.goForward", defaultValue: "Go Forward"))
 
             Button(action: handleReloadOrStopButtonAction) {
-                CmuxSystemSymbolImage(systemName: panel.isLoading ? "xmark" : "arrow.clockwise", pointSize: chromeMetrics.navigationIconFontSize, weight: .medium, tint: .primary)
+                WmuxSystemSymbolImage(systemName: panel.isLoading ? "xmark" : "arrow.clockwise", pointSize: chromeMetrics.navigationIconFontSize, weight: .medium, tint: .primary)
                     .frame(width: addressBarButtonHitSize, height: addressBarButtonHitSize, alignment: .center)
                     .contentShape(Rectangle())
             }
@@ -1389,7 +1389,7 @@ struct BrowserPanelView: View {
         Button(action: handleActiveToolbarModeButtonAction) {
             HStack(spacing: 5) {
                 if let activeToolbarModeIconName {
-                    CmuxSystemSymbolImage(
+                    WmuxSystemSymbolImage(
                         systemName: activeToolbarModeIconName,
                         pointSize: devToolsButtonIconSize,
                         weight: .medium,
@@ -1519,7 +1519,7 @@ struct BrowserPanelView: View {
         Button(action: {
             openDevTools()
         }) {
-            CmuxSystemSymbolImage(systemName: devToolsIconOption.rawValue, pointSize: devToolsButtonIconSize, weight: .medium, tint: devToolsColorOption.color(accent: cmuxAccent))
+            WmuxSystemSymbolImage(systemName: devToolsIconOption.rawValue, pointSize: devToolsButtonIconSize, weight: .medium, tint: devToolsColorOption.color(accent: cmuxAccent))
                 .frame(width: addressBarButtonSize, height: addressBarButtonSize, alignment: .center)
         }
         .buttonStyle(OmnibarAddressButtonStyle())
@@ -1533,7 +1533,7 @@ struct BrowserPanelView: View {
         Button(action: {
             isBrowserProfileMenuPresented.toggle()
         }) {
-            CmuxSystemSymbolImage(systemName: "person.crop.circle", pointSize: devToolsButtonIconSize, weight: .medium, tint: devToolsColorOption.color(accent: cmuxAccent))
+            WmuxSystemSymbolImage(systemName: "person.crop.circle", pointSize: devToolsButtonIconSize, weight: .medium, tint: devToolsColorOption.color(accent: cmuxAccent))
                 .frame(width: addressBarButtonSize, height: addressBarButtonSize, alignment: .center)
         }
         .buttonStyle(OmnibarAddressButtonStyle())
@@ -1623,7 +1623,7 @@ struct BrowserPanelView: View {
         Button(action: {
             isBrowserThemeMenuPresented.toggle()
         }) {
-            CmuxSystemSymbolImage(systemName: browserThemeMode.iconName, pointSize: devToolsButtonIconSize, weight: .medium, tint: browserThemeModeIconColor)
+            WmuxSystemSymbolImage(systemName: browserThemeMode.iconName, pointSize: devToolsButtonIconSize, weight: .medium, tint: browserThemeModeIconColor)
                 .frame(width: addressBarButtonSize, height: addressBarButtonSize, alignment: .center)
         }
         .buttonStyle(OmnibarAddressButtonStyle())
@@ -1651,7 +1651,7 @@ struct BrowserPanelView: View {
             isBrowserImportHintPopoverPresented.toggle()
         }) {
             HStack(spacing: 4) {
-                CmuxSystemSymbolImage(systemName: "square.and.arrow.down.on.square", pointSize: 10, weight: .medium, tint: devToolsColorOption.color(accent: cmuxAccent))
+                WmuxSystemSymbolImage(systemName: "square.and.arrow.down.on.square", pointSize: 10, weight: .medium, tint: devToolsColorOption.color(accent: cmuxAccent))
                 Text(String(localized: "browser.import.hint.toolbar", defaultValue: "Import"))
                     .cmuxFont(size: 11, weight: .medium)
                     .lineLimit(1)
@@ -1680,7 +1680,7 @@ struct BrowserPanelView: View {
                         applyBrowserProfileSelection(profile.id)
                     } label: {
                         HStack(spacing: 8) {
-                            CmuxSystemSymbolImage(systemName: profile.id == panel.profileID ? "checkmark" : "circle", pointSize: 10, weight: .semibold, tint: .primary)
+                            WmuxSystemSymbolImage(systemName: profile.id == panel.profileID ? "checkmark" : "circle", pointSize: 10, weight: .semibold, tint: .primary)
                                 .opacity(profile.id == panel.profileID ? 1.0 : 0.0)
                                 .frame(width: 12, alignment: .center)
                             Text(profile.displayName)
@@ -1742,7 +1742,7 @@ struct BrowserPanelView: View {
                     isBrowserThemeMenuPresented = false
                 } label: {
                     HStack(spacing: 8) {
-                        CmuxSystemSymbolImage(systemName: mode == browserThemeMode ? "checkmark" : "circle", pointSize: 10, weight: .semibold, tint: .primary)
+                        WmuxSystemSymbolImage(systemName: mode == browserThemeMode ? "checkmark" : "circle", pointSize: 10, weight: .semibold, tint: .primary)
                             .opacity(mode == browserThemeMode ? 1.0 : 0.0)
                             .frame(width: 12, alignment: .center)
                         Text(mode.displayName)
@@ -1774,7 +1774,7 @@ struct BrowserPanelView: View {
 
         return HStack(spacing: 4) {
             if showSecureBadge {
-                CmuxSystemSymbolImage(systemName: "lock.fill", pointSize: chromeMetrics.secureBadgeFontSize, tint: .secondary)
+                WmuxSystemSymbolImage(systemName: "lock.fill", pointSize: chromeMetrics.secureBadgeFontSize, tint: .secondary)
             }
 
             OmnibarTextFieldRepresentable(
@@ -1993,7 +1993,7 @@ struct BrowserPanelView: View {
         reason: String,
         isPanelFocusedOverride: Bool? = nil
     ) {
-        guard let cmuxWebView = panel.webView as? CmuxWebView else { return }
+        guard let cmuxWebView = panel.webView as? WmuxWebView else { return }
         let isPanelFocused = isPanelFocusedOverride ?? isFocused
         let next = isPanelFocused && !panel.shouldSuppressWebViewFocus()
         if cmuxWebView.allowsFirstResponderAcquisition != next {
@@ -2764,10 +2764,10 @@ struct BrowserPanelView: View {
 
     private func refreshSuggestionsNow() async {
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         defer {
             let trimmedQuery = omnibarState.buffer.trimmingCharacters(in: .whitespacesAndNewlines)
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "browser.omnibar.refreshSuggestions",
                 startedAt: typingTimingStart,
                 extra: "focused=\(addressBarFocused ? 1 : 0) queryLen=\(trimmedQuery.utf8.count) suggestionCount=\(omnibarState.suggestions.count)"
@@ -2951,8 +2951,8 @@ struct BrowserPanelView: View {
     }
 
     private func forcedRemoteSuggestionsForUITest() -> [String]? {
-        let raw = ProcessInfo.processInfo.environment["CMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON"]
-            ?? UserDefaults.standard.string(forKey: "CMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON")
+        let raw = ProcessInfo.processInfo.environment["WMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON"]
+            ?? UserDefaults.standard.string(forKey: "WMUX_UI_TEST_REMOTE_SUGGESTIONS_JSON")
         guard let raw,
               let data = raw.data(using: .utf8),
               let parsed = try? JSONSerialization.jsonObject(with: data) as? [Any] else {
@@ -4309,10 +4309,10 @@ final class OmnibarNativeTextField: NSTextField {
 
     nonisolated override func keyDown(with event: NSEvent) {
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         var route = "super"
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "browser.omnibar.keyDown",
                 startedAt: typingTimingStart,
                 event: event,
@@ -4340,10 +4340,10 @@ final class OmnibarNativeTextField: NSTextField {
 
     nonisolated override func performKeyEquivalent(with event: NSEvent) -> Bool {
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         var handled = false
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "browser.omnibar.performKeyEquivalent",
                 startedAt: typingTimingStart,
                 event: event,
@@ -4614,9 +4614,9 @@ struct OmnibarTextFieldRepresentable: NSViewRepresentable {
 
         func controlTextDidChange(_ obj: Notification) {
 #if DEBUG
-            let typingTimingStart = CmuxTypingTiming.start()
+            let typingTimingStart = WmuxTypingTiming.start()
             defer {
-                CmuxTypingTiming.logDuration(
+                WmuxTypingTiming.logDuration(
                     path: "browser.omnibar.controlTextDidChange",
                     startedAt: typingTimingStart,
                     event: NSApp.currentEvent,
@@ -4638,10 +4638,10 @@ struct OmnibarTextFieldRepresentable: NSViewRepresentable {
 
         func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
 #if DEBUG
-            let typingTimingStart = CmuxTypingTiming.start()
+            let typingTimingStart = WmuxTypingTiming.start()
             var handled = false
             defer {
-                CmuxTypingTiming.logDuration(
+                WmuxTypingTiming.logDuration(
                     path: "browser.omnibar.doCommandBy",
                     startedAt: typingTimingStart,
                     event: NSApp.currentEvent,
@@ -4844,10 +4844,10 @@ struct OmnibarTextFieldRepresentable: NSViewRepresentable {
 
         func handleKeyEvent(_ event: NSEvent, editor: NSTextView?) -> Bool {
 #if DEBUG
-            let typingTimingStart = CmuxTypingTiming.start()
+            let typingTimingStart = WmuxTypingTiming.start()
             var handled = false
             defer {
-                CmuxTypingTiming.logDuration(
+                WmuxTypingTiming.logDuration(
                     path: "browser.omnibar.handleKeyEvent",
                     startedAt: typingTimingStart,
                     event: event,
@@ -8037,7 +8037,7 @@ struct WebViewRepresentable: NSViewRepresentable {
         webView: WKWebView,
         isPanelFocused: Bool
     ) {
-        guard let cmuxWebView = webView as? CmuxWebView else { return }
+        guard let cmuxWebView = webView as? WmuxWebView else { return }
         let next = isPanelFocused && !panel.shouldSuppressWebViewFocus()
         if cmuxWebView.allowsFirstResponderAcquisition != next {
 #if DEBUG

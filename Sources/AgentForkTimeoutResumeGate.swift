@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 /// Narrow synchronous gate for timer/task races around a single continuation.

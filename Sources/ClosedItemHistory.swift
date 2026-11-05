@@ -1,5 +1,5 @@
-import CmuxSurfaceCatalogModel
-import CmuxWorkspaces
+import WmuxSurfaceCatalogModel
+import WmuxWorkspaces
 import Foundation
 import Combine
 import Bonsplit
@@ -390,7 +390,7 @@ final class ClosedItemHistoryStore: ObservableObject {
     }
 
     /// A Cloud workspace through either transport — the legacy managed remote
-    /// (`managedCloudVMID`) or the cmux-tui binding (`cloudVM`) — the same
+    /// (`managedCloudVMID`) or the wmux-tui binding (`cloudVM`) — the same
     /// definition session restore uses under `DisableCloud`, so a purge and a
     /// blocked restore agree on what a Cloud record is.
     static func workspaceSnapshotHostsCloudVM(_ snapshot: SessionWorkspaceSnapshot) -> Bool {
@@ -758,7 +758,7 @@ final class ClosedItemHistoryStore: ObservableObject {
             options: .regularExpression
         )
         return resolvedAppSupport
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("closed-item-history-\(safeBundleId).json", isDirectory: false)
     }
 
@@ -829,7 +829,7 @@ final class ClosedItemHistoryStore: ObservableObject {
 }
 
 extension Notification.Name {
-    static let closedItemHistoryRevisionDidChange = Notification.Name("cmux.closedItemHistoryRevisionDidChange")
+    static let closedItemHistoryRevisionDidChange = Notification.Name("wmux.closedItemHistoryRevisionDidChange")
 }
 
 private struct ClosedItemHistoryPersistenceSnapshot: Codable, Sendable {

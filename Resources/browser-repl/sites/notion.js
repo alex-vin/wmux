@@ -4,7 +4,7 @@
 // session cookie authenticates and never reaches the REPL.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
   const ORIGIN = "https://www.notion.so";
 

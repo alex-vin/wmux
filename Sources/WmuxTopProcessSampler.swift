@@ -1,35 +1,35 @@
-import CmuxCore
-import CmuxFoundation
+import WmuxCore
+import WmuxFoundation
 import Darwin
 import Foundation
 
 /// Reads one minimal topology census; resources, paths and scope are separate enrichment.
-struct CmuxTopProcessSampler: Sendable {
-    let reader: any CmuxTopProcessReading
-    init(reader: any CmuxTopProcessReading = CmuxTopProcessReader()) { self.reader = reader }
+struct WmuxTopProcessSampler: Sendable {
+    let reader: any WmuxTopProcessReading
+    init(reader: any WmuxTopProcessReading = WmuxTopProcessReader()) { self.reader = reader }
 
-    func capture() throws -> CmuxTopProcessCapture {
+    func capture() throws -> WmuxTopProcessCapture {
         try Task.checkCancellation()
         let startedAt = Date()
         let listing = reader.enumerate()
         let records = processRecords(from: listing.processes, includeResources: false)
         try Task.checkCancellation()
         let missing = listing.missingProcessCount + listing.processes.count - records.count
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: records, sampledAt: startedAt,
             includesProcessDetails: false, includesCMUXScope: false, includesResources: false,
             enumerationIsComplete: listing.isComplete && missing == 0,
             enumerationMissingProcessCount: missing
         )
-        return CmuxTopProcessCapture(listing: listing, snapshot: snapshot, fields: [])
+        return WmuxTopProcessCapture(listing: listing, snapshot: snapshot, fields: [])
     }
 
     func processRecords(
         from sampledProcesses: [proc_bsdinfo], includeResources: Bool
-    ) -> [CmuxTopProcessInfo] {
+    ) -> [WmuxTopProcessInfo] {
         guard !sampledProcesses.isEmpty else { return [] }
         if !includeResources {
-            var unusedCPUSamples: [CmuxTopProcessScopeCacheKey: CmuxTopProcessCPUSample] = [:]
+            var unusedCPUSamples: [WmuxTopProcessScopeCacheKey: WmuxTopProcessCPUSample] = [:]
             return sampledProcesses.compactMap { process in
                 guard !Task.isCancelled else { return nil }
                 return processInfo(
@@ -39,23 +39,23 @@ struct CmuxTopProcessSampler: Sendable {
             }
         }
 
-        var scopeKeyByPID: [Int: CmuxTopProcessScopeCacheKey] = [:]
+        var scopeKeyByPID: [Int: WmuxTopProcessScopeCacheKey] = [:]
         scopeKeyByPID.reserveCapacity(sampledProcesses.count)
         for process in sampledProcesses {
-            scopeKeyByPID[Int(process.pbi_pid)] = CmuxTopProcessSnapshot.scopeCacheKey(from: process)
+            scopeKeyByPID[Int(process.pbi_pid)] = WmuxTopProcessSnapshot.scopeCacheKey(from: process)
         }
         let activeScopeKeys = Set(scopeKeyByPID.values)
-        var parentScopeKeys: [CmuxTopProcessScopeCacheKey: CmuxTopProcessScopeCacheKey] = [:]
+        var parentScopeKeys: [WmuxTopProcessScopeCacheKey: WmuxTopProcessScopeCacheKey] = [:]
         parentScopeKeys.reserveCapacity(sampledProcesses.count)
         for process in sampledProcesses {
-            let key = CmuxTopProcessSnapshot.scopeCacheKey(from: process)
+            let key = WmuxTopProcessSnapshot.scopeCacheKey(from: process)
             let parentPID = Int(process.pbi_ppid)
             guard let parentKey = scopeKeyByPID[parentPID] else { continue }
             parentScopeKeys[key] = parentKey
         }
-        let sampledAtNanoseconds = CmuxTopProcessSnapshot.cpuSampleClockNanoseconds()
-        var currentCPUSamples: [CmuxTopProcessScopeCacheKey: CmuxTopProcessCPUSample] = [:]
-        var processRecords: [(info: CmuxTopProcessInfo, cpuSampleKey: CmuxTopProcessScopeCacheKey?)] = []
+        let sampledAtNanoseconds = WmuxTopProcessSnapshot.cpuSampleClockNanoseconds()
+        var currentCPUSamples: [WmuxTopProcessScopeCacheKey: WmuxTopProcessCPUSample] = [:]
+        var processRecords: [(info: WmuxTopProcessInfo, cpuSampleKey: WmuxTopProcessScopeCacheKey?)] = []
         processRecords.reserveCapacity(sampledProcesses.count)
         for process in sampledProcesses {
             guard !Task.isCancelled else { break }
@@ -69,7 +69,7 @@ struct CmuxTopProcessSampler: Sendable {
             processRecords.append(processRecord)
         }
         guard includeResources else { return processRecords.map(\.info) }
-        let cpuPercentages = CmuxTopProcessSnapshot.cpuPercentages(
+        let cpuPercentages = WmuxTopProcessSnapshot.cpuPercentages(
             for: currentCPUSamples,
             activeKeys: activeScopeKeys,
             parentKeysByKey: parentScopeKeys,
@@ -86,15 +86,15 @@ struct CmuxTopProcessSampler: Sendable {
     private func processInfo(
         from bsdInfo: proc_bsdinfo, includeResources: Bool,
         sampledAtNanoseconds: UInt64,
-        currentCPUSamples: inout [CmuxTopProcessScopeCacheKey: CmuxTopProcessCPUSample]
-    ) -> (info: CmuxTopProcessInfo, cpuSampleKey: CmuxTopProcessScopeCacheKey?)? {
+        currentCPUSamples: inout [WmuxTopProcessScopeCacheKey: WmuxTopProcessCPUSample]
+    ) -> (info: WmuxTopProcessInfo, cpuSampleKey: WmuxTopProcessScopeCacheKey?)? {
         let pid = Int(bsdInfo.pbi_pid)
         guard pid > 0 else { return nil }
 
         let taskInfo = includeResources ? reader.taskInfo(for: pid) : nil
         let resourceUsage = includeResources ? reader.resourceUsage(for: pid) : nil
-        let cacheKey = CmuxTopProcessSnapshot.scopeCacheKey(from: bsdInfo)
-        let fallbackName = CmuxTopProcessSnapshot.fixedString(bsdInfo.pbi_comm)
+        let cacheKey = WmuxTopProcessSnapshot.scopeCacheKey(from: bsdInfo)
+        let fallbackName = WmuxTopProcessSnapshot.fixedString(bsdInfo.pbi_comm)
         let rawTTY = Int64(bsdInfo.e_tdev)
         let ttyDevice = rawTTY > 0 ? rawTTY : nil
         let rawProcessGroupID = Int(bsdInfo.pbi_pgid)
@@ -102,32 +102,32 @@ struct CmuxTopProcessSampler: Sendable {
         let rawTerminalProcessGroupID = Int(bsdInfo.e_tpgid)
         let terminalProcessGroupID = rawTerminalProcessGroupID > 0 ? rawTerminalProcessGroupID : nil
         let memoryBytes: Int64
-        let memorySource: CmuxTopProcessMemorySource
+        let memorySource: WmuxTopProcessMemorySource
         if let resourceUsage {
-            memoryBytes = CmuxTopProcessSnapshot.int64Clamped(resourceUsage.ri_phys_footprint)
+            memoryBytes = WmuxTopProcessSnapshot.int64Clamped(resourceUsage.ri_phys_footprint)
             memorySource = .physicalFootprint
         } else if let taskInfo {
-            memoryBytes = CmuxTopProcessSnapshot.int64Clamped(taskInfo.pti_resident_size)
+            memoryBytes = WmuxTopProcessSnapshot.int64Clamped(taskInfo.pti_resident_size)
             memorySource = .residentSize
         } else {
             memoryBytes = 0
             memorySource = .unavailable
         }
         let residentBytes: Int64
-        let residentMemorySource: CmuxTopProcessMemorySource
+        let residentMemorySource: WmuxTopProcessMemorySource
         if let taskInfo {
-            residentBytes = CmuxTopProcessSnapshot.int64Clamped(taskInfo.pti_resident_size)
+            residentBytes = WmuxTopProcessSnapshot.int64Clamped(taskInfo.pti_resident_size)
             residentMemorySource = .residentSize
         } else if let resourceUsage {
-            residentBytes = CmuxTopProcessSnapshot.int64Clamped(resourceUsage.ri_resident_size)
+            residentBytes = WmuxTopProcessSnapshot.int64Clamped(resourceUsage.ri_resident_size)
             residentMemorySource = .rusageResidentSize
         } else {
             residentBytes = 0
             residentMemorySource = .unavailable
         }
-        let cpuSampleKey: CmuxTopProcessScopeCacheKey?
+        let cpuSampleKey: WmuxTopProcessScopeCacheKey?
         if let taskInfo {
-            let currentCPUSample = CmuxTopProcessSnapshot.cpuSample(from: taskInfo, sampledAtNanoseconds: sampledAtNanoseconds)
+            let currentCPUSample = WmuxTopProcessSnapshot.cpuSample(from: taskInfo, sampledAtNanoseconds: sampledAtNanoseconds)
             currentCPUSamples[cacheKey] = currentCPUSample
             cpuSampleKey = cacheKey
         } else {
@@ -135,7 +135,7 @@ struct CmuxTopProcessSampler: Sendable {
         }
 
         guard !includeResources || reader.matches(pid: pid, key: cacheKey) else { return nil }
-        return (CmuxTopProcessInfo(
+        return (WmuxTopProcessInfo(
             pid: pid,
             processIdentity: AgentPIDProcessIdentity(
                 pid: pid_t(pid), startSeconds: Int64(cacheKey.startSeconds),
@@ -155,7 +155,7 @@ struct CmuxTopProcessSampler: Sendable {
             memorySource: memorySource,
             residentBytes: residentBytes,
             residentMemorySource: residentMemorySource,
-            virtualBytes: CmuxTopProcessSnapshot.int64Clamped(taskInfo?.pti_virtual_size ?? 0),
+            virtualBytes: WmuxTopProcessSnapshot.int64Clamped(taskInfo?.pti_virtual_size ?? 0),
             threadCount: Int(taskInfo?.pti_threadnum ?? 0)
         ), cpuSampleKey)
     }

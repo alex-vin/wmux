@@ -19,7 +19,7 @@ extension CLICallerWorkspaceDefaultTests {
         try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
         let socketPath = Self.makeSocketPath("pr")
         var environment = cliEnvironment(socketPath: socketPath, callerWorkspaceId: Self.callerWorkspaceId)
-        for key in ["CMUX_SOCKET", "CMUX_SOCKET_PASSWORD", "CMUX_CLI_TTY_NAME", "CMUX_TTY_NAME", "TTY", "SSH_TTY", "GH_REPO"] {
+        for key in ["WMUX_SOCKET", "WMUX_SOCKET_PASSWORD", "WMUX_CLI_TTY_NAME", "WMUX_TTY_NAME", "TTY", "SSH_TTY", "GH_REPO"] {
             environment.removeValue(forKey: key)
         }
         environment["PATH"] = bin.path + ":/usr/bin:/bin"
@@ -153,8 +153,8 @@ extension CLICallerWorkspaceDefaultTests {
             environment["GH_FORK"] = "1"
         case "fork-number": environment["GH_FORK"] = "1"
         case "explicit": args += ["--workspace", Self.otherWorkspaceId]
-        case "tty": environment["CMUX_CLI_TTY_NAME"] = "ttys123"
-        case "worktree", "linked-worktree", "sibling-worktree", "missing-directory", "nested-repository", "nested-valid", "nested-child", "nested-child-valid", "nested-bare-repository", "nested-bare-child", "nested-bare-valid", "nested-bare-child-valid", "fake-git-directory", "ambiguous": environment.removeValue(forKey: "CMUX_WORKSPACE_ID")
+        case "tty": environment["WMUX_CLI_TTY_NAME"] = "ttys123"
+        case "worktree", "linked-worktree", "sibling-worktree", "missing-directory", "nested-repository", "nested-valid", "nested-child", "nested-child-valid", "nested-bare-repository", "nested-bare-child", "nested-bare-valid", "nested-bare-child-valid", "fake-git-directory", "ambiguous": environment.removeValue(forKey: "WMUX_WORKSPACE_ID")
         case "window": args += ["--workspace", Self.otherWorkspaceId, "--window", Self.hexWindowId.lowercased()]
         case "window-mismatch": args += ["--workspace", Self.otherWorkspaceId, "--window", Self.focusedWorkspaceId]
         case "mismatch": args[1] = "https://github.com/other/repo/pull/123"

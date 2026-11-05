@@ -1,5 +1,5 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 enum CommandClickFileOpenRouter {

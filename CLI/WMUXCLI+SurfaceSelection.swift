@@ -37,7 +37,7 @@ extension WMUXCLI {
             ?? Self.callerWorkspaceForSurfaceHandle(surfaceOption, windowRaw: windowRaw)
         let surfaceRaw = surfaceOption
             ?? (workspaceOption == nil && windowRaw == nil
-                ? ProcessInfo.processInfo.environment["CMUX_SURFACE_ID"]
+                ? ProcessInfo.processInfo.environment["WMUX_SURFACE_ID"]
                 : nil)
 
         var params: [String: Any] = [:]
@@ -170,8 +170,8 @@ extension WMUXCLI {
         Read the active selection from any selectable surface. Plain output includes source context; --json returns the complete response.
 
         Flags:
-          --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
-          --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+          --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
+          --surface <id|ref|index>     Target surface (default: $WMUX_SURFACE_ID)
           --window <id|ref|index>      Window context for workspace/surface refs and indexes
 
         Example:
@@ -187,8 +187,8 @@ extension WMUXCLI {
         Read terminal text from a surface as plain text.
 
         Flags:
-          --workspace <id|ref|index>   Target workspace (default: $CMUX_WORKSPACE_ID)
-          --surface <id|ref|index>     Target surface (default: $CMUX_SURFACE_ID)
+          --workspace <id|ref|index>   Target workspace (default: $WMUX_WORKSPACE_ID)
+          --surface <id|ref|index>     Target surface (default: $WMUX_SURFACE_ID)
           --window <id|ref|index>      Window context for workspace/surface refs and indexes
           --scrollback                 Include scrollback (not just visible viewport)
           --lines <n>                  Limit to the last n lines (implies --scrollback)

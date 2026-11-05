@@ -1,6 +1,6 @@
 #if DEBUG
 import Bonsplit
-import CMUXDebugLog
+import WMUXDebugLog
 import Foundation
 import XCTest
 
@@ -16,10 +16,10 @@ import XCTest
 /// of order — which once sent a live-capture investigation chasing timestamps
 /// that were merely misfiled.
 final class DebugEventLogSerializedAppendTests: XCTestCase {
-    private static let logPath = CMUXDebugLog.DebugEventLog.currentLogPath()
+    private static let logPath = WMUXDebugLog.DebugEventLog.currentLogPath()
 
     /// Keep in sync with `DebugEventLog.maxPersistedLinesPerWindow` in
-    /// Packages/macOS/CMUXDebugLog. The value is duplicated here on purpose:
+    /// Packages/macOS/WMUXDebugLog. The value is duplicated here on purpose:
     /// the test must compile against builds that predate the constant.
     private static let maxPersistedLinesPerWindow = 2000
 

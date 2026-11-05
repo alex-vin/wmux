@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -160,7 +160,7 @@ struct CloudDirectoryLifecycleTests {
         // A terminal the app just asked a machine for carries the requested
         // directory, but that machine's provider has not accepted any state yet.
         let unconfirmed = SurfaceMachineID.cloud("unconfirmed-machine")
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: unconfirmed.rawValue, provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: fixture.catalog
         )
@@ -223,7 +223,7 @@ struct CloudDirectoryLifecycleTests {
         defer { fixture.close() }
         let old = try #require(fixture.provider.cloudState)
         fixture.catalog.markCloudStateStale(on: fixture.machine, reason: "provider replacement")
-        let replacement = CmuxTuiSurfaceProvider(
+        let replacement = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: fixture.machine.rawValue, provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: fixture.catalog
         )
@@ -284,7 +284,7 @@ struct CloudDirectoryLifecycleTests {
         snapshot["terminals"] = [[
             "id": "term_0", "title": "bash", "lifecycle": "running"
         ]]
-        let next = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: fixture.machine))
+        let next = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: fixture.machine))
         #expect(fixture.provider.installSnapshotIfNewer(next))
         fixture.provider.publishDelta(
             next,
@@ -422,7 +422,7 @@ struct CloudDirectoryLifecycleTests {
         let workspace = fixture.workspace
         workspace.cloudVMBinding = nil
         let other = SurfaceMachineID.cloud("other-machine")
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": "other", "revision": "1"],
             "workspaces": [], "screens": [], "panes": [], "tabs": [],
             "terminals": [["id": "other", "title": "bash", "cwd": "/srv/other", "lifecycle": "running"]],
@@ -431,7 +431,7 @@ struct CloudDirectoryLifecycleTests {
         var info = fixture.provider.info
         info.id = other
         info.name = "Other machine"
-        fixture.catalog.replaceCloudState(state, resources: CmuxTuiSnapshotParser.resources(from: state), info: info)
+        fixture.catalog.replaceCloudState(state, resources: WmuxTuiSnapshotParser.resources(from: state), info: info)
         fixture.catalog.endProjections(panelID: fixture.panels[0], reason: .replaced)
         fixture.catalog.record(SurfaceProjection(
             resource: SurfaceResourceID(machine: other, kind: .terminal, key: "other"),
@@ -459,13 +459,13 @@ struct CloudDirectoryLifecycleTests {
 
         let other = SurfaceMachineID.cloud("other-machine")
         let otherPanel = fixture.panels[1]
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": "other", "revision": "1"],
             "workspaces": [], "screens": [], "panes": [], "tabs": [],
             "terminals": [["id": "other-terminal", "title": "bash", "cwd": "/srv/other", "lifecycle": "running"]],
             "browsers": [], "agents": []
         ], machine: other))
-        let otherProvider = CmuxTuiSurfaceProvider(
+        let otherProvider = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: other.rawValue, provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: fixture.catalog
         )
@@ -476,7 +476,7 @@ struct CloudDirectoryLifecycleTests {
         }
         var otherInfo = otherProvider.info
         otherInfo.name = "Build server"
-        fixture.catalog.replaceCloudState(state, resources: CmuxTuiSnapshotParser.resources(from: state), info: otherInfo)
+        fixture.catalog.replaceCloudState(state, resources: WmuxTuiSnapshotParser.resources(from: state), info: otherInfo)
         fixture.catalog.endProjections(panelID: otherPanel, reason: .replaced)
         fixture.catalog.record(SurfaceProjection(
             resource: SurfaceResourceID(machine: other, kind: .terminal, key: "other-terminal"),

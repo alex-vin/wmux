@@ -1,4 +1,4 @@
-import CmuxAgentJournal
+import WmuxAgentJournal
 import Foundation
 
 extension WMUXCLI {
@@ -203,7 +203,7 @@ extension WMUXCLI {
     /// Dead-letter location: one JSON line per failed emission, bounded by
     /// truncation so an unreachable app cannot grow it without limit.
     static func agentJournalDeadLetterURL(env: [String: String] = ProcessInfo.processInfo.environment) -> URL {
-        if let override = env["CMUX_AGENT_JOURNAL_DEAD_LETTER_PATH"], !override.isEmpty {
+        if let override = env["WMUX_AGENT_JOURNAL_DEAD_LETTER_PATH"], !override.isEmpty {
             return URL(fileURLWithPath: override)
         }
         let home = FileManager.default.homeDirectoryForCurrentUser

@@ -1,11 +1,11 @@
-import CmuxControlSocket
+import WmuxControlSocket
 import Darwin
 import Foundation
 import Testing
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -128,7 +128,7 @@ private final class CLICoderouterMockHandoffServer: @unchecked Sendable {
     deinit { stop() }
 
     var capabilityEnvironment: [String: String] {
-        ["CMUX_SOCKET_CAPABILITY": capability]
+        ["WMUX_SOCKET_CAPABILITY": capability]
     }
 
     private static func readSingleRequest(from fileDescriptor: Int32) -> String? {
@@ -453,8 +453,8 @@ struct CLICoderouterAliasTests {
             arguments: ["cr", "--version"],
             environment: [
                 "PATH": root.path,
-                "CMUX_SOCKET_PATH": makeSocketPath("missing"),
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": makeSocketPath("missing"),
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -492,7 +492,7 @@ struct CLICoderouterAliasTests {
             environment: [
                 "PATH": root.path,
                 "CODEROUTER_STDIN_FILE": stdinURL.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: "interactive input\n"
         )
@@ -559,7 +559,7 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "--version"],
             environment: [
                 "PATH": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -602,7 +602,7 @@ struct CLICoderouterAliasTests {
             environment: [
                 "PATH": root.path,
                 "CODEROUTER_SIGNAL_FILE": signalURL.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -634,8 +634,8 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "capabilities", "--json"],
             environment: [
                 "PATH": root.path,
-                "CMUX_SOCKET_PATH": makeSocketPath("missing"),
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": makeSocketPath("missing"),
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -684,7 +684,7 @@ struct CLICoderouterAliasTests {
             """
             #!/bin/sh
             ulimit -n 256
-            exec "$CMUX_UNDER_TEST" "$@"
+            exec "$WMUX_UNDER_TEST" "$@"
             """,
             at: wrapperURL
         )
@@ -694,9 +694,9 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "--version"],
             environment: [
                 "PATH": root.path,
-                "CMUX_UNDER_TEST": cliPath,
+                "WMUX_UNDER_TEST": cliPath,
                 "CODEROUTER_SENTINEL_FD": String(sentinelFD),
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -732,7 +732,7 @@ struct CLICoderouterAliasTests {
             """
             #!/bin/sh
             exec 3</dev/null
-            exec "$CMUX_UNDER_TEST" "$@"
+            exec "$WMUX_UNDER_TEST" "$@"
             """,
             at: wrapperURL
         )
@@ -742,8 +742,8 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "--version"],
             environment: [
                 "PATH": root.path,
-                "CMUX_UNDER_TEST": cliPath,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_UNDER_TEST": cliPath,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -783,7 +783,7 @@ struct CLICoderouterAliasTests {
             """
             #!/bin/sh
             exec 0<&-
-            exec "$CMUX_UNDER_TEST" "$@"
+            exec "$WMUX_UNDER_TEST" "$@"
             """,
             at: wrapperURL
         )
@@ -793,8 +793,8 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "--version"],
             environment: [
                 "PATH": root.path,
-                "CMUX_UNDER_TEST": cliPath,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_UNDER_TEST": cliPath,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -833,8 +833,8 @@ struct CLICoderouterAliasTests {
             environment: [
                 "PATH": root.path,
                 "CR_ARGS_FILE": argsURL.path,
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -887,8 +887,8 @@ struct CLICoderouterAliasTests {
                 arguments: ["coderouter"] + commandArguments,
                 environment: [
                     "PATH": root.path,
-                    "CMUX_SOCKET_PATH": handoffServer.path,
-                    "CMUX_CLI_SENTRY_DISABLED": "1",
+                    "WMUX_SOCKET_PATH": handoffServer.path,
+                    "WMUX_CLI_SENTRY_DISABLED": "1",
                 ]
             )
             #expect(!result.timedOut, Comment(rawValue: result.stderr))
@@ -931,8 +931,8 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "codex"],
             environment: [
                 "PATH": root.path,
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -949,8 +949,8 @@ struct CLICoderouterAliasTests {
             environment: [
                 "PATH": root.path,
                 "CODEROUTER_PROTOCOL_VALUE": "true",
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
         #expect(booleanResult.status != 0)
@@ -990,8 +990,8 @@ struct CLICoderouterAliasTests {
             arguments: ["cr", "pi"],
             environment: [
                 "PATH": root.path,
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -1030,8 +1030,8 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "codex"],
             environment: [
                 "PATH": root.path,
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             allowUnsignedCoderouter: false
         )
@@ -1077,8 +1077,8 @@ struct CLICoderouterAliasTests {
             environment: [
                 "PATH": root.path,
                 "CODEROUTER_CAPABILITY_TEST_MODE": "slow",
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 4
         )
@@ -1091,8 +1091,8 @@ struct CLICoderouterAliasTests {
             environment: [
                 "PATH": root.path,
                 "CODEROUTER_CAPABILITY_TEST_MODE": "oversized",
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
         #expect(!oversizedResult.timedOut)
@@ -1185,7 +1185,7 @@ struct CLICoderouterAliasTests {
                 "GITHUB_TOKEN": "tool-token",
                 "AWS_ACCESS_KEY_ID": "aws-key",
                 "CUSTOM_SECRET_TOKEN": "tool-secret",
-                "CMUX_SOCKET_CAPABILITY": "cmux-secret",
+                "WMUX_SOCKET_CAPABILITY": "cmux-secret",
                 "CODEROUTER_HANDOFF_FD": "3",
                 "DYLD_LIBRARY_PATH": "/tmp/injected",
             ],
@@ -1196,7 +1196,7 @@ struct CLICoderouterAliasTests {
         #expect(nakedEnvironment["GITHUB_TOKEN"] == "tool-token")
         #expect(nakedEnvironment["AWS_ACCESS_KEY_ID"] == "aws-key")
         #expect(nakedEnvironment["CUSTOM_SECRET_TOKEN"] == "tool-secret")
-        #expect(nakedEnvironment["CMUX_SOCKET_CAPABILITY"] == nil)
+        #expect(nakedEnvironment["WMUX_SOCKET_CAPABILITY"] == nil)
         #expect(nakedEnvironment["CODEROUTER_HANDOFF_FD"] == nil)
         #expect(nakedEnvironment["DYLD_LIBRARY_PATH"] == nil)
 
@@ -1227,16 +1227,16 @@ struct CLICoderouterAliasTests {
                 "PATH": root.path,
                 "CODEROUTER_ENV_FILE": environmentURL.path,
                 "CODEROUTER_TEST_MARKER": "preserved",
-                "CMUX": "cmux-root-secret",
-                "CMUXD": "cmuxd-root-secret",
-                "CMUX_SOCKET": "/tmp/cmux-private.sock",
-                "CMUX_SOCKET_PATH": "/tmp/cmux-private-path.sock",
-                "CMUX_SOCKET_CAPABILITY": "capability-secret",
-                "CMUX_SOCKET_PASSWORD": "password-secret",
-                "CMUX_AUTH_CREDENTIALS_FILE": "/tmp/cmux-credentials",
-                "CMUX_WORKSPACE_ID": "workspace-secret",
-                "CMUX_SURFACE_ID": "surface-secret",
-                "CMUXD_UNIX_PATH": "/tmp/cmuxd-private.sock",
+                "WMUX": "cmux-root-secret",
+                "WMUXD": "cmuxd-root-secret",
+                "WMUX_SOCKET": "/tmp/cmux-private.sock",
+                "WMUX_SOCKET_PATH": "/tmp/cmux-private-path.sock",
+                "WMUX_SOCKET_CAPABILITY": "capability-secret",
+                "WMUX_SOCKET_PASSWORD": "password-secret",
+                "WMUX_AUTH_CREDENTIALS_FILE": "/tmp/cmux-credentials",
+                "WMUX_WORKSPACE_ID": "workspace-secret",
+                "WMUX_SURFACE_ID": "surface-secret",
+                "WMUXD_UNIX_PATH": "/tmp/cmuxd-private.sock",
                 "STACK_ACCESS_TOKEN": "stack-access-secret",
                 "STACK_REFRESH_TOKEN": "stack-refresh-secret",
                 "OPENAI_API_KEY": "openai-secret",
@@ -1262,7 +1262,7 @@ struct CLICoderouterAliasTests {
                 "GCP_PROJECT": "gcp-project-config",
                 "GOOGLE_CLOUD_PROJECT": "google-project-config",
                 "GOOGLE_APPLICATION_CREDENTIALS": "/tmp/google-secret.json",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ]
         )
 
@@ -1274,7 +1274,7 @@ struct CLICoderouterAliasTests {
         let childEnvironmentLines = childEnvironment.split(separator: "\n").map(String.init)
         #expect(
             !childEnvironmentLines.contains { line in
-                line.hasPrefix("CMUX_") || line.hasPrefix("CMUXD_")
+                line.hasPrefix("WMUX_") || line.hasPrefix("WMUXD_")
             },
             Comment(rawValue: childEnvironment)
         )
@@ -1334,8 +1334,8 @@ struct CLICoderouterAliasTests {
             arguments: ["coderouter", "launch"],
             environment: [
                 "PATH": root.path,
-                "CMUX_SOCKET_PATH": handoffServer.path,
-                "CMUX_DEBUG_LOG": debugLogURL.path,
+                "WMUX_SOCKET_PATH": handoffServer.path,
+                "WMUX_DEBUG_LOG": debugLogURL.path,
             ]
         )
 
@@ -1367,12 +1367,12 @@ struct CLICoderouterAliasTests {
         process.executableURL = URL(fileURLWithPath: cliPath)
         process.arguments = arguments
         var childEnvironment = ProcessInfo.processInfo.environment
-        for key in childEnvironment.keys where key.hasPrefix("CMUX_") || key.hasPrefix("CMUXD_") {
+        for key in childEnvironment.keys where key.hasPrefix("WMUX_") || key.hasPrefix("WMUXD_") {
             childEnvironment.removeValue(forKey: key)
         }
         childEnvironment.merge(environment) { _, newValue in newValue }
         if allowUnsignedCoderouter {
-            childEnvironment["CMUX_CODEROUTER_TEST_ALLOW_UNSIGNED"] = "1"
+            childEnvironment["WMUX_CODEROUTER_TEST_ALLOW_UNSIGNED"] = "1"
         }
         childEnvironment["AppleLanguages"] = childEnvironment["AppleLanguages"] ?? "(en)"
         childEnvironment["AppleLocale"] = childEnvironment["AppleLocale"] ?? "en_US"

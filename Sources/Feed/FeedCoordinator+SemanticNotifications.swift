@@ -1,7 +1,7 @@
-import CMUXAgentLaunch
-import CmuxAgentJournal
-import CmuxFoundation
-import CmuxSettings
+import WMUXAgentLaunch
+import WmuxAgentJournal
+import WmuxFoundation
+import WmuxSettings
 import Foundation
 
 extension FeedCoordinator {

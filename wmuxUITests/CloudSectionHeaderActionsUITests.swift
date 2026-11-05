@@ -98,11 +98,11 @@ final class CloudSectionHeaderActionsUITests: XCTestCase {
 
     private func launchSignedInApp() -> XCUIApplication {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UITEST_AUTH_FIXTURE"] = "1"
-        app.launchEnvironment["CMUX_UITEST_AUTH_USER_ID"] = "cloud-header-actions-fixture"
-        app.launchEnvironment["CMUX_UITEST_AUTH_NAME"] = "Cloud Header Actions Fixture"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UITEST_AUTH_FIXTURE"] = "1"
+        app.launchEnvironment["WMUX_UITEST_AUTH_USER_ID"] = "cloud-header-actions-fixture"
+        app.launchEnvironment["WMUX_UITEST_AUTH_NAME"] = "Cloud Header Actions Fixture"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
         app.launchArguments += [
             "-workspacePresentationMode", "standard",
             "-cloud.beta.machines.enabled", "<true/>",

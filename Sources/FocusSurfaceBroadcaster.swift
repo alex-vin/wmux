@@ -1,6 +1,6 @@
 import Foundation
 import OSLog
-import CmuxNotifications
+import WmuxNotifications
 
 nonisolated private let focusSurfaceBroadcasterLogger = Logger(
     subsystem: "com.cmuxterm.app",

@@ -1,12 +1,12 @@
-import CmuxCore
-import CmuxFoundation
-import CmuxRemoteSession
+import WmuxCore
+import WmuxFoundation
+import WmuxRemoteSession
 import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -52,9 +52,9 @@ struct SSHStartupManualReconnectTests {
         try Self.writeFakeSSHCLI(at: fakeCLI)
         try Self.writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
+            "count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
             "count=$((count + 1))",
-            "printf '%s' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "printf '%s' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "if [ \"$count\" -ge 2 ]; then exit 0; fi",
             "exit 1",
         ])
@@ -67,15 +67,15 @@ struct SSHStartupManualReconnectTests {
         #expect(!startupCommand.contains("workspace.remote.terminal_session_connected"))
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_TEST_FAKE_SSH"] = fakeSSH.path
-        environment["CMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_SESSION_END_LOG"] = logFile.path
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_TEST_FAKE_SSH"] = fakeSSH.path
+        environment["WMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_SESSION_END_LOG"] = logFile.path
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
 
         let prompt = try Self.makeTerminalExitPromptProcess(TerminalExitPromptFixture(
             startupCommand: startupCommand,
@@ -128,13 +128,13 @@ struct SSHStartupManualReconnectTests {
         try fileManager.removeItem(at: generatedStartupURL)
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_TEST_FAKE_SSH"] = fakeSSH.path
-        environment["CMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_SSH_RECONNECT_LIMIT"] = "0"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_TEST_FAKE_SSH"] = fakeSSH.path
+        environment["WMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_SSH_RECONNECT_LIMIT"] = "0"
         let prompt = try Self.makeTerminalExitPromptProcess(TerminalExitPromptFixture(
             startupCommand: startupURL.path,
             environment: environment,
@@ -182,9 +182,9 @@ struct SSHStartupManualReconnectTests {
         try Self.writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
             "trap '' HUP INT TERM",
-            "printf '%s\\n' \"$$\" > \"${CMUX_TEST_AUTH_CHILD_PID:?}\"",
+            "printf '%s\\n' \"$$\" > \"${WMUX_TEST_AUTH_CHILD_PID:?}\"",
             "/bin/sleep 30 &",
-            "printf '%s\\n' \"$!\" > \"${CMUX_TEST_AUTH_GRANDCHILD_PID:?}\"",
+            "printf '%s\\n' \"$!\" > \"${WMUX_TEST_AUTH_GRANDCHILD_PID:?}\"",
             "wait $!",
         ])
         for executable in [fakeCLI, fakeSSH] {
@@ -196,15 +196,15 @@ struct SSHStartupManualReconnectTests {
         environment[SSHForegroundAuthenticationLaunch.environmentKey] =
             Self.persistentAttachSupervisorAuthToken
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_TEST_FAKE_SSH"] = fakeSSH.path
-        environment["CMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_AUTH_CHILD_PID"] = childPIDFile.path
-        environment["CMUX_TEST_AUTH_GRANDCHILD_PID"] = grandchildPIDFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_TEST_FAKE_SSH"] = fakeSSH.path
+        environment["WMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_AUTH_CHILD_PID"] = childPIDFile.path
+        environment["WMUX_TEST_AUTH_GRANDCHILD_PID"] = grandchildPIDFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "0"
 
         let process = Process()
         let processExited = DispatchSemaphore(value: 0)
@@ -277,8 +277,8 @@ struct SSHStartupManualReconnectTests {
         ])
         try Self.writeShellFile(at: fakeSleep, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$$\" > \"${CMUX_TEST_BACKOFF_PID:?}\"",
-            "printf '%s\\n' ready > \"${CMUX_TEST_BACKOFF_READY:?}\"", // after the PID: the test reads it on `ready`
+            "printf '%s\\n' \"$$\" > \"${WMUX_TEST_BACKOFF_PID:?}\"",
+            "printf '%s\\n' ready > \"${WMUX_TEST_BACKOFF_READY:?}\"", // after the PID: the test reads it on `ready`
             "exec /bin/sleep \"$1\"",
         ])
         for executable in [fakeCLI, fakeSSH, fakeSleep] {
@@ -290,16 +290,16 @@ struct SSHStartupManualReconnectTests {
         environment[SSHForegroundAuthenticationLaunch.environmentKey] =
             Self.persistentAttachSupervisorAuthToken
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_TEST_FAKE_SSH"] = fakeSSH.path
-        environment["CMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_BACKOFF_READY"] = backoffReadyMarker.path
-        environment["CMUX_TEST_BACKOFF_PID"] = backoffPIDFile.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "30"
-        environment["CMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "30"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_TEST_FAKE_SSH"] = fakeSSH.path
+        environment["WMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_BACKOFF_READY"] = backoffReadyMarker.path
+        environment["WMUX_TEST_BACKOFF_PID"] = backoffPIDFile.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "30"
+        environment["WMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "30"
 
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/sh")
@@ -363,14 +363,14 @@ struct SSHStartupManualReconnectTests {
             "#!/bin/sh",
             "for arg in \"$@\"; do",
             "  if [ \"$arg\" = \"ssh-pty-attach\" ]; then",
-            "    printf '%s\\n' attached >> \"${CMUX_TEST_ATTACH_FILE:?}\"",
+            "    printf '%s\\n' attached >> \"${WMUX_TEST_ATTACH_FILE:?}\"",
             "  fi",
             "done",
             "exit 0",
         ])
         try Self.writeShellFile(at: fakeSSH, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' auth >> \"${CMUX_TEST_ATTEMPT_FILE:?}\"",
+            "printf '%s\\n' auth >> \"${WMUX_TEST_ATTEMPT_FILE:?}\"",
             "exit 0",
         ])
         for executable in [fakeCLI, fakeSSH] {
@@ -382,19 +382,19 @@ struct SSHStartupManualReconnectTests {
         environment[SSHForegroundAuthenticationLaunch.environmentKey] =
             Self.persistentAttachSupervisorAuthToken
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_TEST_FAKE_SSH"] = fakeSSH.path
-        environment["CMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_ATTACH_FILE"] = attachFile.path
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_TEST_FAKE_SSH"] = fakeSSH.path
+        environment["WMUX_PERSISTENT_PTY_EXEC_HELPER"] = "/usr/bin/true"
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_ATTACH_FILE"] = attachFile.path
         // The supervisor's own deferred-signal state must start empty. An
         // inherited value would replay a signal nobody sent right after the
         // authentication child launches, exiting 130 before any attach.
-        environment["cmux_ssh_attach_pending_signal"] = "130"
-        environment["cmux_ssh_attach_pending_signal_name"] = "INT"
+        environment["wmux_ssh_attach_pending_signal"] = "130"
+        environment["wmux_ssh_attach_pending_signal_name"] = "INT"
 
         let result = Self.runProcess(
             executablePath: "/bin/sh",
@@ -730,10 +730,10 @@ struct SSHStartupManualReconnectTests {
             "#!/bin/sh",
             "for arg in \"$@\"; do",
             "  if [ \"$arg\" = \"ssh-pty-attach\" ]; then",
-            "    exec \"$CMUX_TEST_FAKE_SSH\"",
+            "    exec \"$WMUX_TEST_FAKE_SSH\"",
             "  fi",
             "done",
-            "printf '%s\\n' \"$*\" >> \"${CMUX_TEST_SESSION_END_LOG:-/dev/null}\"",
+            "printf '%s\\n' \"$*\" >> \"${WMUX_TEST_SESSION_END_LOG:-/dev/null}\"",
             "exit 0",
         ])
     }

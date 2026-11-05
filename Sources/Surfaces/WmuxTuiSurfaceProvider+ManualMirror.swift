@@ -1,8 +1,8 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     func materializeManualMirrorTerminal(
         _ resource: SurfaceResource,
         remoteTabID: String? = nil,

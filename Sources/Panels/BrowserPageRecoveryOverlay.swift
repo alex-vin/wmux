@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxFoundation
+import WmuxBrowser
+import WmuxFoundation
 import SwiftUI
 
 /// What a browser pane asks the user to do before its page comes back.

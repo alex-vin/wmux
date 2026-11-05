@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxPanes
+import WmuxPanes
 import Foundation
 
 /// Split admission (#15371): a split may not leave a pane smaller than its

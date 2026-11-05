@@ -10,7 +10,7 @@ import XCTest
 /// workspace sidebar rows and the right-sidebar mode bar* — surfaces that
 /// only exist once a workspace has been materialized. The shared
 /// `SettingsUITestCase` harness launches the app with `makeLaunchedApp()`
-/// (no `CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP` / `_SHOW_RIGHT_SIDEBAR`
+/// (no `WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP` / `_SHOW_RIGHT_SIDEBAR`
 /// launch env), so the app comes up with an empty main window: no
 /// workspace rows, and the right sidebar mode bar is not populated. That
 /// means the *downstream* render effects (branch text stacked vs inline in
@@ -109,7 +109,7 @@ final class SettingsSidebarBetaBehaviorUITests: SettingsUITestCase {
     //   the vertical-vs-inline arrangement only affects the branch/directory
     //   text *inside a workspace sidebar row* (ContentView workspace row,
     //   `usesVerticalBranchLayout`). The harness `makeLaunchedApp()` launches
-    //   with no workspaces (no CMUX_UI_TEST_BONSPLIT setup env), so no
+    //   with no workspaces (no WMUX_UI_TEST_BONSPLIT setup env), so no
     //   workspace row exists to inspect, and the two layouts carry no
     //   distinguishing accessibilityIdentifier. Verifying the rendered layout
     //   would require the bonsplit/workspace setup launch env the fixed

@@ -1,12 +1,12 @@
 import AppKit
 import Bonsplit
-import CMUXAgentLaunch
-import CmuxFoundation
-import CmuxNotifications
+import WMUXAgentLaunch
+import WmuxFoundation
+import WmuxNotifications
 import Foundation
 @preconcurrency import UserNotifications
-import CmuxSettings
-import CmuxSidebar
+import WmuxSettings
+import WmuxSidebar
 
 private enum FeedEventAcceptance: Sendable {
     case accepted(event: WorkstreamEvent, item: WorkstreamItem)
@@ -25,7 +25,7 @@ private enum FeedEventAcceptance: Sendable {
 /// Hooks then receive the decision inline in the `feed.push` response.
 final class FeedCoordinator: @unchecked Sendable {
     static let shared = FeedCoordinator()
-    static let storeInstalledNotification = Notification.Name("cmux.feed.storeInstalled")
+    static let storeInstalledNotification = Notification.Name("wmux.feed.storeInstalled")
 
     // The store runs on the main actor. The coordinator is not isolated,
     // so it hops to main explicitly when touching the store.
@@ -52,7 +52,7 @@ final class FeedCoordinator: @unchecked Sendable {
     /// multiple prompts only installs one watcher.
     @MainActor private var pidWatchers: [Int: DispatchSourceProcess] = [:]
     private let pidWatcherQueue = DispatchQueue(
-        label: "cmux.feed.pidWatcher", qos: .utility
+        label: "wmux.feed.pidWatcher", qos: .utility
     )
 
     /// Every accepted Feed path crosses this lane before insertion and `received` publication.
@@ -76,7 +76,7 @@ final class FeedCoordinator: @unchecked Sendable {
     /// transient target per agent session and retire it on the next event.
     @MainActor private var transientAttentionTargets: [String: FeedAttentionTarget] = [:]
 
-    /// Tail of the serialized `CMUXFeedQuestion.` category mutation chain.
+    /// Tail of the serialized `WMUXFeedQuestion.` category mutation chain.
     /// `UNUserNotificationCenter` has no atomic category merge, so every
     /// mutation is a get→filter→set round trip; two concurrent round trips
     /// (mint racing mint, or mint racing cancel) each capture a stale snapshot
@@ -719,7 +719,7 @@ extension FeedCoordinator {
     /// Keeping this transient overlay separate from the agent's own slot makes
     /// concurrent hook updates and overlapping Feed decisions independent.
     static func attentionStatusKey(forSource source: String) -> String {
-        "cmux.feed.attention:\(lifecycleStatusKey(forSource: source))"
+        "wmux.feed.attention:\(lifecycleStatusKey(forSource: source))"
     }
 
     /// The localized "Needs input" sidebar status the overlay sets.
@@ -864,7 +864,7 @@ extension FeedCoordinator {
             key: statusKey,
             value: Self.needsInputStatusValue,
             icon: "bell.fill",
-            color: CmuxAccentColor.builtInAgentStatusHex,
+            color: WmuxAccentColor.builtInAgentStatusHex,
             timestamp: Date()
         ), key: statusKey, panelId: panelId)
 
@@ -899,7 +899,7 @@ extension FeedCoordinator {
                     key: target.statusKey,
                     value: String(localized: "agent.generic.status.running", defaultValue: "Running"),
                     icon: "bolt.fill",
-                    color: CmuxAccentColor.builtInAgentStatusHex,
+                    color: WmuxAccentColor.builtInAgentStatusHex,
                     timestamp: at
                 ),
                 key: target.statusKey,
@@ -912,7 +912,7 @@ extension FeedCoordinator {
                         key: baseStatusKey,
                         value: String(localized: "agent.generic.status.running", defaultValue: "Running"),
                         icon: "bolt.fill",
-                        color: CmuxAccentColor.builtInAgentStatusHex,
+                        color: WmuxAccentColor.builtInAgentStatusHex,
                         timestamp: at
                     ),
                     key: baseStatusKey,
@@ -1002,7 +1002,7 @@ extension FeedCoordinator {
     }
 
     private static func baseStatusKey(forAttentionStatusKey key: String) -> String? {
-        let prefix = "cmux.feed.attention:"
+        let prefix = "wmux.feed.attention:"
         guard key.hasPrefix(prefix) else { return nil }
         return String(key.dropFirst(prefix.count))
     }
@@ -1295,7 +1295,7 @@ private extension FeedCoordinator {
                     defaultValue: "Decision needed"
                 )
             case .exitPlanMode:
-                categoryId = "CMUXFeedExitPlan"
+                categoryId = "WMUXFeedExitPlan"
                 title = String(
                     localized: "feed.notification.exitPlan.title",
                     defaultValue: "\(event.source.capitalized) plan ready"
@@ -1306,8 +1306,8 @@ private extension FeedCoordinator {
                 )
             case .askUserQuestion:
                 categoryId = Self.inlineQuestionOptions(for: event) == nil
-                    ? "CMUXFeedQuestion"
-                    : "CMUXFeedQuestion.\(requestId)"
+                    ? "WMUXFeedQuestion"
+                    : "WMUXFeedQuestion.\(requestId)"
                 title = String(
                     localized: "feed.notification.question.title",
                     defaultValue: "\(event.source.capitalized) question"
@@ -1396,7 +1396,7 @@ private extension FeedCoordinator {
         if supportsOnce { suffix += "Once" }
         if supportsAlways { suffix += "Always" }
         if supportsAll { suffix += "All" }
-        return suffix.isEmpty ? "CMUXFeedPermissionDeny" : "CMUXFeedPermission\(suffix)"
+        return suffix.isEmpty ? "WMUXFeedPermissionDeny" : "WMUXFeedPermission\(suffix)"
     }
 
     private static func inlineQuestionOptions(
@@ -1588,7 +1588,7 @@ private extension FeedCoordinator {
         requestId: String,
         effects: TerminalNotificationPolicyEffects
     ) {
-        guard request.content.categoryIdentifier.hasPrefix("CMUXFeedQuestion."),
+        guard request.content.categoryIdentifier.hasPrefix("WMUXFeedQuestion."),
               let options = Self.inlineQuestionOptions(for: event) else {
             addNotificationIfStillAwaiting(
                 request: request,
@@ -1642,9 +1642,9 @@ private extension FeedCoordinator {
                 )
                 return
             }
-            let liveCategoryIds = self.liveWaiterRequestIds().map { "CMUXFeedQuestion.\($0)" }
+            let liveCategoryIds = self.liveWaiterRequestIds().map { "WMUXFeedQuestion.\($0)" }
             var categories = Set(current.filter { category in
-                !category.identifier.hasPrefix("CMUXFeedQuestion.")
+                !category.identifier.hasPrefix("WMUXFeedQuestion.")
                     || liveCategoryIds.contains(category.identifier)
             })
             categories.insert(minted)
@@ -1657,7 +1657,7 @@ private extension FeedCoordinator {
         }
     }
 
-    /// Appends one `CMUXFeedQuestion.` category round trip to the serialized
+    /// Appends one `WMUXFeedQuestion.` category round trip to the serialized
     /// chain (see `questionCategoryUpdates`). Order between distinct requests
     /// is irrelevant — a mint whose waiter already resolved aborts on its
     /// `isAwaitingDecision` guard, and every update prunes dead categories —
@@ -1777,7 +1777,7 @@ private extension FeedCoordinator {
                     referenceID: identifier
                 )
             }
-            let categoryId = "CMUXFeedQuestion.\(requestId)"
+            let categoryId = "WMUXFeedQuestion.\(requestId)"
             self.enqueueQuestionCategoryUpdate {
                 guard case .success(let current) = await center.notificationCategories() else { return }
                 let categories = Set(current.filter { $0.identifier != categoryId })
@@ -1789,7 +1789,7 @@ private extension FeedCoordinator {
 
 private struct FeedNotificationPolicyContext {
     let envelope: TerminalNotificationPolicyEnvelope
-    let hooks: [CmuxResolvedNotificationHook]
+    let hooks: [WmuxResolvedNotificationHook]
     let globalConfigPath: String?
 }
 

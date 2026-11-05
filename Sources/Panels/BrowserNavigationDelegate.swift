@@ -1,8 +1,8 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxBrowser
-import CmuxCore
-import CmuxSettings
+import WmuxBrowser
+import WmuxCore
+import WmuxSettings
 import Foundation
 import WebKit
 
@@ -120,7 +120,7 @@ import WebKit
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         activeMainFrameNavigation = navigation
-        (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+        (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
         lastAttemptedURL = lastAttemptedURL ?? webView.url ?? lastAttemptedRequest?.url
         shouldPrintAfterCurrentNavigationFinishes = false
         didClearPDFDocument?()
@@ -172,7 +172,7 @@ import WebKit
         didFailNavigation?(webView, failedURL, error.localizedDescription, navigation)
         if isCurrentNavigation {
             owner?.failTrustedLocalFileNavigation()
-            (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+            (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
             trustedInternalNavigationURL = nil
         }
         clearActiveMainFrameNavigation(ifMatching: navigation)
@@ -183,7 +183,7 @@ import WebKit
         if isCurrentNavigation {
             trustedInternalNavigationURL = nil
             owner?.failTrustedLocalFileNavigation()
-            (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+            (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
         }
         let nsError = error as NSError
         NSLog("BrowserPanel provisional navigation failed: %@", error.localizedDescription)
@@ -341,7 +341,7 @@ import WebKit
             label: "BrowserNavigationDelegate.navigationAction"
         ).closure
 
-        let hasRecentMiddleClickIntent = CmuxWebView.hasRecentMiddleClickIntent(for: webView)
+        let hasRecentMiddleClickIntent = WmuxWebView.hasRecentMiddleClickIntent(for: webView)
         let shouldOpenInNewTab = browserNavigationShouldOpenInNewTab(
             navigationType: navigationAction.navigationType,
             modifierFlags: navigationAction.modifierFlags,
@@ -413,7 +413,7 @@ import WebKit
         }
 
         if let url = navigationAction.request.url,
-           url.scheme == "cmux-browser-action",
+           url.scheme == "wmux-browser-action",
            url.host == "bypass-ssl" {
             decisionHandler(.cancel)
             handleSSLTrustBypassAction(url, in: webView)
@@ -494,7 +494,7 @@ import WebKit
             let isMainFrame = navigationAction.targetFrame?.isMainFrame != false
             let isTrustedInternal = trustedInternalNavigation(for: url, in: webView)
             if isMainFrame, !isTrustedInternal {
-                (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+                (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
             }
             let isTrustedDocument = isMainFrame && url.isFileURL
                 && owner?.isTrustedLocalFileDocument(url) == true
@@ -940,7 +940,7 @@ import WebKit
             let isMainFrame = navigationResponse.isForMainFrame
             let isTrustedInternal = trustedInternalNavigation(for: url, in: webView)
             if isMainFrame, !isTrustedInternal {
-                (webView as? CmuxWebView)?.clearTrustedInternalNavigationGrants()
+                (webView as? WmuxWebView)?.clearTrustedInternalNavigationGrants()
             }
             let isTrustedDocument = isMainFrame && url.isFileURL
                 && owner?.isTrustedLocalFileDocument(url) == true
@@ -1063,7 +1063,7 @@ import WebKit
         if trustedInternalNavigationURL?.absoluteString == url.absoluteString {
             return true
         }
-        guard let cmuxWebView = webView as? CmuxWebView,
+        guard let cmuxWebView = webView as? WmuxWebView,
               cmuxWebView.consumeTrustedInternalNavigation(url) else {
             return false
         }

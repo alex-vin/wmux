@@ -71,7 +71,7 @@ extension WMUXCLI {
 
     private func sigpipeProbeExecutablePath() throws -> String {
         let candidate: String? = {
-            if let explicit = ProcessInfo.processInfo.environment["CMUX_CLI_PATH"],
+            if let explicit = ProcessInfo.processInfo.environment["WMUX_CLI_PATH"],
                !explicit.isEmpty {
                 return explicit
             }

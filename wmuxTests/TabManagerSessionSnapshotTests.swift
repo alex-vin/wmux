@@ -1,13 +1,13 @@
-import CmuxSurfaceCatalogModel
-import CmuxWorkspaces
+import WmuxSurfaceCatalogModel
+import WmuxWorkspaces
 import Darwin
-import CmuxCore
-import CmuxRemoteWorkspace
+import WmuxCore
+import WmuxRemoteWorkspace
 import XCTest
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1883,7 +1883,7 @@ final class TabManagerSessionSnapshotTests: XCTestCase {
     func testSessionSnapshotSkipsTemporaryDiffViewerBrowserPanels() throws {
         let workspace = try XCTUnwrap(makeTabManager().selectedWorkspace)
         let paneId = try XCTUnwrap(workspace.bonsplitController.allPaneIds.first)
-        let url = try XCTUnwrap(URL(string: "\(CmuxDiffViewerURLSchemeHandler.scheme)://token/index.html"))
+        let url = try XCTUnwrap(URL(string: "\(WmuxDiffViewerURLSchemeHandler.scheme)://token/index.html"))
         _ = try XCTUnwrap(
             workspace.newBrowserSurface(
                 inPane: paneId,
@@ -2701,10 +2701,10 @@ final class TabManagerSessionSnapshotTests: XCTestCase {
         XCTAssertTrue(terminalStartupCommand.contains("vm-pty-attach"), terminalStartupCommand)
         XCTAssertTrue(terminalStartupCommand.contains("--id nncop8f8h6w9blhns6sy"), terminalStartupCommand)
         XCTAssertTrue(terminalStartupCommand.contains("--default-freestyle-sshd"), terminalStartupCommand)
-        XCTAssertTrue(terminalStartupCommand.contains("CMUX_SSH_RECONNECT_LIMIT"), terminalStartupCommand)
-        XCTAssertTrue(terminalStartupCommand.contains("CMUX_CLOUD_RECONNECT_ATTEMPT"), terminalStartupCommand)
+        XCTAssertTrue(terminalStartupCommand.contains("WMUX_SSH_RECONNECT_LIMIT"), terminalStartupCommand)
+        XCTAssertTrue(terminalStartupCommand.contains("WMUX_CLOUD_RECONNECT_ATTEMPT"), terminalStartupCommand)
         XCTAssertFalse(terminalStartupCommand.contains("Cloud VM reconnecting"), terminalStartupCommand)
-        XCTAssertFalse(terminalStartupCommand.contains("cmux_freestyle_notify_reconnect"), terminalStartupCommand)
+        XCTAssertFalse(terminalStartupCommand.contains("wmux_freestyle_notify_reconnect"), terminalStartupCommand)
         XCTAssertFalse(terminalStartupCommand.contains("[cmux] ssh exited with status"), terminalStartupCommand)
     }
 
@@ -2756,7 +2756,7 @@ final class TabManagerSessionSnapshotTests: XCTestCase {
         XCTAssertFalse(restoredInitialCommand.contains("ssh-stale-session"), restoredInitialCommand)
         XCTAssertTrue(restoredInitialCommand.contains("vm-pty-attach"), restoredInitialCommand)
         XCTAssertTrue(restoredInitialCommand.contains("--default-freestyle-sshd"), restoredInitialCommand)
-        XCTAssertTrue(restoredInitialCommand.contains("CMUX_CLOUD_RECONNECT_ATTEMPT"), restoredInitialCommand)
+        XCTAssertTrue(restoredInitialCommand.contains("WMUX_CLOUD_RECONNECT_ATTEMPT"), restoredInitialCommand)
         XCTAssertFalse(restoredInitialCommand.contains("[cmux] ssh exited with status"), restoredInitialCommand)
         XCTAssertEqual(
             restoredWorkspace.sessionSnapshot(includeScrollback: false)
@@ -2849,16 +2849,16 @@ final class TabManagerSessionSnapshotTests: XCTestCase {
             startupCommand
         )
         XCTAssertTrue(
-            startupCommand.contains("CMUX_TERMINAL_LIFECYCLE_ID"),
+            startupCommand.contains("WMUX_TERMINAL_LIFECYCLE_ID"),
             startupCommand
         )
         XCTAssertTrue(
-            startupCommand.contains("CMUX_SSH_ATTEMPT_ID"),
+            startupCommand.contains("WMUX_SSH_ATTEMPT_ID"),
             startupCommand
         )
         XCTAssertTrue(
             startupCommand.contains(
-                "cmux_restore_begin_attempt\ncmux_restore_launch_status=$?"
+                "wmux_restore_begin_attempt\ncmux_restore_launch_status=$?"
             ),
             "Restore must invoke lifecycle registration before checking its status: \(startupCommand)"
         )
@@ -2871,7 +2871,7 @@ final class TabManagerSessionSnapshotTests: XCTestCase {
         let mockSSH = directory.appendingPathComponent("ssh")
         try """
         #!/bin/sh
-        printf invoked > "$CMUX_TEST_SSH_MARKER"
+        printf invoked > "$WMUX_TEST_SSH_MARKER"
         """.write(to: mockSSH, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes(
             [.posixPermissions: 0o755],
@@ -2883,7 +2883,7 @@ final class TabManagerSessionSnapshotTests: XCTestCase {
         process.executableURL = URL(fileURLWithPath: "/bin/sh")
         process.arguments = ["-c", startupCommand]
         process.environment = [
-            "CMUX_TEST_SSH_MARKER": sshMarker.path,
+            "WMUX_TEST_SSH_MARKER": sshMarker.path,
             "HOME": directory.path,
             "PATH": directory.path,
         ]

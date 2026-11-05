@@ -1,12 +1,12 @@
 import Bonsplit
-import CmuxCloud
-import CmuxSettings
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSettings
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -283,7 +283,7 @@ struct CloudClosedPanelRestoreTests {
 
     private func withCloudBrowser(
         daemonBrowser: Bool = true,
-        _ body: (Workspace, BrowserPanel, CmuxTuiSurfaceProvider, SurfaceResource) throws -> Void
+        _ body: (Workspace, BrowserPanel, WmuxTuiSurfaceProvider, SurfaceResource) throws -> Void
     ) throws {
         try withManager(registeredWithApp: true) { manager in
             let workspace = manager.addWorkspace(initialSurface: .browser, autoWelcomeIfNeeded: false)
@@ -296,7 +296,7 @@ struct CloudClosedPanelRestoreTests {
             var summary = VMSummary(id: machineID, provider: "freestyle", status: "running",
                 image: "cmux-devbox", createdAt: 0, base: nil)
             summary.addressIPv4 = "10.0.0.7"
-            let provider = CmuxTuiSurfaceProvider(summary: summary,
+            let provider = WmuxTuiSurfaceProvider(summary: summary,
                 links: CloudMachineLinkManager(clientURL: nil, hub: nil, hostThemeColors: { nil }),
                 catalog: catalog, browserPolicy: { .init(managedPatterns: nil) })
             catalog.register(provider)

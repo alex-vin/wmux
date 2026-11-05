@@ -1,4 +1,4 @@
-import CmuxPanes
+import WmuxPanes
 
 /// A browser command executed against an explicitly captured panel target.
 enum BrowserAction {

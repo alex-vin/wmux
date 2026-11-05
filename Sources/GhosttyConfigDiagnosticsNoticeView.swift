@@ -1,5 +1,5 @@
-import CmuxFoundation
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxTerminalCore
 import SwiftUI
 
 /// Compact card listing the first Ghostty config errors, shown by

@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxTerminal
+import WmuxFoundation
+import WmuxTerminal
 
 @MainActor
 final class MainWindowFocusController {

@@ -1,9 +1,9 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -830,9 +830,9 @@ struct RestorableAgentSessionIndexTests {
         try fm.createDirectory(at: cwd, withIntermediateDirectories: true)
         try fm.createDirectory(at: projectSessions, withIntermediateDirectories: true)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = sessionsRoot.path
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
         let workspaceId = UUID()
         let panels = [UUID(), UUID(), UUID()]
         let sessionIds = ["pi-session-a", "pi-session-b", "pi-session-c"]
@@ -857,7 +857,7 @@ struct RestorableAgentSessionIndexTests {
         try writeHookStore(root: root, storeFilename: "pi-hook-sessions.json", sessions: hookSessions)
 
         let processes = panels.enumerated().map { index, panelId in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: 4_200 + index,
                 parentPID: 1,
                 name: "pi",
@@ -874,7 +874,7 @@ struct RestorableAgentSessionIndexTests {
                 threadCount: 1
             )
         }
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: processes,
             sampledAt: Date(timeIntervalSince1970: 0),
             includesProcessDetails: true
@@ -886,7 +886,7 @@ struct RestorableAgentSessionIndexTests {
             capturedAt: 42,
             processArgumentsProvider: { processId in
                 guard processes.contains(where: { $0.pid == processId }) else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: ["/usr/local/bin/pi"],
                     environment: [
                         "PWD": cwd.path,
@@ -927,9 +927,9 @@ struct RestorableAgentSessionIndexTests {
         try fm.createDirectory(at: cwd, withIntermediateDirectories: true)
         try fm.createDirectory(at: projectSessions, withIntermediateDirectories: true)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = sessionsRoot.path
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
         let oldWorkspaceIds = [UUID(), UUID(), UUID()]
         let restoredWorkspaceIds = [UUID(), UUID(), UUID()]
         let panels = [UUID(), UUID(), UUID()]
@@ -955,7 +955,7 @@ struct RestorableAgentSessionIndexTests {
         try writeHookStore(root: root, storeFilename: "pi-hook-sessions.json", sessions: hookSessions)
 
         let processes = panels.enumerated().map { index, panelId in
-            CmuxTopProcessInfo(
+            WmuxTopProcessInfo(
                 pid: 4_300 + index,
                 parentPID: 1,
                 name: "pi",
@@ -972,7 +972,7 @@ struct RestorableAgentSessionIndexTests {
                 threadCount: 1
             )
         }
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: processes,
             sampledAt: Date(timeIntervalSince1970: 0),
             includesProcessDetails: true
@@ -984,7 +984,7 @@ struct RestorableAgentSessionIndexTests {
             capturedAt: 42,
             processArgumentsProvider: { processId in
                 guard processes.contains(where: { $0.pid == processId }) else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: ["/usr/local/bin/pi"],
                     environment: [
                         "PWD": cwd.path,
@@ -1029,9 +1029,9 @@ struct RestorableAgentSessionIndexTests {
         try fm.createDirectory(at: cwd, withIntermediateDirectories: true)
         try fm.createDirectory(at: projectSessions, withIntermediateDirectories: true)
 
-        var registration = CmuxVaultAgentRegistration.builtInPi
+        var registration = WmuxVaultAgentRegistration.builtInPi
         registration.sessionDirectory = sessionsRoot.path
-        let registry = CmuxVaultAgentRegistry(registrations: [registration])
+        let registry = WmuxVaultAgentRegistry(registrations: [registration])
         let oldWorkspaceId = UUID()
         let otherOldWorkspaceId = UUID()
         let restoredWorkspaceId = UUID()
@@ -1068,7 +1068,7 @@ struct RestorableAgentSessionIndexTests {
         )
         try writeHookStore(root: root, storeFilename: "pi-hook-sessions.json", sessions: hookSessions)
 
-        let process = CmuxTopProcessInfo(
+        let process = WmuxTopProcessInfo(
             pid: 4_400,
             parentPID: 1,
             name: "pi",
@@ -1084,7 +1084,7 @@ struct RestorableAgentSessionIndexTests {
             virtualBytes: 0,
             threadCount: 1
         )
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [process],
             sampledAt: Date(timeIntervalSince1970: 0),
             includesProcessDetails: true
@@ -1096,7 +1096,7 @@ struct RestorableAgentSessionIndexTests {
             capturedAt: 42,
             processArgumentsProvider: { processId in
                 guard processId == process.pid else { return nil }
-                return CmuxTopProcessArguments(
+                return WmuxTopProcessArguments(
                     arguments: ["/usr/local/bin/pi"],
                     environment: [
                         "PWD": cwd.path,
@@ -1203,7 +1203,7 @@ struct RestorableAgentSessionIndexTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fm,
-            registry: CmuxVaultAgentRegistry(registrations: [.builtInPi]),
+            registry: WmuxVaultAgentRegistry(registrations: [.builtInPi]),
             detectedSnapshots: [
                 key: (
                     snapshot: detectedSnapshot,
@@ -1222,8 +1222,8 @@ struct RestorableAgentSessionIndexTests {
     }
 
     // RestorableAgentKind.cwdNamespacing delegates to the shared AgentResumeWorkingDirectory
-    // classifier (in CMUXAgentLaunch) so the app-side resolver and the CLI surface-restore publisher
-    // apply one policy. The shared resolver's own behavior is covered in CMUXAgentLaunchTests.
+    // classifier (in WMUXAgentLaunch) so the app-side resolver and the CLI surface-restore publisher
+    // apply one policy. The shared resolver's own behavior is covered in WMUXAgentLaunchTests.
     @Test
     func testRestorableAgentKindCwdNamespacingMatchesSharedClassifier() {
         for kind in RestorableAgentKind.allCases {
@@ -1435,11 +1435,11 @@ struct RestorableAgentSessionIndexTests {
         try fm.createDirectory(at: runtimeCwd, withIntermediateDirectories: true)
 
         let agentId = "my-agent"
-        let registry = CmuxVaultAgentRegistry(registrations: [
-            CmuxVaultAgentRegistration(
+        let registry = WmuxVaultAgentRegistry(registrations: [
+            WmuxVaultAgentRegistration(
                 id: agentId,
                 name: "My Agent",
-                detect: CmuxVaultAgentDetectRule(processNames: [agentId]),
+                detect: WmuxVaultAgentDetectRule(processNames: [agentId]),
                 sessionIdSource: .argvOption("--resume"),
                 resumeCommand: "{{executable}} --resume {{sessionId}}",
                 forkCommand: "{{executable}} --resume {{sessionId}} --fork",
@@ -1672,7 +1672,7 @@ struct RestorableAgentSessionIndexTests {
             ]
         )
 
-        let registry = CmuxVaultAgentRegistry.load(homeDirectory: root.path, fileManager: fm)
+        let registry = WmuxVaultAgentRegistry.load(homeDirectory: root.path, fileManager: fm)
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: root.path,
             fileManager: fm,
@@ -1849,7 +1849,7 @@ struct RestorableAgentSessionIndexTests {
         try writeHookStore(root: root, storeFilename: "claude-hook-sessions.json", sessions: sessions)
     }
 
-    // A codex launched from inside a claude session inherits claude's CMUX_AGENT_LAUNCH_*
+    // A codex launched from inside a claude session inherits claude's WMUX_AGENT_LAUNCH_*
     // environment (every child of a claude process carries it), so the codex hook record can
     // capture a claude launch command: launcher "claude" with the claude binary and
     // claude-only flags. Resume/fork must never run the foreign binary; the cross-agent
@@ -1904,16 +1904,16 @@ struct RestorableAgentSessionIndexTests {
         )
         let resume = try XCTUnwrap(snapshot.resumeCommand)
         XCTAssertFalse(resume.contains("claude"), "codex resume must not run the claude binary; got: \(resume)")
-        // Bare `codex` now routes through the codex wrapper token (CMUX_CODEX_WRAPPER_SHIM)
+        // Bare `codex` now routes through the codex wrapper token (WMUX_CODEX_WRAPPER_SHIM)
         // wrapped in `/bin/sh -c '…'` so the resumed session keeps cmux hooks (issue #5639).
         XCTAssertTrue(resume.contains("/bin/sh -c "), "codex resume must wrap the wrapper token for any login shell; got: \(resume)")
-        XCTAssertTrue(resume.contains("CMUX_CODEX_WRAPPER_SHIM"), "codex resume must route through the codex wrapper shim; got: \(resume)")
+        XCTAssertTrue(resume.contains("WMUX_CODEX_WRAPPER_SHIM"), "codex resume must route through the codex wrapper shim; got: \(resume)")
         XCTAssertTrue(resume.contains("resume") && resume.contains(sid), "codex resume must use the resume verb and session id; got: \(resume)")
         XCTAssertFalse(resume.contains(foreignDir.path), "codex resume must not cd into the foreign launch dir; got: \(resume)")
         let fork = try XCTUnwrap(snapshot.forkCommand)
         XCTAssertFalse(fork.contains("claude"), "codex fork must not run the claude binary; got: \(fork)")
         XCTAssertTrue(fork.contains("/bin/sh -c "), "codex fork must wrap the wrapper token for any login shell; got: \(fork)")
-        XCTAssertTrue(fork.contains("CMUX_CODEX_WRAPPER_SHIM"), "codex fork must route through the codex wrapper shim; got: \(fork)")
+        XCTAssertTrue(fork.contains("WMUX_CODEX_WRAPPER_SHIM"), "codex fork must route through the codex wrapper shim; got: \(fork)")
         XCTAssertTrue(fork.contains("fork") && fork.contains(sid), "codex fork must use the fork verb and session id; got: \(fork)")
         XCTAssertFalse(fork.contains(foreignDir.path), "codex fork must not cd into the foreign launch dir; got: \(fork)")
     }
@@ -1940,7 +1940,7 @@ struct RestorableAgentSessionIndexTests {
         record["launchCommand"] = [
             "launcher": "codex",
             "executablePath": "sh",
-            "arguments": ["sh", "-c", "payload=\"${CMUX_HOOK_PAYLOAD:-}\"; eval \"$command\""],
+            "arguments": ["sh", "-c", "payload=\"${WMUX_HOOK_PAYLOAD:-}\"; eval \"$command\""],
             "workingDirectory": dir.path,
             "capturedAt": 10,
             "source": "process",
@@ -1959,11 +1959,11 @@ struct RestorableAgentSessionIndexTests {
         XCTAssertFalse(resume.contains("'sh'"), "codex resume must not run the hook shell wrapper; got: \(resume)")
         // Bare `codex` routes through the codex wrapper token wrapped in `/bin/sh -c '…'`
         // (issue #5639) so the resumed session keeps cmux hooks.
-        XCTAssertTrue(resume.contains("CMUX_CODEX_WRAPPER_SHIM"), "codex resume must route through the codex wrapper shim; got: \(resume)")
+        XCTAssertTrue(resume.contains("WMUX_CODEX_WRAPPER_SHIM"), "codex resume must route through the codex wrapper shim; got: \(resume)")
         XCTAssertTrue(resume.contains("resume") && resume.contains(sid), "codex resume must use the resume verb and session id; got: \(resume)")
         let fork = try XCTUnwrap(snapshot.forkCommand)
         XCTAssertFalse(fork.contains("'sh'"), "codex fork must not run the hook shell wrapper; got: \(fork)")
-        XCTAssertTrue(fork.contains("CMUX_CODEX_WRAPPER_SHIM"), "codex fork must route through the codex wrapper shim; got: \(fork)")
+        XCTAssertTrue(fork.contains("WMUX_CODEX_WRAPPER_SHIM"), "codex fork must route through the codex wrapper shim; got: \(fork)")
         XCTAssertTrue(fork.contains("fork") && fork.contains(sid), "codex fork must use the fork verb and session id; got: \(fork)")
     }
 

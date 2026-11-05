@@ -1,11 +1,11 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxCore
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxCore
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -67,7 +67,7 @@ import Testing
     /// Brings up the daemon fixture, hands the body the production catalog,
     /// provider and fixture directory, and tears both down however it ends.
     private func withDaemonFixture<T>(
-        _ body: (SurfaceCatalog, CmuxTuiSurfaceProvider, URL) async throws -> T
+        _ body: (SurfaceCatalog, WmuxTuiSurfaceProvider, URL) async throws -> T
     ) async throws -> T {
         let root = URL(fileURLWithPath: "/tmp/cmux-rename-\(UUID().uuidString.prefix(8))", isDirectory: true)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -105,7 +105,7 @@ import Testing
         var changes = link.changes.makeAsyncIterator()
         #expect(await changes.next() == .connected)
         let catalog = SurfaceCatalog()
-        let provider = CmuxTuiSurfaceProvider(summary: .ssh(connection), links: links, catalog: catalog)
+        let provider = WmuxTuiSurfaceProvider(summary: .ssh(connection), links: links, catalog: catalog)
         catalog.register(provider)
 
         // Teardown is awaited here rather than detached into a `Task`. The
@@ -122,7 +122,7 @@ import Testing
         }
 
         do {
-            let initial = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: provider.machine))
+            let initial = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: snapshot, machine: provider.machine))
             #expect(provider.installSnapshotIfNewer(initial))
             provider.publish(initial, ports: [])
             let value = try await body(catalog, provider, root)

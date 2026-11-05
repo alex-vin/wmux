@@ -1,6 +1,6 @@
 import Foundation
 
-enum CmuxHelpResource {
+enum WmuxHelpResource {
     case gettingStarted
     case concepts
     case configuration

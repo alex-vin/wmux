@@ -1,11 +1,11 @@
 import AppKit
 import Bonsplit
-import CmuxSidebar
+import WmuxSidebar
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -38,7 +38,7 @@ struct NarrowWindowSidePanelFitTests {
         let savedRightSidebarVisible = defaults.object(forKey: "fileExplorer.isVisible")
         let savedRightSidebarWidth = defaults.object(forKey: "fileExplorer.width")
         let windowId = appDelegate.createMainWindow(shouldActivate: false)
-        let window = try #require(appDelegate.mainWindow(for: windowId) as? CmuxMainWindow)
+        let window = try #require(appDelegate.mainWindow(for: windowId) as? WmuxMainWindow)
 #if DEBUG
         let previousConfirmationHandler = appDelegate.debugCloseMainWindowConfirmationHandler
         appDelegate.debugCloseMainWindowConfirmationHandler = { _ in true }

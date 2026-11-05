@@ -1,6 +1,6 @@
 import Foundation
-import CmuxSettings
-import CmuxTerminalCore
+import WmuxSettings
+import WmuxTerminalCore
 
 extension TabManager {
     struct WorkspaceCreationTabSnapshot {

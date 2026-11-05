@@ -22,7 +22,7 @@ final class FeedIngressDeliveryLane: @unchecked Sendable {
     private static let sessionCriticalOverflowTimeout: TimeInterval = 3
 
     private let executionQueue = DispatchQueue(
-        label: "cmux.feed.ingressDelivery",
+        label: "wmux.feed.ingressDelivery",
         qos: .userInitiated,
         attributes: .concurrent
     )

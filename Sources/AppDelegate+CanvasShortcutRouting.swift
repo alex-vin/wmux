@@ -1,7 +1,7 @@
 import AppKit
-import CmuxCanvas
-import CmuxPanes
-import CmuxSettings
+import WmuxCanvas
+import WmuxPanes
+import WmuxSettings
 
 extension AppDelegate {
     @discardableResult

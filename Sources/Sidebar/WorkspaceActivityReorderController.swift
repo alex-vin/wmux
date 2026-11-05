@@ -1,6 +1,6 @@
-import CmuxAgentJournal
-import CmuxSettings
-import CmuxWorkspaces
+import WmuxAgentJournal
+import WmuxSettings
+import WmuxWorkspaces
 import Foundation
 
 /// Applies the `agentActivity` mode of `app.reorderOnNotification`.

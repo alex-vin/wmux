@@ -1,11 +1,11 @@
-import CMUXMobileCore
-import CmuxIrohTransport
-@testable import CmuxMobileHost
+import WMUXMobileCore
+import WmuxIrohTransport
+@testable import WmuxMobileHost
 import Foundation
 @preconcurrency import Network
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

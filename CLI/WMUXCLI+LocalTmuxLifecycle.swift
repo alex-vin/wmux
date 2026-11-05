@@ -402,7 +402,7 @@ extension WMUXCLI {
         process.executableURL = URL(fileURLWithPath: builder.tmuxPath)
         process.arguments = builder.attachArguments(binding: session.binding)
         var environment = ProcessInfo.processInfo.environment
-        environment = environment.filter { !$0.key.hasPrefix("CMUX_") && !$0.key.hasPrefix("CMUXD_") }
+        environment = environment.filter { !$0.key.hasPrefix("WMUX_") && !$0.key.hasPrefix("WMUXD_") }
         environment.removeValue(forKey: "TMUX")
         process.environment = environment
         process.standardInput = FileHandle.standardInput

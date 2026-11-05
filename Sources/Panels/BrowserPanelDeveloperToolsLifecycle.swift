@@ -1,5 +1,5 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 
 @MainActor
 extension BrowserPanel {
@@ -256,7 +256,7 @@ extension BrowserPanel {
         if let mainWindow = webView.window, window === mainWindow {
             return false
         }
-        if window.identifier?.rawValue.hasPrefix("cmux.main.") == true {
+        if window.identifier?.rawValue.hasPrefix("wmux.main.") == true {
             return false
         }
         return !Self.windowContainsBrowserSlotView(contentView)

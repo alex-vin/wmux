@@ -7,7 +7,7 @@
 // an injected `host` object; nothing here imports Node built-ins.
 (function (root) {
   "use strict";
-  const ns = (root.CmuxBrowserRepl = root.CmuxBrowserRepl || {});
+  const ns = (root.WmuxBrowserRepl = root.WmuxBrowserRepl || {});
   // Playwright's selector builders, with the text argument checked first:
   // getByText(42) fails as an invalid argument instead of matching nothing.
   const LU = (() => {

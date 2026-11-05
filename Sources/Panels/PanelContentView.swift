@@ -1,10 +1,10 @@
-import CmuxFoundation
-import CmuxNotifications
+import WmuxFoundation
+import WmuxNotifications
 import SwiftUI
 import Foundation
 import Bonsplit
 import AppKit
-import CmuxAppKitSupportUI
+import WmuxAppKitSupportUI
 
 /// View that renders the appropriate panel view based on panel type
 struct PanelContentView: View {
@@ -148,7 +148,7 @@ struct PanelContentView: View {
             }
         case .simulator:
             if let simulatorPanel = panel as? SimulatorPanel {
-                if CmuxFeatureFlags.shared.isSimulatorEnabled,
+                if WmuxFeatureFlags.shared.isSimulatorEnabled,
                    simulatorPanel.isFeatureReady {
                     SimulatorPanelView(
                         panel: simulatorPanel,
@@ -186,8 +186,8 @@ struct PanelContentView: View {
                 )
             }
         case .extensionBrowser:
-            if let extensionBrowserPanel = panel as? CMUXSidebarExtensionBrowserPanel {
-                CMUXSidebarExtensionBrowserPanelView(
+            if let extensionBrowserPanel = panel as? WMUXSidebarExtensionBrowserPanel {
+                WMUXSidebarExtensionBrowserPanelView(
                     panel: extensionBrowserPanel,
                     onRequestPanelFocus: onRequestPanelFocus
                 )
@@ -264,7 +264,7 @@ struct PanelFilePathHeader<TrailingContent: View>: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            CmuxSystemSymbolImage(
+            WmuxSystemSymbolImage(
                 systemName: iconSystemName,
                 pointSize: RightSidebarChromeMetrics.contentIconFrameSize,
                 tint: .secondary
@@ -307,7 +307,7 @@ struct PanelHeaderIconGlyph: View {
     let systemName: String
 
     var body: some View {
-        CmuxSystemSymbolImage(
+        WmuxSystemSymbolImage(
             systemName: systemName,
             pointSize: RightSidebarChromeMetrics.headerIconSize,
             tint: .secondary

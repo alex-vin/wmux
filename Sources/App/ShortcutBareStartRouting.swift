@@ -73,7 +73,7 @@ extension AppDelegate {
     /// Process environment is fixed at launch; snapshot this DEBUG-only trace
     /// opt-in instead of rebuilding the environment on every keystroke.
     static let shortcutMonitorTraceEnvironmentEnabled =
-        ProcessInfo.processInfo.environment["CMUX_SHORTCUT_MONITOR_TRACE"] == "1"
+        ProcessInfo.processInfo.environment["WMUX_SHORTCUT_MONITOR_TRACE"] == "1"
 #endif
 
     /// Returns the already-resolved tab manager when plain terminal text can

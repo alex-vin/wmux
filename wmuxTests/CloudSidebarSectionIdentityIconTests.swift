@@ -1,12 +1,12 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxCloud
-import CmuxFoundation
-import CmuxSurfaceCatalogModel
+import WmuxAppKitSupportUI
+import WmuxCloud
+import WmuxFoundation
+import WmuxSurfaceCatalogModel
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -131,9 +131,9 @@ struct CloudSidebarSectionIdentityIconTests {
         }
     }
 
-    static func icons(in view: NSView) -> [CmuxResolvedIconImageView] {
-        view.subviews.flatMap { subview -> [CmuxResolvedIconImageView] in
-            if let icon = subview as? CmuxResolvedIconImageView, !icon.isHidden, icon.bounds.width > 0 { return [icon] }
+    static func icons(in view: NSView) -> [WmuxResolvedIconImageView] {
+        view.subviews.flatMap { subview -> [WmuxResolvedIconImageView] in
+            if let icon = subview as? WmuxResolvedIconImageView, !icon.isHidden, icon.bounds.width > 0 { return [icon] }
             return icons(in: subview)
         }
     }

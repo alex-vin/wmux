@@ -15,8 +15,8 @@ struct LocalTmuxSessionNameValidator {
 
 /// Builds the only shell command cmux persists for local-tmux reattachment.
 struct LocalTmuxCommandBuilder {
-    static let restoreMarker = "CMUX_LOCAL_TMUX=1"
-    static let serverIdentityOption = "@cmux_local_server_id"
+    static let restoreMarker = "WMUX_LOCAL_TMUX=1"
+    static let serverIdentityOption = "@wmux_local_server_id"
     static let identityMismatchCommand = "run-shell false"
 
     let tmuxPath: String

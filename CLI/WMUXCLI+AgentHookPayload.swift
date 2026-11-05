@@ -91,7 +91,7 @@ extension WMUXCLI {
                 compact[key] = value
             }
         }
-        for key in ["fullyIdle", "cmux_notification_routed"] {
+        for key in ["fullyIdle", "wmux_notification_routed"] {
             if let value = object[key] as? Bool {
                 compact[key] = value
             }

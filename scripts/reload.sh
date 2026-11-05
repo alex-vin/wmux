@@ -1655,8 +1655,8 @@ if should_skip_ghostty_cli_helper_zig_build; then
 fi
 
 XCODEBUILD_ARGS=(
-  -project cmux.xcodeproj
-  -scheme cmux
+  -project wmux.xcodeproj
+  -scheme wmux
   -configuration "$BUILD_CONFIGURATION"
   -destination 'platform=macOS'
 )

@@ -1,12 +1,12 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import os
 import Testing
-import CmuxWorkspaces
+import WmuxWorkspaces
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -528,7 +528,7 @@ struct AgentHibernationTerminationFailureTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: FileManager.default.temporaryDirectory.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 sourceKey: (
                     snapshot: snapshot,

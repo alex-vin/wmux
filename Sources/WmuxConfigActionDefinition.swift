@@ -1,17 +1,17 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
-struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
-    var action: CmuxSurfaceTabBarButtonAction?
+struct WmuxConfigActionDefinition: Codable, Sendable, Hashable {
+    var action: WmuxSurfaceTabBarButtonAction?
     var title: String?
     var subtitle: String?
     var keywords: [String]?
     var palette: Bool?
     var shortcut: StoredShortcut?
-    var icon: CmuxButtonIcon?
+    var icon: WmuxButtonIcon?
     var tooltip: String?
     var confirm: Bool?
-    var terminalCommandTarget: CmuxConfigTerminalCommandTarget?
+    var terminalCommandTarget: WmuxConfigTerminalCommandTarget?
     /// Whether this action is offered in the new-workspace plus-button menu.
     /// Defaults to true for `workspace` actions and false otherwise.
     var newWorkspaceMenu: Bool?
@@ -46,16 +46,16 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
     }
 
     init(
-        action: CmuxSurfaceTabBarButtonAction? = nil,
+        action: WmuxSurfaceTabBarButtonAction? = nil,
         title: String? = nil,
         subtitle: String? = nil,
         keywords: [String]? = nil,
         palette: Bool? = nil,
         shortcut: StoredShortcut? = nil,
-        icon: CmuxButtonIcon? = nil,
+        icon: WmuxButtonIcon? = nil,
         tooltip: String? = nil,
         confirm: Bool? = nil,
-        terminalCommandTarget: CmuxConfigTerminalCommandTarget? = nil,
+        terminalCommandTarget: WmuxConfigTerminalCommandTarget? = nil,
         newWorkspaceMenu: Bool? = nil
     ) {
         self.action = action
@@ -82,10 +82,10 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
             .filter { !$0.isEmpty }
         palette = try container.decodeIfPresent(Bool.self, forKey: .palette)
         shortcut = try Self.decodeShortcut(forKey: .shortcut, in: container)
-        icon = try container.decodeIfPresent(CmuxButtonIcon.self, forKey: .icon)
+        icon = try container.decodeIfPresent(WmuxButtonIcon.self, forKey: .icon)
         tooltip = try Self.trimmedString(forKey: .tooltip, in: container, allowBlankAsNil: true)
         confirm = try container.decodeIfPresent(Bool.self, forKey: .confirm)
-        terminalCommandTarget = try container.decodeIfPresent(CmuxConfigTerminalCommandTarget.self, forKey: .target)
+        terminalCommandTarget = try container.decodeIfPresent(WmuxConfigTerminalCommandTarget.self, forKey: .target)
         newWorkspaceMenu = try container.decodeIfPresent(Bool.self, forKey: .newWorkspaceMenu)
 
         let inferredType: String?
@@ -106,7 +106,7 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
         switch inferredType {
         case "builtin":
             let raw = try Self.trimmedString(forKey: .builtin, in: container) ?? ""
-            guard let builtIn = CmuxSurfaceTabBarBuiltInAction(configID: raw) else {
+            guard let builtIn = WmuxSurfaceTabBarBuiltInAction(configID: raw) else {
                 throw DecodingError.dataCorruptedError(
                     forKey: .builtin,
                     in: container,
@@ -118,7 +118,7 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
             let command = try Self.requiredTrimmedString(forKey: .command, in: container)
             action = .command(command)
         case "agent":
-            let agent = try container.decode(CmuxConfigAgentKind.self, forKey: .agent)
+            let agent = try container.decode(WmuxConfigAgentKind.self, forKey: .agent)
             let args = try Self.trimmedString(forKey: .args, in: container, allowBlankAsNil: true)
             action = .agent(agent, args: args)
         case "workspaceCommand":
@@ -143,8 +143,8 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
                     )
                 )
             }
-            let definition = try container.decode(CmuxWorkspaceDefinition.self, forKey: .workspace)
-            let restart = try container.decodeIfPresent(CmuxRestartBehavior.self, forKey: .restart)
+            let definition = try container.decode(WmuxWorkspaceDefinition.self, forKey: .workspace)
+            let restart = try container.decodeIfPresent(WmuxRestartBehavior.self, forKey: .restart)
             action = .workspace(definition, restart: restart)
         case "setting":
             action = .setting(try Self.decodeSettingChange(in: container, codingPath: decoder.codingPath))
@@ -208,7 +208,7 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
     private static func decodeSettingChange(
         in container: KeyedDecodingContainer<CodingKeys>,
         codingPath: [any CodingKey]
-    ) throws -> CmuxSettingChange {
+    ) throws -> WmuxSettingChange {
         let path = try requiredTrimmedString(forKey: .path, in: container)
         let operations = [CodingKeys.set, .toggle, .cycle, .unset].filter { container.contains($0) }
         guard operations.count == 1, let operation = operations.first else {
@@ -221,7 +221,7 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
         }
         switch operation {
         case .set:
-            return .set(path: path, value: try container.decode(CmuxSettingValue.self, forKey: .set))
+            return .set(path: path, value: try container.decode(WmuxSettingValue.self, forKey: .set))
         case .toggle, .unset:
             guard try container.decode(Bool.self, forKey: operation) else {
                 throw DecodingError.dataCorruptedError(
@@ -232,7 +232,7 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
             }
             return operation == .toggle ? .toggle(path: path) : .unset(path: path)
         default:
-            let values = try container.decode([CmuxSettingValue].self, forKey: .cycle)
+            let values = try container.decode([WmuxSettingValue].self, forKey: .cycle)
             guard !values.isEmpty else {
                 throw DecodingError.dataCorruptedError(
                     forKey: .cycle,
@@ -245,7 +245,7 @@ struct CmuxConfigActionDefinition: Codable, Sendable, Hashable {
     }
 
     private static func encodeSettingChange(
-        _ change: CmuxSettingChange,
+        _ change: WmuxSettingChange,
         in container: inout KeyedEncodingContainer<CodingKeys>
     ) throws {
         switch change {

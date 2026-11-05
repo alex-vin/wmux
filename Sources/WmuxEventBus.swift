@@ -1,14 +1,14 @@
 import Foundation
 import os
 nonisolated private let cmuxEventBusLogger = Logger(subsystem: "com.cmuxterm.app", category: "events")
-struct CmuxEventSubscriptionSnapshot {
-    let subscription: CmuxEventSubscription
+struct WmuxEventSubscriptionSnapshot {
+    let subscription: WmuxEventSubscription
     let replay: [[String: Any]]
     let ack: [String: Any]
 }
 
 // Sendable safety: every mutable field is protected by `lock`; `semaphore` only wakes `next(timeout:)`.
-final class CmuxEventSubscription: @unchecked Sendable {
+final class WmuxEventSubscription: @unchecked Sendable {
     let id: UUID
     let names: Set<String>
     let categories: Set<String>
@@ -175,8 +175,8 @@ final class CmuxEventSubscription: @unchecked Sendable {
     }
 }
 
-// Sendable safety: event state is protected by `lock`; disk appends are delegated to `CmuxEventLogWriter`.
-final class CmuxEventBus: @unchecked Sendable {
+// Sendable safety: event state is protected by `lock`; disk appends are delegated to `WmuxEventLogWriter`.
+final class WmuxEventBus: @unchecked Sendable {
     private struct PersistedEventRestore {
         let events: [[String: Any]]
         let allEvents: [[String: Any]]
@@ -200,7 +200,7 @@ final class CmuxEventBus: @unchecked Sendable {
     }
 
     private struct PendingSubscription {
-        let subscription: CmuxEventSubscription
+        let subscription: WmuxEventSubscription
         let afterSequence: Int64?
         let liveOnly: Bool
     }
@@ -208,17 +208,17 @@ final class CmuxEventBus: @unchecked Sendable {
     private struct EventPublication {
         let event: [String: Any]
         let encodedLine: String?
-        let subscriptions: [CmuxEventSubscription]
+        let subscriptions: [WmuxEventSubscription]
     }
 
-    static let shared = CmuxEventBus(eventLogURL: defaultEventLogURL())
-    static let protocolName = "cmux-events"
+    static let shared = WmuxEventBus(eventLogURL: defaultEventLogURL())
+    static let protocolName = "wmux-events"
     static let protocolVersion = 1
     static let defaultHeartbeatIntervalSeconds: TimeInterval = 15
     static let defaultRetainedEventLimit = 4_096
     static let defaultMaxEventLineBytes = 16 * 1024
     static let defaultMaxEventLogBytes: UInt64 = 16 * 1024 * 1024
-    static let defaultMaxPendingEventLogLines = CmuxEventLogWriter.defaultMaxPendingLines
+    static let defaultMaxPendingEventLogLines = WmuxEventLogWriter.defaultMaxPendingLines
     static let defaultMaxPendingEventsPerSubscription = 1_024
     static let maxSanitizedStringBytes = 8 * 1024
     static let maxSanitizedArrayItems = 256
@@ -233,8 +233,8 @@ final class CmuxEventBus: @unchecked Sendable {
     private let maxEventLogBytes: UInt64
     private let maxEventLineBytes: Int
     private let maxPendingEventsPerSubscription: Int
-    private let eventLogWriter: CmuxEventLogWriter?
-    private let sequenceStore: CmuxEventSequenceStore?
+    private let eventLogWriter: WmuxEventLogWriter?
+    private let sequenceStore: WmuxEventSequenceStore?
     // Serializes durable sequence allocation and event publication off caller threads.
     private let publicationQueue: DispatchQueue
     private let bootId = UUID().uuidString
@@ -243,18 +243,18 @@ final class CmuxEventBus: @unchecked Sendable {
     private var restoreTask: Task<Void, Never>?
     private var nextSequence: Int64 = 1
     private var retained: [[String: Any]] = []
-    private var subscriptions: [UUID: CmuxEventSubscription] = [:]
+    private var subscriptions: [UUID: WmuxEventSubscription] = [:]
     private var pendingPublishes: [PendingPublish] = []
     private var pendingSubscriptions: [UUID: PendingSubscription] = [:]
     private var sequenceAllocationFailureLogged = false
 
     init(
-        retainedEventLimit: Int = CmuxEventBus.defaultRetainedEventLimit,
+        retainedEventLimit: Int = WmuxEventBus.defaultRetainedEventLimit,
         eventLogURL: URL? = nil,
-        maxEventLogBytes: UInt64 = CmuxEventBus.defaultMaxEventLogBytes,
-        maxEventLineBytes: Int = CmuxEventBus.defaultMaxEventLineBytes,
-        maxPendingEventLogLines: Int = CmuxEventBus.defaultMaxPendingEventLogLines,
-        maxPendingEventsPerSubscription: Int = CmuxEventBus.defaultMaxPendingEventsPerSubscription
+        maxEventLogBytes: UInt64 = WmuxEventBus.defaultMaxEventLogBytes,
+        maxEventLineBytes: Int = WmuxEventBus.defaultMaxEventLineBytes,
+        maxPendingEventLogLines: Int = WmuxEventBus.defaultMaxPendingEventLogLines,
+        maxPendingEventsPerSubscription: Int = WmuxEventBus.defaultMaxPendingEventsPerSubscription
     ) {
         self.retainedEventLimit = max(1, retainedEventLimit)
         self.eventLogURL = eventLogURL
@@ -263,13 +263,13 @@ final class CmuxEventBus: @unchecked Sendable {
         self.maxPendingEventsPerSubscription = max(1, maxPendingEventsPerSubscription)
         self.restorePending = eventLogURL != nil
         self.restoreTask = nil
-        self.sequenceStore = eventLogURL.map { CmuxEventSequenceStore(eventLogURL: $0) }
+        self.sequenceStore = eventLogURL.map { WmuxEventSequenceStore(eventLogURL: $0) }
         self.publicationQueue = DispatchQueue(
             label: "com.cmuxterm.event-publish.\(UUID().uuidString)",
             qos: .utility
         )
         self.eventLogWriter = eventLogURL.map {
-            CmuxEventLogWriter(
+            WmuxEventLogWriter(
                 eventLogURL: $0,
                 maxEventLogBytes: maxEventLogBytes,
                 maxPendingLines: maxPendingEventLogLines
@@ -326,7 +326,7 @@ final class CmuxEventBus: @unchecked Sendable {
             paneId: paneId,
             windowId: windowId,
             payload: cleanPayload,
-            automationOrigin: CmuxAutomationInvocationContext.eventOrigin?.foundationObject
+            automationOrigin: WmuxAutomationInvocationContext.eventOrigin?.foundationObject
         )
 
         lock.lock()
@@ -431,8 +431,8 @@ final class CmuxEventBus: @unchecked Sendable {
         afterSequence: Int64?,
         names: Set<String>,
         categories: Set<String>
-    ) -> CmuxEventSubscriptionSnapshot {
-        let subscription = CmuxEventSubscription(
+    ) -> WmuxEventSubscriptionSnapshot {
+        let subscription = WmuxEventSubscription(
             names: names,
             categories: categories,
             maxPendingEvents: maxPendingEventsPerSubscription
@@ -474,7 +474,7 @@ final class CmuxEventBus: @unchecked Sendable {
                     "categories": Array(categories).sorted()
                 ]
             ]
-            return CmuxEventSubscriptionSnapshot(subscription: subscription, replay: [], ack: ack)
+            return WmuxEventSubscriptionSnapshot(subscription: subscription, replay: [], ack: ack)
         }
         let oldestSequence = Self.int64(retained.first?["seq"]) ?? nextSequence
         let latestSequence = nextSequence - 1
@@ -528,7 +528,7 @@ final class CmuxEventBus: @unchecked Sendable {
             ]
         ]
 
-        return CmuxEventSubscriptionSnapshot(subscription: subscription, replay: replay, ack: ack)
+        return WmuxEventSubscriptionSnapshot(subscription: subscription, replay: replay, ack: ack)
     }
 
     private func completeRestore(
@@ -594,14 +594,14 @@ final class CmuxEventBus: @unchecked Sendable {
         }
     }
 
-    func unsubscribe(_ subscription: CmuxEventSubscription) {
+    func unsubscribe(_ subscription: WmuxEventSubscription) {
         lock.lock()
         subscriptions.removeValue(forKey: subscription.id)
         lock.unlock()
         subscription.close()
     }
 
-    private func removeSubscriptionIfStillActive(_ subscription: CmuxEventSubscription) {
+    private func removeSubscriptionIfStillActive(_ subscription: WmuxEventSubscription) {
         lock.lock()
         if subscriptions[subscription.id] === subscription {
             subscriptions.removeValue(forKey: subscription.id)
@@ -609,7 +609,7 @@ final class CmuxEventBus: @unchecked Sendable {
         lock.unlock()
     }
 
-    func heartbeat(subscription: CmuxEventSubscription) -> [String: Any] {
+    func heartbeat(subscription: WmuxEventSubscription) -> [String: Any] {
         [
             "type": "heartbeat",
             "protocol": Self.protocolName,
@@ -713,7 +713,7 @@ final class CmuxEventBus: @unchecked Sendable {
         }
 
         var loaded = segments.flatMap { $0 }
-        let sequenceStore = CmuxEventSequenceStore(eventLogURL: eventLogURL)
+        let sequenceStore = WmuxEventSequenceStore(eventLogURL: eventLogURL)
         let persistedHighWater = sequenceStore.current()
         var originalSequences = Set<Int64>()
         var duplicateCount = 0

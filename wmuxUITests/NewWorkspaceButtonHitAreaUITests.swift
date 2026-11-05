@@ -7,7 +7,7 @@ final class NewWorkspaceButtonHitAreaUITests: XCTestCase {
     func testPrimaryButtonAcceptsClicksAcrossItsFullFrame() {
         continueAfterFailure = false
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
         app.launchArguments += [
             "-workspacePresentationMode", "standard",
             "-newWorkspacePlacement", "end",

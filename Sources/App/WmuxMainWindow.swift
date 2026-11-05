@@ -8,8 +8,8 @@ final class MainWindowHostingView<Content: View>: NSHostingView<Content> {
     override var safeAreaRect: NSRect { bounds }
     override var safeAreaLayoutGuide: NSLayoutGuide { zeroSafeAreaLayoutGuide }
     override var mouseDownCanMoveWindow: Bool { false }
-    override var fittingSize: NSSize { CmuxMainWindow.minimumContentSize }
-    override var intrinsicContentSize: NSSize { CmuxMainWindow.minimumContentSize }
+    override var fittingSize: NSSize { WmuxMainWindow.minimumContentSize }
+    override var intrinsicContentSize: NSSize { WmuxMainWindow.minimumContentSize }
 
     /// Lets a click on an interactive titlebar control (the sidebar toggle, the
     /// right-sidebar mode bar, the session-index header controls, etc.) both
@@ -65,7 +65,7 @@ final class MainWindowHostingView<Content: View>: NSHostingView<Content> {
         super.setFrameSize(size)
     }
 
-    /// See ``MainWindowHitTestMutationMonitor`` (CMUXTERM-MACOS-41RH). Tests
+    /// See ``MainWindowHitTestMutationMonitor`` (WMUXTERM-MACOS-41RH). Tests
     /// replace it to observe reports without Sentry.
     var hitTestMutationMonitor = MainWindowHitTestMutationMonitor()
 
@@ -113,7 +113,7 @@ func configureCmuxMainWindowDragBehavior(_ window: NSWindow) {
 }
 
 @MainActor
-final class CmuxMainWindow: NSWindow {
+final class WmuxMainWindow: NSWindow {
     private let workspaceSwitchSignposts = WorkspaceSwitchSignposts()
 
     private var zoomIntent = MainWindowZoomIntentState()
@@ -506,7 +506,7 @@ final class CmuxMainWindow: NSWindow {
     }
 }
 
-extension CmuxMainWindow {
+extension WmuxMainWindow {
     private static let defaultContentSize = NSSize(width: 1_000, height: 700)
 
     /// Returns an unpositioned content rect clamped to the visible display; callers own final placement.

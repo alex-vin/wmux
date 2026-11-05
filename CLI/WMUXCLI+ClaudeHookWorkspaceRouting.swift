@@ -5,7 +5,7 @@ import Foundation
 extension WMUXCLI {
     /// Resolve the workspace a Claude hook should mutate, in strict priority order:
     /// the recorded/preferred workspace, an unambiguous caller-TTY binding (only when
-    /// `preferCallerTTYOverFallback`), the live `CMUX_WORKSPACE_ID` fallback, then an
+    /// `preferCallerTTYOverFallback`), the live `WMUX_WORKSPACE_ID` fallback, then an
     /// unambiguous caller-TTY binding. Each candidate is validated against a live
     /// workspace before it is accepted.
     ///
@@ -45,7 +45,7 @@ extension WMUXCLI {
 
     /// Resolve `raw` to a workspace id only when that workspace currently exists.
     func strictClaudeHookWorkspaceId(_ raw: String, client: SocketClient) -> String? {
-        // UUID identities (hook session records, live CMUX_WORKSPACE_ID) validate directly.
+        // UUID identities (hook session records, live WMUX_WORKSPACE_ID) validate directly.
         if isUUID(raw) {
             return claudeHookWorkspaceExists(raw, client: client) ? raw : nil
         }

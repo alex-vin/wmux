@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 import Testing
@@ -401,14 +401,14 @@ struct KimiHookConfigLocationTests {
         process.arguments = arguments
 
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
         environment.removeValue(forKey: "KIMI_SHARE_DIR")
         environment.removeValue(forKey: "KIMI_CODE_HOME")
         environment["HOME"] = fixture.home.path
         environment["PATH"] = "\(fixture.bin.path):/usr/bin:/bin:/usr/sbin:/sbin"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
         environment.merge(environmentOverrides) { _, override in override }
 
         process.environment = environment

@@ -1,12 +1,12 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxCloud
-import CmuxProductAnalytics
-import CmuxFoundation
-import CmuxSettingsUI
-import CmuxSidebar
-import CmuxSidebarProviderKit
-import CmuxWorkspaces
+import WmuxAppKitSupportUI
+import WmuxCloud
+import WmuxProductAnalytics
+import WmuxFoundation
+import WmuxSettingsUI
+import WmuxSidebar
+import WmuxSidebarProviderKit
+import WmuxWorkspaces
 import SwiftUI
 
 /// Footer debug controls and empty-area drop targets for the vertical tabs sidebar, extracted from `ContentView.swift`, which sits at its file-length budget.
@@ -111,7 +111,7 @@ struct SidebarFooterCircularIcon: View {
     @Environment(\.sidebarReadabilityBackdrop) private var readabilityBackdrop
 
     var body: some View {
-        CmuxSystemSymbolImage(
+        WmuxSystemSymbolImage(
             systemName: systemName,
             pointSize: style.pointSize,
             weight: style.weight,
@@ -321,7 +321,7 @@ struct ExtensionSidebarBrowserStackEmptyArea: View {
     @Binding var draggedTabId: UUID?
     @Binding var dropIndicator: SidebarDropIndicator?
     let onNewTab: () -> Void
-    let onMove: (CmuxSidebarProviderWorkspaceMove) -> Bool
+    let onMove: (WmuxSidebarProviderWorkspaceMove) -> Bool
 
     var body: some View {
         Color.clear
@@ -361,7 +361,7 @@ private struct ExtensionSidebarBrowserStackEndDropDelegate: DropDelegate {
     @Binding var draggedTabId: UUID?
     let dragAutoScrollController: SidebarDragAutoScrollController
     @Binding var dropIndicator: SidebarDropIndicator?
-    let onMove: (CmuxSidebarProviderWorkspaceMove) -> Bool
+    let onMove: (WmuxSidebarProviderWorkspaceMove) -> Bool
 
     func validateDrop(info: DropInfo) -> Bool {
         info.hasItemsConforming(to: [SidebarTabDragPayload.typeIdentifier])

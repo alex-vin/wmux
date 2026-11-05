@@ -1,9 +1,9 @@
-import CmuxTerminal
+import WmuxTerminal
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -11,7 +11,7 @@ import Testing
 /// Behavior coverage for per-workspace user-defined environment variables
 /// (issue #5995): the initial shell inherits them, every later pane/split
 /// inherits them, they survive session restore, explicit per-surface env wins,
-/// and the managed `CMUX_*` variables can never be clobbered.
+/// and the managed `WMUX_*` variables can never be clobbered.
 @Suite(.serialized)
 @MainActor
 struct WorkspaceEnvironmentTests {
@@ -30,13 +30,13 @@ struct WorkspaceEnvironmentTests {
     }
 
     /// Regression for the Swift→C truncation bypass: a NUL in a key collapses it
-    /// at `strdup`/Ghostty, so `"CMUX_SOCKET_PATH\0x"` would dodge the exact-match
+    /// at `strdup`/Ghostty, so `"WMUX_SOCKET_PATH\0x"` would dodge the exact-match
     /// protection and overwrite the managed variable. NUL/`=` keys and NUL values
     /// must be rejected at the sanitizer (the single choke point).
     @Test
     func sanitizedWorkspaceEnvironmentRejectsKeysThatTruncateAtTheCBoundary() {
         let result = Workspace.sanitizedWorkspaceEnvironment([
-            "CMUX_SOCKET_PATH\u{0}x": "spoofed",  // NUL would truncate to CMUX_SOCKET_PATH
+            "WMUX_SOCKET_PATH\u{0}x": "spoofed",  // NUL would truncate to WMUX_SOCKET_PATH
             "BAD=KEY": "v",                        // '=' is never a valid env var name
             "NUL_VALUE": "a\u{0}b",                // NUL in the value
             "GOOD": "value",
@@ -175,7 +175,7 @@ struct WorkspaceEnvironmentTests {
         #expect(workspace.sessionSnapshot(includeScrollback: false).environment == nil)
     }
 
-    // MARK: - Acceptance: managed CMUX_* variables cannot be clobbered
+    // MARK: - Acceptance: managed WMUX_* variables cannot be clobbered
 
     /// Workspace env reaches a spawned shell through `additionalEnvironment` /
     /// `initialEnvironmentOverrides`, both of which `mergedStartupEnvironment`
@@ -184,17 +184,17 @@ struct WorkspaceEnvironmentTests {
     @Test
     func workspaceEnvironmentCannotClobberProtectedCmuxVariables() {
         let merged = TerminalSurface.mergedStartupEnvironment(
-            base: ["CMUX_WORKSPACE_ID": "real-id", "TERM": "xterm-ghostty"],
-            protectedKeys: ["CMUX_WORKSPACE_ID", "TERM"],
+            base: ["WMUX_WORKSPACE_ID": "real-id", "TERM": "xterm-ghostty"],
+            protectedKeys: ["WMUX_WORKSPACE_ID", "TERM"],
             additionalEnvironment: [
-                "CMUX_WORKSPACE_ID": "spoofed",   // must be ignored
+                "WMUX_WORKSPACE_ID": "spoofed",   // must be ignored
                 "TERM": "dumb",                    // must be ignored
                 "AWS_PROFILE": "prod",             // must be applied
             ],
-            initialEnvironmentOverrides: ["CMUX_WORKSPACE_ID": "also-spoofed"],
+            initialEnvironmentOverrides: ["WMUX_WORKSPACE_ID": "also-spoofed"],
             ambientEnvironment: [:]
         )
-        #expect(merged["CMUX_WORKSPACE_ID"] == "real-id")
+        #expect(merged["WMUX_WORKSPACE_ID"] == "real-id")
         #expect(merged["TERM"] == "xterm-ghostty")
         #expect(merged["AWS_PROFILE"] == "prod")
     }
@@ -245,13 +245,13 @@ struct WorkspaceEnvironmentTests {
     @Test
     func cmuxWorkspaceDefinitionDecodesEnv() throws {
         let json = #"{"name":"Build","env":{"AWS_PROFILE":"prod","API_BASE":"https://api.example.com"}}"#
-        let definition = try JSONDecoder().decode(CmuxWorkspaceDefinition.self, from: Data(json.utf8))
+        let definition = try JSONDecoder().decode(WmuxWorkspaceDefinition.self, from: Data(json.utf8))
         #expect(definition.env == ["AWS_PROFILE": "prod", "API_BASE": "https://api.example.com"])
     }
 
     @Test
     func cmuxWorkspaceDefinitionEnvIsOptional() throws {
-        let definition = try JSONDecoder().decode(CmuxWorkspaceDefinition.self, from: Data(#"{"name":"Build"}"#.utf8))
+        let definition = try JSONDecoder().decode(WmuxWorkspaceDefinition.self, from: Data(#"{"name":"Build"}"#.utf8))
         #expect(definition.env == nil)
     }
 }

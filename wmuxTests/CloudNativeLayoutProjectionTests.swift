@@ -1,16 +1,16 @@
-import CMUXMobileCore
-import CMUXAuthCore
-import CmuxAuthRuntime
+import WMUXMobileCore
+import WMUXAuthCore
+import WmuxAuthRuntime
 import Bonsplit
-import CmuxCloud
-import CmuxCore
-import CmuxIrohTransport
-import CmuxMobileRPC
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCore
+import WmuxIrohTransport
+import WmuxMobileRPC
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -584,13 +584,13 @@ struct CloudNativeLayoutProjectionTests {
     }
 
     private func makeDeviceTestAuth(defaults: UserDefaults) -> AuthCoordinator {
-        let config = AuthConfig(stack: CMUXAuthConfig(projectId: "test", publishableClientKey: "test"),
+        let config = AuthConfig(stack: WMUXAuthConfig(projectId: "test", publishableClientKey: "test"),
             magicLinkCallbackURL: "http://127.0.0.1:1/auth/callback", apiBaseURL: "http://127.0.0.1:1")
         return AuthCoordinator(
             client: StackAuthClient(config: config, tokenStore: .memory, noAutomaticPrefetch: true),
-            sessionCache: CMUXAuthSessionCache(keyValueStore: defaults, key: "session"),
-            userCache: CMUXAuthIdentityStore(keyValueStore: defaults, key: "user"),
-            teamSelection: CMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
+            sessionCache: WMUXAuthSessionCache(keyValueStore: defaults, key: "session"),
+            userCache: WMUXAuthIdentityStore(keyValueStore: defaults, key: "user"),
+            teamSelection: WMUXAuthTeamSelectionStore(keyValueStore: defaults, key: "team"),
             anchor: AuthPresentationContextProvider(), config: config,
             launch: AuthLaunchOptions(clearAuthRequested: false, mockDataEnabled: false, environment: [:], includesDevAuth: false))
     }

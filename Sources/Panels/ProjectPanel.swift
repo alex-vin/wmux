@@ -1,5 +1,5 @@
 import AppKit
-import CMUXProjectModel
+import WMUXProjectModel
 import Combine
 import Foundation
 import SwiftUI

@@ -1,9 +1,9 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxSidebar
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxSidebar
 import SwiftUI
-import CmuxSettings
+import WmuxSettings
 
 /// Collapsible group header that doubles as the anchor workspace row.
 struct SidebarWorkspaceGroupHeaderView: View, Equatable {
@@ -78,7 +78,7 @@ struct SidebarWorkspaceGroupHeaderView: View, Equatable {
     let shortcutHintXOffset: Double
     let shortcutHintYOffset: Double
     let fontScale: CGFloat
-    let cwdContextMenuItems: [CmuxResolvedConfigContextMenuItem]
+    let cwdContextMenuItems: [WmuxResolvedConfigContextMenuItem]
     let newWorkspacePlacement: WorkspaceGroupNewPlacement?
     let rowSpacing: CGFloat
     let isFirstRow: Bool
@@ -155,7 +155,7 @@ struct SidebarWorkspaceGroupHeaderView: View, Equatable {
 #endif
         HStack(spacing: 4) {
             if isPinned {
-                CmuxSystemSymbolImage(
+                WmuxSystemSymbolImage(
                     magnified: "pin.fill",
                     pointSize: metrics.pinnedIconFontSize,
                     weight: .semibold,
@@ -165,7 +165,7 @@ struct SidebarWorkspaceGroupHeaderView: View, Equatable {
                 .safeHelp(pinnedGroupTooltip)
                 .accessibilityLabel(Text(pinnedGroupTooltip))
             }
-            CmuxSystemSymbolImage(
+            WmuxSystemSymbolImage(
                 systemName: isCollapsed ? "chevron.right" : "chevron.down",
                 pointSize: metrics.chevronFontSize,
                 weight: .semibold,
@@ -184,7 +184,7 @@ struct SidebarWorkspaceGroupHeaderView: View, Equatable {
                 )
 
             HStack(spacing: 6) {
-                CmuxSystemSymbolImage(
+                WmuxSystemSymbolImage(
                     systemName: displayedIconSymbol,
                     pointSize: metrics.iconFontSize,
                     weight: .semibold,
@@ -234,7 +234,7 @@ struct SidebarWorkspaceGroupHeaderView: View, Equatable {
 
             let plusVisible = isPointerHovering && !contextMenuVisible && !showsShortcutHint
             Button(action: actions.onTapPlus) {
-                CmuxSystemSymbolImage(
+                WmuxSystemSymbolImage(
                     systemName: "plus",
                     pointSize: metrics.plusFontSize,
                     weight: .medium,

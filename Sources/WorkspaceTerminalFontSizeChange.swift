@@ -1,7 +1,7 @@
 import Foundation
-import CmuxFoundation
-import CmuxTerminal
-import CmuxTerminalCore
+import WmuxFoundation
+import WmuxTerminal
+import WmuxTerminalCore
 
 enum WorkspaceTerminalFontSizeChange: Equatable {
     case relative(TerminalFontSizeDeltaTransform)
@@ -80,7 +80,7 @@ enum WorkspaceTerminalFontSizeChange: Equatable {
         switch self {
         case .relative(let relativeTransform):
             startingRuntimePoints = sourceLineage.map {
-                CmuxSurfaceConfigTemplate.runtimeFontSize(
+                WmuxSurfaceConfigTemplate.runtimeFontSize(
                     fromBasePoints: $0.basePoints,
                     percent: magnificationPercent
                 )
@@ -108,7 +108,7 @@ enum WorkspaceTerminalFontSizeChange: Equatable {
             isExplicitOverride = !resetTransform.isIdentity
         }
         return TerminalFontSizeLineage(
-            basePoints: CmuxSurfaceConfigTemplate.baseFontSize(
+            basePoints: WmuxSurfaceConfigTemplate.baseFontSize(
                 fromRuntimePoints: finalRuntimePoints,
                 percent: magnificationPercent
             ),
@@ -372,7 +372,7 @@ extension Workspace {
             to: configuredRuntimePoints
         )
         return TerminalFontSizeLineage(
-            basePoints: CmuxSurfaceConfigTemplate.baseFontSize(
+            basePoints: WmuxSurfaceConfigTemplate.baseFontSize(
                 fromRuntimePoints: finalRuntimePoints,
                 percent: magnificationPercent
             ),

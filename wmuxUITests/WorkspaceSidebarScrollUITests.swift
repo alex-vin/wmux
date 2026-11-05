@@ -130,13 +130,13 @@ final class WorkspaceSidebarScrollUITests: XCTestCase {
 
         configureLaunch(app)
         app.launchArguments += ["-socketControlMode", "allowAll", "-NSAppSleepDisabled", "YES"]
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
-        app.launchEnvironment["CMUX_TAG"] = "ui-sidebar-livelock-\(token.prefix(8))"
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_TAG"] = "ui-sidebar-livelock-\(token.prefix(8))"
 
         launchAndEnsureRunning(app)
         XCTAssertTrue(waitForWindowCount(atLeast: 1, app: app, timeout: 8.0), "Expected a main window")
@@ -210,8 +210,8 @@ final class WorkspaceSidebarScrollUITests: XCTestCase {
     private func configureLaunch(_ app: XCUIApplication) {
         app.launchArguments += ["-newWorkspacePlacement", "end"]
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = "ui-sidebar-scroll"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = "ui-sidebar-scroll"
     }
 
     private func waitForWorkspaceRowHittable(

@@ -1,10 +1,10 @@
 import AppKit
 import Bonsplit
 import Combine
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxWorkspaces
-import CmuxSettings
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxWorkspaces
+import WmuxSettings
 import SwiftUI
 
 #if DEBUG

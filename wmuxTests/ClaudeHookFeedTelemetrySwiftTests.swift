@@ -47,7 +47,7 @@ struct ClaudeHookFeedTelemetrySwiftTests {
         )
         #expect(
             event["surface_id"] as? String == resolvedSurfaceID,
-            "Feed telemetry must use the resolved agent TTY surface, not leaked CMUX_SURFACE_ID; event=\(event)"
+            "Feed telemetry must use the resolved agent TTY surface, not leaked WMUX_SURFACE_ID; event=\(event)"
         )
     }
 
@@ -218,17 +218,17 @@ private final class FeedTelemetryTestContext {
         [
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceID,
-            "CMUX_SURFACE_ID": surfaceID,
-            "CMUX_CLI_TTY_NAME": ttyName,
-            "CMUX_CLAUDE_HOOK_STATE_PATH": root.appendingPathComponent("claude-hook-sessions.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceID,
+            "WMUX_SURFACE_ID": surfaceID,
+            "WMUX_CLI_TTY_NAME": ttyName,
+            "WMUX_CLAUDE_HOOK_STATE_PATH": root.appendingPathComponent("claude-hook-sessions.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated(["/usr/local/bin/claude"]),
         ]
     }
 }

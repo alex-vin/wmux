@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 
@@ -76,15 +76,15 @@ extension WMUXCLI {
 
     func sshRemoteReconnectShellFunction() -> String {
         [
-            "cmux_ssh_remote_reconnect() {",
-            "  cmux_reconnect_cli=\"${CMUX_BUNDLED_CLI_PATH:-}\"",
-            "  if [ -z \"$cmux_reconnect_cli\" ] || [ ! -x \"$cmux_reconnect_cli\" ]; then cmux_reconnect_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
-            "  cmux_reconnect_socket=\"${CMUX_SOCKET_PATH:-${CMUX_SOCKET:-}}\"",
-            "  if [ -z \"$cmux_reconnect_cli\" ] || [ -z \"$cmux_reconnect_socket\" ] || [ -z \"${CMUX_WORKSPACE_ID:-}\" ]; then return 0; fi",
-            "  cmux_reconnect_payload=\"{\\\"workspace_id\\\":\\\"$CMUX_WORKSPACE_ID\\\"\"",
-            "  if [ -n \"${CMUX_SURFACE_ID:-}\" ]; then cmux_reconnect_payload=\"$cmux_reconnect_payload,\\\"surface_id\\\":\\\"$CMUX_SURFACE_ID\\\"\"; fi",
-            "  cmux_reconnect_payload=\"$cmux_reconnect_payload}\"",
-            "  \"$cmux_reconnect_cli\" --socket \"$cmux_reconnect_socket\" rpc workspace.remote.reconnect \"$cmux_reconnect_payload\" >/dev/null 2>&1",
+            "wmux_ssh_remote_reconnect() {",
+            "  wmux_reconnect_cli=\"${WMUX_BUNDLED_CLI_PATH:-}\"",
+            "  if [ -z \"$wmux_reconnect_cli\" ] || [ ! -x \"$wmux_reconnect_cli\" ]; then wmux_reconnect_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
+            "  wmux_reconnect_socket=\"${WMUX_SOCKET_PATH:-${WMUX_SOCKET:-}}\"",
+            "  if [ -z \"$wmux_reconnect_cli\" ] || [ -z \"$wmux_reconnect_socket\" ] || [ -z \"${WMUX_WORKSPACE_ID:-}\" ]; then return 0; fi",
+            "  wmux_reconnect_payload=\"{\\\"workspace_id\\\":\\\"$WMUX_WORKSPACE_ID\\\"\"",
+            "  if [ -n \"${WMUX_SURFACE_ID:-}\" ]; then wmux_reconnect_payload=\"$wmux_reconnect_payload,\\\"surface_id\\\":\\\"$WMUX_SURFACE_ID\\\"\"; fi",
+            "  wmux_reconnect_payload=\"$wmux_reconnect_payload}\"",
+            "  \"$wmux_reconnect_cli\" --socket \"$wmux_reconnect_socket\" rpc workspace.remote.reconnect \"$wmux_reconnect_payload\" >/dev/null 2>&1",
             "}",
         ].joined(separator: "\n")
     }

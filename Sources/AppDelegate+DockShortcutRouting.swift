@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxPanes
+import WmuxPanes
 
 enum GhosttyGotoSplitRoute {
     case direction(NavigationDirection)

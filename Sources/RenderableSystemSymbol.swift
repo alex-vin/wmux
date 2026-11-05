@@ -1,6 +1,6 @@
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxFoundation
 import SwiftUI
 
 /// Returns whether a rasterized icon contains a visible alpha pixel.
@@ -420,7 +420,7 @@ enum RenderableSystemSymbol {
 /// `tintColor` to `SessionIndexResolvedSystemSymbolImage`. SwiftUI never
 /// composites the glyph (no raster image, no mask), which is what keeps it
 /// visible on Intel Macs running macOS 15.
-struct CmuxSystemSymbolImage: View {
+struct WmuxSystemSymbolImage: View {
     @Environment(\.cmuxGlobalFontMagnificationPercent) private var globalFontPercent
 
     let systemName: String
@@ -485,7 +485,7 @@ struct CmuxSystemSymbolImage: View {
             pointSize: rasterSize,
             weight: weight
         ) {
-            CmuxHostedSystemSymbolImage(
+            WmuxHostedSystemSymbolImage(
                 systemName: systemName,
                 pointSize: rasterSize,
                 imageSize: image.size,
@@ -497,7 +497,7 @@ struct CmuxSystemSymbolImage: View {
         } else if RenderableSystemSymbol.isRenderable(systemName) {
             // A transient blank materialization gets the same AppKit lifecycle
             // owner and forced-appearance retry through the hosted renderer.
-            CmuxHostedSystemSymbolImage(
+            WmuxHostedSystemSymbolImage(
                 systemName: systemName,
                 pointSize: rasterSize,
                 imageSize: NSSize(width: rasterSize, height: rasterSize),

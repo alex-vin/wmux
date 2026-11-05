@@ -1,10 +1,10 @@
 import XCTest
 import Bonsplit
 import Darwin
-import CmuxSidebar
+import WmuxSidebar
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -329,7 +329,7 @@ final class TerminalNotificationClearAllTests: XCTestCase {
             workspace.newTerminalSplit(
                 from: secondPanel.id,
                 orientation: .horizontal,
-                startupEnvironment: ["CMUX_AGENT_MANAGED_SUBAGENT": "1"]
+                startupEnvironment: ["WMUX_AGENT_MANAGED_SUBAGENT": "1"]
             )
         )
 

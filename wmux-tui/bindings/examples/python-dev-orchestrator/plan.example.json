@@ -1,0 +1,19 @@
+{
+  "jobs": [
+    {
+      "name": "setup",
+      "argv": ["/usr/bin/env", "python3", "-c", "print('WMUX_SETUP_READY')"],
+      "ready_pattern": "WMUX_SETUP_READY"
+    },
+    {
+      "name": "build",
+      "argv": ["/usr/bin/env", "python3", "-c", "print('WMUX_BUILD_OK')"],
+      "ready_pattern": "WMUX_BUILD_OK"
+    },
+    {
+      "name": "tests",
+      "argv": ["/usr/bin/env", "python3", "-c", "print('WMUX_TESTS_OK')"],
+      "ready_pattern": "WMUX_TESTS_OK"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
-import CmuxCloud
-import CmuxCloudTui
+import WmuxCloud
+import WmuxCloudTui
 import Foundation
 
-extension CmuxTuiSurfaceProviderRegistry {
+extension WmuxTuiSurfaceProviderRegistry {
     /// Kills the hub child synchronously; for `applicationWillTerminate`, where nothing
     /// may await and an orphaned hub would keep a WireGuard session alive after quit.
     nonisolated func terminateWireGuardHubForAppQuit() {

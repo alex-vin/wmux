@@ -1,6 +1,6 @@
 import AppKit
-import CmuxSettings
-import CmuxWorkspaces
+import WmuxSettings
+import WmuxWorkspaces
 import Foundation
 import UniformTypeIdentifiers
 
@@ -18,7 +18,7 @@ enum WorkspaceTodoFeature {
     static var isEnabled: Bool {
         isEnabled(
             defaults: .standard,
-            remoteEnabled: CmuxFeatureFlags.shared.isWorkspaceTodoControlsEnabled
+            remoteEnabled: WmuxFeatureFlags.shared.isWorkspaceTodoControlsEnabled
         )
     }
 
@@ -223,6 +223,6 @@ extension Notification.Name {
     /// for a workspace's very first item), or by expanding the row's inline
     /// checklist in `.inline` style.
     static let workspaceChecklistAddItemRequested = Notification.Name(
-        "cmux.workspaceChecklistAddItemRequested"
+        "wmux.workspaceChecklistAddItemRequested"
     )
 }

@@ -1,18 +1,18 @@
-import CmuxCloud
-import CmuxSettings
+import WmuxCloud
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 @MainActor
 struct CloudNightlyOverrideTests {
-    private let cloud = CmuxFeatureFlags.cloudMachinesFlag
-    private let nightly = CmuxFeatureFlagOverrideCapability(
+    private let cloud = WmuxFeatureFlags.cloudMachinesFlag
+    private let nightly = WmuxFeatureFlagOverrideCapability(
         bundleIdentifier: "com.cmuxterm.app.nightly", isDebugBuild: false
     )
 
@@ -30,12 +30,12 @@ struct CloudNightlyOverrideTests {
         ("", true, false)
     ])
     func capabilityUsesBuildIdentity(bundleID: String, isDebug: Bool, allowed: Bool) {
-        let capability = CmuxFeatureFlagOverrideCapability(
+        let capability = WmuxFeatureFlagOverrideCapability(
             bundleIdentifier: bundleID, isDebugBuild: isDebug
         )
         #expect(capability.allowsCloudOverride == allowed)
         #expect(capability.policy(for: cloud) == (allowed ? .localFirst : .disabled))
-        #expect(capability.policy(for: CmuxFeatureFlags.simulatorFlag) == .remoteFirst)
+        #expect(capability.policy(for: WmuxFeatureFlags.simulatorFlag) == .remoteFirst)
     }
 
     @Test
@@ -46,9 +46,9 @@ struct CloudNightlyOverrideTests {
         defaults.set(true, forKey: BetaFeaturesCatalogSection().cloudMachines.userDefaultsKey)
         defaults.set(true, forKey: "cmux.flags.override.\(cloud.key)")
 
-        _ = CmuxFeatureFlags(
+        _ = WmuxFeatureFlags(
             defaults: defaults,
-            overrideCapability: CmuxFeatureFlagOverrideCapability(
+            overrideCapability: WmuxFeatureFlagOverrideCapability(
                 bundleIdentifier: "com.cmuxterm.app.debug.old", isDebugBuild: true,
                 cloudDogfoodRequested: false, cloudDogfoodMarkerPresent: true
             ),
@@ -69,9 +69,9 @@ struct CloudNightlyOverrideTests {
         defaults.set(true, forKey: betaKey)
         defaults.set(true, forKey: overrideKey)
 
-        _ = CmuxFeatureFlags(
+        _ = WmuxFeatureFlags(
             defaults: defaults,
-            overrideCapability: CmuxFeatureFlagOverrideCapability(
+            overrideCapability: WmuxFeatureFlagOverrideCapability(
                 bundleIdentifier: "com.cmuxterm.app.debug", isDebugBuild: true, cloudDogfoodRequested: false
             ),
             remoteFlagValueProvider: { _ in false }
@@ -86,7 +86,7 @@ struct CloudNightlyOverrideTests {
         let suite = "cmux.cloud.nightly.picker.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults, overrideCapability: nightly, remoteFlagValueProvider: { _ in nil }
         )
         flags.applyLoadedFlags()
@@ -116,7 +116,7 @@ struct CloudNightlyOverrideTests {
         let cleared = InternalFlagRowSnapshot(definition: cloud, flags: flags)
         #expect(cleared.overrideChoice == .noOverride)
         #expect(cleared.resolution.source == .default)
-        #expect(cleared.resolution.effectiveValue == CmuxFeatureFlags.cloudMachinesDefault)
+        #expect(cleared.resolution.effectiveValue == WmuxFeatureFlags.cloudMachinesDefault)
         #expect(cleared.resolution.allowsLocalOverride)
     }
 
@@ -125,14 +125,14 @@ struct CloudNightlyOverrideTests {
         let suite = "cmux.cloud.nightly.persistence.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults, overrideCapability: nightly, remoteFlagValueProvider: { _ in false }
         )
         flags.applyLoadedFlags()
         flags.setOverride(true, for: cloud)
 
         let nextDefaults = try #require(UserDefaults(suiteName: suite))
-        let relaunched = CmuxFeatureFlags(
+        let relaunched = WmuxFeatureFlags(
             defaults: nextDefaults, overrideCapability: nightly, remoteFlagValueProvider: { _ in nil }
         )
         #expect(relaunched.remoteValue(for: cloud) == nil)
@@ -142,14 +142,14 @@ struct CloudNightlyOverrideTests {
         #expect(relaunched.isCloudMachinesEnabled)
         relaunched.setOverride(nil, for: cloud)
 
-        let cleared = CmuxFeatureFlags(defaults: nextDefaults, overrideCapability: nightly)
+        let cleared = WmuxFeatureFlags(defaults: nextDefaults, overrideCapability: nightly)
         #expect(cleared.overrideValue(for: cloud) == nil)
         #expect(cleared.isCloudMachinesEnabled)
         cleared.setOverride(true, for: cloud)
         cleared.clearAllOverrides()
         #expect(cleared.overrideValue(for: cloud) == nil)
         #expect(cleared.isCloudMachinesEnabled)
-        let afterClearAll = CmuxFeatureFlags(defaults: nextDefaults, overrideCapability: nightly)
+        let afterClearAll = WmuxFeatureFlags(defaults: nextDefaults, overrideCapability: nightly)
         #expect(afterClearAll.overrideValue(for: cloud) == nil)
         #expect(afterClearAll.isCloudMachinesEnabled)
     }
@@ -158,14 +158,14 @@ struct CloudNightlyOverrideTests {
     func stableIgnoresPersistedOverrideAndRejectsWrites() throws {
         // A stable identity disables overrides and keeps the local definition's
         // fallback. The retired key is never loaded from a remote payload.
-        let expectedValue = CmuxFeatureFlags.cloudMachinesDefault
+        let expectedValue = WmuxFeatureFlags.cloudMachinesDefault
         let persistedOverride = !expectedValue
         let suite = "cmux.cloud.stable.override.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let dogfood = CmuxFeatureFlags(defaults: defaults, overrideCapability: nightly)
+        let dogfood = WmuxFeatureFlags(defaults: defaults, overrideCapability: nightly)
         dogfood.setOverride(persistedOverride, for: cloud)
-        let stable = CmuxFeatureFlags(
+        let stable = WmuxFeatureFlags(
             defaults: defaults,
             overrideCapability: .init(bundleIdentifier: "com.cmuxterm.app", isDebugBuild: false),
             remoteFlagValueProvider: { _ in true }
@@ -192,11 +192,11 @@ struct CloudNightlyOverrideTests {
         let suite = "cmux.cloud.nightly.scope.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults, overrideCapability: nightly, remoteFlagValueProvider: { _ in false }
         )
         flags.applyLoadedFlags()
-        for flag in CmuxFeatureFlags.allFlags where flag.key != cloud.key {
+        for flag in WmuxFeatureFlags.allFlags where flag.key != cloud.key {
             flags.setOverride(true, for: flag)
             #expect(flags.overrideValue(for: flag) == nil)
             #expect(!flags.effectiveValue(for: flag))
@@ -216,7 +216,7 @@ struct CloudNightlyOverrideTests {
         let plist: [String: Any] = [
             "CFBundleIdentifier": bundleID,
             "CFBundleVersion": "1",
-            "CMUXCloudDogfoodEnabled": true
+            "WMUXCloudDogfoodEnabled": true
         ]
         try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
             .write(to: contents.appendingPathComponent("Info.plist"))
@@ -226,7 +226,7 @@ struct CloudNightlyOverrideTests {
         defer { defaults.removePersistentDomain(forName: suite) }
         let betaKey = BetaFeaturesCatalogSection().cloudMachines.userDefaultsKey
         defaults.set(false, forKey: betaKey)
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             overrideCapability: .init(bundle: bundle),
             remoteFlagValueProvider: { _ in false }

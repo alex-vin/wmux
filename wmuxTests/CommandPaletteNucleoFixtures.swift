@@ -1,10 +1,10 @@
-import CmuxCommandPalette
+import WmuxCommandPalette
 import Darwin
 import Foundation
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -353,9 +353,9 @@ func repeatedQueries(_ baseQueries: [String], repetitions: Int) -> [String] {
 /// wall-clock ratios are also load-sensitive on a shared runner, so they belong
 /// in a focused invocation rather than the unit suite. They stay runnable on
 /// demand through the same env-gated skip shape the renderer-memory regression
-/// uses (`CMUX_RENDERER_MEMORY_REGRESSION` in `TerminalAndGhosttyTests`):
+/// uses (`WMUX_RENDERER_MEMORY_REGRESSION` in `TerminalAndGhosttyTests`):
 ///
-///     CMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS=1 \
+///     WMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS=1 \
 ///       scripts/ci/run-app-host-xcodebuild.sh ... \
 ///       -only-testing:cmuxTests/CommandPaletteSearchEngineTests/<benchmark>
 ///
@@ -367,10 +367,10 @@ func repeatedQueries(_ baseQueries: [String], repetitions: Int) -> [String] {
 /// a small separate test, so behavior regressions are still caught when the
 /// timing runs are skipped.
 func skipUnlessCommandPaletteSearchBenchmarksAreEnabled() throws {
-    guard ProcessInfo.processInfo.environment["CMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS"] == "1" else {
+    guard ProcessInfo.processInfo.environment["WMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS"] == "1" else {
         throw XCTSkip(
             "Runs in the focused command-palette search benchmark invocation "
-                + "(CMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS=1)"
+                + "(WMUX_COMMAND_PALETTE_SEARCH_BENCHMARKS=1)"
         )
     }
 }

@@ -1,13 +1,13 @@
-import CMUXAuthCore
-import CmuxAuthRuntime
-import CmuxBrowser
-import CmuxCloud
+import WMUXAuthCore
+import WmuxAuthRuntime
+import WmuxBrowser
+import WmuxCloud
 import Foundation
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -121,7 +121,7 @@ struct BrowserWebContentProcessTests {
         }
 
         #expect(!completion.0)
-        #expect(completion.1?.absoluteString == "https://cmux.test/app-pricing?cmux_app=1")
+        #expect(completion.1?.absoluteString == "https://cmux.test/app-pricing?wmux_app=1")
 
         let webView = WKWebView()
         var presentedFailure = false
@@ -1517,21 +1517,21 @@ struct BrowserWebContentProcessTests {
     ) -> AuthCoordinator {
         AuthCoordinator(
             client: BrowserAppSessionRestoredSessionAuthClient(),
-            sessionCache: CMUXAuthSessionCache(
+            sessionCache: WMUXAuthSessionCache(
                 keyValueStore: defaults,
                 key: "auth-session"
             ),
-            userCache: CMUXAuthIdentityStore(
+            userCache: WMUXAuthIdentityStore(
                 keyValueStore: defaults,
                 key: "auth-user"
             ),
-            teamSelection: CMUXAuthTeamSelectionStore(
+            teamSelection: WMUXAuthTeamSelectionStore(
                 keyValueStore: defaults,
                 key: "auth-team"
             ),
             anchor: AuthPresentationContextProvider(),
             config: AuthConfig(
-                stack: CMUXAuthConfig(
+                stack: WMUXAuthConfig(
                     projectId: "project-a",
                     publishableClientKey: "publishable-a"
                 ),
@@ -1542,8 +1542,8 @@ struct BrowserWebContentProcessTests {
                 clearAuthRequested: false,
                 mockDataEnabled: false,
                 environment: [
-                    "CMUX_UITEST_AUTH_FIXTURE": "1",
-                    "CMUX_UITEST_AUTH_USER_ID": "restored-account",
+                    "WMUX_UITEST_AUTH_FIXTURE": "1",
+                    "WMUX_UITEST_AUTH_USER_ID": "restored-account",
                 ],
                 includesDevAuth: true
             )
@@ -1559,14 +1559,14 @@ private actor BrowserAppSessionRestoredSessionAuthClient: AuthClient {
     func forceRefreshAccessToken() async -> String? { "access-token" }
     func currentUser(
         throwOnMissing: Bool
-    ) async throws -> CMUXAuthCore.CMUXAuthUser? {
-        CMUXAuthCore.CMUXAuthUser(
+    ) async throws -> WMUXAuthCore.WMUXAuthUser? {
+        WMUXAuthCore.WMUXAuthUser(
             id: "restored-account",
             primaryEmail: "restored@cmux.test",
             displayName: "Restored Account"
         )
     }
-    func listTeams() async throws -> [CMUXAuthCore.CMUXAuthTeam] { [] }
+    func listTeams() async throws -> [WMUXAuthCore.WMUXAuthTeam] { [] }
     func sendMagicLinkEmail(email: String, callbackURL: String) async throws -> String {
         "nonce"
     }

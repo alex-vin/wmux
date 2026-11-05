@@ -1,4 +1,4 @@
-import CmuxSidebar
+import WmuxSidebar
 import Darwin
 import Foundation
 

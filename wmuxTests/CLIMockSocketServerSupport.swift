@@ -240,7 +240,7 @@ final class CLIMockAcceptLoopRegistry: @unchecked Sendable {
     }
 }
 
-extension CMUXOpenCommandTests {
+extension WMUXOpenCommandTests {
     func openTypedDiffSession(payload: [String: Any], cliPath: String) throws -> String {
         let source = try XCTUnwrap(payload["sessionSource"] as? [String: Any])
         let token = try XCTUnwrap(payload["capabilityToken"] as? String)

@@ -3,7 +3,7 @@ import QuartzCore
 import SwiftUI
 
 final class GPUSpinnerNSView: NSView {
-    static let animationKey = "cmux.gpuSpinner.rotation"
+    static let animationKey = "wmux.gpuSpinner.rotation"
     private static let spokeCount = 8
     private static let cycleDuration: CFTimeInterval = 0.8
     private static let arcDuration: CFTimeInterval = 0.9

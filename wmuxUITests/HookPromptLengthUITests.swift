@@ -41,14 +41,14 @@ final class HookPromptLengthUITests: XCTestCase {
         appEnvironment["HOME"] = root.path
         appEnvironment["CFFIXED_USER_HOME"] = root.path
         appEnvironment["XDG_CONFIG_HOME"] = root.appendingPathComponent(".config").path
-        appEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        appEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        appEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        appEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        appEnvironment["CMUX_TAG"] = "ui-tests-14024-hook-length"
-        appEnvironment["CMUX_UI_TEST_PROCESS"] = "1"
-        appEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        appEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = appDiagnosticsURL.path
+        appEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        appEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        appEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        appEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        appEnvironment["WMUX_TAG"] = "ui-tests-14024-hook-length"
+        appEnvironment["WMUX_UI_TEST_PROCESS"] = "1"
+        appEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        appEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = appDiagnosticsURL.path
         app.environment = appEnvironment
         app.standardOutput = FileHandle.nullDevice
         app.standardError = FileHandle.nullDevice
@@ -113,9 +113,9 @@ import base64, json, pathlib, socket, subprocess, sys, time, uuid
 cli, sock, root, log_path = sys.argv[1:]
 prefix = 'hook-length-' + uuid.uuid4().hex
 env = {'PATH': '/usr/bin:/bin:/usr/sbin:/sbin', 'HOME': root,
-       'CMUX_SOCKET_PATH': sock, 'CMUX_CLI_SENTRY_DISABLED': '1',
-       'CMUX_CLAUDE_HOOK_SENTRY_DISABLED': '1',
-       'CMUX_CLAUDE_HOOK_STATE_PATH': root + '/sessions.json'}
+       'WMUX_SOCKET_PATH': sock, 'WMUX_CLI_SENTRY_DISABLED': '1',
+       'WMUX_CLAUDE_HOOK_SENTRY_DISABLED': '1',
+       'WMUX_CLAUDE_HOOK_STATE_PATH': root + '/sessions.json'}
 
 def rpc(method, params):
     with socket.socket(socket.AF_UNIX) as connection:
@@ -144,7 +144,7 @@ while True:
 workspace = rpc('workspace.create', {'focus': False})['workspace_id']
 surfaces = rpc('surface.list', {'workspace_id': workspace})['surfaces']
 surface = surfaces[0]['id']
-env.update(CMUX_WORKSPACE_ID=workspace, CMUX_SURFACE_ID=surface)
+env.update(WMUX_WORKSPACE_ID=workspace, WMUX_SURFACE_ID=surface)
 expected = {}
 expected_surfaces = {}
 sentinels = ['PRIVATE_PROMPT_', 'PRIVATE_TOOL_', 'PRIVATE_CONTEXT_']

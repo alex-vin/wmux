@@ -193,8 +193,8 @@ enum SettingsSearchIndex {
         setting(.automation, "gemini", String(localized: "settings.automation.gemini", defaultValue: "Gemini CLI Integration"), "agent hooks notifications"),
         setting(.automation, "kiro", String(localized: "settings.automation.kiro", defaultValue: "Kiro CLI Integration"), "agent hooks notifications"),
         setting(.automation, "kiro-notification-level", String(localized: "settings.automation.kiro.notificationLevel", defaultValue: "Kiro Notification Level"), "agent hooks notifications verbosity tool events"),
-        setting(.automation, "port-base", String(localized: "settings.automation.portBase", defaultValue: "Port Base"), "CMUX_PORT start"),
-        setting(.automation, "port-range", String(localized: "settings.automation.portRange", defaultValue: "Port Range Size"), "CMUX_PORT_END workspace ports"),
+        setting(.automation, "port-base", String(localized: "settings.automation.portBase", defaultValue: "Port Base"), "WMUX_PORT start"),
+        setting(.automation, "port-range", String(localized: "settings.automation.portRange", defaultValue: "Port Range Size"), "WMUX_PORT_END workspace ports"),
         setting(.browser, "search-engine", String(localized: "settings.browser.searchEngine", defaultValue: "Default Search Engine"), "address bar query google duckduckgo bing kagi brave startpage perplexity exa yahoo ecosia qwant mojeek wikipedia github baidu yandex custom search provider"),
         setting(.browser, "enable-browser", String(localized: "settings.browser.enabled", defaultValue: "Enable wmux Browser"), "webview tabs links"),
         setting(.browser, "search-suggestions", String(localized: "settings.browser.searchSuggestions", defaultValue: "Show Search Suggestions"), "browser address bar suggestions"),
@@ -231,7 +231,7 @@ enum SettingsSearchIndex {
         setting(.workspaceColors, "badge", String(localized: "settings.workspaceColors.notificationBadgeColor", defaultValue: "Notification Badge"), "unread notification color"),
         setting(.workspaceColors, "palette", String(localized: "settings.workspaceColors.resetPalette", defaultValue: "Reset Palette"), "named colors palette"),
         setting(.settingsJSON, "open-file", String(localized: "settings.settingsJSON.openFile", defaultValue: "Open wmux.json"), "config json file editor dotfiles"),
-        setting(.settingsJSON, "documentation", String(localized: "settings.settingsJSON.documentation", defaultValue: "Documentation"), "cmux json schema reference docs"),
+        setting(.settingsJSON, "documentation", String(localized: "settings.settingsJSON.documentation", defaultValue: "Documentation"), "wmux json schema reference docs"),
         setting(.reset, "reset-all", String(localized: "settings.reset.resetAll", defaultValue: "Reset All Settings"), "restore defaults")
     ] + terminalScrollSpeedSettingEntries
 

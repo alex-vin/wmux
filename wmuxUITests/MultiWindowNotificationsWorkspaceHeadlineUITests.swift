@@ -3,9 +3,9 @@ import XCTest
 extension MultiWindowNotificationsUITests {
     func runNotificationsPopoverShowsWorkspaceAsHeadline() {
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
-        app.launchEnvironment["CMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"] = dataPath
+        app.launchEnvironment["WMUX_TAG"] = launchTag
         launchAllowingHeadlessBackgroundActivation(app)
         XCTAssertTrue(
             ensureAppRunningAfterLaunch(app, timeout: 12.0),

@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
@@ -13,7 +13,7 @@ struct CLICodexHookTimeoutRegressionTests {
         try FileManager.default.createDirectory(at: codexHome, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: root) }
 
-        let previousCommand = "cmux_cli=\"${CMUX_BUNDLED_CLI_PATH:-}\"; if [ -z \"$cmux_cli\" ] || [ ! -x \"$cmux_cli\" ]; then cmux_cli=\"$(command -v cmux 2>/dev/null || true)\"; fi; if [ -n \"$CMUX_SURFACE_ID\" ] && [ \"$CMUX_CODEX_HOOKS_DISABLED\" != \"1\" ] && [ -n \"$cmux_cli\" ]; then { if [ -n \"${CMUX_SOCKET_PATH:-}\" ]; then \"$cmux_cli\" --socket \"$CMUX_SOCKET_PATH\" hooks codex prompt-submit; else \"$cmux_cli\" hooks codex prompt-submit; fi; } || echo '{}'; else echo '{}'; fi"
+        let previousCommand = "wmux_cli=\"${WMUX_BUNDLED_CLI_PATH:-}\"; if [ -z \"$wmux_cli\" ] || [ ! -x \"$wmux_cli\" ]; then wmux_cli=\"$(command -v cmux 2>/dev/null || true)\"; fi; if [ -n \"$WMUX_SURFACE_ID\" ] && [ \"$WMUX_CODEX_HOOKS_DISABLED\" != \"1\" ] && [ -n \"$wmux_cli\" ]; then { if [ -n \"${WMUX_SOCKET_PATH:-}\" ]; then \"$wmux_cli\" --socket \"$WMUX_SOCKET_PATH\" hooks codex prompt-submit; else \"$wmux_cli\" hooks codex prompt-submit; fi; } || echo '{}'; else echo '{}'; fi"
         let legacyHookJSON: [String: Any] = [
             "hooks": [
                 "UserPromptSubmit": [
@@ -40,15 +40,15 @@ struct CLICodexHookTimeoutRegressionTests {
         #expect(sessionStartHooks.count == 1, "Installer should install one session-start hook")
         #expect(sessionStartHooks.allSatisfy { $0.body.contains("hooks enqueue codex session-start") })
         #expect(sessionStartHooks.allSatisfy { $0.timeout == 5 })
-        #expect(sessionStartHooks.allSatisfy { $0.body.contains("agent_pid=") && $0.body.contains("CMUX_CODEX_PID=") })
+        #expect(sessionStartHooks.allSatisfy { $0.body.contains("agent_pid=") && $0.body.contains("WMUX_CODEX_PID=") })
         #expect(promptHooks.count == 1, "Installer should collapse duplicate prompt hooks")
         #expect(promptHooks.allSatisfy { $0.body.contains("hooks enqueue codex prompt-submit") })
         #expect(promptHooks.allSatisfy { $0.timeout == 5 })
-        #expect(promptHooks.allSatisfy { $0.body.contains("agent_pid=") && $0.body.contains("CMUX_CODEX_PID=") })
+        #expect(promptHooks.allSatisfy { $0.body.contains("agent_pid=") && $0.body.contains("WMUX_CODEX_PID=") })
         #expect(stopHooks.count == 1, "Installer should install one stop hook")
         #expect(stopHooks.allSatisfy { $0.body.contains("hooks enqueue codex stop") })
         #expect(stopHooks.allSatisfy { $0.timeout == 5 })
-        #expect(stopHooks.allSatisfy { $0.body.contains("agent_pid=") && $0.body.contains("CMUX_CODEX_PID=") })
+        #expect(stopHooks.allSatisfy { $0.body.contains("agent_pid=") && $0.body.contains("WMUX_CODEX_PID=") })
         #expect([sessionStartHooks, promptHooks, stopHooks].flatMap { $0 }.allSatisfy {
             !$0.body.contains("nohup")
                 && !$0.body.contains("sleep ")
@@ -77,7 +77,7 @@ struct CLICodexHookTimeoutRegressionTests {
         }
         let permissionHook = try #require(feedHooksByEvent["PermissionRequest"])
         #expect(permissionHook.body.contains("hooks feed --source codex --event PermissionRequest"))
-        #expect(permissionHook.body.contains("CMUX_CODEX_HOOK_PID"))
+        #expect(permissionHook.body.contains("WMUX_CODEX_HOOK_PID"))
         #expect(permissionHook.timeout == 120)
         for event in ["PreCompact", "PostCompact", "SubagentStart", "SubagentStop"] {
             let hook = try #require(feedHooksByEvent[event])
@@ -204,13 +204,13 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CODEX_PID": "4242",
-                "CMUX_CODEX_HOOK_PID": "4242",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CODEX_PID": "4242",
+                "WMUX_CODEX_HOOK_PID": "4242",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","cwd":"\#(root.path)","transcript_path":"\#(transcriptURL.path)","hook_event_name":"PermissionRequest","message":"approval required"}"#,
             timeout: 5
@@ -255,9 +255,9 @@ struct CLICodexHookTimeoutRegressionTests {
 
         try makeCodexHookExecutableShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" > \"$CMUX_TEST_ARGS\"",
-            "printf '%s\\n' \"$CMUX_CODEX_PID\" > \"$CMUX_TEST_PID\"",
-            "cat > \"$CMUX_TEST_STDIN\"",
+            "printf '%s\\n' \"$*\" > \"$WMUX_TEST_ARGS\"",
+            "printf '%s\\n' \"$WMUX_CODEX_PID\" > \"$WMUX_TEST_PID\"",
+            "cat > \"$WMUX_TEST_STDIN\"",
             "printf '{}\\n'",
         ])
 
@@ -281,13 +281,13 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "TMPDIR": root.path,
-                "CMUX_SURFACE_ID": "surface-123",
-                "CMUX_SOCKET_PATH": "/tmp/cmux-test.sock",
-                "CMUX_BUNDLED_CLI_PATH": fakeCLI.path,
-                "CMUX_CODEX_PID": "4242",
-                "CMUX_TEST_STDIN": capturedStdin.path,
-                "CMUX_TEST_ARGS": capturedArgs.path,
-                "CMUX_TEST_PID": capturedPID.path,
+                "WMUX_SURFACE_ID": "surface-123",
+                "WMUX_SOCKET_PATH": "/tmp/cmux-test.sock",
+                "WMUX_BUNDLED_CLI_PATH": fakeCLI.path,
+                "WMUX_CODEX_PID": "4242",
+                "WMUX_TEST_STDIN": capturedStdin.path,
+                "WMUX_TEST_ARGS": capturedArgs.path,
+                "WMUX_TEST_PID": capturedPID.path,
             ],
             standardInput: payload,
             timeout: 2
@@ -315,9 +315,9 @@ struct CLICodexHookTimeoutRegressionTests {
 
         try makeCodexHookExecutableShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" > \"$CMUX_TEST_ARGS\"",
-            "printf '%s\\n' \"$CMUX_CODEX_PID\" > \"$CMUX_TEST_PID\"",
-            "cat > \"$CMUX_TEST_STDIN\"",
+            "printf '%s\\n' \"$*\" > \"$WMUX_TEST_ARGS\"",
+            "printf '%s\\n' \"$WMUX_CODEX_PID\" > \"$WMUX_TEST_PID\"",
+            "cat > \"$WMUX_TEST_STDIN\"",
             "printf '{}\\n'",
         ])
 
@@ -341,13 +341,13 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "TMPDIR": root.path,
-                "CMUX_SURFACE_ID": "surface-123",
-                "CMUX_SOCKET_PATH": "/tmp/cmux-test.sock",
-                "CMUX_BUNDLED_CLI_PATH": fakeCLI.path,
-                "CMUX_CODEX_PID": "4242",
-                "CMUX_TEST_STDIN": capturedStdin.path,
-                "CMUX_TEST_ARGS": capturedArgs.path,
-                "CMUX_TEST_PID": capturedPID.path,
+                "WMUX_SURFACE_ID": "surface-123",
+                "WMUX_SOCKET_PATH": "/tmp/cmux-test.sock",
+                "WMUX_BUNDLED_CLI_PATH": fakeCLI.path,
+                "WMUX_CODEX_PID": "4242",
+                "WMUX_TEST_STDIN": capturedStdin.path,
+                "WMUX_TEST_ARGS": capturedArgs.path,
+                "WMUX_TEST_PID": capturedPID.path,
             ],
             standardInput: payload,
             timeout: 1
@@ -375,9 +375,9 @@ struct CLICodexHookTimeoutRegressionTests {
 
         try makeCodexHookExecutableShellFile(at: fakeCLI, lines: [
             "#!/bin/sh",
-            "printf '%s\\n' \"$*\" > \"$CMUX_TEST_ARGS\"",
-            "printf '%s\\n' \"$CMUX_CODEX_PID\" > \"$CMUX_TEST_PID\"",
-            "cat > \"$CMUX_TEST_STDIN\"",
+            "printf '%s\\n' \"$*\" > \"$WMUX_TEST_ARGS\"",
+            "printf '%s\\n' \"$WMUX_CODEX_PID\" > \"$WMUX_TEST_PID\"",
+            "cat > \"$WMUX_TEST_STDIN\"",
             "printf '{}\\n'",
         ])
 
@@ -401,13 +401,13 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "TMPDIR": root.path,
-                "CMUX_SURFACE_ID": "surface-123",
-                "CMUX_SOCKET_PATH": "/tmp/cmux-test.sock",
-                "CMUX_BUNDLED_CLI_PATH": fakeCLI.path,
-                "CMUX_CODEX_PID": "4242",
-                "CMUX_TEST_STDIN": capturedStdin.path,
-                "CMUX_TEST_ARGS": capturedArgs.path,
-                "CMUX_TEST_PID": capturedPID.path,
+                "WMUX_SURFACE_ID": "surface-123",
+                "WMUX_SOCKET_PATH": "/tmp/cmux-test.sock",
+                "WMUX_BUNDLED_CLI_PATH": fakeCLI.path,
+                "WMUX_CODEX_PID": "4242",
+                "WMUX_TEST_STDIN": capturedStdin.path,
+                "WMUX_TEST_ARGS": capturedArgs.path,
+                "WMUX_TEST_PID": capturedPID.path,
             ],
             standardInput: payload,
             timeout: 2
@@ -445,12 +445,12 @@ struct CLICodexHookTimeoutRegressionTests {
             executablePath: "/bin/bash",
             arguments: [
                 "-o", "pipefail", "-c",
-                #"/bin/dd if=/dev/zero bs=1048576 count=8 2>/dev/null | CMUX_CODEX_HOOKS_DISABLED=1 "$CMUX_TEST_HOOK" >/dev/null"#,
+                #"/bin/dd if=/dev/zero bs=1048576 count=8 2>/dev/null | WMUX_CODEX_HOOKS_DISABLED=1 "$WMUX_TEST_HOOK" >/dev/null"#,
             ],
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_TEST_HOOK": stopCommand,
+                "WMUX_TEST_HOOK": stopCommand,
             ],
             timeout: 5
         )
@@ -672,13 +672,13 @@ struct CLICodexHookTimeoutRegressionTests {
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": root.path,
             "TMPDIR": root.path,
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceId,
-            "CMUX_SURFACE_ID": surfaceId,
-            "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_BUNDLED_CLI_PATH": cliPath,
-            "CMUX_CODEX_PID": String(getpid()),
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceId,
+            "WMUX_SURFACE_ID": surfaceId,
+            "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_BUNDLED_CLI_PATH": cliPath,
+            "WMUX_CODEX_PID": String(getpid()),
         ]
 
         let oldPrompt = runCodexHookProcess(
@@ -788,11 +788,11 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","turn_id":"turn-done","cwd":"\#(root.path)","hook_event_name":"UserPromptSubmit","prompt":"late"}"#,
             timeout: 5
@@ -890,12 +890,12 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CODEX_PID": "2",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CODEX_PID": "2",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","cwd":"\#(root.path)","transcript_path":"\#(transcriptURL.path)","hook_event_name":"SessionStart"}"#,
             timeout: 5
@@ -1011,13 +1011,13 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
                 "CODEX_HOME": codexHome.path,
-                "CMUX_CODEX_PID": "4242",
+                "WMUX_CODEX_PID": "4242",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","cwd":"\#(root.path)","transcript_path":"\#(transcriptURL.path)","hook_event_name":"SessionStart"}"#,
             timeout: 5
@@ -1050,12 +1050,12 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CODEX_PID": "1",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CODEX_PID": "1",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","turn_id":"turn-done","cwd":"\#(root.path)","transcript_path":"\#(transcriptURL.path)","hook_event_name":"UserPromptSubmit","prompt":"late"}"#,
             timeout: 5
@@ -1131,12 +1131,12 @@ struct CLICodexHookTimeoutRegressionTests {
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
                 "PWD": root.path,
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_CLI_SENTRY_DISABLED": "1",
-                "CMUX_CODEX_PID": "4242",
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CODEX_PID": "4242",
             ],
             standardInput: #"{"session_id":"\#(sessionId)","cwd":"\#(root.path)","transcript_path":"\#(transcriptURL.path)","hook_event_name":"SessionStart"}"#,
             timeout: 5

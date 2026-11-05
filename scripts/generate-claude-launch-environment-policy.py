@@ -14,9 +14,9 @@ from typing import Dict, List
 SCRIPT_PATH = Path(__file__).resolve()
 REPO_ROOT = SCRIPT_PATH.parent.parent
 MANIFEST_PATH = SCRIPT_PATH.with_name("claude-launch-environment-policy.json")
-SWIFT_PATH = REPO_ROOT / "Packages/macOS/CMUXAgentLaunch/Sources/CMUXAgentLaunch/ClaudeSessionEnvironmentPolicy+Generated.swift"
+SWIFT_PATH = REPO_ROOT / "Packages/macOS/WMUXAgentLaunch/Sources/WMUXAgentLaunch/ClaudeSessionEnvironmentPolicy+Generated.swift"
 TYPESCRIPT_PATH = REPO_ROOT / "agent-chat/adapters/claude-environment-policy.generated.ts"
-WRAPPER_PATH = REPO_ROOT / "Resources/bin/cmux-claude-wrapper"
+WRAPPER_PATH = REPO_ROOT / "Resources/bin/wmux-claude-wrapper"
 WRAPPER_BEGIN = "    # BEGIN GENERATED CLAUDE LAUNCH ENVIRONMENT POLICY"
 WRAPPER_END = "    # END GENERATED CLAUDE LAUNCH ENVIRONMENT POLICY"
 ENVIRONMENT_KEY_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")

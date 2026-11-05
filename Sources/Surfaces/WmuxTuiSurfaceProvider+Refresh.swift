@@ -1,7 +1,7 @@
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     func isCurrentLifecycleGeneration(_ generation: UInt64) -> Bool {
         !isFeatureSuspended && lifecycleGeneration == generation
     }

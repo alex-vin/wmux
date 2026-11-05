@@ -1,43 +1,43 @@
-import CmuxCloud
-import CmuxMobileHost
-import CmuxSettingsUI
+import WmuxCloud
+import WmuxMobileHost
+import WmuxSettingsUI
 import AppKit
-import CmuxRemoteSession
-import CmuxCore
-import CmuxAuthRuntime
-import CmuxBrowser
-import CmuxControlSocket
-import CmuxFoundation
-import CmuxPanes
-import CmuxRemoteDaemon
-import CmuxRemoteWorkspace
-import CmuxSurfaceCatalogModel
-import CmuxTerminal
-import CmuxTerminalSharing
-import CmuxTerminalSizing
-import CmuxSettings
-import CmuxSwiftRenderUI
+import WmuxRemoteSession
+import WmuxCore
+import WmuxAuthRuntime
+import WmuxBrowser
+import WmuxControlSocket
+import WmuxFoundation
+import WmuxPanes
+import WmuxRemoteDaemon
+import WmuxRemoteWorkspace
+import WmuxSurfaceCatalogModel
+import WmuxTerminal
+import WmuxTerminalSharing
+import WmuxTerminalSizing
+import WmuxSettings
+import WmuxSwiftRenderUI
 import Carbon.HIToolbox
-import CMUXMobileCore
-import CMUXAgentLaunch
-import CmuxAgentChat
+import WMUXMobileCore
+import WMUXAgentLaunch
+import WmuxAgentChat
 import Foundation
 import os
 import Bonsplit
 import WebKit
-import CmuxSidebar
-import CmuxWorkspaces
-import CmuxNotifications
+import WmuxSidebar
+import WmuxWorkspaces
+import WmuxNotifications
 private let mobileReconnectDebugLog = Logger(subsystem: "dev.cmux", category: "mobile-reconnect-debug")
 extension Notification.Name {
-    static let socketListenerDidStart = Notification.Name("cmux.socketListenerDidStart")
-    static let terminalSurfaceHostedViewDidMoveToWindow = Notification.Name("cmux.terminalSurfaceHostedViewDidMoveToWindow")
-    static let mainWindowContextsDidChange = Notification.Name("cmux.mainWindowContextsDidChange")
-    static let browserDownloadEventDidArrive = Notification.Name("cmux.browserDownloadEventDidArrive")
+    static let socketListenerDidStart = Notification.Name("wmux.socketListenerDidStart")
+    static let terminalSurfaceHostedViewDidMoveToWindow = Notification.Name("wmux.terminalSurfaceHostedViewDidMoveToWindow")
+    static let mainWindowContextsDidChange = Notification.Name("wmux.mainWindowContextsDidChange")
+    static let browserDownloadEventDidArrive = Notification.Name("wmux.browserDownloadEventDidArrive")
     /// Posted on the main thread by a browser panel when its main frame commits a new document.
-    static let browserMainFrameDidCommit = Notification.Name("cmux.browserMainFrameDidCommit")
-    static let reactGrabDidCopySelection = Notification.Name("cmux.reactGrabDidCopySelection")
-    static let workstreamEventReceived = Notification.Name("cmux.workstreamEventReceived")
+    static let browserMainFrameDidCommit = Notification.Name("wmux.browserMainFrameDidCommit")
+    static let reactGrabDidCopySelection = Notification.Name("wmux.reactGrabDidCopySelection")
+    static let workstreamEventReceived = Notification.Name("wmux.workstreamEventReceived")
 }
 
 struct CodeRouterHandoffSessionBinding: Sendable, Equatable {
@@ -55,7 +55,7 @@ private struct SocketLineProcessingResult: Sendable {
 }
 // Agent notification gating types (AgentTurnCompleteMode / AgentNotificationMeta /
 // agentNotificationShouldDeliver) live in AgentNotificationGate.swift;
-// AgentNotifyCategory lives in the CmuxSettings package.
+// AgentNotifyCategory lives in the WmuxSettings package.
 #if DEBUG
 /// Accumulated worker→main `v2MainSync` hop time for the socket command
 /// currently executing on a worker thread. Confined to one thread: it lives in
@@ -79,7 +79,7 @@ private struct RemotePTYSocketTarget {
 }
 nonisolated func remotePTYSessionListErrorIsUnsupportedDaemon(_ error: Error) -> Bool {
     let nsError = error as NSError
-    guard nsError.domain == "cmux.remote.daemon.rpc", nsError.code == 14 else {
+    guard nsError.domain == "wmux.remote.daemon.rpc", nsError.code == 14 else {
         return false
     }
     return error.localizedDescription
@@ -200,8 +200,8 @@ class TerminalController {
     private var simulatorMutationRecoveryTask: Task<Void, Never>?
     /// Process-wide native SSH master owner and per-host reconnect coordinator.
     nonisolated let nativeSSHConnectionBroker: NativeSSHConnectionBroker
-    // Stateless Sendable structs from CmuxControlSocket; injected at construction.
-    // `transport` is internal so sibling-file extensions (CmuxEventStream) can write through it.
+    // Stateless Sendable structs from WmuxControlSocket; injected at construction.
+    // `transport` is internal so sibling-file extensions (WmuxEventStream) can write through it.
     nonisolated let transport: SocketTransport
     // The package-owned listener: path/bind/lock lifecycle, accept source,
     // backoff/rearm recovery, and the generation-counted state machine.
@@ -241,13 +241,13 @@ class TerminalController {
     // do not downgrade its locking on the assumption that all callers are
     // main-isolated.
     let socketFastPathState = SocketFastPathState()
-    // Stateless sidebar-metadata/command argument parser (CmuxSidebar).
+    // Stateless sidebar-metadata/command argument parser (WmuxSidebar).
     // Pure transforms over the raw arg string; holds no state and reaches no
     // app singletons, so the `report_*`/sidebar-mutation handlers forward to it.
     private nonisolated let sidebarMetadataArgumentParser = SidebarMetadataArgumentParser()
     private nonisolated let myPid = getpid()
-    private nonisolated static let socketCommandFocusAllowanceStackKey = "cmux.socketCommandFocusAllowanceStack"
-    private nonisolated static let socketCommandKeyStackKey = "cmux.socketCommandKeyStack"
+    private nonisolated static let socketCommandFocusAllowanceStackKey = "wmux.socketCommandFocusAllowanceStack"
+    private nonisolated static let socketCommandKeyStackKey = "wmux.socketCommandKeyStack"
     /// Signposter for the worker→main `v2MainSync` hop. Intervals are named
     /// "main-hop" and carry the active socket command key plus queue-wait and
     /// body durations, so Instruments can attribute main-thread occupancy per
@@ -306,7 +306,7 @@ class TerminalController {
     var localSizingControllersBySurfaceID: [UUID: LocalTerminalSharingController] = [:]
     /// Phones someone disconnected from a Cloud terminal, by surface then client id.
     var cloudDetachedPhonesBySurfaceID: [UUID: [String: TerminalSharingDetachment]] = [:]
-    /// Cloud mirrors that relay phones to a cmux-tui host, by surface id.
+    /// Cloud mirrors that relay phones to a wmux-tui host, by surface id.
     var cloudSizingRelaysBySurfaceID: [UUID: CloudSizingRelayReference] = [:]
     /// The single owner of shared-terminal size state and actions.
     let terminalSharing = TerminalSharingStore()
@@ -314,7 +314,7 @@ class TerminalController {
     let terminalSizePanelPresenter = TerminalSizePanelPresenter()
     private var mobileViewportGovernorFlushTasksBySurfaceID: [UUID: Task<Void, Never>] = [:]
 #if DEBUG
-    private nonisolated static let socketCommandDebugLogEnvironmentKey = "CMUX_DEBUG_SOCKET_COMMAND_LOG"
+    private nonisolated static let socketCommandDebugLogEnvironmentKey = "WMUX_DEBUG_SOCKET_COMMAND_LOG"
     private nonisolated static let socketCommandSlowThresholdMs: Double = 500
 #endif
     // The terminal-input message/error statics are nonisolated: pure,
@@ -340,7 +340,7 @@ class TerminalController {
     }
     /// The command that shows, and so wakes, a hibernated terminal.
     nonisolated static func terminalWakeCommand(workspaceID: UUID, surfaceID: UUID) -> String {
-        "cmux focus-panel --workspace \(workspaceID.uuidString) --panel \(surfaceID.uuidString)"
+        "wmux focus-panel --workspace \(workspaceID.uuidString) --panel \(surfaceID.uuidString)"
     }
 
     /// Explains why a terminal has no running runtime and how to get one.
@@ -366,7 +366,7 @@ class TerminalController {
         case .awaitingRestore:
             return String(
                 localized: "socket.terminal.notRunning.awaitingRestore",
-                defaultValue: "cmux is still restoring the terminal after it reopened and is checking which agent session to resume. Retry in a few seconds."
+                defaultValue: "wmux is still restoring the terminal after it reopened and is checking which agent session to resume. Retry in a few seconds."
             )
         case .starting:
             return String(
@@ -444,7 +444,7 @@ class TerminalController {
         id: Any?,
         params: [String: Any]
     ) -> String? {
-        guard CmuxAutomationInvocationContext.focusAllowed == false,
+        guard WmuxAutomationInvocationContext.focusAllowed == false,
               commandHasFocusIntent(commandKey: method, isV2: true, params: params) else {
             return nil
         }
@@ -459,7 +459,7 @@ class TerminalController {
         )
     }
 
-    /// The main-actor RPC dispatch coordinator (CmuxControlSocket). Owns the
+    /// The main-actor RPC dispatch coordinator (WmuxControlSocket). Owns the
     /// `kind:N` handle registry and the moved command domains (window so far,
     /// growing per stage-3c sub-stage); this controller is its interim
     /// composition owner and ``ControlCommandContext`` conformer. Constructed in
@@ -480,7 +480,7 @@ class TerminalController {
     private var v2BrowserUnsupportedNetworkRequestsBySurface: [UUID: [[String: Any]]] = [:]
     private nonisolated let v2BrowserUndefinedSentinel = V2BrowserUndefinedSentinel()
     /// Stateless browser-control logic (JS builders, value normalization,
-    /// diagnostics, failure classification) extracted to `CmuxBrowser`.
+    /// diagnostics, failure classification) extracted to `WmuxBrowser`.
     /// The per-surface mutable state and WebKit evaluation seam stay here.
     private nonisolated let v2BrowserControl = BrowserControlService(
         evalEnvelope: BrowserEvalEnvelope(
@@ -526,7 +526,7 @@ class TerminalController {
         weak var controller: TerminalController?
     }
 
-    /// Queues a session hook the app observed for a remote agent (the cmux-tui agent
+    /// Queues a session hook the app observed for a remote agent (the wmux-tui agent
     /// roster of a `cmux ssh` machine) through the same relay-backed delivery
     /// lane as `agent.hook.enqueue`, routed to the local pane showing it.
     /// - Returns: `false` when the socket is not listening, the event is
@@ -597,10 +597,10 @@ class TerminalController {
         let socketPathMarkerStore = SocketPathMarkerStore(
             bundleIdentifier: socketMarkerBundleIdentifier,
             environment: socketMarkerEnvironment,
-            stateDirectory: CmuxStateDirectory.url(
+            stateDirectory: WmuxStateDirectory.url(
                 homeDirectory: socketMarkerFileManager.homeDirectoryForCurrentUser
             ),
-            legacyDirectory: CmuxStateDirectory.legacyApplicationSupportURL(
+            legacyDirectory: WmuxStateDirectory.legacyApplicationSupportURL(
                 fileManager: socketMarkerFileManager
             ),
             tmpMarkerPath: socketMarkerVariant.tmpPath,
@@ -772,7 +772,7 @@ class TerminalController {
         // calls, but their default is deliberately focus-neutral. A task-local
         // override lets an action opt into focus without weakening the normal
         // command policy for user and external CLI traffic.
-        if let automationOverride = CmuxAutomationInvocationContext.focusAllowed {
+        if let automationOverride = WmuxAutomationInvocationContext.focusAllowed {
             return automationOverride
         }
         if isV2 {
@@ -1706,7 +1706,7 @@ class TerminalController {
                           }),
                           CodeRouterHandoffClient.isValidLeaseSyntax(lease.lease),
                           lease.expiresAt.utf8.count <= 128,
-                          let expiry = CmuxRFC3339DateParser().date(from: lease.expiresAt),
+                          let expiry = WmuxRFC3339DateParser().date(from: lease.expiresAt),
                           expiry > Date() else {
                         return .err(
                             code: "coderouter_handoff_invalid_response",
@@ -1745,7 +1745,7 @@ class TerminalController {
                 v2FeedPush(
                     params: request.params,
                     requiresIngestionAcknowledgment: request.id != nil,
-                    automationOrigin: CmuxAutomationInvocationContext.eventOrigin
+                    automationOrigin: WmuxAutomationInvocationContext.eventOrigin
                 )
             )
         case "feed.permission.reply":
@@ -2079,7 +2079,7 @@ class TerminalController {
                     let candidates = (NSApp.keyWindow?.contentView).map { WindowHintTargets.collect(in: $0).count }
                     return [
                         "active": false,
-                        "enabled": CmuxFeatureFlags.shared.isWindowHintsEnabled,
+                        "enabled": WmuxFeatureFlags.shared.isWindowHintsEnabled,
                         "candidates": candidates ?? -1,
                     ]
                 }
@@ -2526,7 +2526,7 @@ class TerminalController {
                 )
                 return
             }
-            let result = await CmuxAutomationInvocationContext.$eventOrigin.withValue(commandOrigin) {
+            let result = await WmuxAutomationInvocationContext.$eventOrigin.withValue(commandOrigin) {
                 await processSocketLineAsync(
                     trimmed,
                     passwordAuthorization: passwordAuthorization,
@@ -2536,7 +2536,7 @@ class TerminalController {
             passwordAuthorization = result.passwordAuthorization
             if let response = result.response {
                 guard await writer.writeAll(Data((response + "\n").utf8)) else { return }
-                CmuxAutomationInvocationContext.$eventOrigin.withValue(commandOrigin) {
+                WmuxAutomationInvocationContext.$eventOrigin.withValue(commandOrigin) {
                     publishSocketEvents(command: trimmed, response: response)
                 }
             }
@@ -2838,7 +2838,7 @@ class TerminalController {
         cmuxDebugLog(message())
     }
 
-    private nonisolated static let socketCommandMainHopAccumulatorKey = "cmux.socketCommandMainHopAccumulator"
+    private nonisolated static let socketCommandMainHopAccumulatorKey = "wmux.socketCommandMainHopAccumulator"
 
     /// Installs a fresh per-command main-hop accumulator on the current
     /// (socket worker) thread. Called once per socket line so the totals in
@@ -2889,7 +2889,7 @@ class TerminalController {
                 return errorResponse
             }
             let request = relayAuthorization.request
-            let automationOrigin = CmuxAutomationInvocationContext.eventOrigin
+            let automationOrigin = WmuxAutomationInvocationContext.eventOrigin
             if let focusError = Self.focusSuppressionResponse(
                 method: request.method,
                 id: request.id.map(\.foundationObject),
@@ -2910,7 +2910,7 @@ class TerminalController {
                         message: "\(request.method) must run off the main thread"
                     )
                 }
-                return CmuxAutomationInvocationContext.$eventOrigin.withValue(automationOrigin) {
+                return WmuxAutomationInvocationContext.$eventOrigin.withValue(automationOrigin) {
                     v2BrowserKeyboardNativeResponseSync(
                         request: request,
                         event: event,
@@ -2926,11 +2926,11 @@ class TerminalController {
                 )
             }
             if policy.runsOnSocketWorker {
-                return CmuxAutomationInvocationContext.$eventOrigin.withValue(automationOrigin) {
+                return WmuxAutomationInvocationContext.$eventOrigin.withValue(automationOrigin) {
                     socketWorkerV2Response(handling: request, codeRouterTeamID: codeRouterTeamID)
                 }
             }
-            return CmuxAutomationInvocationContext.$eventOrigin.withValue(automationOrigin) {
+            return WmuxAutomationInvocationContext.$eventOrigin.withValue(automationOrigin) {
                 processParsedV2Command(request)
             }
         }
@@ -2986,7 +2986,7 @@ class TerminalController {
 
         let policyParams = cmd == "right_sidebar" ? ["args": args] : [:]
         return withSocketCommandPolicy(commandKey: cmd, isV2: false, params: policyParams) {
-            // V1 domains migrated into CmuxControlSocket's ControlCommandCoordinator
+            // V1 domains migrated into WmuxControlSocket's ControlCommandCoordinator
             // (the sidebar metadata/pane/surface commands and the browser panel
             // commands) answer here; everything else falls through to the legacy
             // switch below.
@@ -3194,8 +3194,8 @@ class TerminalController {
         case .failure(let parseError):
             return Self.v2Encoder.response(for: parseError)
         case .success(let request):
-            return CmuxAutomationInvocationContext.$eventOrigin.withValue(
-                CmuxAutomationInvocationContext.eventOrigin
+            return WmuxAutomationInvocationContext.$eventOrigin.withValue(
+                WmuxAutomationInvocationContext.eventOrigin
             ) {
                 processParsedV2Command(request)
             }
@@ -3289,7 +3289,7 @@ class TerminalController {
     ) -> V2MainHopOutcome {
         v2RefreshKnownRefs()
 
-        // Domains migrated into CmuxControlSocket's ControlCommandCoordinator
+        // Domains migrated into WmuxControlSocket's ControlCommandCoordinator
         // answer here, on the main actor, through the same encoder/id as the
         // legacy switch (the worker encodes the typed result after the hop);
         // everything else falls through to the legacy switch below.
@@ -3404,7 +3404,7 @@ class TerminalController {
         case "debug.cloudtree.rows":
             return v2Ok(id: id, result: ["rows": []])
         case "debug.cloudtree.spacing":
-            return v2Ok(id: id, result: ["window": "cmux.cloudSidebarDebugLab"])
+            return v2Ok(id: id, result: ["window": "wmux.cloudSidebarDebugLab"])
         case "debug.notification.status":
             return v2Ok(id: id, result: notificationDebugStatus())
         case "debug.notification.mode":
@@ -3670,7 +3670,7 @@ class TerminalController {
         result["app_bundle_path"] = Bundle.main.bundleURL.path
         // Lets a CLI from another build explain an unknown method
         // (`CLIVersionSkew`): product, version, and build of this process.
-        result["app"] = "cmux"
+        result["app"] = "wmux"
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             result["version"] = version
         }
@@ -3682,7 +3682,7 @@ class TerminalController {
         }
         if let cliPath = Bundle.main.resourceURL?
             .appendingPathComponent("bin", isDirectory: true)
-            .appendingPathComponent("cmux", isDirectory: false)
+            .appendingPathComponent("wmux", isDirectory: false)
             .path {
             result["app_cli_path"] = cliPath
         }
@@ -3964,7 +3964,7 @@ class TerminalController {
             return item
         }
 
-        let webContentPID = CmuxWebContentProcessIdentifier.pid(for: browserPanel.webView)
+        let webContentPID = WmuxWebContentProcessIdentifier.pid(for: browserPanel.webView)
         let url = browserPanel.currentURL?.absoluteString ?? ""
         item["url"] = url
         item["browser_web_content_pid"] = v2OrNull(webContentPID)
@@ -4215,7 +4215,7 @@ class TerminalController {
                     code: "vm_tui_daemon_unavailable",
                     message: String(
                         localized: "socket.cloudVM.tuiDaemonUnavailable",
-                        defaultValue: "The machine's cmux-tui daemon is unavailable. Wake the machine or retry `cmux vm workspace new`."
+                        defaultValue: "The machine's wmux-tui daemon is unavailable. Wake the machine or retry `cmux vm workspace new`."
                     )
                 )
             }
@@ -4265,7 +4265,7 @@ class TerminalController {
             if let vmError = error as? VMClientError,
                let machineID = transportUnsupportedMachineID,
                Self.isCloudVMTransportUnsupportedError(vmError) {
-                // `vm.cmux_remote_info` is the shared attach path for `vm shell`,
+                // `vm.wmux_remote_info` is the shared attach path for `vm shell`,
                 // `vm open`, `vm tui`, and the sidebar, so the message names the
                 // machine and the missing transport rather than guessing the
                 // caller, and points at commands that do not need that transport.
@@ -4280,10 +4280,10 @@ class TerminalController {
                 let message = String(
                     format: String(
                         localized: "socket.cloudVM.transportUnsupported",
-                        defaultValue: "%1$@ offers no `%2$@` transport (its provider has no cmux-tui daemon route), so cmux cannot attach a terminal to it. %3$@"
+                        defaultValue: "%1$@ offers no `%2$@` transport (its provider has no wmux-tui daemon route), so cmux cannot attach a terminal to it. %3$@"
                     ),
                     machineID,
-                    "cmux-remote",
+                    "wmux-remote",
                     alternative
                 )
                 return v2Error(
@@ -5718,7 +5718,7 @@ class TerminalController {
                     return (match.element.windowId, match.offset)
                 }
                 guard let raw = window.identifier?.rawValue else { return (nil, nil) }
-                let prefix = "cmux.main."
+                let prefix = "wmux.main."
                 guard raw.hasPrefix(prefix),
                       let parsedWindowId = UUID(uuidString: String(raw.dropFirst(prefix.count))) else {
                     return (nil, nil)
@@ -6467,7 +6467,7 @@ class TerminalController {
     private nonisolated func v2FeedPush(
         params: [String: Any],
         requiresIngestionAcknowledgment: Bool,
-        automationOrigin: CmuxAutomationEventOrigin? = nil
+        automationOrigin: WmuxAutomationEventOrigin? = nil
     ) -> V2CallResult {
         let waitTimeout: TimeInterval
         if let rawTimeout = params["wait_timeout_seconds"] {
@@ -7291,7 +7291,7 @@ class TerminalController {
             )
         }
         guard let url else {
-            return .err(code: "browser_disabled", message: "cmux browser is disabled", data: nil)
+            return .err(code: "browser_disabled", message: "wmux browser is disabled", data: nil)
         }
 
         var result: V2CallResult = .err(
@@ -7481,7 +7481,7 @@ class TerminalController {
                 )
             }
             if v2IsDiffViewerURL(url) {
-                return .err(code: "browser_disabled", message: "cmux browser is disabled", data: nil)
+                return .err(code: "browser_disabled", message: "wmux browser is disabled", data: nil)
             }
             return v2BrowserDisabledExternalOpenResult(rawURL: urlStr, url: url, tabManager: tabManager)
         }
@@ -8520,7 +8520,7 @@ class TerminalController {
                 data: [
                     "timeout_ms": timeoutMs,
                     "url": v2MainSync { webView.url?.absoluteString ?? "about:blank" },
-                    "hint": "Verify the page loaded with 'cmux browser <surface> get url' before waiting"
+                    "hint": "Verify the page loaded with 'wmux browser <surface> get url' before waiting"
                 ]
             )
         }
@@ -9064,7 +9064,7 @@ class TerminalController {
 
         // Best effort: keep screenshot data available even when temp-file writes fail.
         let screenshotsDirectory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("cmux-browser-screenshots", isDirectory: true)
+            .appendingPathComponent("wmux-browser-screenshots", isDirectory: true)
         if (try? FileManager.default.createDirectory(at: screenshotsDirectory, withIntermediateDirectories: true)) != nil {
             bestEffortPruneTemporaryFiles(in: screenshotsDirectory)
             let timestampMs = Int(Date().timeIntervalSince1970 * 1000)
@@ -10899,8 +10899,8 @@ class TerminalController {
                 if all { return true }
                 if let name, cookie.name != name { return false }
                 if let value, cookie.value != value { return false }
-                if let url, !CmuxWebView.cookieMatchesURL(cookie, url: url) { return false }
-                if let domain, !CmuxWebView.cookieDomainMatchesFilter(cookie.domain, filter: domain) { return false }
+                if let url, !WmuxWebView.cookieMatchesURL(cookie, url: url) { return false }
+                if let domain, !WmuxWebView.cookieDomainMatchesFilter(cookie.domain, filter: domain) { return false }
                 if let path, cookie.path != path { return false }
                 if let expires,
                    cookie.expiresDate.map({ Int($0.timeIntervalSince1970) }) != expires {
@@ -12752,7 +12752,7 @@ class TerminalController {
                 ?? NSApp.keyWindow
                 ?? NSApp.windows.first(where: { win in
                     guard let raw = win.identifier?.rawValue else { return false }
-                    return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+                    return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
                 }),
                   let contentView = window.contentView,
                   let themeFrame = contentView.superview else { return }
@@ -12799,7 +12799,7 @@ class TerminalController {
                 ?? NSApp.keyWindow
                 ?? NSApp.windows.first(where: { win in
                     guard let raw = win.identifier?.rawValue else { return false }
-                    return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+                    return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
                 }),
                   let contentView = window.contentView,
                   let themeFrame = contentView.superview else { return }
@@ -13997,7 +13997,7 @@ class TerminalController {
         let snapshotId = "\(timestamp)_\(shortId)"
 
         let outputDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("cmux-screenshots")
+            .appendingPathComponent("wmux-screenshots")
         try? FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
         let filename = label.isEmpty ? "\(snapshotId).png" : "\(label)_\(snapshotId).png"
         let outputPath = outputDir.appendingPathComponent(filename)
@@ -14887,7 +14887,7 @@ class TerminalController {
         options: [String: String]
     ) -> (target: SidebarMutationTabTarget?, error: String?) {
         // `SidebarMetadataArgumentParser.parseMutationTabTarget` already returns the
-        // `CmuxSidebar.SidebarMutationTabTarget` cases this controller resolves, so
+        // `WmuxSidebar.SidebarMutationTabTarget` cases this controller resolves, so
         // forward the parsed target verbatim instead of re-mapping it case-for-case
         // onto a duplicate local enum.
         let resolution = sidebarMetadataArgumentParser.parseMutationTabTarget(options: options)
@@ -15136,10 +15136,10 @@ class TerminalController {
             return true
         }
         guard !AgentHibernationLifecycleStatusKeys.isManualKey(key), let tab = resolveSidebarMutationTab(target),
-              CmuxVaultAgentRegistration.isValidID(key) else {
+              WmuxVaultAgentRegistration.isValidID(key) else {
             return false
         }
-        let registry = CmuxVaultAgentRegistry.load(
+        let registry = WmuxVaultAgentRegistry.load(
             workingDirectory: agentLifecycleRegistryWorkingDirectory(tab: tab, panelId: panelId)
         )
         return registry.registration(id: key) != nil
@@ -15464,7 +15464,7 @@ class TerminalController {
     ///
     /// Reads `{ text, terminal_text, build_stamp, diagnostic_blob_base64 }` off
     /// the wire and hands them to ``DogfoodFeedbackService`` (in the
-    /// `CmuxFeedback` package), which caps the fields, rejects an oversized
+    /// `WmuxFeedback` package), which caps the fields, rejects an oversized
     /// base64 blob without decoding, and writes a self-contained bundle
     /// directory under `~/.cache/cmux-dogfood-feedback/<ISO8601>_<shortid>/`
     /// (a `bundle.json` manifest plus the decoded `diagnostic.log`) off the main

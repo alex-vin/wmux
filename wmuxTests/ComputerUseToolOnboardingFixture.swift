@@ -1,13 +1,13 @@
-#if canImport(CmuxComputerUse)
-import CMUXAgentLaunch
-import CmuxFoundation
-@testable import CmuxComputerUse
-import CmuxSettings
+#if canImport(WmuxComputerUse)
+import WMUXAgentLaunch
+import WmuxFoundation
+@testable import WmuxComputerUse
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -80,7 +80,7 @@ final class ComputerUseToolOnboardingFixture {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: persistence.root.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 .init(workspaceId: workspaceID, panelId: surfaceID): (
                     snapshot: SessionRestorableAgentSnapshot(kind: .codex, sessionId: sessionID),
@@ -90,7 +90,7 @@ final class ComputerUseToolOnboardingFixture {
                     sessionIDSource: .explicit
                 )
             ],
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": hookDirectory.path],
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": hookDirectory.path],
             processArgumentsProvider: { _ in nil },
             processPresenceProvider: { $0 == Int(pid) ? .present : .absent },
             processIdentityProvider: { $0 == Int(pid) ? identity : nil }

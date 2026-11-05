@@ -3,7 +3,7 @@
 // web session's cookies, the way the Linear web app calls it.
 (function (root) {
   "use strict";
-  const S = root.CmuxBrowserRepl && root.CmuxBrowserRepl.sites;
+  const S = root.WmuxBrowserRepl && root.WmuxBrowserRepl.sites;
   if (!S) return;
   const APP = "https://linear.app";
   const API = "https://client-api.linear.app/graphql";

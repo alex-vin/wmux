@@ -11,7 +11,7 @@
 //   only `tool.method(draftId, { confirm: true })` performs it.
 (function (root) {
   "use strict";
-  const ns = (root.CmuxBrowserRepl = root.CmuxBrowserRepl || {});
+  const ns = (root.WmuxBrowserRepl = root.WmuxBrowserRepl || {});
   const registry = [];
   const shared = {};
 

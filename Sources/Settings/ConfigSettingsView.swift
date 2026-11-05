@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxWorkspaces
+import WmuxFoundation
+import WmuxWorkspaces
 import SwiftUI
 
 struct ConfigSettingsView: View {
@@ -177,7 +177,7 @@ struct ConfigSettingsView: View {
     }
 
     private func configureWindow(_ window: NSWindow) {
-        window.identifier = NSUserInterfaceItemIdentifier("cmux.configEditor")
+        window.identifier = NSUserInterfaceItemIdentifier("wmux.configEditor")
         window.minSize = NSSize(width: 700, height: 500)
         window.tabbingMode = .disallowed
         window.animationBehavior = .utilityWindow

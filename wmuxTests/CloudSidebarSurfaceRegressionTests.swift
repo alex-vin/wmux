@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -117,7 +117,7 @@ struct CloudSidebarSurfaceRegressionTests {
         let catalog = SurfaceCatalog(cloudWorkspaceRenameService: service)
         catalog.upsert(resource)
         catalog.record(SurfaceProjection(resource: resource.id, workspaceID: workspace.id, panelID: panelID))
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "workspaces": [["id": "ws_1", "name": "Cloud", "index": 0, "focused": true]],
             "screens": [], "panes": [], "tabs": [],
             "terminals": [["id": "term_1", "title": "terminal", "cwd": "/home/cloud/project", "lifecycle": "running"]],
@@ -243,7 +243,7 @@ struct CloudSidebarSurfaceRegressionTests {
 
     @Test("A route failure remains visible beside real port rows")
     func routeFailureDoesNotReplacePorts() throws {
-        let port = CmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000, directURL: nil)
+        let port = WmuxTuiSnapshotParser.portBrowser(machine: machine, port: 3000, directURL: nil)
         let info = SurfaceMachineInfo(
             id: machine, name: machine.rawValue, status: "running", image: nil,
             hasDesktop: false, memoryMb: nil, diskMb: nil, linkState: .connected,
@@ -358,7 +358,7 @@ struct CloudSidebarSurfaceRegressionTests {
             ["id": "tab_desktop", "pane_id": "pane_side", "content_kind": "display", "content_id": "display:1"]
         ]
         document["browsers"] = [["id": "docs", "tab_id": "tab_docs", "title": "Docs", "url": "https://cmux.com/docs"]]
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
         publishVisibility(state, to: catalog, incremental: false)
         let before = catalog.snapshot
         #expect(workspaceIDs(catalog.snapshot) == ["ws_main", "ws_side"])
@@ -400,7 +400,7 @@ struct CloudSidebarSurfaceRegressionTests {
             "terminals": [["id": "term_existing", "title": "Existing shell", "lifecycle": "running"]],
             "browsers": [], "agents": []
         ]
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
     }
 
     private func terminalTab(pane: String) -> [String: Any] {
@@ -416,7 +416,7 @@ struct CloudSidebarSurfaceRegressionTests {
             "kind": "delta", "previous_revision": String(cursor.revision), "revision": String(next.revision),
             "changes": changes
         ]
-        let state = try #require(CmuxTuiSnapshotParser.applying(
+        let state = try #require(WmuxTuiSnapshotParser.applying(
             deltaPayload: JSONSerialization.data(withJSONObject: delta), cursor: next, to: previous
         ))
         publishVisibility(state, to: catalog, incremental: incremental)
@@ -432,7 +432,7 @@ struct CloudSidebarSurfaceRegressionTests {
                 SurfaceRemoteWorkspace(id: $0.id, name: $0.name, index: $0.index, focused: $0.focused)
             }
         )
-        let resources = CmuxTuiSnapshotParser.resources(from: state)
+        let resources = WmuxTuiSnapshotParser.resources(from: state)
         if incremental { catalog.applyCloudStateDelta(state, resources: resources, info: info) }
         else { catalog.replaceCloudState(state, resources: resources, info: info) }
     }

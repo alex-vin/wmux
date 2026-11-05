@@ -1,9 +1,9 @@
-import CmuxTerminalCore
+import WmuxTerminalCore
 import Testing
 
 /// Keeps the app-host selector wired to the package-owned copy resolver.
 ///
-/// The complete flavor and fallback matrix lives in `CmuxTerminalCoreTests`;
+/// The complete flavor and fallback matrix lives in `WmuxTerminalCoreTests`;
 /// this smoke test verifies the executable test target can consume the public
 /// package API instead of silently executing zero tests.
 @Suite struct GhosttyCopyActionResolverTests {

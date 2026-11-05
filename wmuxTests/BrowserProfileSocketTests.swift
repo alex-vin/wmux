@@ -1,8 +1,8 @@
 import Foundation
 import Testing
-import CmuxCore
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+import WmuxCore
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

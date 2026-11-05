@@ -1,11 +1,11 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -164,7 +164,7 @@ struct CloudTerminalLayoutCreationTests {
     @Test
     func missingSourceTabNeverFallsBackToTheFocusedPane() async throws {
         let runner = LayoutCreationRunner(responses: [.success(try Self.snapshot())])
-        await #expect(throws: CmuxTuiSurfaceProvider.ProviderError.self) {
+        await #expect(throws: WmuxTuiSurfaceProvider.ProviderError.self) {
             try await operation(runner).run(nearTabID: "tab_deleted", splitDirection: .right)
         }
         #expect(await runner.commands.count == 1)
@@ -173,7 +173,7 @@ struct CloudTerminalLayoutCreationTests {
     @Test
     func malformedGraphNeverAuthorizesCreation() async throws {
         let runner = LayoutCreationRunner(responses: [.success(Data("{}".utf8))])
-        await #expect(throws: CmuxTuiSurfaceProvider.ProviderError.self) {
+        await #expect(throws: WmuxTuiSurfaceProvider.ProviderError.self) {
             try await operation(runner).run(nearTabID: "tab_source", splitDirection: .right)
         }
         #expect(await runner.commands.count == 1)
@@ -182,7 +182,7 @@ struct CloudTerminalLayoutCreationTests {
     @Test func currentEventSnapshotAvoidsThePreCreationRoundTrip() async throws {
         let data = try Self.snapshot()
         let object = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: object, machine: Self.machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: object, machine: Self.machine))
         let runner = LayoutCreationRunner(responses: [.success(try Self.created())])
         var operation = operation(runner)
         operation.initialState = state
@@ -195,7 +195,7 @@ struct CloudTerminalLayoutCreationTests {
 
     @Test func staleEventSnapshotRefreshesOnlyAfterRevisionRejection() async throws {
         let object = try #require(JSONSerialization.jsonObject(with: Self.snapshot()) as? [String: Any])
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: object, machine: Self.machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: object, machine: Self.machine))
         let runner = LayoutCreationRunner(responses: [
             .failure(.exited(status: 1, output: #"{"code":"revision.conflict"}"#)),
             .success(try Self.snapshot(revision: "11", paneID: "pane_moved")), .success(try Self.created())

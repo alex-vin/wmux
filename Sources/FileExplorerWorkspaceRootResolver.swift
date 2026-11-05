@@ -1,6 +1,6 @@
-import CmuxCloud
-import CmuxAuthRuntime
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxAuthRuntime
+import WmuxSurfaceCatalogModel
 import Foundation
 
 /// Both Files presentations resolve through the same workspace and account authority.
@@ -24,7 +24,7 @@ struct FileExplorerWorkspaceRootResolver {
     }
 
     func resolve(_ workspace: Workspace) -> FileExplorerWorkspaceRoot {
-        // A cmux-tui binding is the explicit Cloud filesystem authority. A
+        // A wmux-tui binding is the explicit Cloud filesystem authority. A
         // legacy managedCloudVMID on an SSH workspace must keep using its SSH
         // transport, otherwise Files would silently change hosts.
         if let binding = workspace.cloudVMBinding {
@@ -135,7 +135,7 @@ struct FileExplorerWorkspaceRootResolver {
               let provider = catalog.provider(for: machine),
               catalog.machines[machine]?.linkState == .connected,
               catalog.cloudStateObservations[machine]?.freshness == .current else { return nil }
-        if let concrete = provider as? CmuxTuiSurfaceProvider,
+        if let concrete = provider as? WmuxTuiSurfaceProvider,
            concrete.isFeatureSuspended || concrete.fileAccessTeamScope != team || !concrete.capabilities.exec { return nil }
         guard catalog.projectionMachines(forWorkspace: workspace.id).allSatisfy({
             $0.isLocal || $0 == machine

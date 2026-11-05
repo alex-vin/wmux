@@ -21,7 +21,7 @@ struct OneShotTerminalLauncherStore {
     private let temporaryDirectory: URL
     private let currentDate: Date
 
-    private let directoryName = "cmux-r"
+    private let directoryName = "wmux-r"
     private let scriptTTL: TimeInterval = 24 * 60 * 60
     private let pruneInterval: TimeInterval = 5 * 60
     private let pruneMarkerName = ".last-prune"

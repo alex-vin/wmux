@@ -2,8 +2,8 @@ import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -157,7 +157,7 @@ struct AgentHibernationEvaluationSchedulingTests {
         defer { try? FileManager.default.removeItem(at: hookStoreDirectory) }
         let fullReloadCount = OSAllocatedUnfairLock(initialState: 0)
         let processCensusCount = OSAllocatedUnfairLock(initialState: 0)
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [], sampledAt: .now, includesProcessDetails: true,
             includesCMUXScope: true, includesResources: false
         )
@@ -196,7 +196,7 @@ struct AgentHibernationEvaluationSchedulingTests {
         let refreshStarted = AsyncStream<Void>.makeStream()
         let censusStarted = AsyncStream<Void>.makeStream()
         let releaseCensus = AsyncStream<Void>.makeStream()
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [], sampledAt: .now, includesProcessDetails: true,
             includesCMUXScope: true, includesResources: false
         )

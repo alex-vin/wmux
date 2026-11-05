@@ -1,9 +1,9 @@
-import CmuxBrowser
-import CmuxFoundation
-import CmuxSettings
+import WmuxBrowser
+import WmuxFoundation
+import WmuxSettings
 import Foundation
 
-extension CmuxSettingsFileStore {
+extension WmuxSettingsFileStore {
     static func defaultTemplate() -> String {
         var lines: [String] = [
             "{",

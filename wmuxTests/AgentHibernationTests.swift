@@ -1,12 +1,12 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
 import Testing
 import Bonsplit
-import CmuxTerminal
+import WmuxTerminal
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -396,16 +396,16 @@ struct AgentHibernationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { requestedPID in
                 requestedPID == pid
-                    ? CmuxTopProcessArguments(
+                    ? WmuxTopProcessArguments(
                         arguments: ["/bin/sleep", "30"],
                         environment: [
-                            "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-                            "CMUX_SURFACE_ID": panelId.uuidString,
-                            "CMUX_AGENT_LAUNCH_KIND": RestorableAgentKind.codex.rawValue,
+                            "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+                            "WMUX_SURFACE_ID": panelId.uuidString,
+                            "WMUX_AGENT_LAUNCH_KIND": RestorableAgentKind.codex.rawValue,
                         ]
                     )
                     : nil
@@ -475,19 +475,19 @@ struct AgentHibernationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { requestedPID in
                 requestedPID == pid
-                    ? CmuxTopProcessArguments(
+                    ? WmuxTopProcessArguments(
                         arguments: [
                             "/opt/homebrew/Cellar/node/24.0.0/bin/node",
                             "/Users/example/.claude/local/node_modules/@anthropic-ai/claude-code/cli.js",
                         ],
                         environment: [
-                            "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-                            "CMUX_SURFACE_ID": panelId.uuidString,
-                            "CMUX_AGENT_LAUNCH_KIND": RestorableAgentKind.claude.rawValue,
+                            "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+                            "WMUX_SURFACE_ID": panelId.uuidString,
+                            "WMUX_AGENT_LAUNCH_KIND": RestorableAgentKind.claude.rawValue,
                         ]
                     )
                     : nil
@@ -506,11 +506,11 @@ struct AgentHibernationTests {
     func testLiveProcessScopeMatchingAcceptsLegacyEnvironmentKeys() throws {
         let workspaceId = UUID()
         let panelId = UUID()
-        let process = CmuxTopProcessArguments(
+        let process = WmuxTopProcessArguments(
             arguments: ["/usr/bin/codex"],
             environment: [
-                "CMUX_TAB_ID": workspaceId.uuidString,
-                "CMUX_PANEL_ID": panelId.uuidString,
+                "WMUX_TAB_ID": workspaceId.uuidString,
+                "WMUX_PANEL_ID": panelId.uuidString,
             ]
         )
 
@@ -607,7 +607,7 @@ struct AgentHibernationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 key: (
                     snapshot: detectedSnapshot,
@@ -676,7 +676,7 @@ struct AgentHibernationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 key: (
                     snapshot: detectedSnapshot,
@@ -746,7 +746,7 @@ struct AgentHibernationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 key: (
                     snapshot: detectedSnapshot,
@@ -783,7 +783,7 @@ struct AgentHibernationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 key: (
                     snapshot: detectedSnapshot,
@@ -834,10 +834,10 @@ struct AgentHibernationTests {
 
     @Test
     func testCustomRegisteredAgentSnapshotCanHibernateWhenResumeCommandExists() {
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "local-agent",
             name: "Local Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "local-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "local-agent"),
             sessionIdSource: .argvOption("--resume"),
             resumeCommand: "{{executable}} resume {{sessionId}}",
             cwd: .preserve
@@ -874,7 +874,7 @@ struct AgentHibernationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [
                 key: (
                     snapshot: snapshot,

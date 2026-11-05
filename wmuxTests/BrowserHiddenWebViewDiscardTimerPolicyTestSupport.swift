@@ -1,4 +1,4 @@
-import CmuxBrowser
+import WmuxBrowser
 import Foundation
 
 /// Enables the discard policy in timer mode, which arms a countdown when a

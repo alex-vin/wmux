@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
 
-extension CmuxTopProcessSnapshot {
+extension WmuxTopProcessSnapshot {
     /// Verifies one foreground PID without enumerating the process table.
     ///
     /// Identity comes from the kernel-reported executable path
@@ -10,12 +10,12 @@ extension CmuxTopProcessSnapshot {
     /// closed when the executable path cannot be resolved.
     nonisolated static func promptAgentDefinition(
         foregroundPID: Int
-    ) -> CmuxTaskManagerCodingAgentDefinition? {
+    ) -> WmuxTaskManagerCodingAgentDefinition? {
         guard let details = processArgumentsAndEnvironment(for: foregroundPID),
               let executablePath = executablePath(for: foregroundPID) else {
             return nil
         }
-        let definition = CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let definition = WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: (executablePath as NSString).lastPathComponent,
             processPath: executablePath,
             arguments: details.arguments,

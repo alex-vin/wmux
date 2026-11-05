@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// The in-app UI-test setup script runs socket commands in order and threads
 /// the id a `new_*` command returns into later commands through `{last}`.

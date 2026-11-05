@@ -1,18 +1,18 @@
-import CMUXMobileCore
-import CmuxAgentChat
-import CmuxIrohTransport
-@testable import CmuxMobileHost
-import CmuxMobileRPC
-import CmuxTerminalSharing
-import CmuxTerminalSizing
-import CmuxSettings
+import WMUXMobileCore
+import WmuxAgentChat
+import WmuxIrohTransport
+@testable import WmuxMobileHost
+import WmuxMobileRPC
+import WmuxTerminalSharing
+import WmuxTerminalSizing
+import WmuxSettings
 import Darwin
 import Foundation
 @preconcurrency import Network
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

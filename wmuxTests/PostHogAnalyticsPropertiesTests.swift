@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 
 @Suite(.serialized)
 struct PostHogAnalyticsPropertiesTests {
@@ -12,12 +12,12 @@ struct PostHogAnalyticsPropertiesTests {
         let suiteName = "cmux.feature.flags.pinned.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
-        let flagKey = CmuxFeatureFlags.appKitSidebarListFlag.key
+        let flagKey = WmuxFeatureFlags.appKitSidebarListFlag.key
         defaults.set(true, forKey: "cmux.flags.remote.\(flagKey)")
         defaults.set(false, forKey: "cmux.flags.override.\(flagKey)")
         let probe = FeatureFlagRemoteLoaderProbe()
 
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in nil },
             remoteFlagLoader: { await probe.load() },
@@ -35,11 +35,11 @@ struct PostHogAnalyticsPropertiesTests {
         let suiteName = "cmux.feature.flags.unpinned.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
-        let flagKey = CmuxFeatureFlags.appKitSidebarListFlag.key
+        let flagKey = WmuxFeatureFlags.appKitSidebarListFlag.key
         defaults.set(true, forKey: "cmux.flags.remote.\(flagKey)")
         defaults.set(false, forKey: "cmux.flags.override.\(flagKey)")
 
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in nil },
             pinsFlagsToLocalValues: false
@@ -55,7 +55,7 @@ struct PostHogAnalyticsPropertiesTests {
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
         let probe = FeatureFlagRemoteLoaderProbe()
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in nil },
             remoteFlagLoader: { await probe.load() }
@@ -75,11 +75,11 @@ struct PostHogAnalyticsPropertiesTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
         let identityKey = "cmux.flags.releaseControlDistinctID"
 
-        let firstRequest = try #require(CmuxFeatureFlags.postHogControlPlaneRequest(
+        let firstRequest = try #require(WmuxFeatureFlags.postHogControlPlaneRequest(
             telemetryEnabled: true,
             defaults: defaults
         ))
-        let secondRequest = try #require(CmuxFeatureFlags.postHogControlPlaneRequest(
+        let secondRequest = try #require(WmuxFeatureFlags.postHogControlPlaneRequest(
             telemetryEnabled: true,
             defaults: defaults
         ))
@@ -101,7 +101,7 @@ struct PostHogAnalyticsPropertiesTests {
         #expect(UUID(uuidString: String(distinctID.dropFirst(prefix.count))) != nil)
         #expect(secondPayload["distinctId"] as? String == distinctID)
         #expect(personProperties["$os"] as? String == "macOS")
-        #expect((personProperties["cmux_architecture"] as? String)?.isEmpty == false)
+        #expect((personProperties["wmux_architecture"] as? String)?.isEmpty == false)
         #expect(firstPayload["$anon_distinct_id"] == nil)
         #expect(firstPayload["person_properties"] == nil)
     }
@@ -113,7 +113,7 @@ struct PostHogAnalyticsPropertiesTests {
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        let request = try #require(CmuxFeatureFlags.postHogControlPlaneRequest(
+        let request = try #require(WmuxFeatureFlags.postHogControlPlaneRequest(
             telemetryEnabled: false,
             defaults: defaults
         ))
@@ -129,21 +129,21 @@ struct PostHogAnalyticsPropertiesTests {
 
     @Test("feature flag bool coercion accepts PostHog bool-like values")
     func featureFlagBoolCoercionAcceptsPostHogBoolLikeValues() {
-        #expect(CmuxFeatureFlags.coerceBoolFlagValue(true, default: false))
-        #expect(!CmuxFeatureFlags.coerceBoolFlagValue(false, default: true))
-        #expect(CmuxFeatureFlags.coerceBoolFlagValue(NSNumber(value: true), default: false))
-        #expect(!CmuxFeatureFlags.coerceBoolFlagValue(NSNumber(value: false), default: true))
-        #expect(CmuxFeatureFlags.coerceBoolFlagValue("TRUE", default: false))
-        #expect(!CmuxFeatureFlags.coerceBoolFlagValue(" false ", default: true))
-        #expect(CmuxFeatureFlags.coerceBoolFlagValue("not-a-bool", default: true))
-        #expect(!CmuxFeatureFlags.coerceBoolFlagValue("not-a-bool", default: false))
-        #expect(CmuxFeatureFlags.coerceBoolFlagValue(nil, default: true))
-        #expect(!CmuxFeatureFlags.coerceBoolFlagValue(nil, default: false))
+        #expect(WmuxFeatureFlags.coerceBoolFlagValue(true, default: false))
+        #expect(!WmuxFeatureFlags.coerceBoolFlagValue(false, default: true))
+        #expect(WmuxFeatureFlags.coerceBoolFlagValue(NSNumber(value: true), default: false))
+        #expect(!WmuxFeatureFlags.coerceBoolFlagValue(NSNumber(value: false), default: true))
+        #expect(WmuxFeatureFlags.coerceBoolFlagValue("TRUE", default: false))
+        #expect(!WmuxFeatureFlags.coerceBoolFlagValue(" false ", default: true))
+        #expect(WmuxFeatureFlags.coerceBoolFlagValue("not-a-bool", default: true))
+        #expect(!WmuxFeatureFlags.coerceBoolFlagValue("not-a-bool", default: false))
+        #expect(WmuxFeatureFlags.coerceBoolFlagValue(nil, default: true))
+        #expect(!WmuxFeatureFlags.coerceBoolFlagValue(nil, default: false))
     }
 
     @Test("feature flag control plane rejects partial errored responses")
     func featureFlagControlPlaneRejectsPartialErroredResponses() throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first {
+        let flag = try #require(WmuxFeatureFlags.allFlags.first {
             !$0.defaultWhenUnavailable
         })
         let payload = try JSONSerialization.data(withJSONObject: [
@@ -157,8 +157,8 @@ struct PostHogAnalyticsPropertiesTests {
             "errorsWhileComputingFlags": false,
         ])
 
-        #expect(CmuxFeatureFlags.postHogControlPlaneFlagValues(from: payload) == nil)
-        #expect(CmuxFeatureFlags.postHogControlPlaneFlagValues(
+        #expect(WmuxFeatureFlags.postHogControlPlaneFlagValues(from: payload) == nil)
+        #expect(WmuxFeatureFlags.postHogControlPlaneFlagValues(
             from: completePayload
         ) == [flag.key: true])
     }
@@ -168,7 +168,7 @@ struct PostHogAnalyticsPropertiesTests {
         let counter = FeatureFlagByteConsumptionCounter()
         let bytes = FeatureFlagCountingByteSequence(count: 100, counter: counter)
 
-        let data = try await CmuxFeatureFlags.boundedPostHogControlPlaneData(
+        let data = try await WmuxFeatureFlags.boundedPostHogControlPlaneData(
             from: bytes,
             maximumByteCount: 3
         )
@@ -180,7 +180,7 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("feature flag resolution prefers remote, then override, then default")
     func featureFlagResolutionPrecedence() throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first {
+        let flag = try #require(WmuxFeatureFlags.allFlags.first {
             $0.key == "sidebar-appkit-list-experiment"
         })
         let suiteName = "cmux.feature.flags.precedence.\(UUID().uuidString)"
@@ -190,7 +190,7 @@ struct PostHogAnalyticsPropertiesTests {
         }
 
         var remoteValues: [String: Any] = [:]
-        let flags = CmuxFeatureFlags(defaults: defaults) { key in
+        let flags = WmuxFeatureFlags(defaults: defaults) { key in
             remoteValues[key]
         }
 
@@ -221,7 +221,7 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("AppKit sidebar feature flag defaults on")
     func appKitSidebarFeatureFlagDefaultsOn() throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first {
+        let flag = try #require(WmuxFeatureFlags.allFlags.first {
             $0.key == "sidebar-appkit-list-experiment"
         })
         #expect(flag.defaultWhenUnavailable)
@@ -236,7 +236,7 @@ struct PostHogAnalyticsPropertiesTests {
             defaults.removePersistentDomain(forName: suiteName)
         }
 
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in nil }
         )
@@ -247,7 +247,7 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("remote-controlled flags reject new local override writes")
     func remoteControlledFlagsRejectNewLocalOverrideWrites() throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first {
+        let flag = try #require(WmuxFeatureFlags.allFlags.first {
             $0.key == "sidebar-appkit-list-experiment"
         })
         let suiteName = "cmux.feature.flags.remote.controlled.\(UUID().uuidString)"
@@ -257,7 +257,7 @@ struct PostHogAnalyticsPropertiesTests {
         }
 
         let remoteValues: [String: Any] = [flag.key: true]
-        let flags = CmuxFeatureFlags(defaults: defaults) { key in
+        let flags = WmuxFeatureFlags(defaults: defaults) { key in
             remoteValues[key]
         }
         flags.applyLoadedFlags()
@@ -277,13 +277,13 @@ struct PostHogAnalyticsPropertiesTests {
             defaults.removePersistentDomain(forName: suiteName)
         }
 
-        let flags = CmuxFeatureFlags(defaults: defaults) { _ in false }
+        let flags = WmuxFeatureFlags(defaults: defaults) { _ in false }
         #expect(flags.isSimulatorEnabled)
 
         flags.applyLoadedFlags()
         #expect(!flags.isSimulatorEnabled)
 
-        let offlineRelaunch = CmuxFeatureFlags(defaults: defaults) { _ in nil }
+        let offlineRelaunch = WmuxFeatureFlags(defaults: defaults) { _ in nil }
         #expect(!offlineRelaunch.isSimulatorEnabled)
 
         offlineRelaunch.applyLoadedFlags()
@@ -300,23 +300,23 @@ struct PostHogAnalyticsPropertiesTests {
         }
 
         var remoteValues: [String: Any] = [:]
-        let flags = CmuxFeatureFlags(defaults: defaults) { key in
+        let flags = WmuxFeatureFlags(defaults: defaults) { key in
             remoteValues[key]
         }
         #expect(flags.isMobileTerminalFilesChipEnabled)
 
-        remoteValues[CmuxFeatureFlags.mobileTerminalFilesChipFlag.key] = false
+        remoteValues[WmuxFeatureFlags.mobileTerminalFilesChipFlag.key] = false
         flags.applyLoadedFlags()
         #expect(!flags.isMobileTerminalFilesChipEnabled)
 
-        let offlineRelaunch = CmuxFeatureFlags(defaults: defaults) { _ in nil }
+        let offlineRelaunch = WmuxFeatureFlags(defaults: defaults) { _ in nil }
         #expect(!offlineRelaunch.isMobileTerminalFilesChipEnabled)
     }
 
     @MainActor
     @Test("successful control-plane omission clears a cached remote disable")
     func successfulControlPlaneOmissionClearsCachedDisable() async throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first {
+        let flag = try #require(WmuxFeatureFlags.allFlags.first {
             $0.defaultWhenUnavailable
         })
         let suiteName = "cmux.feature.flags.omitted-disable.\(UUID().uuidString)"
@@ -325,7 +325,7 @@ struct PostHogAnalyticsPropertiesTests {
         let remoteCacheKey = "cmux.flags.remote.\(flag.key)"
         defaults.set(false, forKey: remoteCacheKey)
         let probe = FeatureFlagRemoteLoaderProbe()
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { _ in nil },
             remoteFlagLoader: { await probe.load() }
@@ -347,7 +347,7 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("missing refresh clears a cached enable for a default-off flag")
     func missingRefreshClearsCachedEnableForDefaultOffFlag() throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first { !$0.defaultWhenUnavailable })
+        let flag = try #require(WmuxFeatureFlags.allFlags.first { !$0.defaultWhenUnavailable })
         let suiteName = "cmux.feature.flags.missing-enable.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer {
@@ -355,7 +355,7 @@ struct PostHogAnalyticsPropertiesTests {
         }
 
         var remoteValues: [String: Any] = [flag.key: true]
-        let flags = CmuxFeatureFlags(defaults: defaults) { key in
+        let flags = WmuxFeatureFlags(defaults: defaults) { key in
             remoteValues[key]
         }
         flags.applyLoadedFlags()
@@ -367,7 +367,7 @@ struct PostHogAnalyticsPropertiesTests {
         #expect(flags.remoteValue(for: flag) == nil)
         #expect(!flags.effectiveValue(for: flag))
 
-        let offlineRelaunch = CmuxFeatureFlags(defaults: defaults) { _ in nil }
+        let offlineRelaunch = WmuxFeatureFlags(defaults: defaults) { _ in nil }
         #expect(offlineRelaunch.remoteValue(for: flag) == nil)
         #expect(!offlineRelaunch.effectiveValue(for: flag))
     }
@@ -375,7 +375,7 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("workspace todo controls feature flag follows remote values")
     func workspaceTodoControlsFeatureFlagFollowsRemoteValues() throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first {
+        let flag = try #require(WmuxFeatureFlags.allFlags.first {
             $0.key == "workspace-todo-controls-enabled-release"
         })
         let suiteName = "cmux.workspace.todo.controls.flag.\(UUID().uuidString)"
@@ -385,7 +385,7 @@ struct PostHogAnalyticsPropertiesTests {
         }
 
         var remoteValues: [String: Any] = [:]
-        let flags = CmuxFeatureFlags(defaults: defaults) { key in
+        let flags = WmuxFeatureFlags(defaults: defaults) { key in
             remoteValues[key]
         }
 
@@ -403,7 +403,7 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("conversation sidebar rollout flag honors default, local override, and remote precedence")
     func conversationSidebarRolloutFlagPrecedence() async throws {
-        let flag = CmuxFeatureFlags.conversationSidebarFlag
+        let flag = WmuxFeatureFlags.conversationSidebarFlag
         #expect(flag.key == "conversation-sidebar-release")
         #expect(!flag.defaultWhenUnavailable)
 
@@ -413,7 +413,7 @@ struct PostHogAnalyticsPropertiesTests {
 
         var remoteValues: [String: Any] = [:]
         let probe = FeatureFlagRemoteLoaderProbe()
-        let flags = CmuxFeatureFlags(
+        let flags = WmuxFeatureFlags(
             defaults: defaults,
             remoteFlagValueProvider: { remoteValues[$0] },
             remoteFlagLoader: { await probe.load() }
@@ -455,24 +455,24 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("feature flag overrides persist through UserDefaults")
     func featureFlagOverridePersistenceRoundTrip() throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first { $0.defaultWhenUnavailable })
+        let flag = try #require(WmuxFeatureFlags.allFlags.first { $0.defaultWhenUnavailable })
         let suiteName = "cmux.feature.flags.persistence.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer {
             defaults.removePersistentDomain(forName: suiteName)
         }
 
-        let firstLoad = CmuxFeatureFlags(defaults: defaults) { _ in true }
+        let firstLoad = WmuxFeatureFlags(defaults: defaults) { _ in true }
         firstLoad.setOverride(false, for: flag)
         #expect(firstLoad.overrideValue(for: flag) == false)
         #expect(!firstLoad.effectiveValue(for: flag))
 
-        let secondLoad = CmuxFeatureFlags(defaults: defaults) { _ in true }
+        let secondLoad = WmuxFeatureFlags(defaults: defaults) { _ in true }
         #expect(secondLoad.overrideValue(for: flag) == false)
         #expect(!secondLoad.effectiveValue(for: flag))
 
         secondLoad.setOverride(nil, for: flag)
-        let thirdLoad = CmuxFeatureFlags(defaults: defaults) { _ in true }
+        let thirdLoad = WmuxFeatureFlags(defaults: defaults) { _ in true }
         #expect(thirdLoad.overrideValue(for: flag) == nil)
         #expect(thirdLoad.effectiveValue(for: flag))
     }
@@ -480,7 +480,7 @@ struct PostHogAnalyticsPropertiesTests {
     @MainActor
     @Test("remote payload superseding a local override posts a change notification")
     func remotePayloadSupersedingLocalOverridePostsChangeNotification() async throws {
-        let flag = try #require(CmuxFeatureFlags.allFlags.first {
+        let flag = try #require(WmuxFeatureFlags.allFlags.first {
             $0.key == "sidebar-appkit-list-experiment"
         })
         let suiteName = "cmux.feature.flags.notifications.\(UUID().uuidString)"
@@ -490,7 +490,7 @@ struct PostHogAnalyticsPropertiesTests {
         }
 
         var remoteValues: [String: Any] = [:]
-        let flags = CmuxFeatureFlags(defaults: defaults) { key in
+        let flags = WmuxFeatureFlags(defaults: defaults) { key in
             remoteValues[key]
         }
         flags.setOverride(false, for: flag)
@@ -596,9 +596,9 @@ struct PostHogAnalyticsPropertiesTests {
 
     @Test
     func flushPolicyIncludesDailyAndHourlyActiveEvents() {
-        #expect(PostHogAnalytics.shouldFlushAfterCapture(event: "cmux_daily_active"))
-        #expect(PostHogAnalytics.shouldFlushAfterCapture(event: "cmux_hourly_active"))
-        #expect(!PostHogAnalytics.shouldFlushAfterCapture(event: "cmux_other_event"))
+        #expect(PostHogAnalytics.shouldFlushAfterCapture(event: "wmux_daily_active"))
+        #expect(PostHogAnalytics.shouldFlushAfterCapture(event: "wmux_hourly_active"))
+        #expect(!PostHogAnalytics.shouldFlushAfterCapture(event: "wmux_other_event"))
     }
 
     @Test
@@ -642,7 +642,7 @@ struct PostHogAnalyticsPropertiesTests {
         #expect(eventsCaptured.wait(timeout: .now() + .seconds(1)) == .success)
         #expect(flushCalled.wait(timeout: .now() + .seconds(1)) == .success)
         let events = capturedQueue.sync { capturedEvents }
-        #expect(events.map(\.event) == ["cmux_daily_active", "cmux_hourly_active"])
+        #expect(events.map(\.event) == ["wmux_daily_active", "wmux_hourly_active"])
         let dailyEvent = try #require(events.first)
         let hourlyEvent = try #require(events.dropFirst().first)
         #expect(dailyEvent.properties["day_utc"] as? String == "2026-02-21")
@@ -985,7 +985,7 @@ struct PostHogAnalyticsPropertiesTests {
                 capturedQueue.sync { capturedEvents.append(event) }
             },
             flushPostHog: {},
-            environment: ["CMUX_TEST_PROCESS": "1", "CMUX_POSTHOG_ENABLE": "1"],
+            environment: ["WMUX_TEST_PROCESS": "1", "WMUX_POSTHOG_ENABLE": "1"],
             telemetryEnabled: { true }
         )
 

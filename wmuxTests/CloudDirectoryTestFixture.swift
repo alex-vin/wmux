@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -15,7 +15,7 @@ final class CloudDirectoryTestFixture {
     let workspace: Workspace
     let panels: [UUID]
     let catalog: SurfaceCatalog
-    let provider: CmuxTuiSurfaceProvider
+    let provider: WmuxTuiSurfaceProvider
 
     init() throws {
         let workspace = Workspace(workingDirectory: "/Users/alice/local-checkout")
@@ -30,7 +30,7 @@ final class CloudDirectoryTestFixture {
                 workspaces: { [workspace] }
             )
         ))
-        provider = CmuxTuiSurfaceProvider(
+        provider = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: machine.rawValue, provider: "freestyle", status: "running", image: "cmux-devbox", createdAt: 0, base: nil),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: catalog
         )
@@ -58,7 +58,7 @@ final class CloudDirectoryTestFixture {
         let terminals = paths.enumerated().map { index, path -> [String: Any] in
             ["id": "term_\(index)", "title": "bash", "cwd": path as Any? ?? NSNull(), "lifecycle": index < lifecycles.count ? lifecycles[index] : "running"]
         }
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": generation, "revision": String(revision)],
             "workspaces": [["id": "ws_main", "name": "Remote name", "focused": true]],
             "screens": [["id": "screen", "workspace_id": "ws_main"]],
@@ -86,7 +86,7 @@ final class CloudDirectoryTestFixture {
             "kind": "upsert", "resource": "terminal", "id": "term_\(terminal)",
             "value": ["id": "term_\(terminal)", "title": "bash", "cwd": path as Any? ?? NSNull(), "lifecycle": "running"]
         ]]])
-        let application = try #require(CmuxTuiSnapshotParser.applyingWithImpact(deltaPayload: delta, cursor: nextCursor, to: current))
+        let application = try #require(WmuxTuiSnapshotParser.applyingWithImpact(deltaPayload: delta, cursor: nextCursor, to: current))
         #expect(application.state.workspaces == current.workspaces)
         #expect(application.state.tabs == current.tabs)
         #expect(provider.installSnapshotIfNewer(application.state))

@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -100,11 +100,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         // The environment of an attach launched by the persistent wrapper
         // while it still has retries left.
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
-        environment["CMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] = "1"
-        environment["CMUX_SURFACE_ID"] = surfaceId
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] = "1"
+        environment["WMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] = "1"
+        environment["WMUX_SURFACE_ID"] = surfaceId
 
         let process = runProcess(
             executablePath: cliPath,

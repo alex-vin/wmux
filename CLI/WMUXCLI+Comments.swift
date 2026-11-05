@@ -2,11 +2,11 @@ import Foundation
 
 /// `cmux comments` — read-only access to diff-viewer review comments.
 ///
-/// Strings resolve through `CMUXDiffViewerLocalization`, which reads the enclosing
+/// Strings resolve through `WMUXDiffViewerLocalization`, which reads the enclosing
 /// app bundle: the CLI executable carries no string catalog of its own, so
 /// `String(localized:)` here would always fall back to its default value.
 extension WMUXCLI {
-    static let commentsUsage = CMUXDiffViewerLocalization.string(
+    static let commentsUsage = WMUXDiffViewerLocalization.string(
         "cli.comments.usage",
         defaultValue: """
         Usage: wmux comments <subcommand> [options]
@@ -934,7 +934,7 @@ extension WMUXCLI {
             return
         }
         guard let sub = commandArgs.first?.lowercased() else {
-            throw CLIError(message: CMUXDiffViewerLocalization.string(
+            throw CLIError(message: WMUXDiffViewerLocalization.string(
                 "cli.comments.error.subcommandRequired",
                 defaultValue: "comments requires a subcommand. Try: list"
             ))
@@ -947,7 +947,7 @@ extension WMUXCLI {
             // would resolve a repository named "--all". A path that starts with
             // a dash can still be passed as `./-name`.
             if let repoOption, repoOption.hasPrefix("--") {
-                throw CLIError(message: CMUXDiffViewerLocalization.string(
+                throw CLIError(message: WMUXDiffViewerLocalization.string(
                     "cli.comments.error.repoRequiresPath",
                     defaultValue: "--repo requires a path. For a path starting with a dash, pass it as ./-name"
                 ))
@@ -956,7 +956,7 @@ extension WMUXCLI {
             // nor a stray positional may read as a supported request.
             if let unexpected = remainder.first(where: { $0 != "--all" }) {
                 throw CLIError(message: String.localizedStringWithFormat(
-                    CMUXDiffViewerLocalization.string(
+                    WMUXDiffViewerLocalization.string(
                         "cli.comments.error.unexpectedArgument",
                         defaultValue: "Unexpected argument '%@' for wmux comments list. Supported: --repo <path>, --all, --json"
                     ),
@@ -973,7 +973,7 @@ extension WMUXCLI {
             printCommentsListPayload(payload, jsonOutput: jsonOutput, idFormat: idFormat)
         default:
             throw CLIError(message: String.localizedStringWithFormat(
-                CMUXDiffViewerLocalization.string(
+                WMUXDiffViewerLocalization.string(
                     "cli.comments.error.unknownSubcommand",
                     defaultValue: "Unknown comments subcommand '%@'. Try: list"
                 ),
@@ -993,7 +993,7 @@ extension WMUXCLI {
         let root = result.stdout.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !result.timedOut, result.status == 0, !root.isEmpty else {
             throw CLIError(message: String.localizedStringWithFormat(
-                CMUXDiffViewerLocalization.string(
+                WMUXDiffViewerLocalization.string(
                     "cli.comments.error.notARepository",
                     defaultValue: "wmux comments requires a git repository: %@"
                 ),
@@ -1013,7 +1013,7 @@ extension WMUXCLI {
     private func commentsListHeaderText(count: Int, repoRoot: String) -> String {
         if count == 1 {
             return String.localizedStringWithFormat(
-                CMUXDiffViewerLocalization.string(
+                WMUXDiffViewerLocalization.string(
                     "cli.comments.list.header.one",
                     defaultValue: "1 review comment (repo: %@)"
                 ),
@@ -1021,7 +1021,7 @@ extension WMUXCLI {
             )
         }
         return String.localizedStringWithFormat(
-            CMUXDiffViewerLocalization.string(
+            WMUXDiffViewerLocalization.string(
                 "cli.comments.list.header.other",
                 defaultValue: "%1$lld review comments (repo: %2$@)"
             ),
@@ -1045,7 +1045,7 @@ extension WMUXCLI {
         let repoRoot = payload["repo_root"] as? String ?? ""
         guard !comments.isEmpty else {
             print(String.localizedStringWithFormat(
-                CMUXDiffViewerLocalization.string(
+                WMUXDiffViewerLocalization.string(
                     "cli.comments.list.empty",
                     defaultValue: "No review comments. (repo: %@)"
                 ),
@@ -1060,12 +1060,12 @@ extension WMUXCLI {
             let endLine = intFromAny(comment["endLine"]) ?? startLine
             let range = endLine > startLine ? "\(startLine)-\(endLine)" : "\(startLine)"
             let state = comment["consumedAt"] == nil
-                ? CMUXDiffViewerLocalization.string("cli.comments.list.statePending", defaultValue: "pending")
-                : CMUXDiffViewerLocalization.string("cli.comments.list.stateConsumed", defaultValue: "consumed")
+                ? WMUXDiffViewerLocalization.string("cli.comments.list.statePending", defaultValue: "pending")
+                : WMUXDiffViewerLocalization.string("cli.comments.list.stateConsumed", defaultValue: "consumed")
             print("- \(filePath):\(range) [\(state)]")
             if let lineText = comment["lineText"] as? String, !lineText.isEmpty {
                 print(String.localizedStringWithFormat(
-                    CMUXDiffViewerLocalization.string(
+                    WMUXDiffViewerLocalization.string(
                         "cli.comments.list.anchor",
                         defaultValue: "    anchor: %@"
                     ),

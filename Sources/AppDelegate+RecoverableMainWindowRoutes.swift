@@ -1,6 +1,6 @@
 import AppKit
-import CmuxTerminalCore
-import CmuxTerminal
+import WmuxTerminalCore
+import WmuxTerminal
 
 // The retire sweep is the MainWindowRouteRetiring witness: terminal topology
 // changes prompt a coalesced lifecycle audit through the seam instead of the

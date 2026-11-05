@@ -1,8 +1,8 @@
 import AppKit
 import Bonsplit
-import CmuxAppKitSupportUI
-import CmuxFoundation
-import CmuxNotifications
+import WmuxAppKitSupportUI
+import WmuxFoundation
+import WmuxNotifications
 import SwiftUI
 
 /// Main-actor owner of the default sidebar table lifecycle and its AppKit interactions.
@@ -1424,7 +1424,7 @@ final class SidebarWorkspaceTableController: NSObject, NSTableViewDataSource, NS
         tableView.cacheDisplay(in: rowRect, to: representation)
         let rowImage = NSImage(size: rowRect.size)
         rowImage.addRepresentation(representation)
-        let badgeColor = (AppDelegate.shared?.accentColor ?? CmuxAccentColor()).nsColor(for: tableView.effectiveAppearance)
+        let badgeColor = (AppDelegate.shared?.accentColor ?? WmuxAccentColor()).nsColor(for: tableView.effectiveAppearance)
 
         return NSImage(size: size, flipped: false) { bounds in
             rowImage.draw(in: bounds)

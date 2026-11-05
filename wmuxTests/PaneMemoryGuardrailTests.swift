@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -152,8 +152,8 @@ struct PaneMemoryGuardrailTests {
     @Test
     func processTreeMemorySummationByTTY() {
         let tty: Int64 = 0x1600_0003
-        func proc(_ pid: Int, ppid: Int, mem: Int64, pgid: Int, tpgid: Int) -> CmuxTopProcessInfo {
-            CmuxTopProcessInfo(
+        func proc(_ pid: Int, ppid: Int, mem: Int64, pgid: Int, tpgid: Int) -> WmuxTopProcessInfo {
+            WmuxTopProcessInfo(
                 pid: pid, parentPID: ppid, name: "pytest", path: nil, ttyDevice: tty,
                 cmuxWorkspaceID: nil, cmuxSurfaceID: nil, cmuxAttributionReason: nil,
                 processGroupID: pgid, terminalProcessGroupID: tpgid, cpuPercent: 0,
@@ -166,7 +166,7 @@ struct PaneMemoryGuardrailTests {
         // plus an unrelated process on a different tty that must be excluded.
         let shell = proc(100, ppid: 1, mem: 5_000_000, pgid: 100, tpgid: 200)
         let leak = proc(200, ppid: 100, mem: 9_000_000_000, pgid: 200, tpgid: 200)
-        let other = CmuxTopProcessInfo(
+        let other = WmuxTopProcessInfo(
             pid: 300, parentPID: 1, name: "other", path: nil, ttyDevice: 0x1600_0099,
             cmuxWorkspaceID: nil, cmuxSurfaceID: nil, cmuxAttributionReason: nil,
             processGroupID: 300, terminalProcessGroupID: 300, cpuPercent: 0,
@@ -174,7 +174,7 @@ struct PaneMemoryGuardrailTests {
             residentBytes: 1_000_000_000, residentMemorySource: .residentSize,
             virtualBytes: 0, threadCount: 1
         )
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [shell, leak, other],
             sampledAt: Date(),
             includesProcessDetails: false
@@ -205,8 +205,8 @@ struct PaneMemoryGuardrailTests {
             pgid: Int,
             tty: Int64?,
             surface: UUID?
-        ) -> CmuxTopProcessInfo {
-            CmuxTopProcessInfo(
+        ) -> WmuxTopProcessInfo {
+            WmuxTopProcessInfo(
                 pid: pid, parentPID: ppid, name: name, path: nil, ttyDevice: tty,
                 cmuxWorkspaceID: nil, cmuxSurfaceID: surface, cmuxAttributionReason: nil,
                 processGroupID: pgid, terminalProcessGroupID: pgid, cpuPercent: 0,
@@ -218,7 +218,7 @@ struct PaneMemoryGuardrailTests {
         let shell = proc(100, ppid: 1, name: "zsh", mem: 10_000_000, pgid: 100, tty: 0x1600_0003, surface: nil)
         let leak = proc(200, ppid: 100, name: "python", mem: 9_000_000_000, pgid: 200, tty: nil, surface: nil)
         let other = proc(300, ppid: 1, name: "other", mem: 1_000_000_000, pgid: 300, tty: nil, surface: nil)
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [shell, leak, other],
             sampledAt: Date(),
             includesProcessDetails: false,
@@ -255,8 +255,8 @@ struct PaneMemoryGuardrailTests {
             pgid: Int,
             tty: Int64?,
             surface: UUID?
-        ) -> CmuxTopProcessInfo {
-            CmuxTopProcessInfo(
+        ) -> WmuxTopProcessInfo {
+            WmuxTopProcessInfo(
                 pid: pid, parentPID: ppid, name: name, path: nil, ttyDevice: tty,
                 cmuxWorkspaceID: surface == nil ? nil : ws, cmuxSurfaceID: surface, cmuxAttributionReason: nil,
                 processGroupID: pgid, terminalProcessGroupID: pgid, cpuPercent: 0,
@@ -268,7 +268,7 @@ struct PaneMemoryGuardrailTests {
         let shell = proc(100, ppid: 1, name: "zsh", mem: 10_000_000, pgid: 100, tty: 0x1600_0003, surface: nil)
         let daemon = proc(200, ppid: 1, name: "python", mem: 9_000_000_000, pgid: 200, tty: nil, surface: pane)
         let other = proc(300, ppid: 1, name: "other", mem: 1_000_000_000, pgid: 300, tty: nil, surface: nil)
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [shell, daemon, other],
             sampledAt: Date(),
             includesProcessDetails: false,
@@ -352,7 +352,7 @@ struct PaneMemoryGuardrailTests {
     @Test
     func memoryPressureProcessGroupsAreEmptyAfterPressureClears() {
         let tty: Int64 = 0x1600_0003
-        let shell = CmuxTopProcessInfo(
+        let shell = WmuxTopProcessInfo(
             pid: 100, parentPID: 1, name: "zsh", path: nil, ttyDevice: tty,
             cmuxWorkspaceID: nil, cmuxSurfaceID: nil, cmuxAttributionReason: nil,
             processGroupID: 100, terminalProcessGroupID: 100, cpuPercent: 0,
@@ -360,7 +360,7 @@ struct PaneMemoryGuardrailTests {
             residentBytes: 20_000_000, residentMemorySource: .residentSize,
             virtualBytes: 0, threadCount: 1
         )
-        let snapshot = CmuxTopProcessSnapshot(
+        let snapshot = WmuxTopProcessSnapshot(
             processes: [shell],
             sampledAt: Date(),
             includesProcessDetails: false

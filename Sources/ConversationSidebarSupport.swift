@@ -1,4 +1,4 @@
-import CmuxMobileHost
+import WmuxMobileHost
 import Foundation
 import Observation
 import SwiftUI

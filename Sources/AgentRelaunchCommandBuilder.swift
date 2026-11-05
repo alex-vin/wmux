@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 /// Builds shell commands for agents whose upstream CLI can only start a fresh conversation.

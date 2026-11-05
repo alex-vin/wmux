@@ -26,7 +26,7 @@ import XCTest
 ///
 /// Identifiers asserted here all exist in the live Settings UI
 /// (`Sources/cmuxApp.swift`, the `Settings…` window) and in the
-/// migrated `CmuxSettingsUI.TerminalSection`:
+/// migrated `WmuxSettingsUI.TerminalSection`:
 ///   SettingsTerminalScrollBarToggle,
 ///   SettingsTerminalCopyOnSelectToggle,
 ///   SettingsTerminalAgentAutoResumeToggle,

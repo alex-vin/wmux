@@ -1,5 +1,5 @@
-import CmuxControlSocket
-import CmuxSettings
+import WmuxControlSocket
+import WmuxSettings
 import CryptoKit
 import Darwin
 import Foundation
@@ -768,7 +768,7 @@ extension TerminalController {
               }) else {
             return nil
         }
-        let prefix = Data("cmux-coderouter-team-v1\0".utf8)
+        let prefix = Data("wmux-coderouter-team-v1\0".utf8)
         let digest = SHA256.hash(data: prefix + Data(teamID.utf8))
         return digest.map { String(format: "%02x", $0) }.joined()
     }

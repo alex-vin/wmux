@@ -1,6 +1,6 @@
 import Foundation
 
-struct CmuxRuntimeDebugCaptureConfiguration {
+struct WmuxRuntimeDebugCaptureConfiguration {
     let baseURL: URL
     let token: String
     let sessionID: String

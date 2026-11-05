@@ -264,7 +264,7 @@ struct CLIAgentMessageCommandTests {
         let drain = try runCLI(
             arguments: ["hooks", "claude", "inbox-drain"],
             standardInput: #"{"session_id":"s-1"}"#,
-            extraEnvironment: ["CMUX_CLAUDE_HEADLESS": "1"],
+            extraEnvironment: ["WMUX_CLAUDE_HEADLESS": "1"],
             responses: ["agent.message.claim": ["messages": [], "text": "should not appear"]]
         )
         #expect(drain.result.status == 0)
@@ -273,7 +273,7 @@ struct CLIAgentMessageCommandTests {
         let wait = try runCLI(
             arguments: ["hooks", "claude", "inbox-wait"],
             standardInput: #"{"session_id":"s-1","hook_event_name":"SessionStart"}"#,
-            extraEnvironment: ["CMUX_CLAUDE_HEADLESS": "1"]
+            extraEnvironment: ["WMUX_CLAUDE_HEADLESS": "1"]
         )
         #expect(wait.result.status == 0)
         #expect(drain.requests.isEmpty && wait.requests.isEmpty)
@@ -359,16 +359,16 @@ struct CLIAgentMessageCommandTests {
         }
 
         var environment = [
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_SOCKET_PASSWORD": "",
-            "CMUX_WORKSPACE_ID": Self.callerWorkspaceID,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_SOCKET_PASSWORD": "",
+            "WMUX_WORKSPACE_ID": Self.callerWorkspaceID,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
             "CFFIXED_USER_HOME": home.path,
             "HOME": home.path,
             "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",
         ]
         if let surfaceID {
-            environment["CMUX_SURFACE_ID"] = surfaceID
+            environment["WMUX_SURFACE_ID"] = surfaceID
         }
         environment.merge(extraEnvironment) { _, new in new }
         let result = CLIHookProcessRunner.run(

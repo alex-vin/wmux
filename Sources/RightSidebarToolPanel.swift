@@ -1,7 +1,7 @@
 import AppKit
 import Combine
-import CmuxAppKitSupportUI
-import CmuxCloudMachines
+import WmuxAppKitSupportUI
+import WmuxCloudMachines
 import SwiftUI
 
 @MainActor

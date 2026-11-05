@@ -1,11 +1,11 @@
 import AppKit
-import CmuxCloudMachines
-import CmuxSettings
+import WmuxCloudMachines
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -214,7 +214,7 @@ private extension SidebarNewLocalWorkspaceTests {
         let defaults: UserDefaults
         let suiteName: String
         let window = NSWindow(contentRect: .zero, styleMask: [], backing: .buffered, defer: false)
-        let store: CmuxConfigStore
+        let store: WmuxConfigStore
         let windowID: UUID
 
         init() throws {
@@ -225,7 +225,7 @@ private extension SidebarNewLocalWorkspaceTests {
             let defaultsSuite = "SidebarNewLocalWorkspaceTests.\(UUID().uuidString)"
             suiteName = defaultsSuite
             defaults = try #require(UserDefaults(suiteName: defaultsSuite))
-            store = CmuxConfigStore(globalConfigPath: config.path, localConfigPath: nil, startFileWatchers: false)
+            store = WmuxConfigStore(globalConfigPath: config.path, localConfigPath: nil, startFileWatchers: false)
             store.loadAll()
             let localDirectory = root.path
             manager = TabManager(

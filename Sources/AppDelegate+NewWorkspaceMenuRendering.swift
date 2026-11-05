@@ -6,7 +6,7 @@ extension AppDelegate {
     func renderNewWorkspaceContextMenu(
         model: NewWorkspaceMenuModel,
         context: MainWindowContext,
-        cmuxConfigStore: CmuxConfigStore
+        cmuxConfigStore: WmuxConfigStore
     ) -> NSMenu? {
         let menu = NSMenu()
         var renderedSectionCount = 0
@@ -19,7 +19,7 @@ extension AppDelegate {
         }
 
         func actionItem(
-            menuAction: CmuxResolvedConfigMenuAction,
+            menuAction: WmuxResolvedConfigMenuAction,
             isDefault: Bool
         ) -> NSMenuItem {
             let item = NSMenuItem(
@@ -44,7 +44,7 @@ extension AppDelegate {
             return item
         }
 
-        func alternateDeleteItem(action: CmuxResolvedConfigAction) -> NSMenuItem {
+        func alternateDeleteItem(action: WmuxResolvedConfigAction) -> NSMenuItem {
             let deleteFormat = String(
                 localized: "menu.newWorkspace.deleteLayoutAlternate",
                 defaultValue: "Delete “%@”"
@@ -244,7 +244,7 @@ extension AppDelegate {
     /// `shortcut` declared on a config action. Nil when unbound or when the
     /// binding is a chord, which an `NSMenuItem` key equivalent cannot show.
     nonisolated static func newWorkspaceMenuShortcutHint(
-        for action: CmuxResolvedConfigAction
+        for action: WmuxResolvedConfigAction
     ) -> StoredShortcut? {
         let shortcut: StoredShortcut
         if case .builtIn(let builtIn) = action.action, let shortcutAction = builtIn.shortcutAction {
@@ -261,7 +261,7 @@ extension AppDelegate {
     /// AppKit draws a key equivalent as the grey shortcut column of the menu
     /// row. The menu is rebuilt on every open, so this always reflects the
     /// current binding.
-    func applyNewWorkspaceMenuShortcutHint(to item: NSMenuItem, action: CmuxResolvedConfigAction) {
+    func applyNewWorkspaceMenuShortcutHint(to item: NSMenuItem, action: WmuxResolvedConfigAction) {
         guard let shortcut = Self.newWorkspaceMenuShortcutHint(for: action),
               let keyEquivalent = shortcut.menuItemKeyEquivalent else {
             item.keyEquivalent = ""

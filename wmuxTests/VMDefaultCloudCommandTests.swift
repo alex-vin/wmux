@@ -62,9 +62,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -134,7 +134,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
                         "kind": "desktop",
                     ]
                 )
-            case "vm.cmux_remote_info":
+            case "vm.wmux_remote_info":
                 return self.v2Response(
                     id: id,
                     ok: true,
@@ -220,9 +220,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         environment["HOME"] = homeURL.path
         environment["CFFIXED_USER_HOME"] = homeURL.path
         environment["AppleLanguages"] = "(en)"
@@ -248,7 +248,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertEqual(devices[vmID]?["deviceFingerprint"] as? String, "carrier", "vm new records the trusted-carrier marker")
         let requests = state.commands.compactMap { self.jsonObject($0) }
         let methods = requests.compactMap { $0["method"] as? String }
-        XCTAssertFalse(methods.contains("vm.status"), "cmux_remote_info must not issue a redundant status read")
+        XCTAssertFalse(methods.contains("vm.status"), "wmux_remote_info must not issue a redundant status read")
         XCTAssertEqual(methods.filter { $0 == "workspace.create" }.count, 1)
         XCTAssertEqual(methods.filter { $0 == "surface.project" }.count, 1)
         XCTAssertFalse(methods.contains("surface.new_terminal"), "Opening a new machine must reuse its seeded terminal")
@@ -270,7 +270,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertFalse(reopened.timedOut, reopened.stdout + reopened.stderr)
         XCTAssertEqual(reopened.status, 0, reopened.stdout + reopened.stderr)
         let secondRequests = state.commands.dropFirst(firstRequestCount).compactMap { self.jsonObject($0) }
-        let infos = secondRequests.filter { $0["method"] as? String == "vm.cmux_remote_info" }
+        let infos = secondRequests.filter { $0["method"] as? String == "vm.wmux_remote_info" }
         XCTAssertEqual(infos.count, 1)
         let infoParams = infos.first?["params"] as? [String: Any]
         XCTAssertEqual(infoParams?["device_fingerprint"] as? String, "carrier")
@@ -328,9 +328,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         environment["HOME"] = homeURL.path
         environment["CFFIXED_USER_HOME"] = homeURL.path
         // The ready line is localized; the assertion reads its English form.
@@ -401,9 +401,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         environment["HOME"] = homeURL.path
         environment["CFFIXED_USER_HOME"] = homeURL.path
 
@@ -490,9 +490,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         environment["HOME"] = homeURL.path
         environment["CFFIXED_USER_HOME"] = homeURL.path
 
@@ -546,9 +546,9 @@ extension CLINotifyProcessIntegrationRegressionTests {
         try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
         try """
         #!/bin/sh
-        : > "$CMUX_FAKE_SSH_ARGS"
+        : > "$WMUX_FAKE_SSH_ARGS"
         for arg in "$@"; do
-          printf '%s\\n' "$arg" >> "$CMUX_FAKE_SSH_ARGS"
+          printf '%s\\n' "$arg" >> "$WMUX_FAKE_SSH_ARGS"
         done
         exit 0
         """.write(toFile: fakeExpectPath, atomically: true, encoding: .utf8)
@@ -599,13 +599,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = workspaceID
-        environment["CMUX_SURFACE_ID"] = surfaceID
-        environment["CMUX_CLOUD_TMUX_SESSION"] = "cmux-cloud"
-        environment["CMUX_FAKE_SSH_ARGS"] = capturedArgsPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = workspaceID
+        environment["WMUX_SURFACE_ID"] = surfaceID
+        environment["WMUX_CLOUD_TMUX_SESSION"] = "cmux-cloud"
+        environment["WMUX_FAKE_SSH_ARGS"] = capturedArgsPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         environment["PATH"] = "\(tempDirectory.path):/usr/bin:/bin:/usr/sbin:/sbin"
 
         let result = runProcess(
@@ -621,8 +621,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
 
         let capturedArgs = try String(contentsOfFile: capturedArgsPath, encoding: .utf8)
         let decodedRemoteBootstrap = try XCTUnwrap(decodedFirstEmbeddedStartupScript(capturedArgs), capturedArgs)
-        XCTAssertTrue(decodedRemoteBootstrap.contains("export CMUX_WORKSPACE_ID='\(workspaceID)'"), decodedRemoteBootstrap)
-        XCTAssertTrue(decodedRemoteBootstrap.contains("export CMUX_SURFACE_ID='\(surfaceID)'"), decodedRemoteBootstrap)
+        XCTAssertTrue(decodedRemoteBootstrap.contains("export WMUX_WORKSPACE_ID='\(workspaceID)'"), decodedRemoteBootstrap)
+        XCTAssertTrue(decodedRemoteBootstrap.contains("export WMUX_SURFACE_ID='\(surfaceID)'"), decodedRemoteBootstrap)
         XCTAssertFalse(
             decodedRemoteBootstrap.contains("apt-get"),
             "interactive SSH attach must not install packages before the prompt: \(decodedRemoteBootstrap)"
@@ -636,15 +636,15 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "interactive SSH attach must leave cmux CLI provisioning to vm.exec: \(decodedRemoteBootstrap)"
         )
         XCTAssertTrue(
-            decodedRemoteBootstrap.contains("cmux-cloud-$cmux_cloud_tty_scope"),
+            decodedRemoteBootstrap.contains("cmux-cloud-$wmux_cloud_tty_scope"),
             decodedRemoteBootstrap
         )
         XCTAssertTrue(
-            decodedRemoteBootstrap.contains("unset CMUX_CLOUD_TMUX_SESSION"),
+            decodedRemoteBootstrap.contains("unset WMUX_CLOUD_TMUX_SESSION"),
             decodedRemoteBootstrap
         )
-        XCTAssertTrue(decodedRemoteBootstrap.contains("if [ \"$cmux_cloud_tty_scope\" = default ]; then"), decodedRemoteBootstrap)
-        XCTAssertTrue(decodedRemoteBootstrap.contains("cmux_tmux_status=$?"), decodedRemoteBootstrap)
+        XCTAssertTrue(decodedRemoteBootstrap.contains("if [ \"$wmux_cloud_tty_scope\" = default ]; then"), decodedRemoteBootstrap)
+        XCTAssertTrue(decodedRemoteBootstrap.contains("wmux_tmux_status=$?"), decodedRemoteBootstrap)
         XCTAssertTrue(decodedRemoteBootstrap.contains("exec zsh -l"), decodedRemoteBootstrap)
     }
 
@@ -716,12 +716,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_CLOUD_TMUX_SESSION"] = "cmux-cloud"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_CLOUD_TMUX_SESSION"] = "cmux-cloud"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         environment["PATH"] = "\(tempDirectory.path):/usr/bin:/bin:/usr/sbin:/sbin"
 
         let result = runProcess(
@@ -759,11 +759,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         printf "lease@vm-ssh.freestyle.sh's password: " >&2
         IFS= read -r _cmux_password
         [ "$_cmux_password" = "lease-token" ] || exit 64
-        exec 3<> "$CMUX_FAKE_SSH_RELEASE"
-        : > "$CMUX_FAKE_SSH_READY"
+        exec 3<> "$WMUX_FAKE_SSH_RELEASE"
+        : > "$WMUX_FAKE_SSH_READY"
         IFS= read -r _cmux_release <&3
         exec 3>&-
-        printf 'CMUX_DELAYED_RELAY_OK\\n'
+        printf 'WMUX_DELAYED_RELAY_OK\\n'
         exit 0
         """.write(toFile: fakeSSHPath, atomically: true, encoding: .utf8)
         chmod(fakeSSHPath, 0o755)
@@ -812,14 +812,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_CLOUD_TMUX_SESSION"] = "cmux-cloud"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
-        environment["CMUX_FAKE_SSH_READY"] = readyPath
-        environment["CMUX_FAKE_SSH_RELEASE"] = releasePath
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_CLOUD_TMUX_SESSION"] = "cmux-cloud"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_FAKE_SSH_READY"] = readyPath
+        environment["WMUX_FAKE_SSH_RELEASE"] = releasePath
         environment["PATH"] = "\(tempDirectory.path):/usr/bin:/bin:/usr/sbin:/sbin"
 
         let processFinished = expectation(description: "delayed successful SSH attach completed")
@@ -856,7 +856,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         XCTAssertFalse(result.timedOut, result.stdout + result.stderr)
         XCTAssertEqual(result.status, 0, result.stdout + result.stderr)
         XCTAssertTrue(
-            (result.stdout + result.stderr).contains("CMUX_DELAYED_RELAY_OK"),
+            (result.stdout + result.stderr).contains("WMUX_DELAYED_RELAY_OK"),
             result.stdout + result.stderr
         )
         XCTAssertFalse(result.stderr.contains("credential prompt timed out"), result.stderr)
@@ -902,11 +902,11 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -972,13 +972,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
-        environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"] = "1"
-        environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"] = "1"
+        environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -1041,15 +1041,15 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLOUD_ATTACH_RETRY_LIMIT"] = "1"
-        environment["CMUX_CLOUD_ATTACH_RETRY_DELAY_SECONDS"] = "0"
-        environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"] = "120"
-        environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"] = "2"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLOUD_ATTACH_RETRY_LIMIT"] = "1"
+        environment["WMUX_CLOUD_ATTACH_RETRY_DELAY_SECONDS"] = "0"
+        environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"] = "120"
+        environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"] = "2"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -1112,13 +1112,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
-        environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"] = "86400"
-        environment["CMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"] = "0.1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_LIMIT"] = "86400"
+        environment["WMUX_DEFAULT_FREESTYLE_ATTACH_RETRY_DELAY_SECONDS"] = "0.1"
 
         let child = try StreamingChildProcess(
             executablePath: cliPath,
@@ -1169,10 +1169,10 @@ extension CLINotifyProcessIntegrationRegressionTests {
         try """
         #!/bin/sh
         [ "$#" -ge 2 ] && [ "$2" = /usr/bin/ssh ] || exit 64
-        cmux_fixture_script="$1"
+        wmux_fixture_script="$1"
         shift 2
-        cmux_fixture_ssh="$(dirname "$0")/ssh"
-        exec /usr/bin/expect "$cmux_fixture_script" "$cmux_fixture_ssh" "$@"
+        wmux_fixture_ssh="$(dirname "$0")/ssh"
+        exec /usr/bin/expect "$wmux_fixture_script" "$wmux_fixture_ssh" "$@"
         """.write(toFile: expectPath, atomically: true, encoding: .utf8)
         chmod(expectPath, 0o755)
     }

@@ -52,12 +52,12 @@ import Testing
             executablePath: cliPath,
             arguments: ["__tmux-compat", "split-window", "-P"],
             environment: [
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
                 "HOME": tmpDir.path,
                 "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 30
         )
@@ -98,12 +98,12 @@ import Testing
         }
 
         let environment = [
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
-            "CMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": "11111111-1111-1111-1111-111111111111",
+            "WMUX_SURFACE_ID": "22222222-2222-2222-2222-222222222222",
             "HOME": tmpDir.path,
             "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         for arguments in [
             ["__tmux-compat", "show-options -v extended-keys"],
@@ -201,12 +201,12 @@ import Testing
         }
 
         var environment = [
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceId,
-            "CMUX_SURFACE_ID": surfaceId,
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceId,
+            "WMUX_SURFACE_ID": surfaceId,
             "HOME": tmpDir.path,
             "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         for (key, value) in extraEnvironment {
             environment[key] = value
@@ -311,7 +311,7 @@ import Testing
     /// (not by `cmux claude-teams`), so they do not inherit the launcher env and must
     /// be re-supplied it. Because the gate is a real safety boundary, cmux waives it
     /// only when the launcher recorded the user's `--dangerously-skip-permissions`
-    /// opt-in in `CMUX_CLAUDE_TEAMS_SANDBOXED` — the decision is NOT re-derived from
+    /// opt-in in `WMUX_CLAUDE_TEAMS_SANDBOXED` — the decision is NOT re-derived from
     /// the respawn command text. OMO and the public `respawn-pane` never see that env
     /// and are unaffected.
     @Test func respawnPaneInjectsClaudeTeamsTrustBypass() throws {
@@ -321,7 +321,7 @@ import Testing
 
         let inTeams = try respawnPaneForwardedCommand(
             teammate,
-            extraEnvironment: ["CMUX_CLAUDE_TEAMS_SANDBOXED": "1"]
+            extraEnvironment: ["WMUX_CLAUDE_TEAMS_SANDBOXED": "1"]
         )
         #expect(
             inTeams.command.hasPrefix("/bin/sh -lc "),
@@ -377,7 +377,7 @@ import Testing
             "ANTHROPIC_API_KEY": secret,
         ])
         let markerEnvironment = [
-            "CMUX_CLAUDE_TEAMS_RESPAWN_ENV_B64": transport.base64EncodedString(),
+            "WMUX_CLAUDE_TEAMS_RESPAWN_ENV_B64": transport.base64EncodedString(),
         ]
 
         let inTeams = try respawnPaneForwardedCommand(

@@ -1,6 +1,6 @@
 import AppKit
-import CMUXAgentLaunch
-import CmuxAgentJournal
+import WMUXAgentLaunch
+import WmuxAgentJournal
 import SwiftUI
 
 struct AgentInboxView: View {

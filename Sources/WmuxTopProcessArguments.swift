@@ -1,14 +1,14 @@
-import CmuxFoundation
+import WmuxFoundation
 import Darwin
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
-struct CmuxTopProcessArguments: Sendable {
+struct WmuxTopProcessArguments: Sendable {
     let arguments: [String]
     let environment: [String: String]
 }
 
-extension CmuxTopProcessSnapshot {
+extension WmuxTopProcessSnapshot {
     /// Reads argv and environment only while the process still has the census generation.
     ///
     /// The identity is checked immediately before and after the `KERN_PROCARGS2`
@@ -17,7 +17,7 @@ extension CmuxTopProcessSnapshot {
     static func processArgumentsAndEnvironment(
         for pid: Int,
         expectedIdentity: AgentPIDProcessIdentity
-    ) -> CmuxTopProcessArguments? {
+    ) -> WmuxTopProcessArguments? {
         guard expectedIdentity.pid == pid_t(pid),
               AgentPIDProcessIdentity(pid: expectedIdentity.pid) == expectedIdentity,
               let bytes = kernProcArgsBytes(for: pid),
@@ -30,13 +30,13 @@ extension CmuxTopProcessSnapshot {
 
     /// Reads argv and environment for one immutable census record.
     static func processArgumentsAndEnvironment(
-        for process: CmuxTopProcessInfo
-    ) -> CmuxTopProcessArguments? {
+        for process: WmuxTopProcessInfo
+    ) -> WmuxTopProcessArguments? {
         guard let identity = process.processIdentity else { return nil }
         return processArgumentsAndEnvironment(for: process.pid, expectedIdentity: identity)
     }
 
-    static func processArgumentsAndEnvironment(for pid: Int) -> CmuxTopProcessArguments? {
+    static func processArgumentsAndEnvironment(for pid: Int) -> WmuxTopProcessArguments? {
         guard pid > 0, pid <= Int(Int32.max),
               let bytes = kernProcArgsBytes(for: pid) else {
             return nil
@@ -44,7 +44,7 @@ extension CmuxTopProcessSnapshot {
         return processArgumentsAndEnvironment(fromKernProcArgs: bytes)
     }
 
-    static func processArgumentsAndEnvironment(fromKernProcArgs bytes: [UInt8]) -> CmuxTopProcessArguments? {
+    static func processArgumentsAndEnvironment(fromKernProcArgs bytes: [UInt8]) -> WmuxTopProcessArguments? {
         guard bytes.count > MemoryLayout<Int32>.size else { return nil }
 
         var argcRaw: Int32 = 0
@@ -85,7 +85,7 @@ extension CmuxTopProcessSnapshot {
             environment[key] = String(entry[entry.index(after: equals)...])
         }
 
-        return CmuxTopProcessArguments(arguments: arguments, environment: environment)
+        return WmuxTopProcessArguments(arguments: arguments, environment: environment)
     }
 
     private static func kernProcArgsBytes(for pid: Int) -> [UInt8]? {

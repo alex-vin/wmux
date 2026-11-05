@@ -1,5 +1,5 @@
 import Foundation
-import CmuxMemoryPressure
+import WmuxMemoryPressure
 
 struct MemoryPressureShedAction: Equatable, Sendable {
     let responderID: String

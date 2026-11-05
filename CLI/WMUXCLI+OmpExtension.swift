@@ -88,14 +88,14 @@ function base64NulSeparated(values: string[]): string {
 
 function hookEnvironment(cwd: string): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env };
-  env.CMUX_OMP_PID = String(process.pid);
-  if (!env.CMUX_AGENT_LAUNCH_ARGV_B64) {
+  env.WMUX_OMP_PID = String(process.pid);
+  if (!env.WMUX_AGENT_LAUNCH_ARGV_B64) {
     const argv = normalizedLaunchArgv();
     if (argv) {
-      env.CMUX_AGENT_LAUNCH_KIND = "omp";
-      env.CMUX_AGENT_LAUNCH_EXECUTABLE = argv[0];
-      env.CMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
-      env.CMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
+      env.WMUX_AGENT_LAUNCH_KIND = "omp";
+      env.WMUX_AGENT_LAUNCH_EXECUTABLE = argv[0];
+      env.WMUX_AGENT_LAUNCH_ARGV_B64 = base64NulSeparated(argv);
+      env.WMUX_AGENT_LAUNCH_CWD = cwd || process.cwd();
     }
   }
   return env;
@@ -157,8 +157,8 @@ function isNestedArtifactSession(ctx: ExtensionContext): boolean {
 }
 
 function hookInvocation(subcommand: string, ctx: ExtensionContext, extra: Record<string, unknown> = {}): HookInvocation | null {
-  if (process.env.CMUX_OMP_HOOKS_DISABLED === "1") return null;
-  if (!process.env.CMUX_SURFACE_ID) return null;
+  if (process.env.WMUX_OMP_HOOKS_DISABLED === "1") return null;
+  if (!process.env.WMUX_SURFACE_ID) return null;
   if (isNestedArtifactSession(ctx)) return null;
 
   const sessionId = firstString(ctx.sessionManager.getSessionId());
@@ -172,7 +172,7 @@ function hookInvocation(subcommand: string, ctx: ExtensionContext, extra: Record
     event: eventName(subcommand),
     ...extra,
   };
-  const wmux = process.env.CMUX_OMP_CMUX_BIN || "wmux";
+  const wmux = process.env.WMUX_OMP_CMUX_BIN || "wmux";
   return {
     wmux,
     cwd,
@@ -207,7 +207,7 @@ function startHook(invocation: HookInvocation, subcommand: string): RunningHook 
     };
     try {
       child = spawn(invocation.wmux, ["hooks", "enqueue", "omp", subcommand], {
-        env: { ...invocation.env, CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
+        env: { ...invocation.env, WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC: "1" },
         stdio: ["pipe", "ignore", "ignore"],
       });
       child.on("error", settle);
@@ -334,7 +334,7 @@ function sendHook(subcommand: string, ctx: ExtensionContext, extra: Record<strin
 
 // The pane's lifecycle in wmux must be owned by exactly one OMP session: the
 // top-level session driving the terminal. Subagents spawned by the task tool
-// run in the same process and inherit CMUX_SURFACE_ID, but each has its own
+// run in the same process and inherit WMUX_SURFACE_ID, but each has its own
 // session id; without an ownership check, every subagent's agent_end reports
 // the whole pane idle while the main agent is still mid-turn, and Agent
 // Hibernation then SIGHUPs the live pane (issue #9591).
@@ -343,15 +343,15 @@ function sendHook(subcommand: string, ctx: ExtensionContext, extra: Record<strin
 // copy of this module for every session in the process (each extension import
 // uses a unique ?mtime= cache-busting URL), so module state is per-session
 // while the pane is per-process.
-interface CmuxOmpPaneOwnership {
+interface WmuxOmpPaneOwnership {
   sessionId: string | null;
 }
 
 const cmuxOmpGlobals = globalThis as typeof globalThis & {
-  __cmuxOmpPaneOwnership?: CmuxOmpPaneOwnership;
+  __cmuxOmpPaneOwnership?: WmuxOmpPaneOwnership;
 };
 
-function paneOwnership(): CmuxOmpPaneOwnership {
+function paneOwnership(): WmuxOmpPaneOwnership {
   cmuxOmpGlobals.__cmuxOmpPaneOwnership ??= { sessionId: null };
   return cmuxOmpGlobals.__cmuxOmpPaneOwnership;
 }

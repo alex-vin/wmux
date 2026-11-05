@@ -1,12 +1,12 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxCloudMachines
-import CmuxSettings
+import WmuxCloudMachines
+import WmuxSettings
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -154,20 +154,20 @@ final class NewCloudWorkspaceShortcutTests {
 
     @Test func testBuiltInActionResolvesFromConfigAndMapsToShortcut() {
         defer { restoreState() }
-        #expect(CmuxSurfaceTabBarBuiltInAction(configID: "cmux.newCloudWorkspace") == .newCloudWorkspace)
-        #expect(CmuxSurfaceTabBarBuiltInAction(configID: "newCloudWorkspace") == .newCloudWorkspace)
-        #expect(CmuxSurfaceTabBarBuiltInAction(configID: "cmux.newCloudMachine") == .newCloudMachine)
-        #expect(CmuxSurfaceTabBarBuiltInAction.newCloudWorkspace.shortcutAction == .newCloudWorkspace)
-        #expect(CmuxSurfaceTabBarBuiltInAction.newCloudMachine.shortcutAction == .newCloudMachine)
-        #expect(CmuxSurfaceTabBarBuiltInAction.newWorkspace.shortcutAction == .newTab)
-        #expect(CmuxSurfaceTabBarBuiltInAction.newTerminal.shortcutAction == .newSurface)
-        #expect(CmuxSurfaceTabBarBuiltInAction.newBrowser.shortcutAction == .openBrowser)
-        #expect(CmuxSurfaceTabBarBuiltInAction.cloudVM.shortcutAction == nil)
+        #expect(WmuxSurfaceTabBarBuiltInAction(configID: "cmux.newCloudWorkspace") == .newCloudWorkspace)
+        #expect(WmuxSurfaceTabBarBuiltInAction(configID: "newCloudWorkspace") == .newCloudWorkspace)
+        #expect(WmuxSurfaceTabBarBuiltInAction(configID: "cmux.newCloudMachine") == .newCloudMachine)
+        #expect(WmuxSurfaceTabBarBuiltInAction.newCloudWorkspace.shortcutAction == .newCloudWorkspace)
+        #expect(WmuxSurfaceTabBarBuiltInAction.newCloudMachine.shortcutAction == .newCloudMachine)
+        #expect(WmuxSurfaceTabBarBuiltInAction.newWorkspace.shortcutAction == .newTab)
+        #expect(WmuxSurfaceTabBarBuiltInAction.newTerminal.shortcutAction == .newSurface)
+        #expect(WmuxSurfaceTabBarBuiltInAction.newBrowser.shortcutAction == .openBrowser)
+        #expect(WmuxSurfaceTabBarBuiltInAction.cloudVM.shortcutAction == nil)
     }
 
     // MARK: Plus menu
 
-    private func loadStore(globalJSON: String) throws -> (store: CmuxConfigStore, root: URL) {
+    private func loadStore(globalJSON: String) throws -> (store: WmuxConfigStore, root: URL) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(
             "cmux-new-cloud-workspace-tests-\(UUID().uuidString)",
             isDirectory: true
@@ -175,7 +175,7 @@ final class NewCloudWorkspaceShortcutTests {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         let globalConfigURL = root.appendingPathComponent("cmux.json")
         try globalJSON.write(to: globalConfigURL, atomically: true, encoding: .utf8)
-        let store = CmuxConfigStore(
+        let store = WmuxConfigStore(
             globalConfigPath: globalConfigURL.path,
             localConfigPath: nil,
             startFileWatchers: false
@@ -184,7 +184,7 @@ final class NewCloudWorkspaceShortcutTests {
         return (store, root)
     }
 
-    private func builtInMenuRows(_ menu: NSMenu) -> [(action: CmuxSurfaceTabBarBuiltInAction, item: NSMenuItem)] {
+    private func builtInMenuRows(_ menu: NSMenu) -> [(action: WmuxSurfaceTabBarBuiltInAction, item: NSMenuItem)] {
         menu.items.compactMap { item in
             guard let box = item.representedObject as? NewWorkspaceContextMenuActionBox,
                   case .builtIn(let builtIn) = box.action.action else { return nil }

@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -278,12 +278,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
         var environment = [
             "HOME": context.root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": context.socketPath,
-            "CMUX_WORKSPACE_ID": context.workspaceId,
-            "CMUX_SURFACE_ID": context.surfaceId,
-            "CMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
-            "CMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "WMUX_WORKSPACE_ID": context.workspaceId,
+            "WMUX_SURFACE_ID": context.surfaceId,
+            "WMUX_CLAUDE_HOOK_STATE_PATH": context.root.appendingPathComponent("claude-hook-sessions.json").path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_CLAUDE_HOOK_SENTRY_DISABLED": "1",
         ]
         for (key, value) in extraEnvironment {
             environment[key] = value
@@ -303,10 +303,10 @@ extension CLINotifyProcessIntegrationRegressionTests {
         parentSessionId: String
     ) -> [String: String] {
         [
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
-            "CMUX_AGENT_LAUNCH_CWD": context.root.path,
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated([
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/claude",
+            "WMUX_AGENT_LAUNCH_CWD": context.root.path,
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated([
                 "/usr/local/bin/claude",
                 "--resume",
                 parentSessionId,

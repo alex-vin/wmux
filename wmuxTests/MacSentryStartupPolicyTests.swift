@@ -1,8 +1,8 @@
 import Testing
 import Foundation
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -22,13 +22,13 @@ private func validateAppHostUserConfigurationHome(
         return
     }
 
-    #expect(environment["CMUX_APP_HOST_ISOLATION_REQUIRED"] == "1")
+    #expect(environment["WMUX_APP_HOST_ISOLATION_REQUIRED"] == "1")
     let expectedHome = try #require(
-        environment["CMUX_APP_HOST_EXPECTED_HOME"],
+        environment["WMUX_APP_HOST_EXPECTED_HOME"],
         "The isolated app-host launch must publish its resolved home"
     )
     let expectedXDGConfigHome = try #require(
-        environment["CMUX_APP_HOST_EXPECTED_XDG_CONFIG_HOME"],
+        environment["WMUX_APP_HOST_EXPECTED_XDG_CONFIG_HOME"],
         "The isolated app-host launch must publish its resolved XDG config home"
     )
 
@@ -69,7 +69,7 @@ private func validateAppHostUserConfigurationHome(
 }
 
 private var appHostIsolationRequiredByBuild: Bool {
-    #if CMUX_CI_APP_HOST_ISOLATION_REQUIRED
+    #if WMUX_CI_APP_HOST_ISOLATION_REQUIRED
     true
     #else
     false
@@ -82,7 +82,7 @@ private var appHostIsolationRequiredByBuild: Bool {
         try validateAppHostUserConfigurationHome(
             environment: environment,
             isolationRequired: appHostIsolationRequiredByBuild
-                || environment["CMUX_APP_HOST_ISOLATION_REQUIRED"] == "1"
+                || environment["WMUX_APP_HOST_ISOLATION_REQUIRED"] == "1"
         )
     }
 
@@ -140,7 +140,7 @@ private var appHostIsolationRequiredByBuild: Bool {
     @Test func explicitUITestMarkerPreventsSentryStartup() {
         #expect(
             MacSentryStartupPolicy(
-                environment: ["CMUX_UI_TEST_PROCESS": "1"],
+                environment: ["WMUX_UI_TEST_PROCESS": "1"],
                 telemetryEnabled: true
             ).shouldStart == false
         )
@@ -149,7 +149,7 @@ private var appHostIsolationRequiredByBuild: Bool {
     @Test func testRunnerMarkerPreventsSentryStartup() {
         #expect(
             MacSentryStartupPolicy(
-                environment: ["CMUX_TEST_PROCESS": "1"],
+                environment: ["WMUX_TEST_PROCESS": "1"],
                 telemetryEnabled: true
             ).shouldStart == false
         )
@@ -159,8 +159,8 @@ private var appHostIsolationRequiredByBuild: Bool {
         #expect(
             MacSentryStartupPolicy(
                 environment: [
-                    "CMUX_UI_TEST_PROCESS": "1",
-                    "CMUX_TEST_SENTRY_ENABLED": "1"
+                    "WMUX_UI_TEST_PROCESS": "1",
+                    "WMUX_TEST_SENTRY_ENABLED": "1"
                 ],
                 telemetryEnabled: true
             ).shouldStart == true
@@ -169,7 +169,7 @@ private var appHostIsolationRequiredByBuild: Bool {
 
     @Test func foreignBundleIdentityPreventsSentryStartup() {
         // A rebranded public-repo fork keeping the hardcoded cmux DSN must
-        // not start Sentry (Sentry issue CMUXTERM-MACOS-1RZF).
+        // not start Sentry (Sentry issue WMUXTERM-MACOS-1RZF).
         #expect(
             MacSentryStartupPolicy(
                 environment: [:],

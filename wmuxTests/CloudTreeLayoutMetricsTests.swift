@@ -1,10 +1,10 @@
-import CmuxCloud
+import WmuxCloud
 import CoreGraphics
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -47,7 +47,7 @@ struct CloudTreeLayoutMetricsTests {
         #expect(metrics.titleWidth(rowWidth: 140, leadingContentWidth: 92, trailingContentWidth: 76) == 0)
     }
 
-    /// CmuxCloud cannot import the app target, so `CloudSidebarChromeMetrics`
+    /// WmuxCloud cannot import the app target, so `CloudSidebarChromeMetrics`
     /// restates the sidebar's chrome numbers for the Cloud surfaces. This test
     /// runs in the app target, where both types are visible, and is the only
     /// thing stopping the copy from drifting from the original.

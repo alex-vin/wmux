@@ -1,6 +1,6 @@
-import CmuxAgentChat
-import CmuxTerminal
-import CmuxWorkspaces
+import WmuxAgentChat
+import WmuxTerminal
+import WmuxWorkspaces
 import Foundation
 
 /// Commits structured terminal restores after their owning topology is authoritative.

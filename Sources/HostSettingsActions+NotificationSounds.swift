@@ -1,4 +1,4 @@
-import CmuxSettingsUI
+import WmuxSettingsUI
 import Foundation
 
 extension HostSettingsActions {

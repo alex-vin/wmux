@@ -1,5 +1,5 @@
-import CmuxSettings
-import CmuxSettingsUI
+import WmuxSettings
+import WmuxSettingsUI
 import Foundation
 
 extension KeyboardShortcutSettings {
@@ -32,7 +32,7 @@ extension KeyboardShortcutSettings {
         for action: Action,
         explicitlyConfiguredShortcut: (Action) -> StoredShortcut?
     ) -> StoredShortcut? {
-        guard let settingsAction = CmuxSettings.ShortcutAction(rawValue: action.rawValue) else {
+        guard let settingsAction = WmuxSettings.ShortcutAction(rawValue: action.rawValue) else {
             return action.defaultShortcut.isUnbound ? nil : action.defaultShortcut
         }
         return settingsAction.effectivePersistedShortcutResolvingLegacyConflicts(

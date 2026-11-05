@@ -1,5 +1,5 @@
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 /// The marker `sidebarBoundedDisplayString` appends when it cuts a block.
 ///

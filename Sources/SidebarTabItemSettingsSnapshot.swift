@@ -1,6 +1,6 @@
-import CmuxFoundation
-import CmuxSettings
-import CmuxSidebar
+import WmuxFoundation
+import WmuxSettings
+import WmuxSidebar
 import CoreGraphics
 import Foundation
 
@@ -40,7 +40,7 @@ struct SidebarTabItemSettingsSnapshot: Equatable {
     let workspaceTodoChecklistStyle: WorkspaceTodoChecklistStyle
     /// The resolved cmux accent. Rows draw selection, progress, drop
     /// indicators and agent status with it, and reconfigure when it changes.
-    let accentColor: CmuxAccentColor
+    let accentColor: WmuxAccentColor
 
     var usesLastSegmentPath: Bool { branchDirectory.usesLastSegmentPath }
     var showsSSH: Bool { details.showSSH }
@@ -48,7 +48,7 @@ struct SidebarTabItemSettingsSnapshot: Equatable {
     init(
         defaults: UserDefaults = .standard,
         sidebarFontSize: CGFloat = GhosttyConfig.defaultSidebarFontSize,
-        accentColor: CmuxAccentColor = CmuxAccentColor()
+        accentColor: WmuxAccentColor = WmuxAccentColor()
     ) {
         let settings = UserDefaultsSettingsClient(defaults: defaults)
         let sidebar = SidebarCatalogSection()

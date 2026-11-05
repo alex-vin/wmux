@@ -1,10 +1,10 @@
-import CmuxCloud
+import WmuxCloud
 import AppKit
-import CmuxSurfaceCatalogModel
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -94,7 +94,7 @@ final class CloudNotificationDismissParityHarness {
         )
         provider.info = info
         catalog.register(provider)
-        catalog.replaceCloudState(state, resources: CmuxTuiSnapshotParser.resources(from: state), info: info)
+        catalog.replaceCloudState(state, resources: WmuxTuiSnapshotParser.resources(from: state), info: info)
         catalog.record(SurfaceProjection(
             resource: SurfaceResourceID(machine: machine, kind: .terminal, key: "term_a"),
             workspaceID: workspace.id, panelID: panelID, remoteWorkspaceID: "ws_1", remoteTabID: "tab_a"
@@ -143,7 +143,7 @@ final class CloudNotificationDismissParityHarness {
             "terminals": ["a", "b", "c"].map { ["id": "term_\($0)", "title": "agent \($0)", "lifecycle": "running"] },
             "browsers": [], "agents": [],
         ]
-        return try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
+        return try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))
     }
 
     func row(_ id: String, terminal: String, title: String, createdAt: UInt64) -> CloudVMNotificationRow {

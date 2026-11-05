@@ -1,4 +1,4 @@
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 enum AgentHookNotificationStatus: String, Codable {

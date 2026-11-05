@@ -1,12 +1,12 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Bonsplit
 import Testing
 import XCTest
 // Legacy XCTest fixture; new Resources coverage is in CloudTreeMachineResourcesTests.swift.
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif

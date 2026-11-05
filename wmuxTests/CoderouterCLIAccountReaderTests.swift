@@ -1,9 +1,9 @@
 import AppKit
-import CmuxCloud
+import WmuxCloud
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -266,10 +266,10 @@ struct CoderouterCLIAccountReaderTests {
         let task = Task {
             try await CoderouterCLIAccountReader.runProcess(
                 executable: "/bin/sh",
-                arguments: ["-c", "touch \"$CMUX_TEST_READY\"; exec sleep 1000"],
+                arguments: ["-c", "touch \"$WMUX_TEST_READY\"; exec sleep 1000"],
                 environment: [
                     "PATH": "/usr/bin:/bin",
-                    "CMUX_TEST_READY": readyURL.path,
+                    "WMUX_TEST_READY": readyURL.path,
                 ]
             )
         }

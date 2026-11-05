@@ -1,9 +1,9 @@
 import AppKit
-import CmuxCanvasUI
-import CmuxControlSocket
-import CmuxSettings
+import WmuxCanvasUI
+import WmuxControlSocket
+import WmuxSettings
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 
 /// The debug-domain witnesses are the byte-faithful bodies of the former
 /// `v2Debug*` dispatchers `processV2Command` routed (DEBUG builds only), minus

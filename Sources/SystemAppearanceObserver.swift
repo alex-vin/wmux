@@ -3,7 +3,7 @@ import Foundation
 
 extension Notification.Name {
     /// Posted by SystemAppearanceObserver when NSApp.effectiveAppearance changes (#6385).
-    static let systemAppearanceDidChange = Notification.Name("cmux.systemAppearanceDidChange")
+    static let systemAppearanceDidChange = Notification.Name("wmux.systemAppearanceDidChange")
 }
 
 extension NSAppearance {

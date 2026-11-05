@@ -9,10 +9,10 @@ final class RightSidebarChromeHeightUITests: XCTestCase {
         let dataPath = "/tmp/cmux-ui-test-right-sidebar-chrome-\(UUID().uuidString).json"
         try? FileManager.default.removeItem(atPath: dataPath)
 
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
         app.launchArguments += ["-workspacePresentationMode", "minimal", "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launchArguments += ["-rightSidebar.beta.feed.enabled", "YES"]
         app.launch()
@@ -107,10 +107,10 @@ final class RightSidebarChromeHeightUITests: XCTestCase {
         let dataPath = "/tmp/cmux-ui-test-sidebar-appearance-\(UUID().uuidString).json"
         try? FileManager.default.removeItem(atPath: dataPath)
 
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
         app.launchArguments += [
             "-workspacePresentationMode", "minimal",
             "-sidebarMatchTerminalBackground", "true",
@@ -464,13 +464,13 @@ final class TerminalViewportUITests: XCTestCase {
         try? FileManager.default.removeItem(atPath: dataPath)
 
         let app = XCUIApplication.cmuxTestApplication()
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_VIEWPORT_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_VIEWPORT_PATH"] = dataPath
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_VIEWPORT_WINDOW_SIZE"] = "900x620"
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_VIEWPORT_RESIZE_WINDOW_SIZE"] = "1180x780"
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_VIEWPORT_HIDE_SIDEBAR"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_TERMINAL_VIEWPORT_HIDE_RIGHT_SIDEBAR"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_VIEWPORT_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_VIEWPORT_PATH"] = dataPath
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_VIEWPORT_WINDOW_SIZE"] = "900x620"
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_VIEWPORT_RESIZE_WINDOW_SIZE"] = "1180x780"
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_VIEWPORT_HIDE_SIDEBAR"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_TERMINAL_VIEWPORT_HIDE_RIGHT_SIDEBAR"] = "1"
         app.launchArguments += ["-workspacePresentationMode", "minimal"]
         let options = XCTExpectedFailure.Options()
         options.isStrict = false

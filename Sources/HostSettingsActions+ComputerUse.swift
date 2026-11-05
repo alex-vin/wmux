@@ -1,4 +1,4 @@
-import CmuxSettingsUI
+import WmuxSettingsUI
 
 /// Settings observes readiness separately from explicit permission/setup actions.
 extension HostSettingsActions {

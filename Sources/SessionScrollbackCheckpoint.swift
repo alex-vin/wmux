@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import os
 
@@ -50,7 +50,7 @@ enum SessionScrollbackCheckpointPolicy {
     /// Checkpoints follow session restore: when restore is disabled there is nothing to restore
     /// into, and automated test runs must not write into the real application support directory.
     static func isEnabled(environment: [String: String]) -> Bool {
-        environment["CMUX_DISABLE_SESSION_RESTORE"] != "1"
+        environment["WMUX_DISABLE_SESSION_RESTORE"] != "1"
             && !SessionRestorePolicy.isRunningUnderAutomatedTests(environment: environment)
     }
 

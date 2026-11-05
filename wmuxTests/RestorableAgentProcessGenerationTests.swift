@@ -1,10 +1,10 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 import os
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -39,7 +39,7 @@ struct RestorableAgentProcessGenerationTests {
         let unknownIndex = RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { _ in nil },
             processPresenceProvider: { _ in .unknown },
@@ -48,7 +48,7 @@ struct RestorableAgentProcessGenerationTests {
         let exitedIndex = RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { _ in nil },
             processPresenceProvider: { _ in .absent },
@@ -160,12 +160,12 @@ struct RestorableAgentProcessGenerationTests {
         let fixture = try makeFixture(prefix: "cmux-pid-generation")
         defer { cleanup(fixture) }
 
-        let processArguments = CmuxTopProcessArguments(
+        let processArguments = WmuxTopProcessArguments(
             arguments: ["/usr/local/bin/codex"],
             environment: [
-                "CMUX_AGENT_LAUNCH_KIND": "codex",
-                "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                "WMUX_AGENT_LAUNCH_KIND": "codex",
+                "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                "WMUX_SURFACE_ID": fixture.panelID.uuidString,
             ]
         )
         let reusedIdentity = AgentPIDProcessIdentity(
@@ -209,11 +209,11 @@ struct RestorableAgentProcessGenerationTests {
             startSeconds: Int64(fixture.updatedAt + 1),
             startMicroseconds: 0
         )
-        let reusedProcess = CmuxTopProcessArguments(
+        let reusedProcess = WmuxTopProcessArguments(
             arguments: ["/usr/local/bin/claude"],
             environment: [
-                "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                "WMUX_SURFACE_ID": fixture.panelID.uuidString,
             ]
         )
         let index = loadRunningFixture(
@@ -253,7 +253,7 @@ struct RestorableAgentProcessGenerationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { _ in arguments },
             processPresenceProvider: { _ in
@@ -326,19 +326,19 @@ struct RestorableAgentProcessGenerationTests {
     func legacyPIDWithContradictoryArgumentsDoesNotBlockRestoreWithoutIdentity() throws {
         let fixture = try makeFixture(prefix: "cmux-legacy-pid-missing-identity")
         defer { cleanup(fixture) }
-        let unrelatedProcess = CmuxTopProcessArguments(
+        let unrelatedProcess = WmuxTopProcessArguments(
             arguments: ["/usr/local/bin/claude"],
             environment: [
-                "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                "WMUX_SURFACE_ID": fixture.panelID.uuidString,
             ]
         )
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": fixture.hookStateDirectory.path],
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": fixture.hookStateDirectory.path],
             processArgumentsProvider: { pid in
                 pid == fixture.processID ? unrelatedProcess : nil
             },
@@ -383,7 +383,7 @@ struct RestorableAgentProcessGenerationTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [key: (
                 snapshot: snapshot,
                 updatedAt: fixture.updatedAt + 1,
@@ -391,7 +391,7 @@ struct RestorableAgentProcessGenerationTests {
                 agentProcessIDs: [firstPID, secondPID],
                 sessionIDSource: .explicit
             )],
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": fixture.hookStateDirectory.path],
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": fixture.hookStateDirectory.path],
             processArgumentsProvider: { _ in nil },
             processPresenceProvider: { pid in
                 pid == secondPID ? .present : .absent
@@ -473,13 +473,13 @@ struct RestorableAgentProcessGenerationTests {
 
     private func loadRunningFixture(
         _ fixture: Fixture,
-        processArguments: CmuxTopProcessArguments,
+        processArguments: WmuxTopProcessArguments,
         processIdentity: AgentPIDProcessIdentity
     ) -> RestorableAgentSessionIndex {
         RestorableAgentSessionIndex.load(
             homeDirectory: fixture.root.path,
             fileManager: fixture.fileManager,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:],
             processArgumentsProvider: { pid in
                 pid == fixture.processID ? processArguments : nil
@@ -491,13 +491,13 @@ struct RestorableAgentProcessGenerationTests {
         )
     }
 
-    private func codexProcessArguments(for fixture: Fixture) -> CmuxTopProcessArguments {
-        CmuxTopProcessArguments(
+    private func codexProcessArguments(for fixture: Fixture) -> WmuxTopProcessArguments {
+        WmuxTopProcessArguments(
             arguments: ["/usr/local/bin/codex"],
             environment: [
-                "CMUX_AGENT_LAUNCH_KIND": "codex",
-                "CMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
-                "CMUX_SURFACE_ID": fixture.panelID.uuidString,
+                "WMUX_AGENT_LAUNCH_KIND": "codex",
+                "WMUX_WORKSPACE_ID": fixture.workspaceID.uuidString,
+                "WMUX_SURFACE_ID": fixture.panelID.uuidString,
             ]
         )
     }
@@ -527,7 +527,7 @@ struct RestorableAgentProcessGenerationTests {
         let root = fileManager.temporaryDirectory
             .appendingPathComponent("\(prefix)-\(UUID().uuidString)", isDirectory: true)
         let hookStateDirectory = root.appendingPathComponent("hook-state", isDirectory: true)
-        let previousHookStateDirectory = getenv("CMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
+        let previousHookStateDirectory = getenv("WMUX_AGENT_HOOK_STATE_DIR").map { String(cString: $0) }
 
         let workspaceID = UUID()
         let panelID = UUID()
@@ -545,7 +545,7 @@ struct RestorableAgentProcessGenerationTests {
         try rolloutData.write(to: rollout, options: .atomic)
         let storeURL = RestorableAgentKind.codex.hookStoreFileURL(
             homeDirectory: root.path,
-            environment: ["CMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
+            environment: ["WMUX_AGENT_HOOK_STATE_DIR": hookStateDirectory.path]
         )
         try fileManager.createDirectory(at: storeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         let record: [String: Any] = [
@@ -570,7 +570,7 @@ struct RestorableAgentProcessGenerationTests {
             options: [.prettyPrinted, .sortedKeys]
         )
         try data.write(to: storeURL, options: .atomic)
-        setenv("CMUX_AGENT_HOOK_STATE_DIR", hookStateDirectory.path, 1)
+        setenv("WMUX_AGENT_HOOK_STATE_DIR", hookStateDirectory.path, 1)
         return (
             root: root,
             hookStateDirectory: hookStateDirectory,
@@ -587,9 +587,9 @@ struct RestorableAgentProcessGenerationTests {
 
     private func cleanup(_ fixture: Fixture) {
         if let previousHookStateDirectory = fixture.previousHookStateDirectory {
-            setenv("CMUX_AGENT_HOOK_STATE_DIR", previousHookStateDirectory, 1)
+            setenv("WMUX_AGENT_HOOK_STATE_DIR", previousHookStateDirectory, 1)
         } else {
-            unsetenv("CMUX_AGENT_HOOK_STATE_DIR")
+            unsetenv("WMUX_AGENT_HOOK_STATE_DIR")
         }
         try? fixture.fileManager.removeItem(at: fixture.root)
     }

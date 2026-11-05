@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -231,7 +231,7 @@ struct BrowserViewportRuntimeTests {
         let slot = WindowBrowserSlotView(
             frame: NSRect(x: 0, y: 0, width: 380, height: 610)
         )
-        let webView = CmuxWebView(frame: slot.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: slot.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let viewportHost = BrowserViewportHostView(frame: slot.bounds)
         let viewportModel = BrowserViewportModel()
         defer {
@@ -312,7 +312,7 @@ struct BrowserViewportRuntimeTests {
             defer: false
         )
         let pane = NSView(frame: paneFrame)
-        let webView = CmuxWebView(frame: pane.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: pane.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let viewportHost = BrowserViewportHostView(frame: pane.bounds)
         let viewportModel = BrowserViewportModel()
         let loadDelegate = BrowserViewportRuntimeLoadDelegate()
@@ -462,7 +462,7 @@ struct BrowserViewportRuntimeTests {
     func presentationRootTracksExternalWebKitOwnershipAndRestoresSafely() throws {
         let originalContainer = NSView(frame: NSRect(x: 0, y: 0, width: 380, height: 610))
         let externalContainer = NSView(frame: NSRect(x: 0, y: 0, width: 600, height: 400))
-        let webView = CmuxWebView(frame: originalContainer.bounds, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: originalContainer.bounds, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         let viewportHost = BrowserViewportHostView(frame: originalContainer.bounds)
         let viewportModel = BrowserViewportModel()
         let viewport = try #require(BrowserViewport(width: 1_280, height: 720))

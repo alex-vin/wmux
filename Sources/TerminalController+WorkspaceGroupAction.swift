@@ -1,6 +1,6 @@
-import CmuxCore
+import WmuxCore
 import Foundation
-import CmuxWorkspaces
+import WmuxWorkspaces
 
 extension TerminalController {
     /// Mobile-gated workspace-group creation that mirrors mobile workspace.create.

@@ -1,13 +1,12 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import ObjectiveC.runtime
 import SwiftUI
 import Testing
 import WebKit
-import CmuxUpdater
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -24,7 +23,7 @@ struct FileDropOverlayViewTests {
             .environmentObject(SidebarState())
             .environmentObject(SidebarSelectionState())
             .environmentObject(FileExplorerState())
-            .environmentObject(CmuxConfigStore())
+            .environmentObject(WmuxConfigStore())
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 520, height: 340),
@@ -215,7 +214,7 @@ struct FileDropOverlayViewTests {
         let anchor = NSView(frame: NSRect(x: 40, y: 36, width: 220, height: 150))
         contentView.addSubview(anchor)
 
-        let webView = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let webView = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
         BrowserWindowPortalRegistry.bind(webView: webView, to: anchor, visibleInUI: true)
         BrowserWindowPortalRegistry.synchronizeForAnchor(anchor)
         defer { BrowserWindowPortalRegistry.detach(webView: webView) }

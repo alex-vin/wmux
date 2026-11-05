@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -166,7 +166,7 @@ struct CloudDisplayCatalogTests {
         #expect(SurfaceOwnershipPolicy(cloudMachine: .cloud("a")).rejection(for: b.map(\.id)) != nil)
         #expect(SurfaceOwnershipPolicy(cloudMachine: .cloud("b")).rejection(for: a.map(\.id)) != nil)
         #expect(SurfaceOwnershipPolicy(cloudMachine: .cloud("a")).rejection(for: [a[0].id, a[0].id, a[1].id]) == nil)
-        let refreshed = CmuxTuiSurfaceProvider.withPrivateBrowserURL(a[1], privateAddress: "10.0.0.8")
+        let refreshed = WmuxTuiSurfaceProvider.withPrivateBrowserURL(a[1], privateAddress: "10.0.0.8")
         #expect(refreshed.id == a[1].id)
         #expect(URL(string: try #require(refreshed.url))?.port == 6902)
     }
@@ -184,7 +184,7 @@ struct CloudDisplayCatalogTests {
 
     @Test("A daemon pointer without a discovered target cannot open the first desktop")
     func unknownDisplayHasNoTarget() {
-        let resource = CmuxTuiSnapshotParser.display(machine: .cloud("a"), key: "display:2")
+        let resource = WmuxTuiSnapshotParser.display(machine: .cloud("a"), key: "display:2")
         if case .unsupported = CloudPortRoutePlan.plan(resource: resource, privateAddress: "10.0.0.7") {} else {
             Issue.record("Unknown display aliased the default desktop")
         }
@@ -198,9 +198,9 @@ struct CloudDisplayCatalogTests {
           {"id":"display:2","number":2,"port":6902,"state":"running"}]}
         """)
         let pool = snapshot.displays.map { $0.resource(on: .cloud("a"), address: "10.0.0.7") }
-        var pointer = CmuxTuiSnapshotParser.display(machine: .cloud("a"), key: "display:2")
+        var pointer = WmuxTuiSnapshotParser.display(machine: .cloud("a"), key: "display:2")
         pointer.remoteViews = [.init(tabID: "tab-a", workspace: .init(id: "ws-a", name: "same", index: 0, focused: false))]
-        let resources = CmuxTuiSnapshotParser.mergingDisplays(pool: pool, parsed: [pointer])
+        let resources = WmuxTuiSnapshotParser.mergingDisplays(pool: pool, parsed: [pointer])
         #expect(resources.count == 2)
         let second = try #require(resources.first { $0.id == pointer.id })
         #expect(second.port == 6902 && second.url == pool[1].url)
@@ -217,7 +217,7 @@ struct CloudDisplayCatalogTests {
         summary.kind = .desktop
         summary.addressIPv4 = "10.0.0.7"
         let catalog = SurfaceCatalog()
-        let provider = CmuxTuiSurfaceProvider(
+        let provider = WmuxTuiSurfaceProvider(
             summary: summary,
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }),
             catalog: catalog,
@@ -240,7 +240,7 @@ struct CloudDisplayCatalogTests {
         #expect(displayPorts() == ["display:1": 6901, "display:2": 6902])
 
         // A daemon graph carries no display tabs; the guest catalog still owns both screens.
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: [
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: [
             "cursor": ["generation": "daemon", "revision": "1"],
             "workspaces": [["id": "ws_main", "name": "main", "focused": true]],
             "screens": [["id": "screen", "workspace_id": "ws_main"]],

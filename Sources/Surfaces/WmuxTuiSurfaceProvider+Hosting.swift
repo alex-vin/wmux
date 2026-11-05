@@ -1,11 +1,11 @@
-import CmuxAuthRuntime
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxAuthRuntime
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
-import CmuxSettings
+import WmuxSettings
 
 @MainActor
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     convenience init(
         summary: VMSummary,
         fileAccessTeamScope: AuthenticatedTeamScope? = nil,

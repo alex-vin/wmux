@@ -42,14 +42,14 @@ extension CLINotifyProcessIntegrationRegressionTests {
         }
 
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_WORKSPACE_ID"] = workspaceId
-        environment["CMUX_SURFACE_ID"] = surfaceId
-        environment["CMUX_AGENT_HOOK_STATE_DIR"] = root.path
-        environment["CMUX_ROVODEV_SESSIONS_DIR"] = sessionsRoot.path
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "rovodev"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/acli"
-        environment["CMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated([
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_WORKSPACE_ID"] = workspaceId
+        environment["WMUX_SURFACE_ID"] = surfaceId
+        environment["WMUX_AGENT_HOOK_STATE_DIR"] = root.path
+        environment["WMUX_ROVODEV_SESSIONS_DIR"] = sessionsRoot.path
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "rovodev"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/acli"
+        environment["WMUX_AGENT_LAUNCH_ARGV_B64"] = base64NULSeparated([
             "/usr/local/bin/acli",
             "rovodev",
             "run",
@@ -58,8 +58,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
             "--yolo",
             "prompt that should not persist",
         ])
-        environment["CMUX_AGENT_LAUNCH_CWD"] = workspace.path
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_AGENT_LAUNCH_CWD"] = workspace.path
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,
@@ -150,21 +150,21 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_SOCKET_PATH": socketPath,
-                "CMUX_WORKSPACE_ID": workspaceId,
-                "CMUX_SURFACE_ID": surfaceId,
-                "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-                "CMUX_ROVODEV_SESSIONS_DIR": sessionsRoot.path,
-                "CMUX_AGENT_LAUNCH_CWD": workspace.path,
-                "CMUX_AGENT_LAUNCH_KIND": "rovodev",
-                "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/acli",
-                "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated([
+                "WMUX_SOCKET_PATH": socketPath,
+                "WMUX_WORKSPACE_ID": workspaceId,
+                "WMUX_SURFACE_ID": surfaceId,
+                "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+                "WMUX_ROVODEV_SESSIONS_DIR": sessionsRoot.path,
+                "WMUX_AGENT_LAUNCH_CWD": workspace.path,
+                "WMUX_AGENT_LAUNCH_KIND": "rovodev",
+                "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/acli",
+                "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated([
                     "/usr/local/bin/acli",
                     "rovodev",
                     "run",
                     "--yolo",
                 ]),
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             standardInput: #"{"cwd":"\#(workspace.path)","hook_event_name":"on_tool_permission"}"#,
             timeout: 5
@@ -242,13 +242,13 @@ extension CLINotifyProcessIntegrationRegressionTests {
         let environment: [String: String] = [
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceId,
-            "CMUX_SURFACE_ID": surfaceId,
-            "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-            "CMUX_AGENT_LAUNCH_KIND": "rovodev",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/acli",
-            "CMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated([
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceId,
+            "WMUX_SURFACE_ID": surfaceId,
+            "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+            "WMUX_AGENT_LAUNCH_KIND": "rovodev",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/usr/local/bin/acli",
+            "WMUX_AGENT_LAUNCH_ARGV_B64": base64NULSeparated([
                 "/usr/local/bin/acli",
                 "rovodev",
                 "run",
@@ -256,8 +256,8 @@ extension CLINotifyProcessIntegrationRegressionTests {
                 sessionId,
                 "--yolo",
             ]),
-            "CMUX_AGENT_LAUNCH_CWD": workspace.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_AGENT_LAUNCH_CWD": workspace.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
 
         let result = runProcess(
@@ -322,12 +322,12 @@ extension CLINotifyProcessIntegrationRegressionTests {
         let environment: [String: String] = [
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-            "CMUX_SOCKET_PATH": socketPath,
-            "CMUX_WORKSPACE_ID": workspaceId,
-            "CMUX_SURFACE_ID": surfaceId,
-            "CMUX_AGENT_HOOK_STATE_DIR": root.path,
-            "CMUX_ROVODEV_SESSIONS_DIR": sessionsRoot.path,
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SOCKET_PATH": socketPath,
+            "WMUX_WORKSPACE_ID": workspaceId,
+            "WMUX_SURFACE_ID": surfaceId,
+            "WMUX_AGENT_HOOK_STATE_DIR": root.path,
+            "WMUX_ROVODEV_SESSIONS_DIR": sessionsRoot.path,
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
 
         let result = runProcess(
@@ -370,7 +370,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 5
         )
@@ -400,7 +400,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "\(binDir.path):/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 5
         )
@@ -415,7 +415,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
         )
         XCTAssertTrue(config.contains("eventHooks:"), config)
         XCTAssertTrue(config.contains(#"hooks enqueue rovodev prompt-submit"#), config)
-        XCTAssertTrue(config.contains(#"CMUX_BUNDLED_CLI_PATH"#), config)
+        XCTAssertTrue(config.contains(#"WMUX_BUNDLED_CLI_PATH"#), config)
     }
 
     func testSetupHooksRejectsConflictingAgentFilters() throws {
@@ -431,7 +431,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 5
         )
@@ -454,7 +454,7 @@ extension CLINotifyProcessIntegrationRegressionTests {
             environment: [
                 "HOME": root.path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 5
         )

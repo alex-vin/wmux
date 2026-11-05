@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 /// `cmux session move <id> --to <ssh-destination|local>`: stop-state move of a

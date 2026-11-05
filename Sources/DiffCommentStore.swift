@@ -1,4 +1,4 @@
-import CmuxDiffComments
+import WmuxDiffComments
 import CryptoKit
 import Foundation
 
@@ -124,7 +124,7 @@ final class DiffCommentStore {
     ) -> URL? {
         guard !isRunningUnderAutomatedTests, let appSupportDirectory else { return nil }
         return appSupportDirectory
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("diff-comments", isDirectory: true)
     }
 

@@ -1,8 +1,8 @@
-import CmuxCommandPalette
+import WmuxCommandPalette
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -976,10 +976,10 @@ final class CommandPaletteSearchEngineTests: XCTestCase {
             workspaceId: workspaceId,
             panelId: panelId
         )
-        let customRegistration = CmuxVaultAgentRegistration(
+        let customRegistration = WmuxVaultAgentRegistration(
             id: "my-agent",
             name: "My Agent",
-            detect: CmuxVaultAgentDetectRule(processNames: ["my-agent"]),
+            detect: WmuxVaultAgentDetectRule(processNames: ["my-agent"]),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "my-agent --session {{sessionId}}",
             forkCommand: "my-agent --session {{sessionId}} --fork"
@@ -1314,10 +1314,10 @@ final class CommandPaletteSearchEngineTests: XCTestCase {
             launchCommand: launchCommand
         )
         var second = first
-        second.registration = CmuxVaultAgentRegistration(
+        second.registration = WmuxVaultAgentRegistration(
             id: "fork-fingerprint",
             name: "Fork Fingerprint",
-            detect: CmuxVaultAgentDetectRule(processName: "fork-fingerprint"),
+            detect: WmuxVaultAgentDetectRule(processName: "fork-fingerprint"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "{{executable}} resume {{sessionId}}",
             cwd: .ignore

@@ -1,5 +1,5 @@
 import AppKit
-import CmuxCommandPalette
+import WmuxCommandPalette
 import Foundation
 
 extension ContentView {

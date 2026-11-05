@@ -1,6 +1,6 @@
 import AppKit
 import Bonsplit
-import CmuxSettings
+import WmuxSettings
 import Foundation
 
 enum DockBatchCloseConfirmationPolicy: Sendable {

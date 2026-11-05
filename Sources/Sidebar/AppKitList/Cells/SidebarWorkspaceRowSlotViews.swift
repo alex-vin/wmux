@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxSidebar
+import WmuxFoundation
+import WmuxSidebar
 
 /// Leaf AppKit views for the pure-AppKit workspace row: unread badge,
 /// pull-request status icons, progress bar. Each is configured with values

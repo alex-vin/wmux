@@ -44,7 +44,7 @@ enum SettingsNavigationTarget: String, CaseIterable, Identifiable {
         case .automation:
             return String(localized: "settings.section.automation", defaultValue: "Automation")
         case .computerUse:
-            return String(localized: "settings.section.computerUse", defaultValue: "cmux Computer Use")
+            return String(localized: "settings.section.computerUse", defaultValue: "wmux Computer Use")
         case .browser:
             return String(localized: "settings.section.browser", defaultValue: "Browser")
         case .browserImport:
@@ -140,7 +140,7 @@ enum SettingsNavigationTarget: String, CaseIterable, Identifiable {
 }
 
 enum SettingsNavigationRequest {
-    static let notificationName = Notification.Name("cmux.settings.navigate")
+    static let notificationName = Notification.Name("wmux.settings.navigate")
     private static let targetKey = "target"
     private static let anchorKey = "anchor"
     private static let highlightKey = "highlight"

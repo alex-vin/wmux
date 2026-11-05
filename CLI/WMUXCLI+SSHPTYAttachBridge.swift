@@ -1,6 +1,6 @@
 import Darwin
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
 extension CLIError {
     init(message: String, exitCode: SSHPTYAttachExitCode) {
@@ -12,7 +12,7 @@ extension WMUXCLI {
     /// Whether the generated reconnect wrapper owns presentation for this attach.
     /// Direct CLI invocations keep their detailed diagnostics for troubleshooting.
     func sshPTYAttachManagedReconnectPresentation() -> Bool {
-        (ProcessInfo.processInfo.environment["CMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] ?? "")
+        (ProcessInfo.processInfo.environment["WMUX_SSH_PTY_ATTACH_MANAGED_RECONNECT"] ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines) == "1"
     }
 
@@ -30,10 +30,10 @@ extension WMUXCLI {
     }
 
     /// True when a persistent attach wrapper has another general retry available.
-    /// Persistent wrappers export `CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY=1`;
+    /// Persistent wrappers export `WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY=1`;
     /// direct invocations leave it unset, so failures there always clean up.
     func sshPTYAttachWrapperRetryPending() -> Bool {
-        (ProcessInfo.processInfo.environment["CMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] ?? "")
+        (ProcessInfo.processInfo.environment["WMUX_SSH_PTY_ATTACH_WRAPPER_CAN_RETRY"] ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines) == "1"
     }
 
@@ -41,9 +41,9 @@ extension WMUXCLI {
         guard sshPTYAttachWrapperRetryPending() else { return false }
         if exitCode == .bridgeClosedWithoutProgress {
             let environment = ProcessInfo.processInfo.environment
-            guard let retry = Int(environment["CMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY"] ?? ""),
+            guard let retry = Int(environment["WMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY"] ?? ""),
                   retry >= 0,
-                  let limit = Int(environment["CMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT"] ?? ""),
+                  let limit = Int(environment["WMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT"] ?? ""),
                   limit > 0 else {
                 return false
             }
@@ -62,8 +62,8 @@ extension WMUXCLI {
         let environment = ProcessInfo.processInfo.environment
         let bridgeUptime = ProcessInfo.processInfo.systemUptime - readyUptime
         guard sshPTYAttachWrapperRetryPending(),
-              environment["CMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY"] != nil,
-              environment["CMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT"] != nil,
+              environment["WMUX_SSH_PTY_ATTACH_NO_PROGRESS_RETRY"] != nil,
+              environment["WMUX_SSH_PTY_ATTACH_NO_PROGRESS_LIMIT"] != nil,
               SSHPTYAttachExitCode.bridgeClosureMadeNoProgress(
                   receivedLiveOutput: receivedLiveOutput,
                   bridgeUptime: bridgeUptime
@@ -407,7 +407,7 @@ extension WMUXCLI {
     /// matching the `wait_for_ready` RPC response timeout in `runSSHPTYAttach`.
     private func sshPTYBridgeReadyTimeoutSeconds() -> TimeInterval {
         let defaultTimeout: TimeInterval = 185
-        guard let raw = ProcessInfo.processInfo.environment["CMUX_SSH_PTY_BRIDGE_READY_TIMEOUT_SECONDS"],
+        guard let raw = ProcessInfo.processInfo.environment["WMUX_SSH_PTY_BRIDGE_READY_TIMEOUT_SECONDS"],
               let value = TimeInterval(raw), value > 0 else {
             return defaultTimeout
         }

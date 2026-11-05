@@ -1,5 +1,5 @@
 import Foundation
-import CmuxBrowser
+import WmuxBrowser
 
 enum BrowserImportAutomationError: LocalizedError, CustomStringConvertible {
     case noBrowsers
@@ -125,7 +125,7 @@ enum BrowserProfileAutomationError: LocalizedError, CustomStringConvertible {
             return String.localizedStringWithFormat(
                 String(
                     localized: "browser.profile.automation.error.profileNotFound",
-                    defaultValue: "No cmux browser profile matches '%@'. Run 'cmux browser profiles' to list available profiles."
+                    defaultValue: "No cmux browser profile matches '%@'. Run 'wmux browser profiles' to list available profiles."
                 ),
                 query
             )

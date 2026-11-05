@@ -20,7 +20,7 @@ struct CLICodexQueuedHookContractTests {
                 "HOME": root.path,
                 "CODEX_HOME": root.appendingPathComponent(".codex").path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 3
         )
@@ -40,7 +40,7 @@ struct CLICodexQueuedHookContractTests {
             #expect(configuration.contains("timeout=5000"))
             #expect(body.contains("hooks enqueue codex \(subcommand)"))
             #expect(body.contains("cmux-codex-hook"))
-            #expect(body.contains("CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5"))
+            #expect(body.contains("WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=0.5"))
             #expect(!body.contains("nohup"))
             #expect(!body.contains("sleep "))
             #expect(!body.contains(">/dev/null 2>&1 &"))
@@ -70,7 +70,7 @@ struct CLICodexQueuedHookContractTests {
                 "HOME": root.path,
                 "CODEX_HOME": root.appendingPathComponent(".codex").path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 3
         )
@@ -81,10 +81,10 @@ struct CLICodexQueuedHookContractTests {
             "HOME": root.path,
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
             "PWD": root.path,
-            "CMUX_SURFACE_ID": "surface-codex-hook-failure",
-            "CMUX_CODEX_HOOK_CMUX_BIN": "/usr/bin/false",
-            "CMUX_BUNDLED_CLI_PATH": "/usr/bin/true",
-            "CMUX_CLI_SENTRY_DISABLED": "1",
+            "WMUX_SURFACE_ID": "surface-codex-hook-failure",
+            "WMUX_CODEX_HOOK_CMUX_BIN": "/usr/bin/false",
+            "WMUX_BUNDLED_CLI_PATH": "/usr/bin/true",
+            "WMUX_CLI_SENTRY_DISABLED": "1",
         ]
         let payload = #"{"session_id":"codex-hook-failure","tool_name":"Write"}"#
 
@@ -172,7 +172,7 @@ struct CLICodexQueuedHookContractTests {
                 "HOME": root.path,
                 "CODEX_HOME": root.appendingPathComponent(".codex").path,
                 "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
-                "CMUX_CLI_SENTRY_DISABLED": "1",
+                "WMUX_CLI_SENTRY_DISABLED": "1",
             ],
             timeout: 3
         )

@@ -1,5 +1,5 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Observation
 /// The single owner of surface identities and projections on this Mac.
@@ -25,7 +25,7 @@ final class SurfaceCatalog {
     /// while cancellation is unresolved. This prevents one unhealthy machine from blocking
     /// unrelated machines while also bounding repeated provider replacements.
     nonisolated static let defaultMaximumTrackedMaterializations = 16
-    static let didChangeNotification = Notification.Name("cmux.surfaces.didChange")
+    static let didChangeNotification = Notification.Name("wmux.surfaces.didChange")
     private(set) var machines: [SurfaceMachineID: SurfaceMachineInfo] = [:]
     private(set) var resources: [SurfaceResourceID: SurfaceResource] = [:]
     private struct CloudProjectionKey: Hashable { let panelID: UUID; let workspaceID: UUID }
@@ -679,7 +679,7 @@ final class SurfaceCatalog {
             }
             let resolved = attachRemoteView(resolvedRemoteView, to: existing)
             if resource.kind != .terminal,
-               let provider = providers[id.machine] as? CmuxTuiSurfaceProvider,
+               let provider = providers[id.machine] as? WmuxTuiSurfaceProvider,
                let browser = SurfacePaneFactory.browserPanel(panelID: resolved.panelID, in: resolved.workspaceID),
                (browser.cloudAccess.model == nil || browser.cloudAccess.model?.phase == .closed),
                let raw = resource.url, let url = URL(string: raw) {

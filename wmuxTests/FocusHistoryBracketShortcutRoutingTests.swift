@@ -1,10 +1,10 @@
 import AppKit
-import CmuxSettings
+import WmuxSettings
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
-private typealias AppStoredShortcut = cmux_DEV.StoredShortcut
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
+private typealias AppStoredShortcut = wmux_DEV.StoredShortcut
 #elseif canImport(cmux)
 @testable import cmux
 private typealias AppStoredShortcut = cmux.StoredShortcut

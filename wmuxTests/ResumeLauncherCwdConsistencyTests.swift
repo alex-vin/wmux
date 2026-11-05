@@ -1,9 +1,9 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -19,10 +19,10 @@ struct ResumeLauncherCwdConsistencyTests {
         let restoredDirectory = root.appendingPathComponent("restored", isDirectory: true)
         try fileManager.createDirectory(at: restoredDirectory, withIntermediateDirectories: true)
         defer { try? fileManager.removeItem(at: root) }
-        let registration = CmuxVaultAgentRegistration(
+        let registration = WmuxVaultAgentRegistration(
             id: "cwd-agent",
             name: "CWD Agent",
-            detect: CmuxVaultAgentDetectRule(processName: "cwd-agent"),
+            detect: WmuxVaultAgentDetectRule(processName: "cwd-agent"),
             sessionIdSource: .argvOption("--session"),
             resumeCommand: "{{executable}} --cwd {{cwd}} --session {{sessionId}}",
             cwd: .preserve
@@ -160,7 +160,7 @@ struct ResumeLauncherCwdConsistencyTests {
                 arguments: ["/opt/custom/codex", "-c", "model_provider=subrouter"],
                 workingDirectory: "/home/dev/repo",
                 environment: [
-                    "CMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
+                    "WMUX_AGENT_LAUNCH_SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
                     "SUBROUTER_CODEX_BIN": "/opt/custom/codex",
                     "SUBROUTER_CODEX_RESUME_COMMAND": "sr codex resume",
                 ],
@@ -171,10 +171,10 @@ struct ResumeLauncherCwdConsistencyTests {
 
         let input = try #require(snapshot.resumeStartupInput(useLocalRestoreVerb: false))
 
-        #expect(input.contains("CMUX_AGENT_RESTORE_LAUNCH=codex:\(sessionId)"), "\(input)")
+        #expect(input.contains("WMUX_AGENT_RESTORE_LAUNCH=codex:\(sessionId)"), "\(input)")
         #expect(input.contains("SUBROUTER_CODEX_BIN="), "\(input)")
-        #expect(input.contains("CMUX_CODEX_WRAPPER_SHIM"), "\(input)")
-        #expect(input.contains("CMUX_CUSTOM_CODEX_PATH=/opt/custom/codex"), "\(input)")
+        #expect(input.contains("WMUX_CODEX_WRAPPER_SHIM"), "\(input)")
+        #expect(input.contains("WMUX_CUSTOM_CODEX_PATH=/opt/custom/codex"), "\(input)")
     }
 
     @Test("restored terminal command wrapper sources login files once")
@@ -187,15 +187,15 @@ struct ResumeLauncherCwdConsistencyTests {
         try fileManager.createDirectory(at: home, withIntermediateDirectories: true)
         defer { try? fileManager.removeItem(at: root) }
         try """
-        export CMUX_9200_ZPROFILE_COUNT=$(( ${CMUX_9200_ZPROFILE_COUNT:-0} + 1 ))
+        export WMUX_9200_ZPROFILE_COUNT=$(( ${WMUX_9200_ZPROFILE_COUNT:-0} + 1 ))
 
         """.write(to: home.appendingPathComponent(".zprofile"), atomically: true, encoding: .utf8)
         try """
-        export CMUX_9200_ZLOGIN_COUNT=$(( ${CMUX_9200_ZLOGIN_COUNT:-0} + 1 ))
+        export WMUX_9200_ZLOGIN_COUNT=$(( ${WMUX_9200_ZLOGIN_COUNT:-0} + 1 ))
 
         """.write(to: home.appendingPathComponent(".zlogin"), atomically: true, encoding: .utf8)
         let command = """
-        print -r -- "profile=${CMUX_9200_ZPROFILE_COUNT:-0} login=${CMUX_9200_ZLOGIN_COUNT:-0}" > \(TerminalStartupShellQuoting.singleQuoted(output.path))
+        print -r -- "profile=${WMUX_9200_ZPROFILE_COUNT:-0} login=${WMUX_9200_ZLOGIN_COUNT:-0}" > \(TerminalStartupShellQuoting.singleQuoted(output.path))
         """
         let startupCommand = try #require(OneShotTerminalLauncherStore(
             fileManager: fileManager,

@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxWorkspaces
+import WmuxFoundation
+import WmuxWorkspaces
 import SwiftUI
 
 // MARK: - Manual status glyph
@@ -18,7 +18,7 @@ final class SidebarRowTaskStatusGlyphButton: NSControl {
         let usesMonochrome: Bool
         let fontScale: CGFloat
         let colorScheme: ColorScheme
-        let accent: CmuxAccentColor
+        let accent: WmuxAccentColor
         var differentiateWithoutColor = false
 
         var glyph: SidebarWorkspaceTaskStatusGlyphModel {

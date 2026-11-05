@@ -52,14 +52,14 @@ struct CLIRemoteShellStartupPerformanceTests {
         environment["PATH"] = "\(root.bin.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
         environment["SHELL"] = root.bin.appendingPathComponent("sh").path
         environment["TERM"] = "xterm-256color"
-        environment["CMUX_BUNDLED_CLI_PATH"] = root.bin.appendingPathComponent("cmux").path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "workspace-cli-perf"
-        environment["CMUX_SURFACE_ID"] = "surface-cli-perf"
-        environment["CMUX_FAKE_SHELL_MARKER"] = shellMarker.path
-        environment["CMUX_FAKE_RELAY_RPC_GATE"] = relayRPCGate.path
-        environment["CMUX_FAKE_SSH_LOG"] = sshInvocationLog.path
-        environment["CMUX_PERSISTENT_PTY_EXEC_HELPER"] = root.bin.appendingPathComponent("cmux").path
+        environment["WMUX_BUNDLED_CLI_PATH"] = root.bin.appendingPathComponent("cmux").path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "workspace-cli-perf"
+        environment["WMUX_SURFACE_ID"] = "surface-cli-perf"
+        environment["WMUX_FAKE_SHELL_MARKER"] = shellMarker.path
+        environment["WMUX_FAKE_RELAY_RPC_GATE"] = relayRPCGate.path
+        environment["WMUX_FAKE_SSH_LOG"] = sshInvocationLog.path
+        environment["WMUX_PERSISTENT_PTY_EXEC_HELPER"] = root.bin.appendingPathComponent("cmux").path
 
         let running = try launchProcess(
             executablePath: "/bin/sh",
@@ -109,9 +109,9 @@ struct CLIRemoteShellStartupPerformanceTests {
 
         let serverDone = startMockServer(listenerFD: listenerFD, state: state)
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
-        environment["CMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_CLAUDE_HOOK_SENTRY_DISABLED"] = "1"
         // `cmux ssh` hands TTY sessions to cmux-tui through
         // `workspace.ssh.open`; the startup wrapper measured here is only
         // produced for sessions without a TTY, so pin RequestTTY=no.
@@ -224,8 +224,8 @@ struct CLIRemoteShellStartupPerformanceTests {
         fi
         case "${1:-}:${2:-}" in
           rpc:surface.report_tty|rpc:surface.ports_kick)
-            if [ -n "${CMUX_FAKE_RELAY_RPC_GATE:-}" ]; then
-              while [ ! -f "$CMUX_FAKE_RELAY_RPC_GATE" ]; do sleep 0.05; done
+            if [ -n "${WMUX_FAKE_RELAY_RPC_GATE:-}" ]; then
+              while [ ! -f "$WMUX_FAKE_RELAY_RPC_GATE" ]; do sleep 0.05; done
             fi
             ;;
         esac
@@ -234,7 +234,7 @@ struct CLIRemoteShellStartupPerformanceTests {
         try writeExecutable(at: bin.appendingPathComponent("tty"), contents: "#!/bin/sh\nprintf '%s\\n' /dev/ttys997")
         try writeExecutable(at: bin.appendingPathComponent("sh"), contents: """
         #!/bin/sh
-        if [ -n "${CMUX_FAKE_SHELL_MARKER:-}" ]; then printf started > "$CMUX_FAKE_SHELL_MARKER"; fi
+        if [ -n "${WMUX_FAKE_SHELL_MARKER:-}" ]; then printf started > "$WMUX_FAKE_SHELL_MARKER"; fi
         exit 0
         """)
         try writeExecutable(at: bin.appendingPathComponent("ssh"), contents: fakeSSHScript)
@@ -248,8 +248,8 @@ struct CLIRemoteShellStartupPerformanceTests {
         // installer command can run, exactly like real ssh.
         """
         #!/bin/sh
-        if [ -n "${CMUX_FAKE_SSH_LOG:-}" ]; then
-          printf '%s\\n' '---' "$@" >> "$CMUX_FAKE_SSH_LOG"
+        if [ -n "${WMUX_FAKE_SSH_LOG:-}" ]; then
+          printf '%s\\n' '---' "$@" >> "$WMUX_FAKE_SSH_LOG"
         fi
         remote_command=
         remote_command_seen=

@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -22,13 +22,13 @@ struct SSHPersistentPTYRetryLifecycleTests {
 
         try Self.writeShellFile(at: fakeCLI, lines: [
             "#!/bin/sh", "case \" $* \" in", "  *\" ssh-pty-attach \"*)",
-            "    count=$(cat \"${CMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
-            "    count=$((count + 1))", "    printf '%s' \"$count\" > \"${CMUX_TEST_ATTEMPT_FILE}\"",
+            "    count=$(cat \"${WMUX_TEST_ATTEMPT_FILE}\" 2>/dev/null || printf 0)",
+            "    count=$((count + 1))", "    printf '%s' \"$count\" > \"${WMUX_TEST_ATTEMPT_FILE}\"",
             "    case \"$count\" in 1|3) exit 255 ;; 2) exit 254 ;; *) exit 253 ;; esac", "    ;;",
             "  *) exit 0 ;;", "esac",
         ])
         try Self.writeShellFile(at: fakeSleep, lines: [
-            "#!/bin/sh", "printf '%s\\n' \"$1\" >> \"${CMUX_TEST_SLEEP_LOG}\"",
+            "#!/bin/sh", "printf '%s\\n' \"$1\" >> \"${WMUX_TEST_SLEEP_LOG}\"",
         ])
         for executable in [fakeCLI, fakeSleep] {
             try fileManager.setAttributes([.posixPermissions: 0o700], ofItemAtPath: executable.path)
@@ -36,14 +36,14 @@ struct SSHPersistentPTYRetryLifecycleTests {
 
         var environment = ProcessInfo.processInfo.environment
         environment["PATH"] = "\(root.path):\(environment["PATH"] ?? "/usr/bin:/bin")"
-        environment["CMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
-        environment["CMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
-        environment["CMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
-        environment["CMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
-        environment["CMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
-        environment["CMUX_TEST_SLEEP_LOG"] = sleepLog.path
-        environment["CMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
-        environment["CMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "5"
+        environment["WMUX_BUNDLED_CLI_PATH"] = fakeCLI.path
+        environment["WMUX_SOCKET_PATH"] = "/tmp/cmux-debug-test.sock"
+        environment["WMUX_WORKSPACE_ID"] = "11111111-1111-1111-1111-111111111111"
+        environment["WMUX_SURFACE_ID"] = "22222222-2222-2222-2222-222222222222"
+        environment["WMUX_TEST_ATTEMPT_FILE"] = attemptFile.path
+        environment["WMUX_TEST_SLEEP_LOG"] = sleepLog.path
+        environment["WMUX_SSH_RECONNECT_DELAY_SECONDS"] = "2"
+        environment["WMUX_SSH_RECONNECT_MAX_DELAY_SECONDS"] = "5"
 
         let result = Self.runShell(
             SSHPTYAttachStartupCommandBuilder.command(sessionID: "ssh-test-session"),

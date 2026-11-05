@@ -34,9 +34,9 @@ struct ClaudeHookWorkStateTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.workspaceId
-        environment["CMUX_SURFACE_ID"] = Self.surfaceId
-        environment["CMUX_CLAUDE_PID"] = pid
+        environment["WMUX_WORKSPACE_ID"] = Self.workspaceId
+        environment["WMUX_SURFACE_ID"] = Self.surfaceId
+        environment["WMUX_CLAUDE_PID"] = pid
 
         let payload: [String: Any] = [
             "session_id": sessionId,

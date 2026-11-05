@@ -1,12 +1,12 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
-extension CmuxTopProcessSnapshot {
+extension WmuxTopProcessSnapshot {
     /// Builds the app-scoped process census authority at the composition root.
-    static func makeProcessSnapshotService() -> ProcessSnapshotService<CmuxTopProcessCapture, CmuxTopProcessFields> {
+    static func makeProcessSnapshotService() -> ProcessSnapshotService<WmuxTopProcessCapture, WmuxTopProcessFields> {
         ProcessSnapshotService(
-            capture: { try CmuxTopProcessSampler().capture() },
-            enrich: { try CmuxTopProcessSampler().enrich($0, fields: $1) }
+            capture: { try WmuxTopProcessSampler().capture() },
+            enrich: { try WmuxTopProcessSampler().enrich($0, fields: $1) }
         )
     }
 
@@ -16,10 +16,10 @@ extension CmuxTopProcessSnapshot {
         includeProcessDetails: Bool = false,
         includeCMUXScope: Bool = true,
         includeResources: Bool = true,
-        service: ProcessSnapshotService<CmuxTopProcessCapture, CmuxTopProcessFields>? = nil
-    ) async -> CmuxTopProcessSnapshot {
+        service: ProcessSnapshotService<WmuxTopProcessCapture, WmuxTopProcessFields>? = nil
+    ) async -> WmuxTopProcessSnapshot {
         await capture(
-            fields: CmuxTopProcessFields(details: includeProcessDetails, scope: includeCMUXScope, resources: includeResources),
+            fields: WmuxTopProcessFields(details: includeProcessDetails, scope: includeCMUXScope, resources: includeResources),
             freshness: .afterRequest, service: service ?? defaultProcessSnapshotService()
         )
     }
@@ -30,24 +30,24 @@ extension CmuxTopProcessSnapshot {
         includeCMUXScope: Bool = true,
         includeResources: Bool = true,
         maximumAge: TimeInterval,
-        service: ProcessSnapshotService<CmuxTopProcessCapture, CmuxTopProcessFields>? = nil
-    ) async -> CmuxTopProcessSnapshot {
+        service: ProcessSnapshotService<WmuxTopProcessCapture, WmuxTopProcessFields>? = nil
+    ) async -> WmuxTopProcessSnapshot {
         await capture(
-            fields: CmuxTopProcessFields(details: includeProcessDetails, scope: includeCMUXScope, resources: includeResources),
+            fields: WmuxTopProcessFields(details: includeProcessDetails, scope: includeCMUXScope, resources: includeResources),
             freshness: .maximumAge(.seconds(max(0, maximumAge))), service: service ?? defaultProcessSnapshotService()
         )
     }
 
     private static func capture(
-        fields: CmuxTopProcessFields, freshness: ProcessSnapshotFreshness,
-        service: ProcessSnapshotService<CmuxTopProcessCapture, CmuxTopProcessFields>
-    ) async -> CmuxTopProcessSnapshot {
+        fields: WmuxTopProcessFields, freshness: ProcessSnapshotFreshness,
+        service: ProcessSnapshotService<WmuxTopProcessCapture, WmuxTopProcessFields>
+    ) async -> WmuxTopProcessSnapshot {
         do {
             return try await service.snapshot(fields: fields, freshness: freshness).snapshot
         } catch {
             // Expiry, cancellation and admission failure are unavailable evidence,
             // never a complete empty machine. Safety callers must fail closed.
-            return CmuxTopProcessSnapshot(
+            return WmuxTopProcessSnapshot(
                 processes: [], sampledAt: Date(), includesProcessDetails: fields.contains(.details),
                 includesCMUXScope: fields.contains(.scope), includesResources: fields.contains(.resources),
                 enumerationIsComplete: false,
@@ -56,12 +56,12 @@ extension CmuxTopProcessSnapshot {
         }
     }
 
-    static func allProcesses(includeProcessDetails: Bool, includeCMUXScope: Bool) async -> [CmuxTopProcessInfo] {
+    static func allProcesses(includeProcessDetails: Bool, includeCMUXScope: Bool) async -> [WmuxTopProcessInfo] {
         let snapshot = await capture(includeProcessDetails: includeProcessDetails, includeCMUXScope: includeCMUXScope, includeResources: false)
         return Array(snapshot.processesByPID.values)
     }
 
-    private static func defaultProcessSnapshotService() -> ProcessSnapshotService<CmuxTopProcessCapture, CmuxTopProcessFields> {
+    private static func defaultProcessSnapshotService() -> ProcessSnapshotService<WmuxTopProcessCapture, WmuxTopProcessFields> {
         AppDelegate.shared?.processSnapshotService ?? makeProcessSnapshotService()
     }
 }

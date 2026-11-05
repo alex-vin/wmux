@@ -1,6 +1,6 @@
 import AppKit
-import CmuxPanes
-import CmuxSettings
+import WmuxPanes
+import WmuxSettings
 
 extension AppDelegate {
     func performEqualizeSplitsShortcut() {
@@ -35,7 +35,7 @@ extension AppDelegate {
 #endif
     }
 
-    /// New Pane (Auto Layout), cmux-tui's Alt-n: adds a terminal pane and
+    /// New Pane (Auto Layout), wmux-tui's Alt-n: adds a terminal pane and
     /// retiles the workspace in Zellij's default layout. Canvas workspaces
     /// have no tiling, so they open the pane to the right. Shortcut and
     /// command palette both call this method.

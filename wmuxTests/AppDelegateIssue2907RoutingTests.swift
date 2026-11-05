@@ -1,10 +1,10 @@
-import CmuxTerminal
+import WmuxTerminal
 import AppKit
 import Bonsplit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1217,10 +1217,10 @@ struct AppDelegateIssue2907RoutingTests {
                 sessionId: sessionID,
                 workingDirectory: savedDirectory,
                 launchCommand: launch,
-                registration: CmuxVaultAgentRegistration(
+                registration: WmuxVaultAgentRegistration(
                     id: "cwd-agent",
                     name: "CWD Agent",
-                    detect: CmuxVaultAgentDetectRule(processName: "cwd-agent"),
+                    detect: WmuxVaultAgentDetectRule(processName: "cwd-agent"),
                     sessionIdSource: .argvOption("--session"),
                     resumeCommand: "{{executable}} --cwd {{cwd}} --session {{sessionId}}",
                     cwd: .preserve

@@ -1,11 +1,11 @@
 import AppKit
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -21,7 +21,7 @@ struct InProcessMachineCreateLauncherTests {
         ]))
         let upstreamMessage = "upstream-diagnostic-fixture-7b912"
         let testCatalog = SurfaceCatalog()
-        let testProvider = CmuxTuiSurfaceProvider(
+        let testProvider = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: "created-machine", provider: "freestyle", status: "running", image: "snapshot", createdAt: 1),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: testCatalog
         )
@@ -113,7 +113,7 @@ struct InProcessMachineCreateLauncherTests {
             "vm", "new", "--workspace", workspace.uuidString, "--focus", "false"
         ]))
         let testCatalog = SurfaceCatalog()
-        let testProvider = CmuxTuiSurfaceProvider(
+        let testProvider = WmuxTuiSurfaceProvider(
             summary: VMSummary(id: "created-machine", provider: "freestyle", status: "running", image: "snapshot", createdAt: 1),
             links: CloudMachineLinkManager(clientURL: nil, hostThemeColors: { nil }), catalog: testCatalog
         )

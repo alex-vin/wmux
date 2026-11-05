@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 extension WMUXCLI {
@@ -16,7 +16,7 @@ extension WMUXCLI {
         telemetry: CLISocketSentryTelemetry,
         turnID: String? = nil
     ) {
-        let retryCount = max(0, Int(environment["CMUX_CODEX_SETTLED_STOP_RETRY_COUNT"] ?? "0") ?? 0)
+        let retryCount = max(0, Int(environment["WMUX_CODEX_SETTLED_STOP_RETRY_COUNT"] ?? "0") ?? 0)
         guard retryCount < Self.codexSettledStopMaximumRetries else {
             telemetry.breadcrumb("codex-hook.settled-stop.retry-limit-reached")
             return
@@ -28,7 +28,7 @@ extension WMUXCLI {
                FileManager.default.isExecutableFile(atPath: first) {
                 return first
             }
-            if let bundled = normalizedHookValue(environment["CMUX_BUNDLED_CLI_PATH"]),
+            if let bundled = normalizedHookValue(environment["WMUX_BUNDLED_CLI_PATH"]),
                FileManager.default.isExecutableFile(atPath: bundled) {
                 return bundled
             }
@@ -58,12 +58,12 @@ extension WMUXCLI {
             String(retryDelay),
         ]
         var childEnvironment = environment
-        childEnvironment["CMUX_CODEX_SETTLED_CHILD_STOP"] = "1"
-        childEnvironment["CMUX_CODEX_SETTLED_STOP_RETRY_COUNT"] = String(retryCount + 1)
+        childEnvironment["WMUX_CODEX_SETTLED_CHILD_STOP"] = "1"
+        childEnvironment["WMUX_CODEX_SETTLED_STOP_RETRY_COUNT"] = String(retryCount + 1)
         if let turnID = turnID?.trimmingCharacters(in: .whitespacesAndNewlines), !turnID.isEmpty {
-            childEnvironment["CMUX_CODEX_SETTLED_STOP_TURN_ID"] = turnID
+            childEnvironment["WMUX_CODEX_SETTLED_STOP_TURN_ID"] = turnID
         } else {
-            childEnvironment.removeValue(forKey: "CMUX_CODEX_SETTLED_STOP_TURN_ID")
+            childEnvironment.removeValue(forKey: "WMUX_CODEX_SETTLED_STOP_TURN_ID")
         }
         process.environment = childEnvironment
         process.standardInput = FileHandle.nullDevice
@@ -139,7 +139,7 @@ extension WMUXCLI {
                FileManager.default.isExecutableFile(atPath: first) {
                 return first
             }
-            if let bundled = normalizedHookValue(environment["CMUX_BUNDLED_CLI_PATH"]),
+            if let bundled = normalizedHookValue(environment["WMUX_BUNDLED_CLI_PATH"]),
                FileManager.default.isExecutableFile(atPath: bundled) {
                 return bundled
             }
@@ -475,13 +475,13 @@ extension WMUXCLI {
         let runner = "payload=\"$1\"; shift; \"$@\" <\"$payload\" >/dev/null 2>&1 & child=\"$!\"; ( timer=; trap \"kill \\$timer 2>/dev/null || true; wait \\$timer 2>/dev/null || true; exit 0\" HUP INT TERM; sleep 30 & timer=\"$!\"; wait \"$timer\" 2>/dev/null || true; timer=; kill \"$child\" 2>/dev/null || true ) & watchdog=\"$!\"; wait \"$child\" 2>/dev/null || true; kill \"$watchdog\" 2>/dev/null || true; wait \"$watchdog\" 2>/dev/null || true; rm -f \"$payload\""
         let noOp = stdinDrainingHookNoOpShellCommand
         return [
-            "cmux_cli=\"${CMUX_BUNDLED_CLI_PATH:-}\"",
-            "if [ -z \"$cmux_cli\" ] || [ ! -x \"$cmux_cli\" ]; then cmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
-            "agent_pid=\"${CMUX_CODEX_PID:-${PPID:-}}\"",
+            "wmux_cli=\"${WMUX_BUNDLED_CLI_PATH:-}\"",
+            "if [ -z \"$wmux_cli\" ] || [ ! -x \"$wmux_cli\" ]; then wmux_cli=\"$(command -v wmux 2>/dev/null || true)\"; fi",
+            "agent_pid=\"${WMUX_CODEX_PID:-${PPID:-}}\"",
             // The hook shell's immediate parent is the callback owner. Do not
             // reuse an inherited observation from an outer Codex process.
             "hook_pid=\"${PPID:-}\"",
-            "if [ -n \"$CMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && [ -n \"$cmux_cli\" ]; then payload=\"$(mktemp \"${TMPDIR:-/tmp}/wmux-codex-hook.XXXXXX\" 2>/dev/null || mktemp -t wmux-codex-hook 2>/dev/null)\" || { \(noOp); exit 0; }; cat >\"$payload\" || true; if [ -n \"${CMUX_SOCKET_PATH:-}\" ]; then CMUX_CODEX_PID=\"$agent_pid\" CMUX_CODEX_HOOK_PID=\"$hook_pid\" nohup sh -c '\(runner)' wmux-codex-hook \"$payload\" \"$cmux_cli\" --socket \"$CMUX_SOCKET_PATH\" \(routedArguments) >/dev/null 2>&1 & else CMUX_CODEX_PID=\"$agent_pid\" CMUX_CODEX_HOOK_PID=\"$hook_pid\" nohup sh -c '\(runner)' wmux-codex-hook \"$payload\" \"$cmux_cli\" \(routedArguments) >/dev/null 2>&1 & fi; echo '{}'; else \(noOp); fi",
+            "if [ -n \"$WMUX_SURFACE_ID\" ] && [ \"$\(def.disableEnvVar)\" != \"1\" ] && [ -n \"$wmux_cli\" ]; then payload=\"$(mktemp \"${TMPDIR:-/tmp}/wmux-codex-hook.XXXXXX\" 2>/dev/null || mktemp -t wmux-codex-hook 2>/dev/null)\" || { \(noOp); exit 0; }; cat >\"$payload\" || true; if [ -n \"${WMUX_SOCKET_PATH:-}\" ]; then WMUX_CODEX_PID=\"$agent_pid\" WMUX_CODEX_HOOK_PID=\"$hook_pid\" nohup sh -c '\(runner)' wmux-codex-hook \"$payload\" \"$wmux_cli\" --socket \"$WMUX_SOCKET_PATH\" \(routedArguments) >/dev/null 2>&1 & else WMUX_CODEX_PID=\"$agent_pid\" WMUX_CODEX_HOOK_PID=\"$hook_pid\" nohup sh -c '\(runner)' wmux-codex-hook \"$payload\" \"$wmux_cli\" \(routedArguments) >/dev/null 2>&1 & fi; echo '{}'; else \(noOp); fi",
         ].joined(separator: "; ")
     }
 }

@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 /// Why waking a hibernated agent would not relaunch it the way it was started.

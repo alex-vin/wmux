@@ -1,8 +1,8 @@
-import CmuxAgentJournal
-import CMUXMobileCore
-import CmuxSettings
-import CmuxSidebar
-import CmuxTerminal
+import WmuxAgentJournal
+import WMUXMobileCore
+import WmuxSettings
+import WmuxSidebar
+import WmuxTerminal
 import Foundation
 
 /// Resumes a cmux-launched agent whose turn ended on a retryable upstream
@@ -60,7 +60,7 @@ final class AgentAutoResumeCoordinator {
             let workspaceHint = draft.workspaceId
             let agent = draft.source
             let sessionId = tracker.pendingSessionId(surfaceId: surface, token: token)
-            CmuxEventBus.shared.publish(
+            WmuxEventBus.shared.publish(
                 name: "agent.auto_resume.scheduled",
                 category: "agent",
                 source: "auto_resume",
@@ -152,7 +152,7 @@ final class AgentAutoResumeCoordinator {
             color: "#4C8DFF"
         )
         target.setStatusEntry(statusEntry, key: Self.statusKey)
-        CmuxEventBus.shared.publish(
+        WmuxEventBus.shared.publish(
             name: "agent.auto_resume.sent",
             category: "agent",
             source: "auto_resume",

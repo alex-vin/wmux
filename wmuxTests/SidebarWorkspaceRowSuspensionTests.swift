@@ -1,9 +1,9 @@
 import AppKit
-import CmuxSettings
-import CmuxSidebar
-import CmuxWorkspaces
+import WmuxSettings
+import WmuxSidebar
+import WmuxWorkspaces
 import Testing
-@testable import cmux_DEV
+@testable import wmux_DEV
 
 @Suite
 @MainActor

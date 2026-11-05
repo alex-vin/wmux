@@ -5,7 +5,7 @@ import Testing
 /// a Claude turn-complete notification must land on the pane whose agent
 /// finished, resolved from LIVE identity at delivery time — never from a
 /// polluted session record, a stale `debug.terminals` tty row, or spawn-time
-/// `CMUX_WORKSPACE_ID`/`CMUX_SURFACE_ID` env captured before a pane move.
+/// `WMUX_WORKSPACE_ID`/`WMUX_SURFACE_ID` env captured before a pane move.
 ///
 /// The CLI asks the app for the live target via the
 /// `agent.resolve_delivery_target` control method:
@@ -50,9 +50,9 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43209"
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43209"
 
         let result = Harness.runHookProcess(
             context: context,
@@ -120,9 +120,9 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.otherWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.otherSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43210"
+        environment["WMUX_WORKSPACE_ID"] = Self.otherWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.otherSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43210"
 
         let result = Harness.runHookProcess(
             context: context,
@@ -184,9 +184,9 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43211"
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43211"
 
         let result = Harness.runHookProcess(
             context: context,
@@ -236,9 +236,9 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43214"
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43214"
 
         let result = Harness.runHookProcess(
             context: context,
@@ -281,13 +281,13 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_CLI_TTY_NAME"] = ttyName
-        environment["CMUX_CLAUDE_PID"] = "43212"
-        environment["CMUX_AGENT_LAUNCH_KIND"] = "claude"
-        environment["CMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/claude"
-        environment["CMUX_AGENT_LAUNCH_CWD"] = context.root.path
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_CLI_TTY_NAME"] = ttyName
+        environment["WMUX_CLAUDE_PID"] = "43212"
+        environment["WMUX_AGENT_LAUNCH_KIND"] = "claude"
+        environment["WMUX_AGENT_LAUNCH_EXECUTABLE"] = "/usr/local/bin/claude"
+        environment["WMUX_AGENT_LAUNCH_CWD"] = context.root.path
 
         let result = Harness.runHookProcess(
             context: context,
@@ -341,8 +341,8 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
         let first = Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-start"],
@@ -351,7 +351,7 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
         assertSuccessfulHook(first)
 
-        environment["CMUX_SURFACE_ID"] = Self.otherSurfaceId
+        environment["WMUX_SURFACE_ID"] = Self.otherSurfaceId
         let second = Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-start"],
@@ -390,8 +390,8 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
         assertSuccessfulHook(Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-start"],
@@ -406,7 +406,7 @@ struct ClaudeHookLiveDeliveryTargetTests {
         ))
 
         let commandCountBeforeResume = context.state.snapshot().count
-        environment["CMUX_SURFACE_ID"] = Self.otherSurfaceId
+        environment["WMUX_SURFACE_ID"] = Self.otherSurfaceId
         assertSuccessfulHook(Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-start"],
@@ -442,9 +442,9 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] = "1"
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_AGENT_HOOK_SUPPRESS_VISIBLE_MUTATIONS"] = "1"
         assertSuccessfulHook(Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-start"],
@@ -453,7 +453,7 @@ struct ClaudeHookLiveDeliveryTargetTests {
         ))
 
         let commandCountBeforeMove = context.state.snapshot().count
-        environment["CMUX_SURFACE_ID"] = Self.otherSurfaceId
+        environment["WMUX_SURFACE_ID"] = Self.otherSurfaceId
         assertSuccessfulHook(Harness.runHookProcess(
             context: context,
             arguments: ["hooks", "claude", "session-start"],
@@ -489,7 +489,7 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
 
         let result = Harness.runHookProcess(
             context: context,
@@ -531,9 +531,9 @@ struct ClaudeHookLiveDeliveryTargetTests {
         )
 
         var environment = Harness.hookEnvironment(context: context)
-        environment["CMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
-        environment["CMUX_SURFACE_ID"] = Self.liveSurfaceId
-        environment["CMUX_CLAUDE_PID"] = "43213"
+        environment["WMUX_WORKSPACE_ID"] = Self.liveWorkspaceId
+        environment["WMUX_SURFACE_ID"] = Self.liveSurfaceId
+        environment["WMUX_CLAUDE_PID"] = "43213"
 
         let result = Harness.runHookProcess(
             context: context,

@@ -1,10 +1,10 @@
 import XCTest
-import CmuxBrowser
+import WmuxBrowser
 import AppKit
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -42,7 +42,7 @@ final class InactivePaneFirstClickFocusTests: XCTestCase {
     func testBrowserViewAcceptsFirstMouseWhenSettingEnabled() {
         UserDefaults.standard.set(true, forKey: settingsKey)
 
-        let view = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let view = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
 
         XCTAssertTrue(view.acceptsFirstMouse(for: nil))
     }
@@ -50,7 +50,7 @@ final class InactivePaneFirstClickFocusTests: XCTestCase {
     func testBrowserViewRejectsFirstMouseWhenSettingDisabled() {
         UserDefaults.standard.set(false, forKey: settingsKey)
 
-        let view = CmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: CmuxWebViewAppHost())
+        let view = WmuxWebView(frame: .zero, configuration: WKWebViewConfiguration(), host: WmuxWebViewAppHost())
 
         XCTAssertFalse(view.acceptsFirstMouse(for: nil))
     }

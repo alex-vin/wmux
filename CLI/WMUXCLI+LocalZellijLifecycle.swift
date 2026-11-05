@@ -147,7 +147,7 @@ extension WMUXCLI {
             sessionName: LocalZellijCommandBuilder.zellijSessionName(for: record)
         )
         let environment = ProcessInfo.processInfo.environment
-            .filter { !$0.key.hasPrefix("CMUX_") && !$0.key.hasPrefix("CMUXD_") }
+            .filter { !$0.key.hasPrefix("WMUX_") && !$0.key.hasPrefix("WMUXD_") }
         process.environment = runtime.builder.environment(base: environment)
         process.standardInput = FileHandle.standardInput
         process.standardOutput = FileHandle.standardOutput

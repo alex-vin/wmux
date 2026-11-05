@@ -1,9 +1,9 @@
 import Foundation
-import CmuxTerminal
+import WmuxTerminal
 import Testing
 
-#if canImport(cmux_DEV)
-    @testable import cmux_DEV
+#if canImport(wmux_DEV)
+    @testable import wmux_DEV
 #elseif canImport(cmux)
     @testable import cmux
 #endif
@@ -21,10 +21,10 @@ struct GhosttyTerminalStartupEnvironmentTests {
         defer { GhosttyApp.terminalSurfaceRegistry.unregister(surface) }
 
         let expectedContextValues = [
-            "CMUX_WORKSPACE_ID": workspaceId.uuidString,
-            "CMUX_SURFACE_ID": surface.id.uuidString,
-            "CMUX_TAB_ID": workspaceId.uuidString,
-            "CMUX_PANEL_ID": surface.id.uuidString,
+            "WMUX_WORKSPACE_ID": workspaceId.uuidString,
+            "WMUX_SURFACE_ID": surface.id.uuidString,
+            "WMUX_TAB_ID": workspaceId.uuidString,
+            "WMUX_PANEL_ID": surface.id.uuidString,
         ]
 
         for (key, expectedValue) in expectedContextValues {
@@ -34,14 +34,14 @@ struct GhosttyTerminalStartupEnvironmentTests {
         }
 
         let socketPath = try #require(
-            surface.startupEnvironmentValue("CMUX_SOCKET_PATH"),
-            "CMUX_SOCKET_PATH should be present"
+            surface.startupEnvironmentValue("WMUX_SOCKET_PATH"),
+            "WMUX_SOCKET_PATH should be present"
         )
         expectFalse(socketPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
         let terminalLifecycleID = try #require(
-            surface.startupEnvironmentValue("CMUX_TERMINAL_LIFECYCLE_ID"),
-            "CMUX_TERMINAL_LIFECYCLE_ID should be present"
+            surface.startupEnvironmentValue("WMUX_TERMINAL_LIFECYCLE_ID"),
+            "WMUX_TERMINAL_LIFECYCLE_ID should be present"
         )
         #expect(UUID(uuidString: terminalLifecycleID) != nil)
     }
@@ -65,7 +65,7 @@ struct GhosttyTerminalStartupEnvironmentTests {
             }
         }
         let originalLifecycleID = try #require(
-            original.startupEnvironmentValue("CMUX_TERMINAL_LIFECYCLE_ID")
+            original.startupEnvironmentValue("WMUX_TERMINAL_LIFECYCLE_ID")
         )
         GhosttyApp.terminalSurfaceRegistry.unregister(original)
         original.teardownHostedSurfaceForTesting()
@@ -82,7 +82,7 @@ struct GhosttyTerminalStartupEnvironmentTests {
             replacement.teardownHostedSurfaceForTesting()
         }
         let replacementLifecycleID = try #require(
-            replacement.startupEnvironmentValue("CMUX_TERMINAL_LIFECYCLE_ID")
+            replacement.startupEnvironmentValue("WMUX_TERMINAL_LIFECYCLE_ID")
         )
 
         #expect(replacement.id == original.id)
@@ -124,14 +124,14 @@ struct GhosttyTerminalStartupEnvironmentTests {
             protectedKeys: &protectedKeys
         )
 
-        expectEqual(environment["CMUX_NO_GIT_WATCH"], "1")
-        expectTrue(protectedKeys.contains("CMUX_NO_GIT_WATCH"))
+        expectEqual(environment["WMUX_NO_GIT_WATCH"], "1")
+        expectTrue(protectedKeys.contains("WMUX_NO_GIT_WATCH"))
     }
 
     @Test
     func testApplyManagedGitWatchEnvironmentClearsInheritedOptOutWhenEnabled() {
         var environment = [
-            "CMUX_NO_GIT_WATCH": "1"
+            "WMUX_NO_GIT_WATCH": "1"
         ]
         var protectedKeys: Set<String> = []
 
@@ -144,20 +144,20 @@ struct GhosttyTerminalStartupEnvironmentTests {
             base: environment,
             protectedKeys: protectedKeys,
             additionalEnvironment: [
-                "CMUX_NO_GIT_WATCH": "1"
+                "WMUX_NO_GIT_WATCH": "1"
             ],
             initialEnvironmentOverrides: [
-                "CMUX_NO_GIT_WATCH": "1"
+                "WMUX_NO_GIT_WATCH": "1"
             ]
         )
 
-        expectEqual(merged["CMUX_NO_GIT_WATCH"], "")
+        expectEqual(merged["WMUX_NO_GIT_WATCH"], "")
     }
 
     @Test
     func testApplyManagedGitWatchEnvironmentDisablesShellPullRequestWatchWhenHidden() {
         var environment = [
-            "CMUX_NO_PR_WATCH": ""
+            "WMUX_NO_PR_WATCH": ""
         ]
         var protectedKeys: Set<String> = []
 
@@ -168,10 +168,10 @@ struct GhosttyTerminalStartupEnvironmentTests {
             protectedKeys: &protectedKeys
         )
 
-        expectEqual(environment["CMUX_NO_GIT_WATCH"], "")
-        expectEqual(environment["CMUX_NO_PR_WATCH"], "1")
-        expectTrue(protectedKeys.contains("CMUX_NO_GIT_WATCH"))
-        expectTrue(protectedKeys.contains("CMUX_NO_PR_WATCH"))
+        expectEqual(environment["WMUX_NO_GIT_WATCH"], "")
+        expectEqual(environment["WMUX_NO_PR_WATCH"], "1")
+        expectTrue(protectedKeys.contains("WMUX_NO_GIT_WATCH"))
+        expectTrue(protectedKeys.contains("WMUX_NO_PR_WATCH"))
     }
 
     @Test
@@ -296,10 +296,10 @@ struct GhosttyTerminalStartupEnvironmentTests {
         #!/usr/bin/env bash
         set -euo pipefail
         {
-            printf 'shim=%s\\n' "${CMUX_CLAUDE_WRAPPER_SHIM:-}"
-            printf 'root=%s\\n' "${CMUX_CLAUDE_WRAPPER_SHIM_ROOT:-}"
+            printf 'shim=%s\\n' "${WMUX_CLAUDE_WRAPPER_SHIM:-}"
+            printf 'root=%s\\n' "${WMUX_CLAUDE_WRAPPER_SHIM_ROOT:-}"
             printf 'args=%s\\n' "$*"
-        } > "$CMUX_TEST_LOG"
+        } > "$WMUX_TEST_LOG"
         """.write(to: wrapperURL, atomically: true, encoding: .utf8)
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: wrapperURL.path)
         let hermesWrapperURL = bundleBin.appendingPathComponent("cmux-hermes-agent-wrapper", isDirectory: false)
@@ -347,7 +347,7 @@ struct GhosttyTerminalStartupEnvironmentTests {
         process.arguments = ["hello", "two words"]
         process.environment = [
             "PATH": "/usr/bin:/bin",
-            "CMUX_TEST_LOG": logURL.path,
+            "WMUX_TEST_LOG": logURL.path,
         ]
         try process.run()
         process.waitUntilExit()
@@ -387,13 +387,13 @@ struct GhosttyTerminalStartupEnvironmentTests {
         let staleWrapperURL = oldBundleBin.appendingPathComponent("cmux-claude-wrapper", isDirectory: false)
         try writeExecutable(staleWrapperURL, """
         #!/usr/bin/env bash
-        printf 'stale %s\\n' "$*" > "$CMUX_TEST_LOG"
+        printf 'stale %s\\n' "$*" > "$WMUX_TEST_LOG"
         """)
 
         let currentWrapperURL = currentBundleBin.appendingPathComponent("cmux-claude-wrapper", isDirectory: false)
         try writeExecutable(currentWrapperURL, """
         #!/usr/bin/env bash
-        printf 'current %s\\n' "$*" > "$CMUX_TEST_LOG"
+        printf 'current %s\\n' "$*" > "$WMUX_TEST_LOG"
         """)
         let currentCLIURL = currentBundleBin.appendingPathComponent("cmux", isDirectory: false)
         try writeExecutable(currentCLIURL, """
@@ -415,8 +415,8 @@ struct GhosttyTerminalStartupEnvironmentTests {
         process.arguments = ["--resume", "session-id"]
         process.environment = [
             "PATH": "/usr/bin:/bin",
-            "CMUX_BUNDLED_CLI_PATH": currentCLIURL.path,
-            "CMUX_TEST_LOG": logURL.path,
+            "WMUX_BUNDLED_CLI_PATH": currentCLIURL.path,
+            "WMUX_TEST_LOG": logURL.path,
         ]
         try process.run()
         process.waitUntilExit()
@@ -454,18 +454,18 @@ struct GhosttyTerminalStartupEnvironmentTests {
         let wrapperURL = bundleBin.appendingPathComponent("cmux-claude-wrapper", isDirectory: false)
         try writeExecutable(wrapperURL, """
         #!/usr/bin/env bash
-        printf 'stale-wrapper %s\\n' "$*" > "$CMUX_TEST_LOG"
+        printf 'stale-wrapper %s\\n' "$*" > "$WMUX_TEST_LOG"
         """)
         let oldShimURL = oldShimRoot.appendingPathComponent("claude", isDirectory: false)
         try writeExecutable(oldShimURL, """
         #!/usr/bin/env bash
-        printf 'old-shim %s\\n' "$*" > "$CMUX_TEST_LOG"
+        printf 'old-shim %s\\n' "$*" > "$WMUX_TEST_LOG"
         exit 43
         """)
         let realClaudeURL = realBin.appendingPathComponent("claude", isDirectory: false)
         try writeExecutable(realClaudeURL, """
         #!/usr/bin/env bash
-        printf 'real %s\\n' "$*" > "$CMUX_TEST_LOG"
+        printf 'real %s\\n' "$*" > "$WMUX_TEST_LOG"
         """)
 
         let shims = try #require(
@@ -482,7 +482,7 @@ struct GhosttyTerminalStartupEnvironmentTests {
         process.arguments = ["--resume", "session-id"]
         process.environment = [
             "PATH": "\(shims.directoryPath):\(oldShimRoot.path):\(realBin.path):/usr/bin:/bin",
-            "CMUX_TEST_LOG": logURL.path,
+            "WMUX_TEST_LOG": logURL.path,
         ]
         try process.run()
         process.waitUntilExit()
@@ -498,19 +498,19 @@ struct GhosttyTerminalStartupEnvironmentTests {
         let merged = TerminalSurface.mergedStartupEnvironment(
             base: [
                 "PATH": "/usr/bin",
-                "CMUX_SURFACE_ID": "managed-surface",
+                "WMUX_SURFACE_ID": "managed-surface",
             ],
-            protectedKeys: ["PATH", "CMUX_SURFACE_ID"],
+            protectedKeys: ["PATH", "WMUX_SURFACE_ID"],
             additionalEnvironment: [
                 SessionScrollbackReplayStore.environmentKey: replayPath
             ],
             initialEnvironmentOverrides: [
-                "CMUX_INITIAL_ENV_TOKEN": "token-123"
+                "WMUX_INITIAL_ENV_TOKEN": "token-123"
             ]
         )
 
         expectEqual(merged[SessionScrollbackReplayStore.environmentKey], replayPath)
-        expectEqual(merged["CMUX_INITIAL_ENV_TOKEN"], "token-123")
+        expectEqual(merged["WMUX_INITIAL_ENV_TOKEN"], "token-123")
     }
 
     @Test
@@ -518,21 +518,21 @@ struct GhosttyTerminalStartupEnvironmentTests {
         let merged = TerminalSurface.mergedStartupEnvironment(
             base: [
                 "PATH": "/usr/bin",
-                "CMUX_SURFACE_ID": "managed-surface",
+                "WMUX_SURFACE_ID": "managed-surface",
             ],
-            protectedKeys: ["PATH", "CMUX_SURFACE_ID"],
+            protectedKeys: ["PATH", "WMUX_SURFACE_ID"],
             additionalEnvironment: [
-                "CMUX_SURFACE_ID": "user-surface",
+                "WMUX_SURFACE_ID": "user-surface",
                 "CUSTOM_FLAG": "1",
             ],
             initialEnvironmentOverrides: [
                 "PATH": "/tmp/bin",
-                "CMUX_SURFACE_ID": "override-surface",
+                "WMUX_SURFACE_ID": "override-surface",
             ]
         )
 
         expectEqual(merged["PATH"], "/usr/bin")
-        expectEqual(merged["CMUX_SURFACE_ID"], "managed-surface")
+        expectEqual(merged["WMUX_SURFACE_ID"], "managed-surface")
         expectEqual(merged["CUSTOM_FLAG"], "1")
     }
 

@@ -1,3 +1,3 @@
-import CmuxTerminal
+import WmuxTerminal
 
 extension TerminalSurface: RendererRealizationSurface {}

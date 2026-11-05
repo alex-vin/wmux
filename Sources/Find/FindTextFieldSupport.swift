@@ -1,7 +1,7 @@
 import AppKit
 
 enum FindFocusNotificationKey {
-    static let selectAll = "cmux.find.selectAll"
+    static let selectAll = "wmux.find.selectAll"
 }
 
 func cmuxClampedFindSelection(_ range: NSRange, in text: String) -> NSRange {

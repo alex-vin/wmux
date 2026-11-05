@@ -1,10 +1,10 @@
-import CmuxCloud
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
 @MainActor
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     #if compiler(>=6.2)
     @concurrent
     #else
@@ -13,15 +13,15 @@ extension CmuxTuiSurfaceProvider {
     private nonisolated static func performRemoteBrowserCreation(
         link: CloudMachineLink,
         request: CloudTuiRequest
-    ) async throws -> CmuxTuiSnapshotParser.CreatedBrowserPath? {
+    ) async throws -> WmuxTuiSnapshotParser.CreatedBrowserPath? {
         let data = try await link.run(arguments: request)
         guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return nil
         }
-        return CmuxTuiSnapshotParser.createdBrowser(fromCreateResult: object)
+        return WmuxTuiSnapshotParser.createdBrowser(fromCreateResult: object)
     }
 
-    /// Creates a browser in cmux-tui so the browser's page, network, and localhost
+    /// Creates a browser in wmux-tui so the browser's page, network, and localhost
     /// context belong to this machine rather than to the Mac running cmux.
     func createBrowser(
         url: URL,
@@ -75,7 +75,7 @@ extension CmuxTuiSurfaceProvider {
 
     /// Keeps a committed receipt across replacement in the same ownership scope.
     func recordCommittedBrowser(
-        _ created: CmuxTuiSnapshotParser.CreatedBrowserPath,
+        _ created: WmuxTuiSnapshotParser.CreatedBrowserPath,
         url: URL,
         name: String?,
         expectedLifecycle: UInt64? = nil
@@ -83,7 +83,7 @@ extension CmuxTuiSurfaceProvider {
         // Account or machine teardown is not a reconnect. The previous provider
         // may already be suspended; only a live replacement for this machine and
         // team may adopt its committed receipt.
-        guard let activeProvider = catalog.provider(for: machine) as? CmuxTuiSurfaceProvider,
+        guard let activeProvider = catalog.provider(for: machine) as? WmuxTuiSurfaceProvider,
               activeProvider.isRegisteredInCatalog(), !activeProvider.hasLostAccess,
               !activeProvider.isFeatureSuspended,
               activeProvider.ownerTeamID == ownerTeamID,
@@ -99,7 +99,7 @@ extension CmuxTuiSurfaceProvider {
     }
 
     func recordCreatedBrowser(
-        _ created: CmuxTuiSnapshotParser.CreatedBrowserPath,
+        _ created: WmuxTuiSnapshotParser.CreatedBrowserPath,
         workspaceID: String,
         url: URL,
         name: String?
@@ -120,7 +120,7 @@ extension CmuxTuiSurfaceProvider {
             lifecycle: .launching,
             agent: nil,
             remoteWorkspace: remoteWorkspace,
-            port: CmuxTuiSnapshotParser.localhostPort(fromURL: url.absoluteString),
+            port: WmuxTuiSnapshotParser.localhostPort(fromURL: url.absoluteString),
             url: url.absoluteString
         )
         resource.remoteViews = [SurfaceRemoteView(

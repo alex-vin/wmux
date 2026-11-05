@@ -1,9 +1,9 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -36,14 +36,14 @@ extension MobileHostIdentityTests {
     }
 }
 
-extension CMUXCLIErrorOutputRegressionTests {
+extension WMUXCLIErrorOutputRegressionTests {
     @Test func testThemesSetRCOverridePathIsReadableByRCAppConfigResolution() throws {
         try assertThemesSetOverridePathIsReadableByChannelApp(channel: "rc")
     }
 
     /// `channel` is the socket/bundle infix shared by the release lanes: `cmux-<channel>-<slug>.sock`
     /// maps to `com.cmuxterm.app.<channel>.<slug>`. The nightly twin in
-    /// `CMUXCLIErrorOutputRegressionTests.swift` calls this with `"nightly"`.
+    /// `WMUXCLIErrorOutputRegressionTests.swift` calls this with `"nightly"`.
     func assertThemesSetOverridePathIsReadableByChannelApp(channel: String) throws {
         let cliPath = try bundledCLIPath()
         let fileManager = FileManager.default
@@ -57,7 +57,7 @@ extension CMUXCLIErrorOutputRegressionTests {
         try fileManager.createDirectory(at: themesURL, withIntermediateDirectories: true)
         try writeTheme(named: "Theme A", background: "#101010", to: themesURL)
 
-        // The reload target comes from the socket file name before CMUX_BUNDLE_ID is even
+        // The reload target comes from the socket file name before WMUX_BUNDLE_ID is even
         // consulted: `cmux-nightly-<slug>.sock` becomes `com.cmuxterm.app.nightly.<slug>`.
         // So scoping the identifier means scoping the socket name it is read from, and both
         // take the same hex-only suffix — a raw UUID's dashes would turn into dots in the
@@ -68,15 +68,15 @@ extension CMUXCLIErrorOutputRegressionTests {
         let socketPath = "/tmp/cmux-\(channel)-\(uniqueSuffix).sock"
         let bundleIdentifier = "com.cmuxterm.app.\(channel).\(uniqueSuffix)"
         var environment = ProcessInfo.processInfo.environment
-        for key in Array(environment.keys) where key.hasPrefix("CMUX_") {
+        for key in Array(environment.keys) where key.hasPrefix("WMUX_") {
             environment.removeValue(forKey: key)
         }
         environment["CFFIXED_USER_HOME"] = root.path
         environment["HOME"] = root.path
         environment["GHOSTTY_RESOURCES_DIR"] = resourcesURL.path
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_BUNDLE_ID"] = bundleIdentifier
-        environment["CMUX_CLI_SENTRY_DISABLED"] = "1"
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_BUNDLE_ID"] = bundleIdentifier
+        environment["WMUX_CLI_SENTRY_DISABLED"] = "1"
 
         let result = runProcess(
             executablePath: cliPath,

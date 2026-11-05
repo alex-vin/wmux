@@ -1,8 +1,8 @@
-import CmuxCloudTui
-import CmuxSurfaceCatalogModel
+import WmuxCloudTui
+import WmuxSurfaceCatalogModel
 import Foundation
 
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     func closeTerminal(_ id: SurfaceResourceID) async throws {
         try await closeTerminal(id, fallbackTabID: nil)
     }

@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Darwin
 import Foundation
 
@@ -7,10 +7,10 @@ import Foundation
 /// itself with Codex; the watcher then routes the discovered identity through
 /// the normal `SessionStart` hook path.
 struct CodexForkSessionWatcher {
-    static let parentSessionEnvironmentKey = "CMUX_AGENT_FORK_PARENT_SESSION_ID"
-    static let launchAtEnvironmentKey = "CMUX_AGENT_FORK_LAUNCH_AT"
-    static let launchIDEnvironmentKey = "CMUX_AGENT_FORK_LAUNCH_ID"
-    static let forkSessionEnvironmentKey = "CMUX_CODEX_FORK_SESSION"
+    static let parentSessionEnvironmentKey = "WMUX_AGENT_FORK_PARENT_SESSION_ID"
+    static let launchAtEnvironmentKey = "WMUX_AGENT_FORK_LAUNCH_AT"
+    static let launchIDEnvironmentKey = "WMUX_AGENT_FORK_LAUNCH_ID"
+    static let forkSessionEnvironmentKey = "WMUX_CODEX_FORK_SESSION"
 
     struct ChildSession: Equatable {
         let sessionID: String
@@ -37,14 +37,14 @@ struct CodexForkSessionWatcher {
         self.parentSessionID = parentSessionID
         self.fileManager = fileManager
         launchID = environment[Self.launchIDEnvironmentKey]?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        ownerPID = Int(environment["CMUX_CODEX_PID"] ?? "") ?? 0
+        ownerPID = Int(environment["WMUX_CODEX_PID"] ?? "") ?? 0
         sessionsRoot = URL(
             fileURLWithPath: CodexHomeResolver().resolve(ambientEnvironment: environment),
             isDirectory: true
         ).appendingPathComponent("sessions", isDirectory: true)
         let launchTimestamp = Double(environment[Self.launchAtEnvironmentKey] ?? "") ?? Date.now.timeIntervalSince1970
         launchedAt = Date(timeIntervalSince1970: launchTimestamp)
-        let stateRoot = environment["CMUX_AGENT_HOOK_STATE_DIR"]
+        let stateRoot = environment["WMUX_AGENT_HOOK_STATE_DIR"]
             .flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
             ?? URL(fileURLWithPath: environment["HOME"] ?? NSHomeDirectory(), isDirectory: true)
                 .appendingPathComponent(".cmuxterm", isDirectory: true).path
@@ -319,12 +319,12 @@ extension WMUXCLI {
             environment[CodexForkSessionWatcher.launchIDEnvironmentKey] = launchID
         }
         if let ownerPID = optionValue(commandArgs, name: "--fork-owner-pid"), !ownerPID.isEmpty {
-            environment["CMUX_CODEX_PID"] = ownerPID
+            environment["WMUX_CODEX_PID"] = ownerPID
         }
         let workspaceID = optionValue(commandArgs, name: "--workspace")
-            ?? environment["CMUX_WORKSPACE_ID"]
+            ?? environment["WMUX_WORKSPACE_ID"]
         let surfaceID = optionValue(commandArgs, name: "--surface")
-            ?? environment["CMUX_SURFACE_ID"]
+            ?? environment["WMUX_SURFACE_ID"]
         guard let workspaceID, let surfaceID,
               !workspaceID.isEmpty, !surfaceID.isEmpty else {
             return
@@ -428,7 +428,7 @@ extension WMUXCLI {
                 with: output.fileHandleForReading.readDataToEndOfFile()
             ) as? [String: Any]
             return process.terminationStatus == 0
-                && result?["cmux_fork_binding"] as? String == "bound"
+                && result?["wmux_fork_binding"] as? String == "bound"
         } catch {
             try? input.fileHandleForWriting.close()
             return false

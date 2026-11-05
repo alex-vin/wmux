@@ -1,5 +1,5 @@
-import CmuxAgentJournal
-import CmuxControlSocket
+import WmuxAgentJournal
+import WmuxControlSocket
 import Foundation
 
 /// Where a message goes, resolved on the main actor.
@@ -356,11 +356,11 @@ extension TerminalController {
             let message = timeout.retryable
                 ? String(
                     localized: "socket.mainActorHop.timeout.notRun",
-                    defaultValue: "cmux did not respond within 10 seconds, so the command was not run. Retry in a moment."
+                    defaultValue: "wmux did not respond within 10 seconds, so the command was not run. Retry in a moment."
                 )
                 : String(
                     localized: "socket.mainActorHop.timeout.mayHaveRun",
-                    defaultValue: "cmux did not respond within 10 seconds after the command started, so its result is unknown. Check the effect before retrying."
+                    defaultValue: "wmux did not respond within 10 seconds after the command started, so its result is unknown. Check the effect before retrying."
                 )
             return .err(
                 code: "timeout",
@@ -499,7 +499,7 @@ extension TerminalController {
         return trimmed.isEmpty ? nil : trimmed
     }
 
-    /// Hooks pass the surface UUID from `CMUX_SURFACE_ID`; stored ids use the
+    /// Hooks pass the surface UUID from `WMUX_SURFACE_ID`; stored ids use the
     /// canonical uppercase form.
     nonisolated static func agentMessageSurfaceUUID(_ raw: Any?) -> String? {
         guard let string = agentMessageTrimmed(raw), let uuid = UUID(uuidString: string) else { return nil }

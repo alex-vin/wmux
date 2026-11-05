@@ -1,4 +1,4 @@
-import CmuxControlSocket
+import WmuxControlSocket
 import Darwin
 import Dispatch
 import Foundation
@@ -41,12 +41,12 @@ extension TerminalController {
         }
 
         let params = object["params"] as? [String: Any] ?? [:]
-        let afterSequence = CmuxEventBus.int64(params["after_seq"] ?? params["after"])
+        let afterSequence = WmuxEventBus.int64(params["after_seq"] ?? params["after"])
         let names = Self.stringSet(params["names"] ?? params["name"])
         let categories = Self.stringSet(params["categories"] ?? params["category"])
         let includeHeartbeats = Self.boolParam(params["include_heartbeats"] ?? params["include_heartbeat"]) ?? true
 
-        let snapshot = CmuxEventBus.shared.subscribe(
+        let snapshot = WmuxEventBus.shared.subscribe(
             afterSequence: afterSequence,
             names: names,
             categories: categories
@@ -57,7 +57,7 @@ extension TerminalController {
         )
         defer {
             revocationSource?.cancel()
-            CmuxEventBus.shared.unsubscribe(snapshot.subscription)
+            WmuxEventBus.shared.unsubscribe(snapshot.subscription)
         }
 
         guard socketEventStreamAuthorizationIsCurrent(
@@ -77,7 +77,7 @@ extension TerminalController {
             authorizationGeneration,
             passwordAuthorization: &streamPasswordAuthorization
         ) {
-            let event = snapshot.subscription.next(timeout: CmuxEventBus.defaultHeartbeatIntervalSeconds)
+            let event = snapshot.subscription.next(timeout: WmuxEventBus.defaultHeartbeatIntervalSeconds)
             guard socketEventStreamAuthorizationIsCurrent(
                 authorizationGeneration,
                 passwordAuthorization: &streamPasswordAuthorization
@@ -92,7 +92,7 @@ extension TerminalController {
                         "error": [
                             "code": "slow_consumer",
                             "message": reason,
-                            "latest_seq": NSNumber(value: CmuxEventBus.shared.latestSequence)
+                            "latest_seq": NSNumber(value: WmuxEventBus.shared.latestSequence)
                         ]
                     ], socket: socket)
                 }
@@ -102,7 +102,7 @@ extension TerminalController {
                           authorizationGeneration,
                           passwordAuthorization: &streamPasswordAuthorization
                       ) {
-                let heartbeat = CmuxEventBus.shared.heartbeat(subscription: snapshot.subscription)
+                let heartbeat = WmuxEventBus.shared.heartbeat(subscription: snapshot.subscription)
                 guard writeEventsStreamLine(heartbeat, socket: socket) else { return }
             } else if Self.socketPeerClosed(socket) {
                 return
@@ -112,7 +112,7 @@ extension TerminalController {
 
     private nonisolated func socketEventStreamRevocationSource(
         _ signal: SocketAuthorizationRevocationSignal,
-        subscription: CmuxEventSubscription
+        subscription: WmuxEventSubscription
     ) -> (any DispatchSourceRead)? {
         let signalDescriptor = signal.readFileDescriptor
         guard signalDescriptor >= 0 else { return nil }
@@ -141,12 +141,12 @@ extension TerminalController {
     }
 
     nonisolated func publishSocketEvents(command: String, response: String) {
-        CmuxSocketEventMapper.publish(command: command, response: response)
+        WmuxSocketEventMapper.publish(command: command, response: response)
     }
 
     private nonisolated func writeEventsStreamLine(_ object: [String: Any], socket: Int32) -> Bool {
         autoreleasepool {
-            guard let line = CmuxEventBus.encodeLine(object) else { return false }
+            guard let line = WmuxEventBus.encodeLine(object) else { return false }
             return transport.writeAll(Data((line + "\n").utf8), to: socket)
         }
     }

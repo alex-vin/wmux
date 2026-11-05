@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 
 /// Retires one reload waiter exactly once, including after its socket timeout.
 final class SocketReloadConfigurationWaiterLease: Sendable {

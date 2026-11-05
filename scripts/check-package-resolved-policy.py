@@ -18,13 +18,13 @@ ALLOWED_IGNORED_PREFIXES = (
 )
 
 XCODE_PACKAGE_RESOLVED = (
-    "cmux.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+    "wmux.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 )
-XCODE_PROJECT_FILE = "cmux.xcodeproj/project.pbxproj"
+XCODE_PROJECT_FILE = "wmux.xcodeproj/project.pbxproj"
 IOS_WORKSPACE_PACKAGE_RESOLVED = (
-    "ios/cmux.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+    "ios/wmux.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 )
-IOS_WORKSPACE_FILE = "ios/cmux.xcworkspace/contents.xcworkspacedata"
+IOS_WORKSPACE_FILE = "ios/wmux.xcworkspace/contents.xcworkspacedata"
 IOS_XCODE_PROJECT_FILE = "ios/cmux-ios.xcodeproj/project.pbxproj"
 EXPECTED_XCODE_LOCKFILES = {
     XCODE_PACKAGE_RESOLVED,

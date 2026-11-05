@@ -4,19 +4,19 @@ import XCTest
 /// Resolves the `cmux` binary these tests spawn.
 ///
 /// `cmuxTests` resolves it relative to the app host that loads it. `cmuxCLITests`
-/// has no app host, so it resolves it from `CMUX_CLI_PATH` or relative to the
+/// has no app host, so it resolves it from `WMUX_CLI_PATH` or relative to the
 /// built products directory the bundle itself was copied into.
 enum BundledCLITestSupport {
     static func ciRuntimeSourceRootEnvironment() -> [String: String] {
         let environment = ProcessInfo.processInfo.environment
         guard let runtimeRoot = [
-            environment["CMUX_CI_RUNTIME_SOURCE_ROOT"],
+            environment["WMUX_CI_RUNTIME_SOURCE_ROOT"],
             environment["TEST_RUNNER_CMUX_CI_RUNTIME_SOURCE_ROOT"],
         ].compactMap({ $0 }).first(where: { !$0.isEmpty }) else {
             return [:]
         }
         return [
-            "CMUX_CI_RUNTIME_SOURCE_ROOT": runtimeRoot,
+            "WMUX_CI_RUNTIME_SOURCE_ROOT": runtimeRoot,
             "TEST_RUNNER_CMUX_CI_RUNTIME_SOURCE_ROOT": runtimeRoot,
         ]
     }
@@ -24,7 +24,7 @@ enum BundledCLITestSupport {
     static func repositoryRoot(file: StaticString = #filePath) -> URL {
         let environment = ProcessInfo.processInfo.environment
         var roots: [URL] = []
-        for key in ["CMUX_CI_RUNTIME_SOURCE_ROOT", "TEST_RUNNER_CMUX_CI_RUNTIME_SOURCE_ROOT"] {
+        for key in ["WMUX_CI_RUNTIME_SOURCE_ROOT", "TEST_RUNNER_CMUX_CI_RUNTIME_SOURCE_ROOT"] {
             if let runtimeRoot = environment[key], !runtimeRoot.isEmpty {
                 roots.append(URL(fileURLWithPath: runtimeRoot, isDirectory: true)
                     .appendingPathComponent("src", isDirectory: true))
@@ -64,7 +64,7 @@ enum BundledCLITestSupport {
     /// Path to the bundled `cmux` CLI under test.
     ///
     /// Resolution order:
-    ///   1. `CMUX_CLI_PATH` — CI and local runs point this at the binary they
+    ///   1. `WMUX_CLI_PATH` — CI and local runs point this at the binary they
     ///      built, which is what makes this bundle independent of an app host.
     ///   2. `<products>/cmux` — the `cmux-cli` target's own product, which sits
     ///      beside this .xctest bundle in `Build/Products/<config>`.
@@ -85,12 +85,12 @@ enum BundledCLITestSupport {
     ) throws -> URL {
         let fileManager = FileManager.default
 
-        if let override = ProcessInfo.processInfo.environment["CMUX_CLI_PATH"], !override.isEmpty {
+        if let override = ProcessInfo.processInfo.environment["WMUX_CLI_PATH"], !override.isEmpty {
             let overrideURL = URL(fileURLWithPath: override)
             if fileManager.isExecutableFile(atPath: overrideURL.path) {
                 return overrideURL
             }
-            let message = "CMUX_CLI_PATH is set but not executable: \(override)"
+            let message = "WMUX_CLI_PATH is set but not executable: \(override)"
             XCTFail(message, file: file, line: line)
             throw NSError(domain: "cmux.tests", code: 2, userInfo: [
                 NSLocalizedDescriptionKey: message,
@@ -117,7 +117,7 @@ enum BundledCLITestSupport {
         }
 
         let message = """
-        cmux CLI not found. Set CMUX_CLI_PATH, or build the cmux-cli product \
+        cmux CLI not found. Set WMUX_CLI_PATH, or build the cmux-cli product \
         into \(productsURL.path).
         """
         XCTFail(message, file: file, line: line)

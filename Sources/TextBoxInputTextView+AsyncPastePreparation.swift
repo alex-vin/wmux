@@ -1,5 +1,5 @@
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 
 extension TextBoxInputTextView {
     typealias PreparedPasteHandler = @MainActor (

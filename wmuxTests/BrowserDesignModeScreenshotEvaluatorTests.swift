@@ -1,10 +1,10 @@
 import AppKit
-import CmuxBrowser
+import WmuxBrowser
 import Testing
 import WebKit
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -668,7 +668,7 @@ struct BrowserDesignModeScreenshotEvaluatorTests {
         #expect(captureStates.map(\.covered) == [false, true, true, true])
         #expect(container.subviews == [webView])
         let prompt = try #require(copiedPrompt)
-        #expect(!prompt.contains("<cmux_design_mode>"))
+        #expect(!prompt.contains("<wmux_design_mode>"))
         #expect(!prompt.contains("base64"))
         #expect(!prompt.contains("Full-page screenshot:"))
         #expect(!prompt.contains("Selection 1"))

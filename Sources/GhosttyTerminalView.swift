@@ -1,16 +1,16 @@
-import CmuxCloudBannerCore
-import CmuxCloud
+import WmuxCloudBannerCore
+import WmuxCloud
 import Foundation
-import CmuxAppKitSupportUI
-import CmuxTerminal
-import CmuxTerminalSharing
-import CmuxFoundation
-import CmuxPanes
-import CmuxTerminalCore
-import CmuxSidebar
-import CmuxSettings
-import CmuxWorkspaces
-import CmuxTestSupport
+import WmuxAppKitSupportUI
+import WmuxTerminal
+import WmuxTerminalSharing
+import WmuxFoundation
+import WmuxPanes
+import WmuxTerminalCore
+import WmuxSidebar
+import WmuxSettings
+import WmuxWorkspaces
+import WmuxTestSupport
 import SwiftUI
 import AppKit
 import Metal
@@ -21,13 +21,13 @@ import Darwin
 import Carbon.HIToolbox
 import os
 import Bonsplit
-import CMUXAgentLaunch
-import CMUXMobileCore
+import WMUXAgentLaunch
+import WMUXMobileCore
 import IOSurface
 import UniformTypeIdentifiers
 enum GhosttyStartupAppearancePreviewState {
     #if DEBUG
-    // The selected debug preview profile. Backed by the CmuxTerminalCore seam
+    // The selected debug preview profile. Backed by the WmuxTerminalCore seam
     // (TerminalStartupAppearancePreviewOverride) so GhosttyConfig's loader, now
     // package-bound, never reaches back up into this app-target settings type.
     // The app is the sole writer of the override.
@@ -53,7 +53,7 @@ enum GhosttyStartupAppearancePreviewState {
 // Window-background policy (cmuxShouldApplyWindowGlass /
 // cmuxShouldUseTransparentBackgroundWindow / cmuxShouldUseClearWindowBackground
 // / cmuxTransparentWindowBaseColor) and the compositor-blur CGS shims
-// (cmuxResetCompositorBackgroundBlur) moved to CmuxWorkspaceWindow as
+// (cmuxResetCompositorBackgroundBlur) moved to WmuxWorkspaceWindow as
 // WindowBackgroundPolicy + CompositorBlurController. The transitional
 // process-wide instances live in WindowBackgroundComposition (app target).
 
@@ -65,10 +65,10 @@ private func cmuxRuntimeReadClipboardCallback(
     GhosttyApp.runtimeReadClipboardCallback(userdata, location, state)
 }
 
-// GhosttyPasteboardHelper moved to CmuxTerminalServices as
+// GhosttyPasteboardHelper moved to WmuxTerminalServices as
 // TerminalPasteboardService (behind the TerminalClipboardReading /
 // TerminalClipboardWriting / TerminalImagePasteWriting seams in
-// CmuxTerminalCore). The process-wide instance is the transitional
+// WmuxTerminalCore). The process-wide instance is the transitional
 // GhosttyApp.terminalPasteboard composition static below.
 
 /// The app-side conformance injected into ``TerminalLinkRouter``: terminal
@@ -118,7 +118,7 @@ private func terminalKeyTableIndicatorText(_ name: String) -> String {
 }
 
 func terminalKeyboardCopyModeShouldBypassForShortcut(modifierFlags: NSEvent.ModifierFlags) -> Bool {
-    CmuxTerminalCore.terminalKeyboardCopyModeShouldBypassForShortcut(
+    WmuxTerminalCore.terminalKeyboardCopyModeShouldBypassForShortcut(
         modifiers: TerminalKeyboardCopyModeModifiers(modifierFlags: modifierFlags)
     )
 }
@@ -130,7 +130,7 @@ func terminalKeyboardCopyModeAction(
     hasSelection: Bool,
     asciiCharacterProvider: (UInt16, NSEvent.ModifierFlags) -> String? = KeyboardLayout.character(forKeyCode:modifierFlags:)
 ) -> TerminalKeyboardCopyModeAction? {
-    CmuxTerminalCore.terminalKeyboardCopyModeAction(
+    WmuxTerminalCore.terminalKeyboardCopyModeAction(
         keyCode: keyCode,
         charactersIgnoringModifiers: charactersIgnoringModifiers,
         modifiers: TerminalKeyboardCopyModeModifiers(modifierFlags: modifierFlags),
@@ -149,7 +149,7 @@ func terminalKeyboardCopyModeResolve(
     state: inout TerminalKeyboardCopyModeInputState,
     asciiCharacterProvider: (UInt16, NSEvent.ModifierFlags) -> String? = KeyboardLayout.character(forKeyCode:modifierFlags:)
 ) -> TerminalKeyboardCopyModeResolution {
-    CmuxTerminalCore.terminalKeyboardCopyModeResolve(
+    WmuxTerminalCore.terminalKeyboardCopyModeResolve(
         keyCode: keyCode,
         charactersIgnoringModifiers: charactersIgnoringModifiers,
         modifiers: TerminalKeyboardCopyModeModifiers(modifierFlags: modifierFlags),
@@ -161,10 +161,10 @@ func terminalKeyboardCopyModeResolve(
     )
 }
 
-// GhosttySurfaceCallbackContext moved to CmuxTerminalCore behind the
+// GhosttySurfaceCallbackContext moved to WmuxTerminalCore behind the
 // TerminalSurfaceControlling/TerminalSurfaceHosting seams; the conformances
 // and concrete-typed convenience accessors live here.
-// TerminalSurface's TerminalSurfaceControlling conformance lives in CmuxTerminal.
+// TerminalSurface's TerminalSurfaceControlling conformance lives in WmuxTerminal.
 
 extension GhosttyNSView: TerminalSurfaceHosting {
     var hostedTabId: UUID? { tabId }
@@ -176,9 +176,9 @@ extension GhosttySurfaceCallbackContext {
     var surfaceView: GhosttyNSView? { surfaceHost as? GhosttyNSView }
 }
 
-// TerminalSurface's TerminalSurfacing conformance lives in CmuxTerminal.
+// TerminalSurface's TerminalSurfacing conformance lives in WmuxTerminal.
 
-// The surface model drives its views through the CmuxTerminal hosting seams;
+// The surface model drives its views through the WmuxTerminal hosting seams;
 // the concrete view classes conform here.
 extension GhosttyNSView: TerminalSurfaceNativeViewing {}
 extension GhosttySurfaceScrollView: TerminalSurfacePaneHosting {}
@@ -217,7 +217,7 @@ extension TerminalSurfaceRegistry {
     }
 }
 
-// TerminalSurfaceRuntimeTeardownCoordinator moved to CmuxTerminal
+// TerminalSurfaceRuntimeTeardownCoordinator moved to WmuxTerminal
 // (Lifecycle/); the process-wide instance is the transitional
 // GhosttyApp.terminalSurfaceRuntimeTeardown composition static below.
 
@@ -237,7 +237,7 @@ class GhosttyApp {
 
     // MARK: Transitional terminal engine/services composition
     //
-    // CmuxTerminalEngine and CmuxTerminalServices ship singleton-free; cmux
+    // WmuxTerminalEngine and WmuxTerminalServices ship singleton-free; cmux
     // constructs exactly one instance of each capability here. These statics
     // are the documented transitional accessors for god-file callers
     // (GhosttyTerminalView.swift, AppDelegate, Workspace, TerminalController,
@@ -607,12 +607,12 @@ class GhosttyApp {
     private static func resolveBackgroundLogURL(
         environment: [String: String] = ProcessInfo.processInfo.environment
     ) -> URL {
-        if let explicitPath = environment["CMUX_DEBUG_BG_LOG"],
+        if let explicitPath = environment["WMUX_DEBUG_BG_LOG"],
            !explicitPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return URL(fileURLWithPath: explicitPath)
         }
 
-        if let debugLogPath = environment["CMUX_DEBUG_LOG"],
+        if let debugLogPath = environment["WMUX_DEBUG_LOG"],
            !debugLogPath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let baseURL = URL(fileURLWithPath: debugLogPath)
             let extensionSeparatorIndex = baseURL.lastPathComponent.lastIndex(of: ".")
@@ -625,10 +625,10 @@ class GhosttyApp {
     }
 
     let backgroundLogEnabled = {
-        if ProcessInfo.processInfo.environment["CMUX_DEBUG_BG"] == "1" {
+        if ProcessInfo.processInfo.environment["WMUX_DEBUG_BG"] == "1" {
             return true
         }
-        if ProcessInfo.processInfo.environment["CMUX_DEBUG_LOG"] != nil {
+        if ProcessInfo.processInfo.environment["WMUX_DEBUG_LOG"] != nil {
             return true
         }
         return UserDefaults.standard.bool(forKey: "cmuxDebugBG")
@@ -1000,13 +1000,13 @@ class GhosttyApp {
             loadInlineGhosttyConfig(
                 "macos-background-from-layer = true",
                 into: fallbackConfig,
-                prefix: "cmux-renderer-bg",
+                prefix: "wmux-renderer-bg",
                 logLabel: "renderer background (fallback)"
             )
             loadInlineGhosttyConfig(
                 "macos-titlebar-proxy-icon = hidden",
                 into: fallbackConfig,
-                prefix: "cmux-titlebar-proxy-icon",
+                prefix: "wmux-titlebar-proxy-icon",
                 logLabel: "titlebar proxy icon (fallback)"
             )
             loadCmuxShellIntegrationOverride(fallbackConfig)
@@ -1173,7 +1173,7 @@ class GhosttyApp {
             shell-integration-features = \(Self.shellIntegrationFeaturesWithoutCursor(features))
             """,
             into: config,
-            prefix: "cmux-shell-integration-override",
+            prefix: "wmux-shell-integration-override",
             logLabel: "shell integration override"
         )
     }
@@ -1192,7 +1192,7 @@ class GhosttyApp {
         loadInlineGhosttyConfig(
             GhosttyConfig.cmuxDefaultThemeConfigContents(preferredColorScheme: preferredColorScheme),
             into: config,
-            prefix: "cmux-default-appearance",
+            prefix: "wmux-default-appearance",
             logLabel: "default appearance fallback"
         )
     }
@@ -1202,7 +1202,7 @@ class GhosttyApp {
         loadInlineGhosttyConfig(
             contents,
             into: config,
-            prefix: "cmux-managed-terminal-settings",
+            prefix: "wmux-managed-terminal-settings",
             logLabel: "managed terminal settings"
         )
     }
@@ -1226,7 +1226,7 @@ class GhosttyApp {
         loadInlineGhosttyConfig(
             contents,
             into: config,
-            prefix: "cmux-startup-preview",
+            prefix: "wmux-startup-preview",
             logLabel: "startup appearance preview"
         )
     }
@@ -1242,7 +1242,7 @@ class GhosttyApp {
         loadInlineGhosttyConfig(
             contents,
             into: config,
-            prefix: "cmux-conditional-theme",
+            prefix: "wmux-conditional-theme",
             logLabel: "conditional theme override"
         )
     }
@@ -1319,7 +1319,7 @@ class GhosttyApp {
         loadInlineGhosttyConfig(
             "macos-background-from-layer = true",
             into: config,
-            prefix: "cmux-renderer-bg",
+            prefix: "wmux-renderer-bg",
             logLabel: "renderer background"
         )
         // Hide Ghostty's native AppKit proxy icon at the source instead of
@@ -1327,7 +1327,7 @@ class GhosttyApp {
         loadInlineGhosttyConfig(
             "macos-titlebar-proxy-icon = hidden",
             into: config,
-            prefix: "cmux-titlebar-proxy-icon",
+            prefix: "wmux-titlebar-proxy-icon",
             logLabel: "titlebar proxy icon"
         )
         // Save the user's preference before we force it to none.
@@ -1361,7 +1361,7 @@ class GhosttyApp {
         let scaledFontSize = max(1, CGFloat(fontSize) * GlobalFontMagnification.scale)
         loadInlineGhosttyConfig(
             "font-size = \(Double(scaledFontSize))", into: config,
-            prefix: "cmux-global-font-magnification",
+            prefix: "wmux-global-font-magnification",
             logLabel: "global font magnification"
         )
     }
@@ -1373,7 +1373,7 @@ class GhosttyApp {
         loadInlineGhosttyConfig(
             "window-vsync = false",
             into: config,
-            prefix: "cmux-no-active-display-vsync-fallback",
+            prefix: "wmux-no-active-display-vsync-fallback",
             logLabel: "no active display vsync fallback"
         )
 #if DEBUG
@@ -1398,7 +1398,7 @@ class GhosttyApp {
         loadInjectedFontCodepointMap(
             mappings,
             into: config,
-            prefix: "cmux-cjk-font-fallback",
+            prefix: "wmux-cjk-font-fallback",
             logLabel: "CJK font fallback"
         )
     }
@@ -1420,7 +1420,7 @@ class GhosttyApp {
         loadInjectedFontCodepointMap(
             mappings,
             into: config,
-            prefix: "cmux-symbol-font-fallback",
+            prefix: "wmux-symbol-font-fallback",
             logLabel: "symbol font fallback"
         )
     }
@@ -3737,12 +3737,12 @@ class GhosttyApp {
     private func activeMainWindow() -> NSWindow? {
         let keyWindow = NSApp.keyWindow
         if let raw = keyWindow?.identifier?.rawValue,
-           raw == "cmux.main" || raw.hasPrefix("cmux.main.") {
+           raw == "wmux.main" || raw.hasPrefix("wmux.main.") {
             return keyWindow
         }
         return NSApp.windows.first(where: { window in
             guard let raw = window.identifier?.rawValue else { return false }
-            return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+            return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
         })
     }
 
@@ -3764,8 +3764,8 @@ class GhosttyApp {
 // MARK: - Debug Render Instrumentation
 
 // GhosttyMetalLayer and the render/tick demand gates moved to
-// CmuxTerminalEngine (RenderDemandCounter behind the RenderDemandGating seam);
-// TerminalSurfaceRegistry moved to CmuxTerminalEngine behind
+// WmuxTerminalEngine (RenderDemandCounter behind the RenderDemandGating seam);
+// TerminalSurfaceRegistry moved to WmuxTerminalEngine behind
 // TerminalSurfaceRegistering, its AppDelegate reach-up inverted via
 // MainWindowRouteRetiring. The process-wide instances live in the
 // transitional GhosttyApp composition statics below.
@@ -3803,9 +3803,9 @@ private final class TerminalSharedBackdropCutoutFilter: CIFilter {
 
 // MARK: - Terminal Surface (owns the ghostty_surface_t lifecycle)
 
-// TerminalSurfaceFocusPlacement moved to CmuxTerminalCore (SurfaceRegistry/).
+// TerminalSurfaceFocusPlacement moved to WmuxTerminalCore (SurfaceRegistry/).
 
-// TerminalSurface and its SearchState moved to the CmuxTerminal package
+// TerminalSurface and its SearchState moved to the WmuxTerminal package
 // (Surface/TerminalSurface*.swift), with the legacy GhosttyApp /
 // TerminalController / MobileTerminalByteTee / RendererRealizationController /
 // AgentHibernationController reach-ups inverted through
@@ -3844,7 +3844,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
     }
 
     private static let focusDebugEnabled: Bool = {
-        if ProcessInfo.processInfo.environment["CMUX_FOCUS_DEBUG"] == "1" {
+        if ProcessInfo.processInfo.environment["WMUX_FOCUS_DEBUG"] == "1" {
             return true
         }
         return UserDefaults.standard.bool(forKey: "cmuxFocusDebug")
@@ -3928,7 +3928,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
     private lazy var remoteFilePreviewCoordinator = RemoteTerminalFilePreviewCoordinator(
         defaults: .standard,
         transport: ProcessSSHFileExplorerTransport.shared,
-        cacheDirectory: FileManager.default.temporaryDirectory.appendingPathComponent("cmux-remote-terminal-previews")
+        cacheDirectory: FileManager.default.temporaryDirectory.appendingPathComponent("wmux-remote-terminal-previews")
     )
 
     func openRemoteFilePreview(tokens: [String]) -> Bool {
@@ -4271,7 +4271,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
     }
 #if DEBUG
     private static let keyLatencyProbeEnabled: Bool = {
-        if ProcessInfo.processInfo.environment["CMUX_KEY_LATENCY_PROBE"] == "1" {
+        if ProcessInfo.processInfo.environment["WMUX_KEY_LATENCY_PROBE"] == "1" {
             return true
         }
         return UserDefaults.standard.bool(forKey: "cmuxKeyLatencyProbe")
@@ -4633,7 +4633,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
     private func setupKeyboardCopyModeCursorOverlay() {
         keyboardCopyModeCursorOverlayView.wantsLayer = true
         keyboardCopyModeCursorOverlayView.layer?.backgroundColor = NSColor.clear.cgColor
-        keyboardCopyModeCursorOverlayView.layer?.borderColor = (AppDelegate.shared?.accentColor ?? CmuxAccentColor()).themeNSColor.cgColor
+        keyboardCopyModeCursorOverlayView.layer?.borderColor = (AppDelegate.shared?.accentColor ?? WmuxAccentColor()).themeNSColor.cgColor
         keyboardCopyModeCursorOverlayView.layer?.borderWidth = 1
         keyboardCopyModeCursorOverlayView.isHidden = true
         addSubview(keyboardCopyModeCursorOverlayView, positioned: .above, relativeTo: nil)
@@ -7080,7 +7080,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
 #if DEBUG
     private func recordKeyLatency(path: String, event: NSEvent) {
         guard Self.keyLatencyProbeEnabled else { return }
-        CmuxTypingTiming.logEventDelay(path: path, event: event)
+        WmuxTypingTiming.logEventDelay(path: path, event: event)
     }
 #endif
 
@@ -7111,9 +7111,9 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
 
     private func performKeyEquivalent(with event: NSEvent, shouldRetryMainMenu: Bool) -> Bool {
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "terminal.performKeyEquivalent",
                 startedAt: typingTimingStart,
                 event: event
@@ -7321,7 +7321,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         if routeInputDuringClipboardRead(event) { return }
         let cancelledDeferredAdmission = terminalSurface?.didReceiveExplicitInput() == true
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         let phaseTotalStart = ProcessInfo.processInfo.systemUptime
         var ensureSurfaceMs: Double = 0
         var rightSidebarShortcutMs: Double = 0
@@ -7331,7 +7331,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         var ghosttySendMs: Double = 0
         defer {
             let totalMs = (ProcessInfo.processInfo.systemUptime - phaseTotalStart) * 1000.0
-            CmuxTypingTiming.logBreakdown(
+            WmuxTypingTiming.logBreakdown(
                 path: "terminal.keyDown.phase",
                 totalMs: totalMs,
                 event: event,
@@ -7346,7 +7346,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                 ],
                 extra: "marked=\(hasMarkedText() ? 1 : 0)"
             )
-            CmuxTypingTiming.logDuration(path: "terminal.keyDown", startedAt: typingTimingStart, event: event)
+            WmuxTypingTiming.logDuration(path: "terminal.keyDown", startedAt: typingTimingStart, event: event)
         }
         let ensureSurfaceStart = ProcessInfo.processInfo.systemUptime
 #endif
@@ -7468,7 +7468,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                 #endif
             } else {
                 #if DEBUG
-                let sendTimingStart = CmuxTypingTiming.start()
+                let sendTimingStart = WmuxTypingTiming.start()
                 let ghosttySendStart = ProcessInfo.processInfo.systemUptime
                 #endif
                 handled = text.withCString { ptr in
@@ -7477,7 +7477,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                 }
                 #if DEBUG
                 ghosttySendMs = (ProcessInfo.processInfo.systemUptime - ghosttySendStart) * 1000.0
-                CmuxTypingTiming.logDuration(
+                WmuxTypingTiming.logDuration(
                     path: "terminal.keyDown.ctrlGhosttySend",
                     startedAt: sendTimingStart,
                     event: event,
@@ -7544,7 +7544,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
 
         // Let the input system handle the event (for IME, dead keys, etc.)
 #if DEBUG
-        let interpretTimingStart = CmuxTypingTiming.start()
+        let interpretTimingStart = WmuxTypingTiming.start()
         let interpretPhaseStart = ProcessInfo.processInfo.systemUptime
 #endif
 #if DEBUG
@@ -7561,7 +7561,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
 #endif
 #if DEBUG
         interpretMs = (ProcessInfo.processInfo.systemUptime - interpretPhaseStart) * 1000.0
-        CmuxTypingTiming.logDuration(
+        WmuxTypingTiming.logDuration(
             path: "terminal.keyDown.interpretKeyEvents",
             startedAt: interpretTimingStart,
             event: event
@@ -7643,7 +7643,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
             for text in accumulatedText {
                 if shouldSendText(text) {
 #if DEBUG
-                    let sendTimingStart = CmuxTypingTiming.start()
+                    let sendTimingStart = WmuxTypingTiming.start()
                     let ghosttySendStart = ProcessInfo.processInfo.systemUptime
 #endif
                     text.withCString { ptr in
@@ -7662,7 +7662,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                     }
 #if DEBUG
                     ghosttySendMs += (ProcessInfo.processInfo.systemUptime - ghosttySendStart) * 1000.0
-                    CmuxTypingTiming.logDuration(
+                    WmuxTypingTiming.logDuration(
                         path: "terminal.keyDown.accumulatedGhosttySend.total",
                         startedAt: sendTimingStart,
                         event: event,
@@ -7722,7 +7722,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                    !suppressComposingFallbackText {
                     var handled = false
 #if DEBUG
-                    let sendTimingStart = CmuxTypingTiming.start()
+                    let sendTimingStart = WmuxTypingTiming.start()
                     let ghosttySendStart = ProcessInfo.processInfo.systemUptime
 #endif
                     text.withCString { ptr in
@@ -7744,7 +7744,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                     }
 #if DEBUG
                     ghosttySendMs += (ProcessInfo.processInfo.systemUptime - ghosttySendStart) * 1000.0
-                    CmuxTypingTiming.logDuration(
+                    WmuxTypingTiming.logDuration(
                         path: "terminal.keyDown.ghosttySend.total",
                         startedAt: sendTimingStart,
                         event: event,
@@ -7895,7 +7895,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         event: NSEvent? = nil,
         extra: String? = nil
     ) -> Bool {
-        let timingStart = CmuxTypingTiming.start()
+        let timingStart = WmuxTypingTiming.start()
         let handled = sendGhosttyKey(surface, keyEvent)
         let baseExtra = "handled=\(handled ? 1 : 0)"
         let mergedExtra: String
@@ -7904,7 +7904,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         } else {
             mergedExtra = baseExtra
         }
-        CmuxTypingTiming.logDuration(path: path, startedAt: timingStart, event: event, extra: mergedExtra)
+        WmuxTypingTiming.logDuration(path: path, startedAt: timingStart, event: event, extra: mergedExtra)
         return handled
     }
 #endif
@@ -8052,7 +8052,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
 #if DEBUG
         if suppressCommandPathHover, flags.contains(.command) {
             _ = UITestCaptureSink().mutateJSONObjectIfConfigured(
-                envKey: "CMUX_UI_TEST_CMD_HOVER_DIAGNOSTICS_PATH"
+                envKey: "WMUX_UI_TEST_CMD_HOVER_DIAGNOSTICS_PATH"
             ) { payload in
                 payload["suppressed_command_hover_count"] = (payload["suppressed_command_hover_count"] as? Int ?? 0) + 1
             }
@@ -8498,7 +8498,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         var payload = data
         payload["surface_id"] = terminalSurface?.id.uuidString ?? "nil"
         payload["word_path_hover_active"] = wordPathHoverActive
-        CmuxRuntimeDebugCapture.logIfConfigured(
+        WmuxRuntimeDebugCapture.logIfConfigured(
             hypothesisID: hypothesisID,
             source: "GhosttyNSView.\(name)",
             name: name,
@@ -8856,7 +8856,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
     #if DEBUG
     private func cmuxTerminalCmdClickQuicklookOverride(_ decodedWord: String) -> String {
         let env = ProcessInfo.processInfo.environment
-        guard let override = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_QUICKLOOK_OVERRIDE"]?
+        guard let override = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_QUICKLOOK_OVERRIDE"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               !override.isEmpty else {
             return decodedWord
@@ -8866,7 +8866,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
 
     private func cmuxTerminalCmdClickViewportOffsetDelta(_ viewportOffsetStart: Int) -> Int {
         let env = ProcessInfo.processInfo.environment
-        guard let delta = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_VIEWPORT_OFFSET_DELTA"]?
+        guard let delta = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_VIEWPORT_OFFSET_DELTA"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               let parsedDelta = Int(delta) else {
             return viewportOffsetStart
@@ -9713,7 +9713,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         )
 
         let swapPaneItem = menu.addItem(
-            withTitle: CmuxPaneSwapStrings().swapWithSession,
+            withTitle: WmuxPaneSwapStrings().swapWithSession,
             action: #selector(beginPaneSwapSelection(_:)),
             keyEquivalent: ""
         )
@@ -10207,7 +10207,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                 }
             },
             uploadDetectedSSH: { _, _, _, finish in
-                finish(.failure(NSError(domain: "cmux.remote.drop", code: 4)))
+                finish(.failure(NSError(domain: "wmux.remote.drop", code: 4)))
             },
             insertText: sendText,
             onFailure: { _ in onFailure() }
@@ -10290,7 +10290,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
                 guard let workspace = MainActor.assumeIsolated({
                     self?.terminalSurface?.owningWorkspace()
                 }) else {
-                    finish(.failure(NSError(domain: "cmux.remote.drop", code: 3)))
+                    finish(.failure(NSError(domain: "wmux.remote.drop", code: 3)))
                     GhosttyApp.terminalPasteboard.cleanupTransferredTemporaryImageFiles(fileURLs)
                     return
                 }
@@ -10379,7 +10379,7 @@ class GhosttyNSView: NSView, NSUserInterfaceValidations {
         asImageData: Bool = false
     ) -> Bool {
         guard !paths.isEmpty else { return false }
-        let pbName = NSPasteboard.Name("cmux.debug.drop.\(UUID().uuidString)")
+        let pbName = NSPasteboard.Name("wmux.debug.drop.\(UUID().uuidString)")
         let pasteboard = NSPasteboard(name: pbName)
         pasteboard.clearContents()
         switch asImageData ? DebugDropPayloadKind.imageData : .fileURLs {
@@ -10479,7 +10479,7 @@ extension Notification.Name {
     static let ghosttySurfaceThemeDidChange = Notification.Name("ghosttySurfaceThemeDidChange")
     static let browserSearchFocus = Notification.Name("browserSearchFocus")
     static let workspaceRemoteConnectionPresentationDidChange = Notification.Name(
-        "cmux.workspaceRemoteConnectionPresentationDidChange"
+        "wmux.workspaceRemoteConnectionPresentationDidChange"
     )
 }
 
@@ -10549,7 +10549,7 @@ final class GhosttySurfaceScrollView: NSView {
         case notification
     }
 
-    private static let flashAnimationKey = "cmux.flash"
+    private static let flashAnimationKey = "wmux.flash"
 
     static func flashStyle(for reason: WorkspaceAttentionFlashReason) -> FlashStyle {
         switch reason {
@@ -10926,7 +10926,7 @@ final class GhosttySurfaceScrollView: NSView {
         inactiveOverlayView.isHidden = true
         addSubview(inactiveOverlayView)
         _ = dropZoneOverlayAnimator
-        applyAccentColor(AppDelegate.shared?.accentColor ?? CmuxAccentColor())
+        applyAccentColor(AppDelegate.shared?.accentColor ?? WmuxAccentColor())
         notificationRingOverlayView.wantsLayer = true
         notificationRingOverlayView.layer?.backgroundColor = NSColor.clear.cgColor
         notificationRingOverlayView.layer?.masksToBounds = false
@@ -11101,7 +11101,7 @@ final class GhosttySurfaceScrollView: NSView {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(cmuxAccentColorDidChange(_:)),
-            name: CmuxAccentColor.didChangeNotification,
+            name: WmuxAccentColor.didChangeNotification,
             object: nil
         )
 
@@ -11833,11 +11833,11 @@ final class GhosttySurfaceScrollView: NSView {
     /// the resolved cmux accent changes. The attention ring and flash get
     /// theirs through ``setWorkspaceAttentionColor(_:)``.
     @objc private func cmuxAccentColorDidChange(_ notification: Notification) {
-        guard let observer = notification.object as? CmuxAccentColorObserver else { return }
+        guard let observer = notification.object as? WmuxAccentColorObserver else { return }
         applyAccentColor(observer.current)
     }
 
-    private func applyAccentColor(_ accentColor: CmuxAccentColor) {
+    private func applyAccentColor(_ accentColor: WmuxAccentColor) {
         let accent = accentColor.themeNSColor
         dropZoneOverlayView.layer?.backgroundColor = accent.withAlphaComponent(0.25).cgColor
         dropZoneOverlayView.layer?.borderColor = accent.cgColor
@@ -14309,7 +14309,7 @@ extension GhosttyNSView: NSTextInputClient {
         }
         guard ensureSurfaceReadyForInput() != nil else { return }
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
 #endif
 #if DEBUG
         TerminalChildExitProbe().write(
@@ -14366,7 +14366,7 @@ extension GhosttyNSView: NSTextInputClient {
         }
         flushBufferedText()
 #if DEBUG
-        CmuxTypingTiming.logDuration(
+        WmuxTypingTiming.logDuration(
             path: "terminal.sendTextToSurface",
             startedAt: typingTimingStart,
             extra: "textBytes=\(chars.utf8.count)"
@@ -14545,9 +14545,9 @@ extension GhosttyNSView: NSTextInputClient {
 
     func setMarkedText(_ string: Any, selectedRange: NSRange, replacementRange: NSRange) {
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "terminal.setMarkedText",
                 startedAt: typingTimingStart,
                 extra: "markedLength=\(markedText.length)"
@@ -14616,9 +14616,9 @@ extension GhosttyNSView: NSTextInputClient {
     func unmarkText() {
 #if DEBUG
         let hadMarkedText = markedText.length > 0
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "terminal.unmarkText",
                 startedAt: typingTimingStart,
                 extra: "hadMarkedText=\(hadMarkedText ? 1 : 0)"
@@ -14638,9 +14638,9 @@ extension GhosttyNSView: NSTextInputClient {
     /// preedit overlay (e.g. for Korean, Japanese, Chinese input).
     private func syncPreedit(clearIfNeeded: Bool = true) {
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "terminal.syncPreedit",
                 startedAt: typingTimingStart,
                 extra: "markedLength=\(markedText.length) clearIfNeeded=\(clearIfNeeded ? 1 : 0)"
@@ -14764,9 +14764,9 @@ extension GhosttyNSView: NSTextInputClient {
     func insertText(_ string: Any, replacementRange: NSRange) {
         if terminalSurface?.sharingViewDetached == true { return }
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "terminal.insertText",
                 startedAt: typingTimingStart,
                 event: NSApp.currentEvent,

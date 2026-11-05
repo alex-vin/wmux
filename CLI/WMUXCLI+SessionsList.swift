@@ -74,7 +74,7 @@ extension WMUXCLI {
 
         let stateDir = sessionsListExpandedPath(
             stateDirRaw
-                ?? processEnv["CMUX_AGENT_HOOK_STATE_DIR"]
+                ?? processEnv["WMUX_AGENT_HOOK_STATE_DIR"]
                 ?? URL(fileURLWithPath: processEnv["HOME"] ?? NSHomeDirectory(), isDirectory: true)
                     .appendingPathComponent(".cmuxterm", isDirectory: true)
                     .path

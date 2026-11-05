@@ -1,10 +1,10 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import SQLite3
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -18,7 +18,7 @@ struct MuseVaultRegistrationTests {
         try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: home) }
 
-        let registry = CmuxVaultAgentRegistry.load(homeDirectory: home.path, environment: [:])
+        let registry = WmuxVaultAgentRegistry.load(homeDirectory: home.path, environment: [:])
         let registration = try #require(registry.registration(id: "muse"))
 
         #expect(registration.isBuiltInMuse)

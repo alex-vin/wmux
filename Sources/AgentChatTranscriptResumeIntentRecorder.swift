@@ -1,16 +1,16 @@
-import CmuxAgentChat
-import CmuxAuthRuntime
-import CmuxCloud
-import CmuxCloudTui
-import CmuxControlSocket
-import CmuxFoundation
-import CmuxSettingsUI
-import CmuxProductAnalytics
-import CmuxMobileHost
-import CmuxSurfaceCatalogModel
-import CmuxTerminal
-import CmuxTerminalCore
-import CMUXMobileCore
+import WmuxAgentChat
+import WmuxAuthRuntime
+import WmuxCloud
+import WmuxCloudTui
+import WmuxControlSocket
+import WmuxFoundation
+import WmuxSettingsUI
+import WmuxProductAnalytics
+import WmuxMobileHost
+import WmuxSurfaceCatalogModel
+import WmuxTerminal
+import WmuxTerminalCore
+import WMUXMobileCore
 import Foundation
 import Observation
 import SwiftUI
@@ -30,7 +30,7 @@ struct AgentChatTranscriptResumeIntentRecorder: AgentChatResumeIntentRecording {
 }
 
 @MainActor
-final class HostAccountFlow: CmuxSettingsUI.AccountFlow, @unchecked Sendable {
+final class HostAccountFlow: WmuxSettingsUI.AccountFlow, @unchecked Sendable {
     var currentIdentity: AccountIdentity? { nil }
     var availableTeams: [AccountTeamSummary] { [] }
     var selectedTeamID: String? { nil }
@@ -128,7 +128,7 @@ enum ManagedFileTransferPolicy {
     static var disabledMessage: String { "File transfer disabled." }
     static func isRefusal(_ error: Error) -> Bool { false }
     static func presentRefusal() {}
-    static func refusalError() -> NSError { NSError(domain: "cmux.filetransfer", code: 1, userInfo: [NSLocalizedDescriptionKey: "File transfer disabled"]) }
+    static func refusalError() -> NSError { NSError(domain: "wmux.filetransfer", code: 1, userInfo: [NSLocalizedDescriptionKey: "File transfer disabled"]) }
 }
 
 final class CloudImagePasteInputLease: @unchecked Sendable {
@@ -137,7 +137,7 @@ final class CloudImagePasteInputLease: @unchecked Sendable {
 }
 
 extension NSNotification.Name {
-    static let fileExplorerStyleDidChange = NSNotification.Name("cmux.fileExplorerStyleDidChange")
+    static let fileExplorerStyleDidChange = NSNotification.Name("wmux.fileExplorerStyleDidChange")
 }
 
 struct CloudWorkspaceGroupDestination: @unchecked Sendable {
@@ -356,7 +356,7 @@ enum CloudPortRoutePlan {
     }
 }
 
-struct CmuxRemoteTmuxConfigDefinition: Codable, Sendable, Equatable {}
+struct WmuxRemoteTmuxConfigDefinition: Codable, Sendable, Equatable {}
 
 @MainActor
 final class AgentChatSessionRegistry {
@@ -618,7 +618,7 @@ enum MobileHostIrxRuntime {
         func record(_ category: String, _ event: String, _ metadata: [String: String]) {}
     }
     static let journal = JournalStub()
-    static let pathModeDefaultsKey = "cmux.iroh.pathMode"
+    static let pathModeDefaultsKey = "wmux.iroh.pathMode"
     static let shared = MobileHostIrxRuntimeStub()
 }
 

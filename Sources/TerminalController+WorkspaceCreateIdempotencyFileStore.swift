@@ -95,7 +95,7 @@ extension TerminalController {
                     : "_"
             }
             return appSupport
-                .appendingPathComponent("cmux", isDirectory: true)
+                .appendingPathComponent("wmux", isDirectory: true)
                 .appendingPathComponent(
                     "workspace-create-tombstones-\(String(bundleID))-v1.json",
                     isDirectory: false

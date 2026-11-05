@@ -1,5 +1,5 @@
 import AppKit
-import CmuxFoundation
+import WmuxFoundation
 import SwiftUI
 
 final class AboutWindowController: ReleasingWindowController {
@@ -32,7 +32,7 @@ final class AboutWindowController: ReleasingWindowController {
             backing: .buffered,
             defer: false
         )
-        window.identifier = NSUserInterfaceItemIdentifier("cmux.about")
+        window.identifier = NSUserInterfaceItemIdentifier("wmux.about")
         window.center()
         window.contentView = NSHostingView(rootView: AboutPanelView(showLicenses: { [acknowledgments] in acknowledgments.show() }))
         prepareTitlebar(window)

@@ -1,8 +1,8 @@
-import CmuxFoundation
+import WmuxFoundation
 import AppKit
 import Bonsplit
 import SwiftUI
-import CmuxTerminal
+import WmuxTerminal
 
 private extension NSView {
     func cmuxAncestor<T: NSView>(of type: T.Type) -> T? {
@@ -19,7 +19,7 @@ private extension NSView {
 
 /// Hosting root for the terminal find bar: the overlay plus the cmux accent
 /// environment, since it mounts outside any window root.
-typealias SurfaceSearchOverlayRoot = ModifiedContent<SurfaceSearchOverlay, CmuxAccentColorEnvironmentModifier>
+typealias SurfaceSearchOverlayRoot = ModifiedContent<SurfaceSearchOverlay, WmuxAccentColorEnvironmentModifier>
 
 struct SurfaceSearchOverlay: View {
     @Environment(\.cmuxAccentColor) private var cmuxAccent

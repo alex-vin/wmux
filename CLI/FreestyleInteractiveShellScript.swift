@@ -12,18 +12,18 @@ struct FreestyleInteractiveShellScript: Sendable {
 
     var text: String {
         """
-        \(suppressWelcome ? "export CMUX_CLOUD_WELCOME=0" : ":")
+        \(suppressWelcome ? "export WMUX_CLOUD_WELCOME=0" : ":")
         \(Self.cloudContextExports(environment: environment))
         export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
         hash -r 2>/dev/null || true
         if command -v zsh >/dev/null 2>&1; then
           touch "$HOME/.hushlogin" 2>/dev/null || true
           if [ ! -e "$HOME/.zshrc" ] || grep -q "wmux-managed zsh defaults" "$HOME/.zshrc" 2>/dev/null; then
-            cat > "$HOME/.zshrc" <<'CMUX_USER_ZSHRC'
+            cat > "$HOME/.zshrc" <<'WMUX_USER_ZSHRC'
         # wmux-managed zsh defaults. Edit ~/.zshrc.local for personal overrides.
         mkdir -p "$HOME/.wmux" 2>/dev/null || true
         printf '%s' '/tmp/wmux-cloud-cli.sock' > "$HOME/.wmux/socket_addr" 2>/dev/null || true
-        export CMUX_SOCKET_PATH="${CMUX_SOCKET_PATH:-/tmp/wmux-cloud-cli.sock}"
+        export WMUX_SOCKET_PATH="${WMUX_SOCKET_PATH:-/tmp/wmux-cloud-cli.sock}"
         if [ -r /etc/wmux/zshrc ]; then
           source /etc/wmux/zshrc
         else
@@ -40,13 +40,13 @@ struct FreestyleInteractiveShellScript: Sendable {
             source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
             ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="${ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE:-fg=8}"
           fi
-          : ${CMUX_PROMPT_USER:=wmux-cloud}
-          : ${CMUX_PROMPT_CHAR:=$'\\u03bb'}
-          PROMPT='%F{magenta}${CMUX_PROMPT_USER}%f in %F{green}%~%f ${CMUX_PROMPT_CHAR} '
+          : ${WMUX_PROMPT_USER:=wmux-cloud}
+          : ${WMUX_PROMPT_CHAR:=$'\\u03bb'}
+          PROMPT='%F{magenta}${WMUX_PROMPT_USER}%f in %F{green}%~%f ${WMUX_PROMPT_CHAR} '
         fi
         [ -r "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
-        if [ "${CMUX_CLOUD_WELCOME:-1}" != "0" ] && [ -z "${CMUX_CLOUD_WELCOME_SHOWN:-}" ] && [ -t 1 ]; then
-          export CMUX_CLOUD_WELCOME_SHOWN=1
+        if [ "${WMUX_CLOUD_WELCOME:-1}" != "0" ] && [ -z "${WMUX_CLOUD_WELCOME_SHOWN:-}" ] && [ -t 1 ]; then
+          export WMUX_CLOUD_WELCOME_SHOWN=1
           printf '\\033[38;2;0;212;255m  ::\\033[0m\\n'
           printf '\\033[38;2;24;181;250m    ::::              \\033[38;2;0;212;255mc\\033[38;2;24;181;250mm\\033[38;2;48;150;245mu\\033[38;2;124;58;237mx cloud\\033[0m\\n'
           printf '\\033[38;2;48;150;245m      ::::::\\033[0m\\n'
@@ -56,43 +56,43 @@ struct FreestyleInteractiveShellScript: Sendable {
           printf '\\033[38;2;124;58;237m  ::\\033[0m\\n'
           printf '\\n'
         fi
-        CMUX_USER_ZSHRC
+        WMUX_USER_ZSHRC
           fi
           if [ ! -e "$HOME/.zshrc.local" ]; then
-            cat > "$HOME/.zshrc.local" <<'CMUX_LOCAL_ZSHRC'
+            cat > "$HOME/.zshrc.local" <<'WMUX_LOCAL_ZSHRC'
         # Personal zsh overrides for this cloud VM.
         # Examples:
-        #   CMUX_CLOUD_WELCOME=0
-        #   CMUX_PROMPT_USER='wmux-cloud'
-        #   CMUX_PROMPT_CHAR='>'
+        #   WMUX_CLOUD_WELCOME=0
+        #   WMUX_PROMPT_USER='wmux-cloud'
+        #   WMUX_PROMPT_CHAR='>'
         #   PROMPT='%F{cyan}%n%f:%F{green}%~%f %# '
-        CMUX_LOCAL_ZSHRC
+        WMUX_LOCAL_ZSHRC
           fi
           if command -v tmux >/dev/null 2>&1; then
-            cmux_cloud_tty_scope="${CMUX_WORKSPACE_ID:-workspace}-${CMUX_SURFACE_ID:-surface}"
-            if [ "$cmux_cloud_tty_scope" = "workspace-surface" ]; then
-              cmux_cloud_tty_scope="default"
+            wmux_cloud_tty_scope="${WMUX_WORKSPACE_ID:-workspace}-${WMUX_SURFACE_ID:-surface}"
+            if [ "$wmux_cloud_tty_scope" = "workspace-surface" ]; then
+              wmux_cloud_tty_scope="default"
             fi
-            cmux_cloud_tty_scope="$(printf '%s' "$cmux_cloud_tty_scope" | tr -c 'A-Za-z0-9_.-' '-')"
-            cmux_cloud_tty_scope="${cmux_cloud_tty_scope#-}"
-            cmux_cloud_tty_scope="${cmux_cloud_tty_scope%-}"
-            [ -n "$cmux_cloud_tty_scope" ] || cmux_cloud_tty_scope=default
-            if [ "$cmux_cloud_tty_scope" != default ] && [ "${CMUX_CLOUD_TMUX_SESSION:-}" = "wmux-cloud" ]; then
-              unset CMUX_CLOUD_TMUX_SESSION
+            wmux_cloud_tty_scope="$(printf '%s' "$wmux_cloud_tty_scope" | tr -c 'A-Za-z0-9_.-' '-')"
+            wmux_cloud_tty_scope="${wmux_cloud_tty_scope#-}"
+            wmux_cloud_tty_scope="${wmux_cloud_tty_scope%-}"
+            [ -n "$wmux_cloud_tty_scope" ] || wmux_cloud_tty_scope=default
+            if [ "$wmux_cloud_tty_scope" != default ] && [ "${WMUX_CLOUD_TMUX_SESSION:-}" = "wmux-cloud" ]; then
+              unset WMUX_CLOUD_TMUX_SESSION
             fi
-            if [ "$cmux_cloud_tty_scope" = default ]; then
-              export CMUX_CLOUD_TMUX_SESSION="${CMUX_CLOUD_TMUX_SESSION:-wmux-cloud}"
+            if [ "$wmux_cloud_tty_scope" = default ]; then
+              export WMUX_CLOUD_TMUX_SESSION="${WMUX_CLOUD_TMUX_SESSION:-wmux-cloud}"
             else
-              export CMUX_CLOUD_TMUX_SESSION="${CMUX_CLOUD_TMUX_SESSION:-wmux-cloud-$cmux_cloud_tty_scope}"
+              export WMUX_CLOUD_TMUX_SESSION="${WMUX_CLOUD_TMUX_SESSION:-wmux-cloud-$wmux_cloud_tty_scope}"
             fi
-            if ! tmux has-session -t "$CMUX_CLOUD_TMUX_SESSION" >/dev/null 2>&1; then
-              tmux new-session -d -s "$CMUX_CLOUD_TMUX_SESSION" "exec zsh -l" >/dev/null 2>&1 || unset CMUX_CLOUD_TMUX_SESSION
+            if ! tmux has-session -t "$WMUX_CLOUD_TMUX_SESSION" >/dev/null 2>&1; then
+              tmux new-session -d -s "$WMUX_CLOUD_TMUX_SESSION" "exec zsh -l" >/dev/null 2>&1 || unset WMUX_CLOUD_TMUX_SESSION
             fi
-            if [ -n "${CMUX_CLOUD_TMUX_SESSION:-}" ] && tmux has-session -t "$CMUX_CLOUD_TMUX_SESSION" >/dev/null 2>&1; then
-              tmux set-option -t "$CMUX_CLOUD_TMUX_SESSION" status off >/dev/null 2>&1 || true
-              tmux attach-session -t "$CMUX_CLOUD_TMUX_SESSION"
-              cmux_tmux_status=$?
-              [ "$cmux_tmux_status" -eq 0 ] && exit 0
+            if [ -n "${WMUX_CLOUD_TMUX_SESSION:-}" ] && tmux has-session -t "$WMUX_CLOUD_TMUX_SESSION" >/dev/null 2>&1; then
+              tmux set-option -t "$WMUX_CLOUD_TMUX_SESSION" status off >/dev/null 2>&1 || true
+              tmux attach-session -t "$WMUX_CLOUD_TMUX_SESSION"
+              wmux_tmux_status=$?
+              [ "$wmux_tmux_status" -eq 0 ] && exit 0
             fi
           fi
           exec zsh -l
@@ -103,13 +103,13 @@ struct FreestyleInteractiveShellScript: Sendable {
 
     private static func cloudContextExports(environment: [String: String]) -> String {
         var lines: [String] = []
-        if let workspaceID = normalizedContextValue(environment["CMUX_WORKSPACE_ID"]) {
-            lines.append("export CMUX_WORKSPACE_ID=\(shellSingleQuote(workspaceID))")
-            lines.append("export CMUX_TAB_ID=\"$CMUX_WORKSPACE_ID\"")
+        if let workspaceID = normalizedContextValue(environment["WMUX_WORKSPACE_ID"]) {
+            lines.append("export WMUX_WORKSPACE_ID=\(shellSingleQuote(workspaceID))")
+            lines.append("export WMUX_TAB_ID=\"$WMUX_WORKSPACE_ID\"")
         }
-        if let surfaceID = normalizedContextValue(environment["CMUX_SURFACE_ID"]) {
-            lines.append("export CMUX_SURFACE_ID=\(shellSingleQuote(surfaceID))")
-            lines.append("export CMUX_PANEL_ID=\"$CMUX_SURFACE_ID\"")
+        if let surfaceID = normalizedContextValue(environment["WMUX_SURFACE_ID"]) {
+            lines.append("export WMUX_SURFACE_ID=\(shellSingleQuote(surfaceID))")
+            lines.append("export WMUX_PANEL_ID=\"$WMUX_SURFACE_ID\"")
         }
         return lines.isEmpty ? ":" : lines.joined(separator: "\n")
     }

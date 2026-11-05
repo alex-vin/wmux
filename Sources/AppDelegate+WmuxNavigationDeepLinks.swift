@@ -45,9 +45,9 @@ extension AppDelegate {
     }
 
     @discardableResult
-    func handleCmuxNavigationURLRequest(_ request: CmuxNavigationURLRequest) -> Bool {
+    func handleCmuxNavigationURLRequest(_ request: WmuxNavigationURLRequest) -> Bool {
         let lookup = cmuxNavigationWorkspaceLookup()
-        let resolver = CmuxNavigationTargetResolver(workspaces: lookup.descriptors)
+        let resolver = WmuxNavigationTargetResolver(workspaces: lookup.descriptors)
         guard let resolution = resolver.resolve(request) else {
             if shouldDeferNavigationURLRequestsForStartupRestore {
                 pendingStartupNavigationURLRequests.append(request)
@@ -142,10 +142,10 @@ extension AppDelegate {
     }
 
     private func cmuxNavigationWorkspaceLookup() -> (
-        descriptors: [CmuxNavigationTargetResolver.WorkspaceDescriptor],
+        descriptors: [WmuxNavigationTargetResolver.WorkspaceDescriptor],
         contextByWorkspaceId: [UUID: MainWindowContext]
     ) {
-        var descriptors: [CmuxNavigationTargetResolver.WorkspaceDescriptor] = []
+        var descriptors: [WmuxNavigationTargetResolver.WorkspaceDescriptor] = []
         var contextByWorkspaceId: [UUID: MainWindowContext] = [:]
         for context in mainWindowContexts.values.sorted(by: { $0.windowId.uuidString < $1.windowId.uuidString }) {
             for workspace in context.tabManager.tabs {
@@ -156,7 +156,7 @@ extension AppDelegate {
         return (descriptors, contextByWorkspaceId)
     }
 
-    func cmuxNavigationWorkspaceDescriptors() -> [CmuxNavigationTargetResolver.WorkspaceDescriptor] {
+    func cmuxNavigationWorkspaceDescriptors() -> [WmuxNavigationTargetResolver.WorkspaceDescriptor] {
         cmuxNavigationWorkspaceLookup().descriptors
     }
 

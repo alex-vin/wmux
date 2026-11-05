@@ -1,11 +1,11 @@
 import AppKit
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -66,10 +66,10 @@ final class CloudWorkspaceRowOpenFixture {
             "terminals": [["id": "term-one", "lifecycle": "running"], ["id": "term-two", "lifecycle": "running"]],
             "browsers": [], "agents": []
         ]
-        let state = try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: provider.machine))
+        let state = try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: provider.machine))
         var info = provider.info
         info.remoteWorkspaces = includeWorkspace ? [remote] : []
-        base.catalog.replaceCloudState(state, resources: CmuxTuiSnapshotParser.resources(from: state), info: info)
+        base.catalog.replaceCloudState(state, resources: WmuxTuiSnapshotParser.resources(from: state), info: info)
         base.catalog.reconcileCloudRemoteState(machine: provider.machine, state: state)
     }
 

@@ -19,7 +19,7 @@ nonisolated private let rosettaRelaunchLogger = Logger(subsystem: "com.cmuxterm.
 enum RosettaNativeRelaunch {
     /// Environment guard that marks a process as the product of a native
     /// relaunch, so a relaunch that fails to escape translation never loops.
-    private static let guardKey = "CMUX_ROSETTA_RELAUNCHED"
+    private static let guardKey = "WMUX_ROSETTA_RELAUNCHED"
 
     /// Whether the current process should re-exec itself as a native arm64
     /// binary.

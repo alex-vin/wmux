@@ -47,19 +47,19 @@ final class FeedSidebarUITests: XCTestCase {
             "-AppleLanguages", "(en)",
             "-AppleLocale", "en_US"
         ]
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = launchTag
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
-        app.launchEnvironment["CMUX_UI_TEST_PORTAL_STATS"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_FEED_SIDEBAR_RESULT_PATH"] = feedResultPath
-        app.launchEnvironment["CMUX_UI_TEST_FEED_SIDEBAR_REQUEST_ID"] = requestId
-        app.launchEnvironment["CMUX_UI_TEST_FEED_TUI_READY_PATH"] = feedTUIReadyPath
-        app.launchEnvironment["CMUX_UI_TEST_DOCK_CONFIG_PATH"] = dockConfigPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_UI_TEST_PORTAL_STATS"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_FEED_SIDEBAR_RESULT_PATH"] = feedResultPath
+        app.launchEnvironment["WMUX_UI_TEST_FEED_SIDEBAR_REQUEST_ID"] = requestId
+        app.launchEnvironment["WMUX_UI_TEST_FEED_TUI_READY_PATH"] = feedTUIReadyPath
+        app.launchEnvironment["WMUX_UI_TEST_DOCK_CONFIG_PATH"] = dockConfigPath
         if let path = ProcessInfo.processInfo.environment["PATH"], !path.isEmpty {
             app.launchEnvironment["PATH"] = path
         }
@@ -134,16 +134,16 @@ final class FeedSidebarUITests: XCTestCase {
             "-AppleLanguages", "(en)",
             "-AppleLocale", "en_US"
         ]
-        app.launchEnvironment["CMUX_SOCKET_PATH"] = socketPath
-        app.launchEnvironment["CMUX_SOCKET_ENABLE"] = "1"
-        app.launchEnvironment["CMUX_SOCKET_MODE"] = "allowAll"
-        app.launchEnvironment["CMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
-        app.launchEnvironment["CMUX_TAG"] = launchTag
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_SOCKET_SANITY"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
-        app.launchEnvironment["CMUX_UI_TEST_PORTAL_STATS"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_DOCK_CONFIG_PATH"] = dockConfigPath
+        app.launchEnvironment["WMUX_SOCKET_PATH"] = socketPath
+        app.launchEnvironment["WMUX_SOCKET_ENABLE"] = "1"
+        app.launchEnvironment["WMUX_SOCKET_MODE"] = "allowAll"
+        app.launchEnvironment["WMUX_ALLOW_SOCKET_OVERRIDE"] = "1"
+        app.launchEnvironment["WMUX_TAG"] = launchTag
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_SOCKET_SANITY"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DIAGNOSTICS_PATH"] = diagnosticsPath
+        app.launchEnvironment["WMUX_UI_TEST_PORTAL_STATS"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_DOCK_CONFIG_PATH"] = dockConfigPath
         if let path = ProcessInfo.processInfo.environment["PATH"], !path.isEmpty {
             app.launchEnvironment["PATH"] = path
         }
@@ -553,9 +553,9 @@ final class FeedSidebarUITests: XCTestCase {
     }
 
     private func writeFeedDockConfig(bunPath: String?) throws {
-        var env = ["CMUX_FEED_TUI_READY_PATH": feedTUIReadyPath]
+        var env = ["WMUX_FEED_TUI_READY_PATH": feedTUIReadyPath]
         if let bunPath, !bunPath.isEmpty {
-            env["CMUX_FEED_TUI_BUN_PATH"] = bunPath
+            env["WMUX_FEED_TUI_BUN_PATH"] = bunPath
         }
         let config: [String: Any] = [
             "controls": [[
@@ -571,7 +571,7 @@ final class FeedSidebarUITests: XCTestCase {
 
     private func writeDockRenderConfig() throws {
         let command = """
-        printf '{"pid":"%s"}\\n' "$$" > "$CMUX_DOCK_RENDER_READY_PATH"; \
+        printf '{"pid":"%s"}\\n' "$$" > "$WMUX_DOCK_RENDER_READY_PATH"; \
         while true; do \
           clear; \
           i=1; \
@@ -588,7 +588,7 @@ final class FeedSidebarUITests: XCTestCase {
                 "title": "Issue 5435 Render",
                 "command": command,
                 "height": 320,
-                "env": ["CMUX_DOCK_RENDER_READY_PATH": dockRenderReadyPath]
+                "env": ["WMUX_DOCK_RENDER_READY_PATH": dockRenderReadyPath]
             ]]
         ]
         let data = try JSONSerialization.data(withJSONObject: config, options: [.prettyPrinted, .sortedKeys])

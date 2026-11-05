@@ -1,7 +1,7 @@
 import Foundation
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -12,16 +12,16 @@ extension CampfireSupportTests {
         processPath: String? = "/Users/example/.local/bin/campfire",
         arguments: [String],
         environment: [String: String],
-        registration: CmuxVaultAgentRegistration = .builtInCampfire,
+        registration: WmuxVaultAgentRegistration = .builtInCampfire,
         defaultCampfireSessionRole: String? = "host"
     ) -> SessionRestorableAgentSnapshot? {
         let workspaceId = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
         let panelId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
         let processId = 4243
         let panelKey = RestorableAgentSessionIndex.PanelKey(workspaceId: workspaceId, panelId: panelId)
-        let processSnapshot = CmuxTopProcessSnapshot(
+        let processSnapshot = WmuxTopProcessSnapshot(
             processes: [
-                CmuxTopProcessInfo(
+                WmuxTopProcessInfo(
                     pid: processId,
                     parentPID: 1,
                     name: processName,
@@ -47,13 +47,13 @@ extension CampfireSupportTests {
             processEnvironment["CAMPFIRE_SESSION_ROLE"] = defaultCampfireSessionRole
         }
         return RestorableAgentSessionIndex.processDetectedSnapshots(
-            registry: CmuxVaultAgentRegistry(registrations: [registration]),
+            registry: WmuxVaultAgentRegistry(registrations: [registration]),
             fileManager: FileManager.default,
             processSnapshot: processSnapshot,
             capturedAt: 42,
             processArgumentsProvider: { requestedProcessId in
                 guard requestedProcessId == processId else { return nil }
-                return CmuxTopProcessArguments(arguments: arguments, environment: processEnvironment)
+                return WmuxTopProcessArguments(arguments: arguments, environment: processEnvironment)
             }
         )[panelKey]?.snapshot
     }

@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -10,10 +10,10 @@ import Testing
 @MainActor
 @Suite struct SavedLayoutDefinitionTests {
     @Test func savedLayoutCodableRoundTripsNestedSplitTree() throws {
-        let layout = CmuxSavedLayout(
+        let layout = WmuxSavedLayout(
             name: "Nested",
             description: "Round trip",
-            workspace: CmuxWorkspaceDefinition(
+            workspace: WmuxWorkspaceDefinition(
                 name: "Workspace",
                 cwd: "/tmp/project",
                 color: "#123456",
@@ -25,7 +25,7 @@ import Testing
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         let data = try encoder.encode(layout)
-        let decoded = try JSONDecoder().decode(CmuxSavedLayout.self, from: data)
+        let decoded = try JSONDecoder().decode(WmuxSavedLayout.self, from: data)
 
         #expect(decoded.name == "Nested")
         #expect(decoded.description == "Round trip")
@@ -48,10 +48,10 @@ import Testing
     }
 
     @Test func splitDefinitionClampsDividerPosition() {
-        #expect(CmuxSplitDefinition(direction: .horizontal, split: -1, children: Self.twoPanes).clampedSplitPosition == 0.1)
-        #expect(CmuxSplitDefinition(direction: .horizontal, split: 2, children: Self.twoPanes).clampedSplitPosition == 0.9)
-        #expect(CmuxSplitDefinition(direction: .horizontal, split: 0.42, children: Self.twoPanes).clampedSplitPosition == 0.42)
-        #expect(CmuxSplitDefinition(direction: .horizontal, children: Self.twoPanes).clampedSplitPosition == 0.5)
+        #expect(WmuxSplitDefinition(direction: .horizontal, split: -1, children: Self.twoPanes).clampedSplitPosition == 0.1)
+        #expect(WmuxSplitDefinition(direction: .horizontal, split: 2, children: Self.twoPanes).clampedSplitPosition == 0.9)
+        #expect(WmuxSplitDefinition(direction: .horizontal, split: 0.42, children: Self.twoPanes).clampedSplitPosition == 0.42)
+        #expect(WmuxSplitDefinition(direction: .horizontal, children: Self.twoPanes).clampedSplitPosition == 0.5)
     }
 
     @Test func storeJSONLayoutDecodesThroughWorkspaceCreateLayoutDecoder() throws {
@@ -59,10 +59,10 @@ import Testing
         defer { context.cleanup() }
         let store = SavedLayoutStore(fileURL: context.fileURL)
         try store.save(
-            CmuxSavedLayout(
+            WmuxSavedLayout(
                 name: "Nested",
                 description: nil,
-                workspace: CmuxWorkspaceDefinition(cwd: "/tmp/project", layout: Self.nestedLayout)
+                workspace: WmuxWorkspaceDefinition(cwd: "/tmp/project", layout: Self.nestedLayout)
             ),
             overwrite: false
         )
@@ -71,27 +71,27 @@ import Testing
         let decoded = try JSONDecoder().decode(SavedLayoutStore.LayoutsFile.self, from: data)
         let layoutNode = try #require(decoded.layouts.first?.workspace.layout)
         let layoutData = try JSONEncoder().encode(layoutNode)
-        _ = try JSONDecoder().decode(CmuxLayoutNode.self, from: layoutData)
+        _ = try JSONDecoder().decode(WmuxLayoutNode.self, from: layoutData)
     }
 
-    private static var nestedLayout: CmuxLayoutNode {
+    private static var nestedLayout: WmuxLayoutNode {
         .split(
-            CmuxSplitDefinition(
+            WmuxSplitDefinition(
                 direction: .horizontal,
                 split: 0.33,
                 children: [
-                    .pane(CmuxPaneDefinition(surfaces: [
-                        CmuxSurfaceDefinition(type: .terminal, name: "Server", command: nil, cwd: "server", env: nil, url: nil, focus: true),
+                    .pane(WmuxPaneDefinition(surfaces: [
+                        WmuxSurfaceDefinition(type: .terminal, name: "Server", command: nil, cwd: "server", env: nil, url: nil, focus: true),
                     ])),
-                    .split(CmuxSplitDefinition(
+                    .split(WmuxSplitDefinition(
                         direction: .vertical,
                         split: 0.66,
                         children: [
-                            .pane(CmuxPaneDefinition(surfaces: [
-                                CmuxSurfaceDefinition(type: .browser, name: "Docs", command: nil, cwd: nil, env: nil, url: "https://example.com", focus: nil),
+                            .pane(WmuxPaneDefinition(surfaces: [
+                                WmuxSurfaceDefinition(type: .browser, name: "Docs", command: nil, cwd: nil, env: nil, url: "https://example.com", focus: nil),
                             ])),
-                            .pane(CmuxPaneDefinition(surfaces: [
-                                CmuxSurfaceDefinition(type: .terminal, name: nil, command: nil, cwd: nil, env: nil, url: nil, focus: nil),
+                            .pane(WmuxPaneDefinition(surfaces: [
+                                WmuxSurfaceDefinition(type: .terminal, name: nil, command: nil, cwd: nil, env: nil, url: nil, focus: nil),
                             ])),
                         ]
                     )),
@@ -100,10 +100,10 @@ import Testing
         )
     }
 
-    private static var twoPanes: [CmuxLayoutNode] {
+    private static var twoPanes: [WmuxLayoutNode] {
         [
-            .pane(CmuxPaneDefinition(surfaces: [CmuxSurfaceDefinition(type: .terminal)])),
-            .pane(CmuxPaneDefinition(surfaces: [CmuxSurfaceDefinition(type: .terminal)])),
+            .pane(WmuxPaneDefinition(surfaces: [WmuxSurfaceDefinition(type: .terminal)])),
+            .pane(WmuxPaneDefinition(surfaces: [WmuxSurfaceDefinition(type: .terminal)])),
         ]
     }
 }

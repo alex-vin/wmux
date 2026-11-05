@@ -1,6 +1,6 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
 extension DockSplitStore {
     /// Dock twin of `Workspace.restoredAgentHasLiveProcess(_:panelId:)`.

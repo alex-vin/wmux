@@ -1,5 +1,5 @@
-import CMUXMobileCore
-import CmuxProductAnalytics
+import WMUXMobileCore
+import WmuxProductAnalytics
 import Foundation
 
 /// Sends ``ProductAnalytics`` output through the app's PostHog SDK, which

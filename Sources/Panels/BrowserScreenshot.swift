@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxFoundation
+import WmuxBrowser
+import WmuxFoundation
 import ObjectiveC
 import QuartzCore
 
@@ -301,7 +301,7 @@ extension BrowserScreenshotFlashView: WindowScreenshotOwnedNativeOverlay {}
 extension BrowserScreenshotSelectionOverlayView: WindowScreenshotOwnedNativeOverlay {}
 #endif
 
-extension CmuxWebView {
+extension WmuxWebView {
     @MainActor
     private var screenshotCaptureGate: BrowserScreenshotCaptureGate {
         if let gate = objc_getAssociatedObject(self, &cmuxWebViewScreenshotCaptureGateKey) as? BrowserScreenshotCaptureGate {
@@ -441,7 +441,7 @@ extension CmuxWebView {
 extension BrowserPanel {
     @MainActor
     func captureScreenshotPageToClipboard() async -> Bool {
-        guard let webView = webView as? CmuxWebView else {
+        guard let webView = webView as? WmuxWebView else {
             NSSound.beep()
             return false
         }
@@ -449,7 +449,7 @@ extension BrowserPanel {
     }
 
     func beginScreenshotSectionSelectionFromBrowserChrome() {
-        guard let webView = webView as? CmuxWebView else { return }
+        guard let webView = webView as? WmuxWebView else { return }
         webView.beginScreenshotSectionSelectionFromBrowserChrome()
     }
 }

@@ -1,6 +1,6 @@
 import AppKit
-import CmuxBrowser
-import CmuxDiffComments
+import WmuxBrowser
+import WmuxDiffComments
 import Foundation
 import WebKit
 
@@ -136,7 +136,7 @@ final class DiffCommentsBridge: NSObject, WKScriptMessageHandlerWithReply {
     /// than the URL the page was opened with. Token registration (checked by
     /// the caller) remains the trust authority.
     static func diffViewerToken(from url: URL?) -> String? {
-        if let components = CmuxDiffViewerURLSchemeHandler.diffViewerComponents(from: url) {
+        if let components = WmuxDiffViewerURLSchemeHandler.diffViewerComponents(from: url) {
             return components.token
         }
         guard let url,
@@ -147,8 +147,8 @@ final class DiffCommentsBridge: NSObject, WKScriptMessageHandlerWithReply {
         let rawPath = URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedPath ?? url.path
         let parts = rawPath.split(separator: "/", omittingEmptySubsequences: true).map(String.init)
         guard parts.count >= 2,
-              CmuxDiffViewerURLSchemeHandler.isValidToken(parts[0]),
-              CmuxDiffViewerURLSchemeHandler.isValidRequestPath("/" + parts.dropFirst().joined(separator: "/")) else {
+              WmuxDiffViewerURLSchemeHandler.isValidToken(parts[0]),
+              WmuxDiffViewerURLSchemeHandler.isValidRequestPath("/" + parts.dropFirst().joined(separator: "/")) else {
             return nil
         }
         return parts[0]
@@ -321,8 +321,8 @@ extension BrowserPanel {
         guard expectedURL.map(hasCurrentURL) != false else { return nil }
         let targetURL: URL
         if let internalURL = URL(string: url),
-           internalURL.scheme == CmuxDiffViewerURLSchemeHandler.scheme {
-            guard CmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: internalURL) else { return nil }
+           internalURL.scheme == WmuxDiffViewerURLSchemeHandler.scheme {
+            guard WmuxDiffViewerURLSchemeHandler.shared.allowsNavigation(to: internalURL) else { return nil }
             targetURL = internalURL
         } else {
             guard let resolvedNavigation = resolveSmartNavigation(from: url) else { return nil }
@@ -339,7 +339,7 @@ extension BrowserPanel {
     }
 }
 
-extension CmuxDiffViewerURLSchemeHandler {
+extension WmuxDiffViewerURLSchemeHandler {
     func allowsNavigation(to url: URL) -> Bool {
         guard url.scheme == Self.scheme,
               url.user == nil,

@@ -59,7 +59,7 @@ extension WMUXCLI {
             // skip work when the user's own shared master is live can see that this connection
             // cannot ride that master and still needs a full authentication.
             var environment = ProcessInfo.processInfo.environment
-            environment["CMUX_REMOTE_TMUX_AUTH"] = "1"
+            environment["WMUX_REMOTE_TMUX_AUTH"] = "1"
             process.environment = environment
         }
 

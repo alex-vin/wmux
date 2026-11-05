@@ -1,6 +1,6 @@
 import Foundation
 
-import CmuxSettings
+import WmuxSettings
 
 extension WMUXCLI {
     /// Resolves which agent should actually run the summarization for one
@@ -17,7 +17,7 @@ extension WMUXCLI {
         env: [String: String],
         telemetry: CLISocketSentryTelemetry
     ) -> (agent: String, missingOverride: String?) {
-        // Pure decision (unit-tested in CmuxSettings); the CLI only supplies the
+        // Pure decision (unit-tested in WmuxSettings); the CLI only supplies the
         // binary-availability probe and emits telemetry.
         let decision = AutoNamingAgentCatalog.resolveSummarizer(
             chosen: probe["summarizer_agent"] as? String,
@@ -38,7 +38,7 @@ extension WMUXCLI {
     func summarizerBinaryAvailable(agent: String, env: [String: String]) -> Bool {
         switch agent {
         case "claude":
-            let customPath = env["CMUX_CUSTOM_CLAUDE_PATH"]?
+            let customPath = env["WMUX_CUSTOM_CLAUDE_PATH"]?
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             if !customPath.isEmpty,
                FileManager.default.isExecutableFile(atPath: customPath),
@@ -107,7 +107,7 @@ extension WMUXCLI {
         timeout: TimeInterval
     ) -> String? {
         let policy = AutoNamingEnvironmentPolicy()
-        let customPath = env["CMUX_CUSTOM_CLAUDE_PATH"]?
+        let customPath = env["WMUX_CUSTOM_CLAUDE_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let executable: String? = {
             var isDirectory = ObjCBool(false)
@@ -138,7 +138,7 @@ extension WMUXCLI {
         guard let executable = resolveCodexExecutable(searchPath: env["PATH"]) else { return nil }
         let policy = AutoNamingEnvironmentPolicy()
         var summarizerEnv = policy.codexSummarizerEnvironment(from: env)
-        summarizerEnv["CMUX_CODEX_HOOKS_DISABLED"] = "1"
+        summarizerEnv["WMUX_CODEX_HOOKS_DISABLED"] = "1"
         let outputFile = FileManager.default.temporaryDirectory
             .appendingPathComponent("wmux-codex-autoname-\(UUID().uuidString).txt")
         let workingDirectory = FileManager.default.temporaryDirectory

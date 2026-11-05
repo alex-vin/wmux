@@ -2,8 +2,8 @@ import Darwin
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -12,7 +12,7 @@ import Testing
 struct OllamaAgentDetectionTests {
     @Test("Only the interactive run command matches Ollama")
     func matchesInteractiveRunOnly() throws {
-        let run = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let run = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "ollama",
             processPath: "/opt/homebrew/bin/ollama",
             arguments: ["ollama", "run", "qwen3:8b"],
@@ -22,19 +22,19 @@ struct OllamaAgentDetectionTests {
         #expect(run.promptTurnDetection?.prompt == ">>> ")
         #expect(run.promptTurnDetection?.waitingPromptSuffixes == ["Send a message (/? for help)"])
 
-        #expect(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        #expect(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "ollama",
             processPath: "/opt/homebrew/bin/ollama",
             arguments: ["ollama", "serve"],
             environment: [:]
         ) == nil)
-        #expect(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        #expect(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "ollama",
             processPath: "/opt/homebrew/bin/ollama",
             arguments: ["ollama", "list"],
             environment: [:]
         ) == nil)
-        #expect(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        #expect(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "ollama",
             processPath: "/opt/homebrew/bin/ollama",
             arguments: ["ollama", "serve", "run"],
@@ -42,7 +42,7 @@ struct OllamaAgentDetectionTests {
         ) == nil)
         // A bare "ollama" argv token must never satisfy identity: wrappers
         // such as `npm run ollama` share the "run" prefix shape.
-        #expect(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        #expect(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "npm",
             processPath: "/opt/homebrew/bin/npm",
             arguments: ["npm", "run", "ollama"],
@@ -53,7 +53,7 @@ struct OllamaAgentDetectionTests {
     @Test("A custom vault registration may reuse the ollama id")
     func customOllamaRegistrationStaysDecodable() throws {
         let registration = try JSONDecoder().decode(
-            CmuxVaultAgentRegistration.self,
+            WmuxVaultAgentRegistration.self,
             from: Data(Self.customOllamaRegistrationJSON.utf8)
         )
         #expect(registration.id == "ollama")
@@ -145,14 +145,14 @@ struct OllamaAgentDetectionTests {
 
     @Test("Inherited claude launch env does not misidentify an ollama process")
     func inheritedLaunchKindDoesNotOverrideExecutableIdentity() throws {
-        // A pane that launched claude exports CMUX_AGENT_LAUNCH_* to every
+        // A pane that launched claude exports WMUX_AGENT_LAUNCH_* to every
         // descendant process. An `ollama run` started later in that pane must
         // be identified by its own executable, not the inherited env.
         let inheritedEnvironment = [
-            "CMUX_AGENT_LAUNCH_KIND": "claude",
-            "CMUX_AGENT_LAUNCH_EXECUTABLE": "/Users/user/.local/bin/claude",
+            "WMUX_AGENT_LAUNCH_KIND": "claude",
+            "WMUX_AGENT_LAUNCH_EXECUTABLE": "/Users/user/.local/bin/claude",
         ]
-        let definition = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let definition = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "ollama",
             processPath: "/usr/local/Cellar/ollama/0.31.1/libexec/ollama",
             arguments: ["ollama", "run", "qwen3:0.6b"],
@@ -162,10 +162,10 @@ struct OllamaAgentDetectionTests {
         #expect(definition.promptTurnDetection != nil)
 
         // The wrapper that actually launched claude keeps its env identity.
-        let wrapper = try #require(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let wrapper = try #require(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "zsh",
             processPath: "/bin/zsh",
-            arguments: ["/bin/zsh", "-lic", "exec \"$CMUX_AGENT_LAUNCH_EXECUTABLE\""],
+            arguments: ["/bin/zsh", "-lic", "exec \"$WMUX_AGENT_LAUNCH_EXECUTABLE\""],
             environment: inheritedEnvironment
         ))
         #expect(wrapper.id == "claude")

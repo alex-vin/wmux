@@ -6,11 +6,11 @@ async function sendHook(
   context: PiExtensionContextSnapshot,
   extra: HookExtra = {},
 ): Promise<boolean> {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1") return true;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1") return true;
   const sessionId = context.sessionId;
   if (!sessionId) return true;
   const target = surfaceTargetArgs(dispatcher, sessionId);
-  if (!target) return !firstString(process.env.CMUX_PANEL_ID);
+  if (!target) return !firstString(process.env.WMUX_PANEL_ID);
 
   const cwd = context.cwd;
   const payload: HookExtra = {
@@ -44,10 +44,10 @@ function surfaceTargetsFor(dispatcher: PiCmuxCommandDispatcher): Map<string, str
 function surfaceTargetArgs(dispatcher: PiCmuxCommandDispatcher, sessionId: string): string[] | null {
   const resolved = surfaceTargetsFor(dispatcher).get(sessionId);
   if (resolved) return [...resolved];
-  const surfaceId = firstString(process.env.CMUX_SURFACE_ID);
+  const surfaceId = firstString(process.env.WMUX_SURFACE_ID);
   if (!surfaceId) return null;
   const args: string[] = [];
-  const workspaceId = firstString(process.env.CMUX_WORKSPACE_ID);
+  const workspaceId = firstString(process.env.WMUX_WORKSPACE_ID);
   if (workspaceId) args.push("--workspace", workspaceId);
   args.push("--surface", surfaceId);
   return args;
@@ -93,7 +93,7 @@ async function clearResumeBinding(
   context: PiExtensionContextSnapshot,
   sessionId: string,
 ): Promise<void> {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1") return;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1") return;
   const target = surfaceTargetArgs(dispatcher, sessionId);
   if (!target) return;
   const cwd = context.cwd;
@@ -146,7 +146,7 @@ function prepareFeedDispatch(
   context: PiExtensionContextSnapshot,
   event: unknown,
 ): (() => void) | undefined {
-  if (process.env.CMUX_PI_HOOKS_DISABLED === "1") return undefined;
+  if (process.env.WMUX_PI_HOOKS_DISABLED === "1") return undefined;
   const sessionId = context.sessionId;
   if (!sessionId) return undefined;
   if (!dispatcher.canDispatch(sessionId)) return undefined;
@@ -227,14 +227,14 @@ async function publishPendingCompletion(
   if (completion.suppressNotification) {
     // Stop normally creates wmux's native fallback notification when no explicit
     // notification was routed. Mark intentional interruption as already handled.
-    stopPayload.cmux_notification_routed = true;
+    stopPayload.wmux_notification_routed = true;
   } else if (feedDelivered) {
     const notificationRouted = await sendHook(dispatcher, "notification", context, {
       message: completion.lastAssistantMessage || "Task completed",
       turn_id: completion.turnId,
       notification: { type: completion.notificationType },
     });
-    if (notificationRouted) stopPayload.cmux_notification_routed = true;
+    if (notificationRouted) stopPayload.wmux_notification_routed = true;
   }
   await sendHook(dispatcher, "stop", context, stopPayload);
 }

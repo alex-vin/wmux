@@ -26,7 +26,7 @@ struct LocalZellijSessionNameValidator {
 /// client, so closing or killing a cmux surface detaches instead of quitting
 /// the session even when the user's zellij config says `quit`.
 struct LocalZellijCommandBuilder {
-    static let restoreMarker = "CMUX_LOCAL_ZELLIJ=1"
+    static let restoreMarker = "WMUX_LOCAL_ZELLIJ=1"
     static let socketDirectoryVariable = "ZELLIJ_SOCKET_DIR"
     /// `sockaddr_un.sun_path` on macOS holds 104 bytes including the NUL.
     static let maxSocketPathBytes = 103
@@ -79,7 +79,7 @@ struct LocalZellijCommandBuilder {
             // Only this CLI's sanitized runner may start a zellij server.
             // A serialized session outlives its server, and a surface's
             // `zellij attach` would resurrect it into a new server that
-            // inherits the surface's CMUX_* credentials and identity.
+            // inherits the surface's WMUX_* credentials and identity.
             "--session-serialization", "false",
         ]
         if let layoutPath {

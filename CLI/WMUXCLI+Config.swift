@@ -1,6 +1,6 @@
 import Foundation
-import CmuxFoundation
-import CmuxSettings
+import WmuxFoundation
+import WmuxSettings
 
 extension WMUXCLI {
     func runConfigCommand(
@@ -45,7 +45,7 @@ extension WMUXCLI {
                 )
             } else {
                 try runConfigSettingChange(
-                    .set(path: args[1], value: CmuxSettingValue(commandLineArgument: args[2])),
+                    .set(path: args[1], value: WmuxSettingValue(commandLineArgument: args[2])),
                     jsonOutput: wantsJSON
                 )
             }
@@ -64,7 +64,7 @@ extension WMUXCLI {
                 throw CLIError(message: "Usage: wmux config cycle <setting.path> <value> [value...]")
             }
             try runConfigSettingChange(
-                .cycle(path: args[1], values: args.dropFirst(2).map { CmuxSettingValue(commandLineArgument: $0) }),
+                .cycle(path: args[1], values: args.dropFirst(2).map { WmuxSettingValue(commandLineArgument: $0) }),
                 jsonOutput: wantsJSON
             )
         case "preset":
@@ -72,7 +72,7 @@ extension WMUXCLI {
                 throw CLIError(message: "Usage: wmux config preset <name>")
             }
             try runConfigSettingChange(.preset(name: args[1]), jsonOutput: wantsJSON)
-        case CmuxGhosttyConfigSettingEditor.sidebarFontSizeKey, CmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey:
+        case WmuxGhosttyConfigSettingEditor.sidebarFontSizeKey, WmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey:
             if args.count == 1 {
                 try runConfigGetFontSize(forKey: subcommand, jsonOutput: wantsJSON)
             } else if args.count == 2 {
@@ -105,7 +105,7 @@ extension WMUXCLI {
             )
             if report.errorCount > 0 {
                 throw CLIError(
-                    message: CmuxConfigValidationLocalization().format(
+                    message: WmuxConfigValidationLocalization().format(
                         "config.validation.cli.errorCount",
                         defaultValue: "wmux config %@ found %lld error(s)",
                         subcommand,
@@ -148,8 +148,8 @@ extension WMUXCLI {
             let key = parsedArgs.arguments.count > 1 ? parsedArgs.arguments[1] : ""
             return canonicalFontSizeKey(key) == nil
         }
-        if subcommand == CmuxGhosttyConfigSettingEditor.sidebarFontSizeKey
-            || subcommand == CmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey {
+        if subcommand == WmuxGhosttyConfigSettingEditor.sidebarFontSizeKey
+            || subcommand == WmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey {
             return parsedArgs.arguments.count == 1
         }
         return hasHelpRequest(beforeSeparator: parsedArgs.head) ||
@@ -157,7 +157,7 @@ extension WMUXCLI {
     }
 
     func configUsage() -> String {
-        let validationHelp = CmuxConfigValidationLocalization().string(
+        let validationHelp = WmuxConfigValidationLocalization().string(
             "config.validation.cli.help",
             defaultValue: "Validate JSONC syntax and wmux config semantics."
         )
@@ -255,9 +255,9 @@ extension WMUXCLI {
 
     /// Applies a setting change to the global cmux.json through the same
     /// ``JSONConfigStore/apply(_:)`` path setting actions use.
-    private func runConfigSettingChange(_ change: CmuxSettingChange, jsonOutput: Bool) throws {
-        let store = JSONConfigStore(fileURL: CmuxConfigLocation().userConfigFile)
-        let result: CmuxSettingChangeResult
+    private func runConfigSettingChange(_ change: WmuxSettingChange, jsonOutput: Bool) throws {
+        let store = JSONConfigStore(fileURL: WmuxConfigLocation().userConfigFile)
+        let result: WmuxSettingChangeResult
         do {
             let liveValues = Self.configSettingLiveValues()
             result = try runConfigSettingsBlocking { try await store.apply(change, liveValues: liveValues) }
@@ -299,8 +299,8 @@ extension WMUXCLI {
     }
 
     private func runConfigGetSetting(path: String, jsonOutput: Bool) throws {
-        let store = JSONConfigStore(fileURL: CmuxConfigLocation().userConfigFile)
-        let reading: CmuxSettingReading
+        let store = JSONConfigStore(fileURL: WmuxConfigLocation().userConfigFile)
+        let reading: WmuxSettingReading
         do {
             reading = try store.reading(at: path, liveValues: Self.configSettingLiveValues())
         } catch {
@@ -343,7 +343,7 @@ extension WMUXCLI {
     /// Reads settings the Settings window stored in the cmux app's
     /// UserDefaults, so `get`, `toggle`, and `cycle` start from the value
     /// the app is using when cmux.json doesn't set the key.
-    private static func configSettingLiveValues() -> CmuxSettingLiveValues {
+    private static func configSettingLiveValues() -> WmuxSettingLiveValues {
         .userDefaults(suiteName: CLISocketPathResolver.currentAppBundleIdentifier())
     }
 
@@ -366,10 +366,10 @@ extension WMUXCLI {
     /// Normalizes a user-supplied key to a supported editable font-size key, or nil if unsupported.
     private func canonicalFontSizeKey(_ raw: String) -> String? {
         switch raw.lowercased() {
-        case CmuxGhosttyConfigSettingEditor.sidebarFontSizeKey:
-            return CmuxGhosttyConfigSettingEditor.sidebarFontSizeKey
-        case CmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey:
-            return CmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey
+        case WmuxGhosttyConfigSettingEditor.sidebarFontSizeKey:
+            return WmuxGhosttyConfigSettingEditor.sidebarFontSizeKey
+        case WmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey:
+            return WmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey
         default:
             return nil
         }
@@ -379,19 +379,19 @@ extension WMUXCLI {
         forKey key: String
     ) -> (defaultValue: Double, clamp: (Double) -> Double, format: (Double) -> String, parse: (String) -> Double?)? {
         switch key {
-        case CmuxGhosttyConfigSettingEditor.sidebarFontSizeKey:
+        case WmuxGhosttyConfigSettingEditor.sidebarFontSizeKey:
             return (
-                CmuxGhosttyConfigSettingEditor.defaultSidebarFontSize,
-                CmuxGhosttyConfigSettingEditor().clampedSidebarFontSize,
-                CmuxGhosttyConfigSettingEditor().formattedSidebarFontSize,
-                { CmuxGhosttyConfigSettingEditor().parsedSidebarFontSize(in: $0) }
+                WmuxGhosttyConfigSettingEditor.defaultSidebarFontSize,
+                WmuxGhosttyConfigSettingEditor().clampedSidebarFontSize,
+                WmuxGhosttyConfigSettingEditor().formattedSidebarFontSize,
+                { WmuxGhosttyConfigSettingEditor().parsedSidebarFontSize(in: $0) }
             )
-        case CmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey:
+        case WmuxGhosttyConfigSettingEditor.surfaceTabBarFontSizeKey:
             return (
-                CmuxGhosttyConfigSettingEditor.defaultSurfaceTabBarFontSize,
-                CmuxGhosttyConfigSettingEditor().clampedSurfaceTabBarFontSize,
-                CmuxGhosttyConfigSettingEditor().formattedSurfaceTabBarFontSize,
-                { CmuxGhosttyConfigSettingEditor().parsedSurfaceTabBarFontSize(in: $0) }
+                WmuxGhosttyConfigSettingEditor.defaultSurfaceTabBarFontSize,
+                WmuxGhosttyConfigSettingEditor().clampedSurfaceTabBarFontSize,
+                WmuxGhosttyConfigSettingEditor().formattedSurfaceTabBarFontSize,
+                { WmuxGhosttyConfigSettingEditor().parsedSurfaceTabBarFontSize(in: $0) }
             )
         default:
             return nil
@@ -444,7 +444,7 @@ extension WMUXCLI {
         let value = descriptor.clamp(requestedValue)
         let formattedValue = descriptor.format(value)
         let url = try cmuxGhosttyConfigURLForCLI()
-        try CmuxGhosttyConfigSettingEditor().writeSetting(
+        try WmuxGhosttyConfigSettingEditor().writeSetting(
             key: key,
             value: formattedValue,
             to: url
@@ -491,19 +491,19 @@ extension WMUXCLI {
     private func cmuxGhosttyConfigURLForCLI() throws -> URL {
         let environment = ProcessInfo.processInfo.environment
         let fileManager = FileManager.default
-        let appSupportDirectories = CmuxApplicationSupportDirectories(environment: environment, fileManager: fileManager)
+        let appSupportDirectories = WmuxApplicationSupportDirectories(environment: environment, fileManager: fileManager)
             .userDirectories
         guard let firstAppSupportDirectory = appSupportDirectories.first else {
             throw CLIError(message: "Could not resolve the user Application Support directory")
         }
-        let bundleIdentifier = normalizedConfigValue(environment["CMUX_BUNDLE_ID"])
+        let bundleIdentifier = normalizedConfigValue(environment["WMUX_BUNDLE_ID"])
             ?? CLISocketPathResolver.currentAppBundleIdentifier()
         // Prefer an existing config under any candidate root (the app loads config
         // across all Application Support locations, including CFFIXED_USER_HOME),
         // so `config get/set` touches the same file the app reads. Fall back to
         // creating one under the first candidate when none exists yet.
         for appSupportDirectory in appSupportDirectories {
-            if let existing = CmuxGhosttyConfigPathResolver().loadConfigURLs(
+            if let existing = WmuxGhosttyConfigPathResolver().loadConfigURLs(
                 currentBundleIdentifier: bundleIdentifier,
                 appSupportDirectory: appSupportDirectory,
                 fileManager: fileManager
@@ -511,7 +511,7 @@ extension WMUXCLI {
                 return existing
             }
         }
-        return CmuxGhosttyConfigPathResolver().activeOrEditableConfigURL(
+        return WmuxGhosttyConfigPathResolver().activeOrEditableConfigURL(
             currentBundleIdentifier: bundleIdentifier,
             appSupportDirectory: firstAppSupportDirectory,
             fileManager: fileManager

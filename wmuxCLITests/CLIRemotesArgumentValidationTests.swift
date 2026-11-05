@@ -66,9 +66,9 @@ struct CLIVPNArgumentValidationTests {
                 executablePath: try BundledCLITestSupport.bundledCLIPath(),
                 arguments: arguments,
                 environment: [
-                    "CMUX_SOCKET_PATH": fixture.path,
-                    "CMUX_SOCKET_PASSWORD": "",
-                    "CMUX_CLI_SENTRY_DISABLED": "1",
+                    "WMUX_SOCKET_PATH": fixture.path,
+                    "WMUX_SOCKET_PASSWORD": "",
+                    "WMUX_CLI_SENTRY_DISABLED": "1",
                     "PATH": ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin",
                 ],
                 timeout: 10

@@ -1,9 +1,9 @@
-import CmuxCloud
-import CmuxSurfaceCatalogModel
+import WmuxCloud
+import WmuxSurfaceCatalogModel
 import Foundation
 import Testing
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -133,7 +133,7 @@ private final class CloudWorkspaceRenameParityHarness {
         let index = try #require(workspaces.firstIndex { $0["id"] as? String == "a" })
         workspaces[index]["name"] = name
         document["workspaces"] = workspaces
-        #expect(provider.install(try #require(CmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))))
+        #expect(provider.install(try #require(WmuxTuiSnapshotParser.state(fromSnapshot: document, machine: machine))))
     }
 
     /// The Cloud tree's "Rename…" action: `CloudTreeNodeActions.renameWorkspace`

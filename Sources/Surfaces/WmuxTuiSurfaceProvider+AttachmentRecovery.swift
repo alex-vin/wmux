@@ -1,8 +1,8 @@
-import CmuxCloud
+import WmuxCloud
 import Foundation
 
 @MainActor
-extension CmuxTuiSurfaceProvider {
+extension WmuxTuiSurfaceProvider {
     func reconcileManualMirrorAttachments(
         connected: CloudMachineLink.Connected,
         link: CloudMachineLink,

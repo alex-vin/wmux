@@ -1,4 +1,4 @@
-import CmuxFoundation
+import WmuxFoundation
 import Foundation
 
 /// Identifies one agent process generation whose SessionEnd belongs to a

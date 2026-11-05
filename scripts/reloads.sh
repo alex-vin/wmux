@@ -144,8 +144,8 @@ if [[ -n "$TAG" ]]; then
 fi
 
 XCODEBUILD_ARGS=(
-  -project cmux.xcodeproj
-  -scheme cmux
+  -project wmux.xcodeproj
+  -scheme wmux
   -configuration Release
   -destination 'platform=macOS'
 )

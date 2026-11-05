@@ -1,28 +1,28 @@
-import CmuxCloud
-import CmuxCloudBannerCore
-import CmuxProductAnalytics
-import CmuxCloudTui
-import CmuxCloudMachines
+import WmuxCloud
+import WmuxCloudBannerCore
+import WmuxProductAnalytics
+import WmuxCloudTui
+import WmuxCloudMachines
 import AppKit
-import CmuxAppKitSupportUI
-import CmuxAuthRuntime
-import CmuxBrowser
-import CmuxCommandPalette
-import CmuxPanes
-import CmuxControlSocket
-import CmuxSurfaceCatalogModel
-import CmuxWindowing
-import CmuxNotifications
-import CmuxTerminalCore
-import CmuxTerminal
-import CmuxSettings
-import CmuxSettingsUI
-import CmuxSudoBroker
-import CmuxSudoBrokerUI
-import CmuxWorkspaces
+import WmuxAppKitSupportUI
+import WmuxAuthRuntime
+import WmuxBrowser
+import WmuxCommandPalette
+import WmuxPanes
+import WmuxControlSocket
+import WmuxSurfaceCatalogModel
+import WmuxWindowing
+import WmuxNotifications
+import WmuxTerminalCore
+import WmuxTerminal
+import WmuxSettings
+import WmuxSettingsUI
+import WmuxSudoBroker
+import WmuxSudoBrokerUI
+import WmuxWorkspaces
 import SwiftUI
 import Bonsplit
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import CoreServices
 import CoreGraphics
 import UserNotifications
@@ -30,11 +30,11 @@ import WebKit
 import Combine
 import ObjectiveC.runtime
 import Darwin
-import CmuxFoundation
-import CmuxSidebar
-import CmuxGit
-import CmuxGeminiQuota
-import CmuxCloudTui
+import WmuxFoundation
+import WmuxSidebar
+import WmuxGit
+import WmuxGeminiQuota
+import WmuxCloudTui
 import os
 
 private nonisolated let sudoApprovalLogger = Logger(
@@ -42,7 +42,7 @@ private nonisolated let sudoApprovalLogger = Logger(
     category: "SudoApproval"
 )
 
-private enum CmuxThemeNotifications {
+private enum WmuxThemeNotifications {
     static let reloadConfig = Notification.Name("com.cmuxterm.themes.reload-config")
 }
 
@@ -54,7 +54,7 @@ struct WorkspaceGroupNewWorkspaceTarget {
 
 /// Owns debug-window coordinators at the application composition root.
 @MainActor
-final class CmuxDebugWindowsCoordinator {
+final class WmuxDebugWindowsCoordinator {
     private let aboutTitlebarCoordinator: DebugWindowsCoordinator
     private weak var decorator: (any WindowDecorating)?
 
@@ -202,10 +202,10 @@ final class ConfiguredGroupActionAsyncWorkspaceObserver {
 }
 
 #if DEBUG
-enum CmuxTypingTiming {
+enum WmuxTypingTiming {
     static let isEnabled: Bool = {
         let environment = ProcessInfo.processInfo.environment
-        if environment["CMUX_TYPING_TIMING_LOGS"] == "1" || environment["CMUX_KEY_LATENCY_PROBE"] == "1" {
+        if environment["WMUX_TYPING_TIMING_LOGS"] == "1" || environment["WMUX_KEY_LATENCY_PROBE"] == "1" {
             return true
         }
         let defaults = UserDefaults.standard
@@ -213,7 +213,7 @@ enum CmuxTypingTiming {
     }()
     static let isVerboseProbeEnabled: Bool = {
         let environment = ProcessInfo.processInfo.environment
-        if environment["CMUX_KEY_LATENCY_PROBE"] == "1" {
+        if environment["WMUX_KEY_LATENCY_PROBE"] == "1" {
             return true
         }
         return UserDefaults.standard.bool(forKey: "cmuxKeyLatencyProbe")
@@ -238,7 +238,7 @@ enum CmuxTypingTiming {
 
     @inline(__always)
     static func logDuration(path: String, startedAt: TimeInterval?, event: NSEvent? = nil, extra: String? = nil) {
-        CmuxMainThreadTurnProfiler.endMeasure(path, startedAt: startedAt)
+        WmuxMainThreadTurnProfiler.endMeasure(path, startedAt: startedAt)
         guard let startedAt else { return }
         let elapsedMs = max(0, (ProcessInfo.processInfo.systemUptime - startedAt) * 1000.0)
         let delayMs: Double? = {
@@ -318,8 +318,8 @@ enum CmuxTypingTiming {
     }
 }
 
-final class CmuxMainRunLoopStallMonitor {
-    static let shared = CmuxMainRunLoopStallMonitor()
+final class WmuxMainRunLoopStallMonitor {
+    static let shared = WmuxMainRunLoopStallMonitor()
 
     private let thresholdMs: Double = 8.0
     private var observer: CFRunLoopObserver?
@@ -330,7 +330,7 @@ final class CmuxMainRunLoopStallMonitor {
     private init() {}
 
     func installIfNeeded() {
-        guard CmuxTypingTiming.isEnabled else { return }
+        guard WmuxTypingTiming.isEnabled else { return }
         guard !installed else { return }
 
         var context = CFRunLoopObserverContext(
@@ -348,7 +348,7 @@ final class CmuxMainRunLoopStallMonitor {
             CFIndex.max,
             { _, activity, info in
                 guard let info else { return }
-                let monitor = Unmanaged<CmuxMainRunLoopStallMonitor>.fromOpaque(info).takeUnretainedValue()
+                let monitor = Unmanaged<WmuxMainRunLoopStallMonitor>.fromOpaque(info).takeUnretainedValue()
                 monitor.handle(activity: activity)
             },
             &context
@@ -404,8 +404,8 @@ final class CmuxMainRunLoopStallMonitor {
     }
 }
 
-final class CmuxMainThreadTurnProfiler {
-    static let shared = CmuxMainThreadTurnProfiler()
+final class WmuxMainThreadTurnProfiler {
+    static let shared = WmuxMainThreadTurnProfiler()
 
     private struct BucketStats {
         var count: Int = 0
@@ -424,13 +424,13 @@ final class CmuxMainThreadTurnProfiler {
 
     @inline(__always)
     static func endMeasure(_ bucket: String, startedAt: TimeInterval?) {
-        guard let startedAt, CmuxTypingTiming.isEnabled, Thread.isMainThread else { return }
+        guard let startedAt, WmuxTypingTiming.isEnabled, Thread.isMainThread else { return }
         let elapsedMs = max(0, (ProcessInfo.processInfo.systemUptime - startedAt) * 1000.0)
         shared.record(bucket: bucket, elapsedMs: elapsedMs, count: 1)
     }
 
     func installIfNeeded() {
-        guard CmuxTypingTiming.isEnabled else { return }
+        guard WmuxTypingTiming.isEnabled else { return }
         guard !installed else { return }
 
         var context = CFRunLoopObserverContext(
@@ -448,7 +448,7 @@ final class CmuxMainThreadTurnProfiler {
             CFIndex.max,
             { _, activity, info in
                 guard let info else { return }
-                let profiler = Unmanaged<CmuxMainThreadTurnProfiler>.fromOpaque(info).takeUnretainedValue()
+                let profiler = Unmanaged<WmuxMainThreadTurnProfiler>.fromOpaque(info).takeUnretainedValue()
                 profiler.handle(activity: activity)
             },
             &context
@@ -546,16 +546,16 @@ final class CmuxMainThreadTurnProfiler {
 }
 #endif
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSMenuItemValidation, NSMenuDelegate, CmuxConfigStoreReloadEnvironment {
+final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSMenuItemValidation, NSMenuDelegate, WmuxConfigStoreReloadEnvironment {
     nonisolated(unsafe) static var shared: AppDelegate?
     let cloudBannerDismissalStore: CloudBannerDismissalStore
     private(set) var devicesRegistry: DeviceSurfaceProviderRegistry?
-    /// Stateless control-socket syscall layer (CmuxControlSocket); composition-root owned.
+    /// Stateless control-socket syscall layer (WmuxControlSocket); composition-root owned.
     nonisolated let socketTransport = SocketTransport()
-    nonisolated let processSnapshotService = CmuxTopProcessSnapshot.makeProcessSnapshotService()
-    /// Owns the About Titlebar Debug subsystem (CmuxAppKitSupportUI); composition-root
+    nonisolated let processSnapshotService = WmuxTopProcessSnapshot.makeProcessSnapshotService()
+    /// Owns the About Titlebar Debug subsystem (WmuxAppKitSupportUI); composition-root
     /// owned and created lazily so the window-decoration seam can point back at `self`.
-    lazy var debugWindowsCoordinator = CmuxDebugWindowsCoordinator(decorator: self)
+    lazy var debugWindowsCoordinator = WmuxDebugWindowsCoordinator(decorator: self)
     /// About Titlebar Debug options store, applied by the About/Acknowledgments windows.
     var aboutTitlebarDebugStore: AboutTitlebarDebugStore { debugWindowsCoordinator.aboutTitlebarStore }
     /// Owns every main-window registration, recovery, and close phase.
@@ -587,9 +587,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private let systemAppearanceObserver = SystemAppearanceObserver()
     /// Resolves `app.accentColor` once per change. Window roots, the sidebar
     /// snapshot and AppKit chrome read ``accentColor`` from here.
-    let accentColorObserver = CmuxAccentColorObserver()
+    let accentColorObserver = WmuxAccentColorObserver()
     /// The resolved cmux accent for chrome drawing.
-    var accentColor: CmuxAccentColor { accentColorObserver.current }
+    var accentColor: WmuxAccentColor { accentColorObserver.current }
     private static let reloadConfigurationMenuItemIdentifier = NSUserInterfaceItemIdentifier("com.cmux.reloadConfiguration")
     private static let cachedIsRunningUnderXCTest = MacSentryStartupPolicy.isRunningUnderXCTest(
         environment: ProcessInfo.processInfo.environment
@@ -613,7 +613,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let sidebarSelectionState: SidebarSelectionState
         var fileExplorerState: FileExplorerState?
         let keyboardFocusCoordinator: MainWindowFocusController
-        var cmuxConfigStore: CmuxConfigStore?
+        var cmuxConfigStore: WmuxConfigStore?
         var closeObserver: WindowCloseObserver?
         weak var window: NSWindow?
         /// Per-window Dock owned by this context and torn down with it.
@@ -637,7 +637,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             sidebarState: SidebarState,
             sidebarSelectionState: SidebarSelectionState,
             fileExplorerState: FileExplorerState?,
-            cmuxConfigStore: CmuxConfigStore?,
+            cmuxConfigStore: WmuxConfigStore?,
             window: NSWindow?,
             workspaceTerminalFontSizeArbiter:
                 WorkspaceTerminalFontSizeArbiter
@@ -666,9 +666,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         let window: NSWindow?
     }
 
-    /// Lifted to ``CmuxWindowing/SessionDisplayGeometry``; aliased so existing
+    /// Lifted to ``WmuxWindowing/SessionDisplayGeometry``; aliased so existing
     /// `AppDelegate.SessionDisplayGeometry` references stay source-identical.
-    typealias SessionDisplayGeometry = CmuxWindowing.SessionDisplayGeometry
+    typealias SessionDisplayGeometry = WmuxWindowing.SessionDisplayGeometry
 
     struct PersistedWindowGeometry: Codable, Sendable {
         let version: Int
@@ -696,7 +696,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private(set) var pullRequestProbeService = PullRequestProbeService()
 #endif
 
-    /// Notification jump/open navigation, extracted into `CmuxNotifications`. `AppDelegate` is the
+    /// Notification jump/open navigation, extracted into `WmuxNotifications`. `AppDelegate` is the
     /// composition root: it conforms to every seam (see `AppDelegate+NotificationNavSeams.swift`)
     /// and injects itself. Built lazily because the seams read late-bound state (`notificationStore`,
     /// `mainWindowContexts`) that is `nil` until startup wiring completes; the seam contracts already
@@ -732,7 +732,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             }
         )
     /// OS notification delivery/response coordination, extracted into
-    /// `CmuxNotifications`. The app target injects the concrete
+    /// `WmuxNotifications`. The app target injects the concrete
     /// `UNUserNotificationCenter`, terminal identifiers from
     /// `TerminalNotificationStore`, localized action titles, and the weak-owner
     /// Feed/app activation seam.
@@ -832,7 +832,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         clientURL: { CloudTuiClientPaths.clientURL() },
         paths: CloudTuiClientPaths()
     )
-    private(set) lazy var cloudActivationCoordinator = CloudActivationCoordinator(prepare: { try await CmuxTuiSurfaceProviderRegistry.shared.prepareForActivation() }, cleanup: { await CmuxTuiSurfaceProviderRegistry.shared.cancelActivationPreparation() }, analytics: .app)
+    private(set) lazy var cloudActivationCoordinator = CloudActivationCoordinator(prepare: { try await WmuxTuiSurfaceProviderRegistry.shared.prepareForActivation() }, cleanup: { await WmuxTuiSurfaceProviderRegistry.shared.cancelActivationPreparation() }, analytics: .app)
     var cloudWorkspaceCoordinator: CloudWorkspaceCoordinator?
     var cloudWorkspaceOperationController: CloudWorkspaceOperationController?
     var deviceWorkspaceCreationCoordinator: DeviceWorkspaceCreationCoordinator?
@@ -874,8 +874,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private var reloadConfigurationMenuItemRefreshScheduled = false
     /// Orchestrates per-window cmux config-store reloads + window-title refresh.
     /// Holds `self` weakly through the environment seam to avoid a retain cycle.
-    private lazy var configStoreReloadCoordinator: CmuxConfigStoreReloadCoordinator = {
-        CmuxConfigStoreReloadCoordinator(environment: self) { source, storeCount in
+    private lazy var configStoreReloadCoordinator: WmuxConfigStoreReloadCoordinator = {
+        WmuxConfigStoreReloadCoordinator(environment: self) { source, storeCount in
 #if DEBUG
             cmuxDebugLog("cmuxConfig.reload source=\(source) stores=\(storeCount)")
 #endif
@@ -932,7 +932,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     var ghosttyGotoSplitNextShortcut: StoredShortcut?
     private var browserAddressBarFocusedPanelId: UUID?
     /// Owns the browser omnibar selection-repeat state machine, extracted into
-    /// `CmuxBrowser`. The app delegate is the composition root: it injects
+    /// `WmuxBrowser`. The app delegate is the composition root: it injects
     /// the `NotificationCenter` selection-move sink and the debug-trace sink.
     private lazy var browserOmnibarSelectionRepeat: BrowserOmnibarSelectionRepeatCoordinator = {
         let debugLog: BrowserOmnibarSelectionRepeatCoordinator.DebugLog?
@@ -988,7 +988,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
         let catalog = settingsRuntime?.catalog ?? SettingCatalog()
         let configStore = settingsRuntime?.jsonStore
-            ?? JSONConfigStore(fileURL: CmuxConfigLocation().userConfigFile)
+            ?? JSONConfigStore(fileURL: WmuxConfigLocation().userConfigFile)
         return ComputerUseUXCoordinator(
             liveAgentIndex: SharedLiveAgentIndex.shared,
             stateRepository: ComputerUseStateRepository(
@@ -1006,7 +1006,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             runtimeService: computerUseRuntimeService,
             userDefaults: .standard,
             workspaceTitle: { [weak self] in self?.tabTitle(for: $0) },
-            featureEnabled: { CmuxFeatureFlags.shared.isComputerUseUXEnabled },
+            featureEnabled: { WmuxFeatureFlags.shared.isComputerUseUXEnabled },
             ownsSurface: { [weak self] surfaceID, workspaceID in
                 self?.ownsLocalComputerUseSurface(surfaceID, workspaceID: workspaceID) == true
             }
@@ -1027,7 +1027,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private static let didInstallWindowKeyEquivalentSwizzle: Void = {
         let targetClass: AnyClass = NSWindow.self
         let originalSelector = #selector(NSWindow.performKeyEquivalent(with:))
-        let swizzledSelector = #selector(NSWindow.cmux_performKeyEquivalent(with:))
+        let swizzledSelector = #selector(NSWindow.wmux_performKeyEquivalent(with:))
         guard let originalMethod = class_getInstanceMethod(targetClass, originalSelector),
               let swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector) else {
             return
@@ -1037,7 +1037,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private static let didInstallWindowFirstResponderSwizzle: Void = {
         let targetClass: AnyClass = NSWindow.self
         let originalSelector = #selector(NSWindow.makeFirstResponder(_:))
-        let swizzledSelector = #selector(NSWindow.cmux_makeFirstResponder(_:))
+        let swizzledSelector = #selector(NSWindow.wmux_makeFirstResponder(_:))
         guard let originalMethod = class_getInstanceMethod(targetClass, originalSelector),
               let swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector) else {
             return
@@ -1047,7 +1047,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private static let didInstallWindowSendEventSwizzle: Void = {
         let targetClass: AnyClass = NSWindow.self
         let originalSelector = #selector(NSWindow.sendEvent(_:))
-        let swizzledSelector = #selector(NSWindow.cmux_sendEvent(_:))
+        let swizzledSelector = #selector(NSWindow.wmux_sendEvent(_:))
         guard let originalMethod = class_getInstanceMethod(targetClass, originalSelector),
               let swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector) else {
             return
@@ -1057,7 +1057,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private static let didInstallApplicationSendEventSwizzle: Void = {
         let targetClass: AnyClass = NSApplication.self
         let originalSelector = #selector(NSApplication.sendEvent(_:))
-        let swizzledSelector = #selector(NSApplication.cmux_applicationSendEvent(_:))
+        let swizzledSelector = #selector(NSApplication.wmux_applicationSendEvent(_:))
         guard let originalMethod = class_getInstanceMethod(targetClass, originalSelector),
               let swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector) else {
             return
@@ -1067,7 +1067,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private static let didInstallApplicationSendActionSwizzle: Void = {
         let targetClass: AnyClass = NSApplication.self
         let originalSelector = #selector(NSApplication.sendAction(_:to:from:))
-        let swizzledSelector = #selector(NSApplication.cmux_sendAction(_:to:from:))
+        let swizzledSelector = #selector(NSApplication.wmux_sendAction(_:to:from:))
         guard let originalMethod = class_getInstanceMethod(targetClass, originalSelector),
               let swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector) else {
             return
@@ -1077,7 +1077,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private static let didInstallApplicationAccessibilitySwizzle: Void = {
         let targetClass: AnyClass = NSApplication.self
         let originalSelector = #selector(NSApplication.accessibilityAttributeValue(_:))
-        let swizzledSelector = #selector(NSApplication.cmux_accessibilityAttributeValue(_:))
+        let swizzledSelector = #selector(NSApplication.wmux_accessibilityAttributeValue(_:))
         guard let originalMethod = class_getInstanceMethod(targetClass, originalSelector),
               let swizzledMethod = class_getInstanceMethod(targetClass, swizzledSelector) else {
             return
@@ -1197,8 +1197,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func childExitKeyboardProbePath() -> String? {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_CHILD_EXIT_KEYBOARD_SETUP"] == "1",
-              let path = env["CMUX_UI_TEST_CHILD_EXIT_KEYBOARD_PATH"],
+        guard env["WMUX_UI_TEST_CHILD_EXIT_KEYBOARD_SETUP"] == "1",
+              let path = env["WMUX_UI_TEST_CHILD_EXIT_KEYBOARD_PATH"],
               !path.isEmpty else {
             return nil
         }
@@ -1281,7 +1281,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
     /// Durable navigation links that arrived before startup restore registered
     /// their target workspaces.
-    var pendingStartupNavigationURLRequests: [CmuxNavigationURLRequest] = []
+    var pendingStartupNavigationURLRequests: [WmuxNavigationURLRequest] = []
     private let sessionPersistenceQueue = DispatchQueue(
         label: "com.cmuxterm.app.sessionPersistence",
         qos: .utility
@@ -1296,7 +1296,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     /// than it started from; installed by startup snapshot preparation or the
     /// first save, whichever comes first.
     var sessionSnapshotOverwriteGuard: SessionSnapshotOverwriteGuard?
-    /// Session snapshot persistence (CmuxSession); composition-root owned.
+    /// Session snapshot persistence (WmuxSession); composition-root owned.
     /// `nonisolated` because the autosave write block runs on `sessionPersistenceQueue`.
     nonisolated let sessionSnapshotStore: any SessionSnapshotStoring<AppSessionSnapshot> = SessionSnapshotRepository(
         schemaVersion: SessionSnapshotSchema.currentVersion,
@@ -1339,14 +1339,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             self?.sessionScrollbackCheckpointCoordinator?.tickIfDue()
         }
     )
-    /// Accessibility window-hierarchy cache (CmuxWindowing); composition-root
+    /// Accessibility window-hierarchy cache (WmuxWindowing); composition-root
     /// owned. The `NSApplication` AX swizzle forwards to it behind
     /// ``AccessibilityWindowCaching``.
     /// `nonisolated(unsafe)`: the existential is non-Sendable, but it is only
     /// touched from the main-actor AX swizzle path (callers hold it on main),
     /// matching the other non-Sendable composition-root members (`shared`).
     nonisolated(unsafe) let accessibilityWindowCache: any AccessibilityWindowCaching = AccessibilityWindowCache()
-    /// First-responder bypass guard (CmuxBrowserPanel); composition-root owned.
+    /// First-responder bypass guard (WmuxBrowserPanel); composition-root owned.
     /// The `NSWindow.makeFirstResponder` swizzle reads `isActive` and
     /// `BrowserPanel` wraps responder-churning devtools work in `withBypass(_:)`.
     nonisolated let browserFirstResponderBypass = BrowserFirstResponderBypass()
@@ -1494,7 +1494,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             in: .userDomainMask
         ).first?
             .appendingPathComponent("Logs", isDirectory: true)
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("hangs", isDirectory: true)
         let captureStore = hangDirectory.map {
             MainThreadHangCaptureStore(
@@ -1643,7 +1643,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // notification, so nothing else would bring it up (#10866).
         BrowserAvailabilityMonitor.shared.activate()
         // Composition root for surfaces: this Mac's panes and every cloud machine's
-        // cmux-tui session feed one catalog, and the sidebar, drag/drop, socket and CLI all
+        // wmux-tui session feed one catalog, and the sidebar, drag/drop, socket and CLI all
         // open through `SurfaceCatalog.project`.
         // Inject the live workspace registry into the catalog-owned rename service before
         // any restore or provider callbacks can reconcile a cloud binding.
@@ -1669,7 +1669,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         SurfaceCatalog.shared.focusProjection = { projection in
             SurfacePaneFactory.focus(panelID: projection.panelID, in: projection.workspaceID)
         }
-        CmuxTuiSurfaceProviderRegistry.shared.start(catalog: .shared)
+        WmuxTuiSurfaceProviderRegistry.shared.start(catalog: .shared)
         let env = ProcessInfo.processInfo.environment
         let telemetryEnabled = TelemetrySettings.enabledForCurrentLaunch
         let sentryStartupPolicy = MacSentryStartupPolicy(
@@ -1741,7 +1741,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         DistributedNotificationCenter.default().addObserver(
             self,
             selector: #selector(handleThemesReloadNotification(_:)),
-            name: CmuxThemeNotifications.reloadConfig,
+            name: WmuxThemeNotifications.reloadConfig,
             object: nil,
             suspensionBehavior: .deliverImmediately
         )
@@ -1788,8 +1788,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
 #if DEBUG
         uiTestDiagnosticsWriter.write(stage: "didFinishLaunching")
-        CmuxMainRunLoopStallMonitor.shared.installIfNeeded()
-        CmuxMainThreadTurnProfiler.shared.installIfNeeded()
+        WmuxMainRunLoopStallMonitor.shared.installIfNeeded()
+        WmuxMainThreadTurnProfiler.shared.installIfNeeded()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             self?.uiTestDiagnosticsWriter.write(stage: "after1s")
         }
@@ -1807,10 +1807,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // carries the same anonymous install id, and flags then use their
         // built-in defaults.
         if !isRunningUnderXCTest, !ManagedDevicePolicy().isEnforced(.disableTelemetry) {
-            CmuxFeatureFlags.shared.start()
+            WmuxFeatureFlags.shared.start()
         }
 
-        let forceDuplicateLaunchObserver = env["CMUX_UI_TEST_ENABLE_DUPLICATE_LAUNCH_OBSERVER"] == "1"
+        let forceDuplicateLaunchObserver = env["WMUX_UI_TEST_ENABLE_DUPLICATE_LAUNCH_OBSERVER"] == "1"
 
         // UI tests frequently time out waiting for the main window if we do heavyweight
         // LaunchServices registration / single-instance enforcement synchronously at startup.
@@ -1876,19 +1876,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // In UI tests, `WindowGroup` occasionally fails to materialize a window quickly on the VM.
         // If there are no windows shortly after launch, force-create one so XCUITest can proceed.
         if isRunningUnderXCTest {
-            if let rawVariant = env["CMUX_UI_TEST_BROWSER_IMPORT_HINT_VARIANT"] {
+            if let rawVariant = env["WMUX_UI_TEST_BROWSER_IMPORT_HINT_VARIANT"] {
                 UserDefaults.standard.set(
                     BrowserImportHintSettings.variant(for: rawVariant).rawValue,
                     forKey: BrowserImportHintSettings.variantKey
                 )
             }
-            if let rawShow = env["CMUX_UI_TEST_BROWSER_IMPORT_HINT_SHOW"] {
+            if let rawShow = env["WMUX_UI_TEST_BROWSER_IMPORT_HINT_SHOW"] {
                 UserDefaults.standard.set(
                     rawShow == "1",
                     forKey: BrowserImportHintSettings.showOnBlankTabsKey
                 )
             }
-            if let rawDismissed = env["CMUX_UI_TEST_BROWSER_IMPORT_HINT_DISMISSED"] {
+            if let rawDismissed = env["WMUX_UI_TEST_BROWSER_IMPORT_HINT_DISMISSED"] {
                 UserDefaults.standard.set(
                     rawDismissed == "1",
                     forKey: BrowserImportHintSettings.dismissedKey
@@ -1913,13 +1913,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 }
                 self.uiTestDiagnosticsWriter.write(stage: "afterForceWindow")
             }
-            if env["CMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_BLANK_BROWSER"] == "1" {
+            if env["WMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_BLANK_BROWSER"] == "1" {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { [weak self] in
                     guard let self else { return }
                     _ = self.openBrowserAndFocusAddressBar(insertAtEnd: true)
                 }
             }
-            if env["CMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_SETTINGS"] == "1" {
+            if env["WMUX_UI_TEST_BROWSER_IMPORT_HINT_OPEN_SETTINGS"] == "1" {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) { [weak self] in
                     self?.openPreferencesWindow(
                         debugSource: "uiTest.browserImportHint",
@@ -1927,7 +1927,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     )
                 }
             }
-            if env["CMUX_UI_TEST_BROWSER_IMPORT_AUTO_OPEN"] == "1" {
+            if env["WMUX_UI_TEST_BROWSER_IMPORT_AUTO_OPEN"] == "1" {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                     self.browserDataImportCoordinator?.presentImportDialog()
                 }
@@ -1967,7 +1967,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func moveUITestWindowToTargetDisplayIfNeeded(attempt: Int = 0) {
         let env = ProcessInfo.processInfo.environment
-        guard let rawDisplayID = env["CMUX_UI_TEST_TARGET_DISPLAY_ID"],
+        guard let rawDisplayID = env["WMUX_UI_TEST_TARGET_DISPLAY_ID"],
               let targetDisplayID = UInt32(rawDisplayID) else {
             return
         }
@@ -2236,7 +2236,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         )
         alert.informativeText = String(
             localized: "dialog.simulatorCameraCleanupFailed.message",
-            defaultValue: "cmux stayed open because it could not restore a Simulator app’s camera state. Quit again to retry cleanup."
+            defaultValue: "wmux stayed open because it could not restore a Simulator app’s camera state. Quit again to retry cleanup."
         )
         alert.addButton(withTitle: String(localized: "common.ok", defaultValue: "OK"))
         _ = alert.runCmuxModal()
@@ -2430,7 +2430,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         connectivityInvalidationSubscriberCoordinator.appWillTerminate()
         closeAllWebInspectorsBeforeAppTeardown()
         sessionAutosaveCoordinator.stop()
-        CmuxSSHURLProcessLauncher.shared.terminateAll()
+        WmuxSSHURLProcessLauncher.shared.terminateAll()
         caffeineController.setEnabled(false)
         TerminalController.shared.stopAutomationEngine()
         TerminalController.shared.stop(cleanupDiscoveryState: true)
@@ -2549,7 +2549,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         setupPortalStatsUITestDiagnosticsIfNeeded()
 
         let env = ProcessInfo.processInfo.environment
-        if isRunningUnderXCTest(env) || env["CMUX_UI_TEST_MODE"] == "1" {
+        if isRunningUnderXCTest(env) || env["WMUX_UI_TEST_MODE"] == "1" {
             uiTestSocketSanityCoordinator.scheduleIfNeeded(environment: env)
             // Read `shared` here, on the main actor; the script runs its
             // commands off it through the nonisolated line handler.
@@ -2609,7 +2609,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 surfaceId: nil,
                 title: String(
                     localized: "crashBreadcrumb.title",
-                    defaultValue: "cmux crashed during your last session"
+                    defaultValue: "wmux crashed during your last session"
                 ),
                 subtitle: String(
                     localized: "crashBreadcrumb.subtitle",
@@ -2630,18 +2630,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard !didSetupTerminalCmdClickUITest else { return }
 
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_SETUP"] == "1" else {
-            cmuxDebugLog("cmdclick.ui.setup skip reason=env_missing tag=\(env["CMUX_TAG"] ?? "nil")")
+        guard env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_SETUP"] == "1" else {
+            cmuxDebugLog("cmdclick.ui.setup skip reason=env_missing tag=\(env["WMUX_TAG"] ?? "nil")")
             return
         }
-        guard let manifestPath = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_PATH"]?
+        guard let manifestPath = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               !manifestPath.isEmpty else {
             cmuxDebugLog("cmdclick.ui.setup skip reason=missing_manifest_path")
             return
         }
         didSetupTerminalCmdClickUITest = true
-        guard let fixtureDirectory = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_FIXTURE_DIR"]?
+        guard let fixtureDirectory = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_FIXTURE_DIR"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               !fixtureDirectory.isEmpty else {
             cmuxDebugLog("cmdclick.ui.setup error reason=missing_fixture_dir manifest=\(manifestPath)")
@@ -2650,37 +2650,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             ])
             return
         }
-        let commandPath = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_COMMAND_PATH"]?
+        let commandPath = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_COMMAND_PATH"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        let screenshotDirectory = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_SCREENSHOT_DIR"]?
+        let screenshotDirectory = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_SCREENSHOT_DIR"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        let displayMode = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_MODE"]?
+        let displayMode = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_MODE"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        let lineFormat = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_FORMAT"]?
+        let lineFormat = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_FORMAT"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        let mouseReportingEnabled = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_MOUSE_REPORTING"] == "1"
-        let linePrefix = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_PREFIX"] ?? ""
-        let displaySuffix = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_SUFFIX"] ?? ""
-        let displayAsAbsolutePath = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_AS_ABSOLUTE_PATH"] == "1"
+        let mouseReportingEnabled = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_MOUSE_REPORTING"] == "1"
+        let linePrefix = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_LINE_PREFIX"] ?? ""
+        let displaySuffix = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_SUFFIX"] ?? ""
+        let displayAsAbsolutePath = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_DISPLAY_AS_ABSOLUTE_PATH"] == "1"
         // The printed path must not exist under the cwd (it may elsewhere, such as the git root).
-        let skipFixtureFile = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_SKIP_FIXTURE_FILE"] == "1"
+        let skipFixtureFile = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_SKIP_FIXTURE_FILE"] == "1"
         // Moves the shell itself into the fixture: links resolve against the
         // cwd the shell reports, which outranks the panel directory set below.
-        let changeShellDirectory = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_CD_FIXTURE"] == "1"
-        if let rawOpenSupportedFiles = env["CMUX_UI_TEST_OPEN_SUPPORTED_FILES_IN_CMUX"]?
+        let changeShellDirectory = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_CD_FIXTURE"] == "1"
+        if let rawOpenSupportedFiles = env["WMUX_UI_TEST_OPEN_SUPPORTED_FILES_IN_CMUX"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !rawOpenSupportedFiles.isEmpty {
             FileRouteSettingsStore(defaults: .standard).setSupportedFileRouteEnabled(rawOpenSupportedFiles == "1")
         }
-        if let rawOpenMarkdown = env["CMUX_UI_TEST_OPEN_MARKDOWN_IN_CMUX_VIEWER"]?
+        if let rawOpenMarkdown = env["WMUX_UI_TEST_OPEN_MARKDOWN_IN_CMUX_VIEWER"]?
             .trimmingCharacters(in: .whitespacesAndNewlines),
            !rawOpenMarkdown.isEmpty {
             FileRouteSettingsStore(defaults: .standard).setMarkdownRouteEnabled(rawOpenMarkdown == "1")
         }
-        let extraFileNamesJSON = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_EXTRA_FILE_NAMES_JSON"]?
+        let extraFileNamesJSON = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_EXTRA_FILE_NAMES_JSON"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        let fileName = env["CMUX_UI_TEST_TERMINAL_CMD_CLICK_FILE_NAME"]?
+        let fileName = env["WMUX_UI_TEST_TERMINAL_CMD_CLICK_FILE_NAME"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let resolvedFileName = (fileName?.isEmpty == false) ? fileName! : "Cmd Click Fixture.txt"
         let fixtureDirectoryURL = URL(fileURLWithPath: fixtureDirectory, isDirectory: true)
@@ -3159,7 +3159,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     break
                 }
 
-                let capturePath = ProcessInfo.processInfo.environment["CMUX_UI_TEST_CAPTURE_OPEN_URL_PATH"]
+                let capturePath = ProcessInfo.processInfo.environment["WMUX_UI_TEST_CAPTURE_OPEN_URL_PATH"]
                 let beforeURLCount = capturePath.flatMap { try? String(contentsOfFile: $0, encoding: .utf8) }?
                     .split(separator: "\n").count ?? 0
                 let result = terminalPanel.hostedView.debugSimulateStationaryCommandClick(at: hitPoint)
@@ -3182,7 +3182,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     .compactMap { ($0 as? MarkdownPanel)?.filePath }
                 payload["lastCommandFilePreviewPaths"] = workspace.panels.values
                     .compactMap { ($0 as? FilePreviewPanel)?.filePath }
-                let capturePath = ProcessInfo.processInfo.environment["CMUX_UI_TEST_CAPTURE_OPEN_URL_PATH"]
+                let capturePath = ProcessInfo.processInfo.environment["WMUX_UI_TEST_CAPTURE_OPEN_URL_PATH"]
                 payload["lastCommandOpenedURLs"] = capturePath
                     .flatMap { try? String(contentsOfFile: $0, encoding: .utf8) }?
                     .split(separator: "\n").map(String.init) ?? []
@@ -3466,7 +3466,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func setupDisplayResolutionUITestDiagnosticsIfNeeded() {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_DISPLAY_RENDER_STATS"] == "1" else { return }
+        guard env["WMUX_UI_TEST_DISPLAY_RENDER_STATS"] == "1" else { return }
         guard !didSetupDisplayResolutionUITestDiagnostics else { return }
         didSetupDisplayResolutionUITestDiagnostics = true
 
@@ -3493,7 +3493,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func setupPortalStatsUITestDiagnosticsIfNeeded() {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_PORTAL_STATS"] == "1" else { return }
+        guard env["WMUX_UI_TEST_PORTAL_STATS"] == "1" else { return }
         guard !didSetupPortalStatsUITestDiagnostics else { return }
         didSetupPortalStatsUITestDiagnostics = true
 
@@ -4577,9 +4577,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             TextBoxInputTextView.flushPendingSessionDraftAttachmentCopies()
         }
 #if DEBUG
-        let timingStart = CmuxTypingTiming.start()
+        let timingStart = WmuxTypingTiming.start()
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "session.saveSnapshot",
                 startedAt: timingStart,
                 extra: "includeScrollback=\(includeScrollback ? 1 : 0) removeWhenEmpty=\(removeWhenEmpty ? 1 : 0) sync=\(writeSynchronously ? 1 : 0)"
@@ -4730,7 +4730,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     /// Captures the live pane-to-PTY identity before the process scan leaves
-    /// the main actor.  Plain `ssh` commonly drops the CMUX_* environment when
+    /// the main actor.  Plain `ssh` commonly drops the WMUX_* environment when
     /// it is exec'd by a user's shell, so process detection cannot safely use
     /// environment scope alone.  The terminal surface owns the controlling
     /// TTY and is the authoritative mapping for this save pass.
@@ -5192,7 +5192,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         sidebarState: SidebarState,
         sidebarSelectionState: SidebarSelectionState,
         fileExplorerState: FileExplorerState? = nil,
-        cmuxConfigStore: CmuxConfigStore? = nil
+        cmuxConfigStore: WmuxConfigStore? = nil
     ) {
         let key = ObjectIdentifier(window)
         let exactContextOwner = mainWindowContext(forExactWindowIdentity: window)
@@ -5390,9 +5390,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 #endif
 
-    /// Lifted to ``CmuxWindowing/MainWindowSummary``; aliased so existing
+    /// Lifted to ``WmuxWindowing/MainWindowSummary``; aliased so existing
     /// `AppDelegate.MainWindowSummary` references stay source-identical.
-    typealias MainWindowSummary = CmuxWindowing.MainWindowSummary
+    typealias MainWindowSummary = WmuxWindowing.MainWindowSummary
 
     struct WindowMoveTarget: Identifiable {
         let windowId: UUID
@@ -5899,7 +5899,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     func requestAgentInbox(preferredWindow: NSWindow? = nil, source: String = "api.agentInbox") {
-        guard CmuxFeatureFlags.shared.isAgentInboxQuickViewEnabled else { return }
+        guard WmuxFeatureFlags.shared.isAgentInboxQuickViewEnabled else { return }
         postCommandPaletteRequest(
             kind: .agentInbox,
             preferredWindow: preferredWindow,
@@ -6685,7 +6685,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func mainWindowId(from window: NSWindow) -> UUID? {
         guard let raw = window.identifier?.rawValue else { return nil }
-        let prefix = "cmux.main."
+        let prefix = "wmux.main."
         guard raw.hasPrefix(prefix) else { return nil }
         let suffix = String(raw.dropFirst(prefix.count))
         return UUID(uuidString: suffix)
@@ -6843,8 +6843,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             return context.windowId
         }
         guard let rawIdentifier = window.identifier?.rawValue,
-              rawIdentifier.hasPrefix("cmux.main.") else { return nil }
-        let idPart = String(rawIdentifier.dropFirst("cmux.main.".count))
+              rawIdentifier.hasPrefix("wmux.main.") else { return nil }
+        let idPart = String(rawIdentifier.dropFirst("wmux.main.".count))
         return UUID(uuidString: idPart)
     }
 
@@ -7068,13 +7068,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
         process.arguments = arguments
         var environment = ProcessInfo.processInfo.environment
-        environment["CMUX_SOCKET_PATH"] = socketPath
-        environment["CMUX_BUNDLED_CLI_PATH"] = cliURL.path
-        environment["CMUX_WORKSPACE_ID"] = workspaceId.uuidString
+        environment["WMUX_SOCKET_PATH"] = socketPath
+        environment["WMUX_BUNDLED_CLI_PATH"] = cliURL.path
+        environment["WMUX_WORKSPACE_ID"] = workspaceId.uuidString
         if let surfaceId {
-            environment["CMUX_SURFACE_ID"] = surfaceId.uuidString
+            environment["WMUX_SURFACE_ID"] = surfaceId.uuidString
         }
-        environment.removeValue(forKey: "CMUX_SOCKET")
+        environment.removeValue(forKey: "WMUX_SOCKET")
         process.environment = environment
         process.standardInput = FileHandle.nullDevice
 
@@ -7542,17 +7542,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             return .ok
 
         case .setCustomSidebar(let name, let focus):
-            guard CmuxExtensionSidebarSelection.customSidebarsEnabled else {
+            guard WmuxExtensionSidebarSelection.customSidebarsEnabled else {
                 return .failure(String(localized: "rightSidebar.remote.error.customSidebarsDisabled", defaultValue: "ERROR: Custom sidebars are disabled (enable them in Settings → Beta Features)"))
             }
             if let name {
-                guard CmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) != nil else {
+                guard WmuxExtensionSidebarSelection.customSidebarFileURL(forName: name) != nil else {
                     return .failure(String(localized: "rightSidebar.remote.error.customSidebarNotFound", defaultValue: "ERROR: No custom sidebar named '\(name)' in ~/.config/cmux/sidebars"))
                 }
                 state.selectCustomSidebar(name: name)
             }
             guard let selected = state.customSidebarName,
-                  CmuxExtensionSidebarSelection.customSidebarFileURL(forName: selected) != nil else {
+                  WmuxExtensionSidebarSelection.customSidebarFileURL(forName: selected) != nil else {
                 return .failure(String(localized: "rightSidebar.remote.error.customSidebarUnset", defaultValue: "ERROR: No custom sidebar selected; run right_sidebar set custom <name>"))
             }
             if focus {
@@ -7910,7 +7910,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             workspace.isManagedCloudVMWorkspace || workspace.cloudVMID != nil
         )
         let cloudCapabilities = workspace.cloudVMID.flatMap { vmID in
-            (SurfaceCatalog.shared.provider(for: .cloud(vmID)) as? CmuxTuiSurfaceProvider)?.capabilities
+            (SurfaceCatalog.shared.provider(for: .cloud(vmID)) as? WmuxTuiSurfaceProvider)?.capabilities
         }
         snapshot.setBool(CommandPaletteContextKeys.cloudVMCapabilitiesKnown, cloudCapabilities != nil)
         snapshot.setBool(CommandPaletteContextKeys.cloudVMSupportsFork, cloudCapabilities?.canFork ?? true)
@@ -8180,7 +8180,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard !didBootstrapInitialMainWindow else { return windowId }
 
         didBootstrapInitialMainWindow = true
-        if ProcessInfo.processInfo.environment["CMUX_UI_TEST_SHOW_SETTINGS"] == "1" {
+        if ProcessInfo.processInfo.environment["WMUX_UI_TEST_SHOW_SETTINGS"] == "1" {
             openPreferencesWindow(debugSource: "uiTestShowSettings.\(debugSource)")
         }
         return windowId
@@ -8815,8 +8815,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             arguments: arguments,
             presentsFailureAlert: false,
             environmentOverrides: [
-                "CMUX_CLOUD_ATTACH_RETRY_LIMIT": "12",
-                "CMUX_CLOUD_ATTACH_RETRY_DELAY_SECONDS": "2",
+                "WMUX_CLOUD_ATTACH_RETRY_LIMIT": "12",
+                "WMUX_CLOUD_ATTACH_RETRY_DELAY_SECONDS": "2",
             ],
             onCancellationReady: onCancellationReady,
             onOutput: onProgress,
@@ -8843,13 +8843,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             if workspace.panels.values.contains(where: { $0.panelType == .cloudVMLoading }) {
                 return true
             }
-            // Base opened through the cmux-tui daemon: the pane owns the session, so the
+            // Base opened through the wmux-tui daemon: the pane owns the session, so the
             // workspace carries a binding instead of a remote configuration.
             if workspace.cloudVMBinding?.isBase == true {
                 return true
             }
             guard let remote = workspace.remoteConfiguration else { return false }
-            return remote.persistentDaemonSlot == "cmux-default-freestyle-sshd-v1" &&
+            return remote.persistentDaemonSlot == "wmux-default-freestyle-sshd-v1" &&
                 remote.managedCloudVMID?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
         }
     }
@@ -9059,11 +9059,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard !target.isEmpty else { return }
         closeLocalWorkspaces(forCloudVMID: target)
         // The sidebar's headless link to that machine has nothing left to talk to.
-        CmuxTuiSurfaceProviderRegistry.shared.machineWasDeleted(target)
+        WmuxTuiSurfaceProviderRegistry.shared.machineWasDeleted(target)
     }
 
     /// The local workspace attached to a cloud machine, through either transport: the
-    /// legacy remote configuration or the cmux-tui binding. Base wins over other
+    /// legacy remote configuration or the wmux-tui binding. Base wins over other
     /// workspaces of the same machine.
     func workspace(forCloudVMID vmID: String) -> Workspace? {
         let target = vmID.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -10150,7 +10150,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
 
         let cascadeOffset: CGFloat = 24
-        let minimumWindowSize = NSSize(width: 460, height: CmuxMainWindow.minimumContentSize.height)
+        let minimumWindowSize = NSSize(width: 460, height: WmuxMainWindow.minimumContentSize.height)
         var frame = window.frame
         frame.origin = NSPoint(
             x: sourceFrame.minX + cascadeOffset,
@@ -10233,7 +10233,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         )
 #if DEBUG
         let shouldStartWithHiddenSidebarForTerminalViewportUITest =
-            ProcessInfo.processInfo.environment["CMUX_UI_TEST_TERMINAL_VIEWPORT_HIDE_SIDEBAR"] == "1"
+            ProcessInfo.processInfo.environment["WMUX_UI_TEST_TERMINAL_VIEWPORT_HIDE_SIDEBAR"] == "1"
 #else
         let shouldStartWithHiddenSidebarForTerminalViewportUITest = false
 #endif
@@ -10260,13 +10260,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         tabManager.syncWorkspaceTabBarLeadingInset(initialTabBarLeadingInset)
         let notificationStore = TerminalNotificationStore.shared
 
-        let cmuxConfigStore = CmuxConfigStore()
+        let cmuxConfigStore = WmuxConfigStore()
         cmuxConfigStore.wireDirectoryTracking(tabManager: tabManager)
         cmuxConfigStore.loadAll()
 
         let fileExplorerState = FileExplorerState()
 #if DEBUG
-        if ProcessInfo.processInfo.environment["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] == "1" {
+        if ProcessInfo.processInfo.environment["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] == "1" {
             fileExplorerState.mode = .files
             fileExplorerState.isVisible = true
         }
@@ -10320,17 +10320,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         } else if let explicitInitialFrame = restoredFrame ?? persistedGeometryFrame {
             initialRect = NSWindow.contentRect(forFrameRect: explicitInitialFrame, styleMask: styleMask)
         } else {
-            initialRect = CmuxMainWindow.defaultContentRect(styleMask: styleMask)
+            initialRect = WmuxMainWindow.defaultContentRect(styleMask: styleMask)
         }
 
-        let window = CmuxMainWindow(
+        let window = WmuxMainWindow(
             contentRect: initialRect,
             styleMask: styleMask,
             backing: .buffered,
             defer: false
         )
-        window.identifier = NSUserInterfaceItemIdentifier("cmux.main.\(windowId.uuidString)")
-        let minimumWindowSize = CmuxMainWindow.minimumContentSize
+        window.identifier = NSUserInterfaceItemIdentifier("wmux.main.\(windowId.uuidString)")
+        let minimumWindowSize = WmuxMainWindow.minimumContentSize
         window.minSize = minimumWindowSize
         window.contentMinSize = minimumWindowSize
         window.animationBehavior = .none
@@ -10520,11 +10520,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     func isCmuxCLIInstalledInPATH() -> Bool {
-        CmuxCLIPathInstaller().isInstalled()
+        WmuxCLIPathInstaller().isInstalled()
     }
 
     @objc func installCmuxCLIInPath(_ sender: Any?) {
-        let installer = CmuxCLIPathInstaller()
+        let installer = WmuxCLIPathInstaller()
         do {
             let outcome = try installer.install()
             var informativeText = String(localized: "cli.install.symlinkCreated", defaultValue: "Created symlink:\n\n\(outcome.destinationURL.path) -> \(outcome.sourceURL.path)")
@@ -10532,7 +10532,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 informativeText += "\n\n" + String(localized: "cli.install.adminRequired", defaultValue: "Administrator privileges were required to write to /usr/local/bin.")
             }
             presentCLIPathAlert(
-                title: String(localized: "cli.installed", defaultValue: "cmux CLI Installed"),
+                title: String(localized: "cli.installed", defaultValue: "wmux CLI Installed"),
                 informativeText: informativeText,
                 style: .informational
             )
@@ -10546,7 +10546,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     @objc func uninstallCmuxCLIInPath(_ sender: Any?) {
-        let installer = CmuxCLIPathInstaller()
+        let installer = WmuxCLIPathInstaller()
         do {
             let outcome = try installer.uninstall()
             let prefix = outcome.removedExistingEntry
@@ -10557,7 +10557,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 informativeText += "\n\n" + String(localized: "cli.uninstall.adminRequired", defaultValue: "Administrator privileges were required to modify /usr/local/bin.")
             }
             presentCLIPathAlert(
-                title: String(localized: "cli.uninstalled", defaultValue: "cmux CLI Uninstalled"),
+                title: String(localized: "cli.uninstalled", defaultValue: "wmux CLI Uninstalled"),
                 informativeText: informativeText,
                 style: .informational
             )
@@ -11940,7 +11940,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard !didSetupJumpUnreadUITest else { return }
         didSetupJumpUnreadUITest = true
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" else { return }
+        guard env["WMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" else { return }
         guard let notificationStore else { return }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
@@ -12010,7 +12010,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func armJumpUnreadFocusRecord(tabId: UUID, surfaceId: UUID) {
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["CMUX_UI_TEST_JUMP_UNREAD_PATH"], !path.isEmpty else { return }
+        guard let path = env["WMUX_UI_TEST_JUMP_UNREAD_PATH"], !path.isEmpty else { return }
         jumpUnreadFocusExpectation = (tabId: tabId, surfaceId: surfaceId)
         installJumpUnreadFocusObserverIfNeeded()
     }
@@ -12042,7 +12042,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func writeJumpUnreadTestData(_ updates: [String: String]) {
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["CMUX_UI_TEST_JUMP_UNREAD_PATH"], !path.isEmpty else { return }
+        guard let path = env["WMUX_UI_TEST_JUMP_UNREAD_PATH"], !path.isEmpty else { return }
         var payload = loadJumpUnreadTestData(at: path)
         for (key, value) in updates {
             payload[key] = value
@@ -12063,15 +12063,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard !didSetupGotoSplitUITest else { return }
         didSetupGotoSplitUITest = true
         let env = ProcessInfo.processInfo.environment
-        if env["CMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] == "1" {
+        if env["WMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] == "1" {
             installGotoSplitUITestFocusObserversIfNeeded()
             startGotoSplitRecordOnlyRecorder()
             return
         }
-        guard env["CMUX_UI_TEST_GOTO_SPLIT_SETUP"] == "1" else { return }
+        guard env["WMUX_UI_TEST_GOTO_SPLIT_SETUP"] == "1" else { return }
         guard tabManager != nil else { return }
 
-        let useGhosttyConfig = env["CMUX_UI_TEST_GOTO_SPLIT_USE_GHOSTTY_CONFIG"] == "1"
+        let useGhosttyConfig = env["WMUX_UI_TEST_GOTO_SPLIT_USE_GHOSTTY_CONFIG"] == "1"
 
         if useGhosttyConfig {
             // Keep the test hermetic: ensure the app does not accidentally pass using a persisted
@@ -12109,7 +12109,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         func hasMainTerminalWindow() -> Bool {
             NSApp.windows.contains { window in
                 guard let raw = window.identifier?.rawValue else { return false }
-                return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+                return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
             }
         }
 
@@ -12126,7 +12126,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             }
             guard let tabManager = self.tabManager else { return }
 
-            let layout = env["CMUX_UI_TEST_GOTO_SPLIT_LAYOUT"]?
+            let layout = env["WMUX_UI_TEST_GOTO_SPLIT_LAYOUT"]?
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
             if layout == "three_pane_terminal" {
@@ -12144,7 +12144,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 return
             }
 
-            let requestedBrowserURL = env["CMUX_UI_TEST_GOTO_SPLIT_BROWSER_URL"]?
+            let requestedBrowserURL = env["WMUX_UI_TEST_GOTO_SPLIT_BROWSER_URL"]?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             let url = requestedBrowserURL.flatMap { rawURL in
                 guard !rawURL.isEmpty else { return nil }
@@ -12177,17 +12177,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         guard !didSetupBonsplitTabDragUITest else { return }
         didSetupBonsplitTabDragUITest = true
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" else { return }
+        guard env["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1" else { return }
         guard tabManager != nil else { return }
-        let startWithHiddenSidebar = env["CMUX_UI_TEST_BONSPLIT_START_WITH_HIDDEN_SIDEBAR"] == "1"
-        let showRightSidebar = env["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] == "1"
-        let fourTabSetup = env["CMUX_UI_TEST_BONSPLIT_FOUR_TAB_SETUP"] == "1"
+        let startWithHiddenSidebar = env["WMUX_UI_TEST_BONSPLIT_START_WITH_HIDDEN_SIDEBAR"] == "1"
+        let showRightSidebar = env["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] == "1"
+        let fourTabSetup = env["WMUX_UI_TEST_BONSPLIT_FOUR_TAB_SETUP"] == "1"
 
         let deadline = Date().addingTimeInterval(20.0)
         func mainWindowContextForUITest() -> (window: NSWindow, context: MainWindowContext)? {
             for window in NSApp.windows {
                 guard let raw = window.identifier?.rawValue else { continue }
-                guard raw == "cmux.main" || raw.hasPrefix("cmux.main.") else { continue }
+                guard raw == "wmux.main" || raw.hasPrefix("wmux.main.") else { continue }
                 guard let context = self.contextForMainTerminalWindow(window),
                       context.fileExplorerState != nil else {
                     continue
@@ -12212,7 +12212,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             let screenFrame = mainWindow.screen?.visibleFrame ?? NSScreen.main?.visibleFrame
             if let screenFrame {
                 let targetSize: NSSize
-                if let rawSize = env["CMUX_UI_TEST_BONSPLIT_WINDOW_SIZE"] {
+                if let rawSize = env["WMUX_UI_TEST_BONSPLIT_WINDOW_SIZE"] {
                     let parts = rawSize
                         .split(separator: "x", maxSplits: 1)
                         .compactMap { Double(String($0).trimmingCharacters(in: .whitespacesAndNewlines)) }
@@ -12282,7 +12282,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 deltaPanelId = createdDeltaPanelId
                 workspace.setPanelCustomTitle(panelId: createdDeltaPanelId, title: deltaTitle)
             }
-            if let rawActionButtonCount = env["CMUX_UI_TEST_BONSPLIT_ACTION_BUTTON_COUNT"],
+            if let rawActionButtonCount = env["WMUX_UI_TEST_BONSPLIT_ACTION_BUTTON_COUNT"],
                let requestedActionButtonCount = Int(rawActionButtonCount),
                requestedActionButtonCount > 0 {
                 guard let cmuxConfigStore = context.cmuxConfigStore else {
@@ -12298,8 +12298,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                         ),
                         Int64(index)
                     )
-                    return CmuxSurfaceTabBarButton.actionReference(
-                        "cmux-ui-test-action-\(index)",
+                    return WmuxSurfaceTabBarButton.actionReference(
+                        "wmux-ui-test-action-\(index)",
                         title: actionTitle,
                         icon: .symbol("circle.fill"),
                         tooltip: actionTitle
@@ -12316,7 +12316,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             if startWithHiddenSidebar {
                 context.sidebarState.setVisible(false)
             }
-            if env["CMUX_UI_TEST_BONSPLIT_CLOUD_WORKSPACE"] == "1" {
+            if env["WMUX_UI_TEST_BONSPLIT_CLOUD_WORKSPACE"] == "1" {
                 // Binds the workspace to a Cloud machine without a transport, so the
                 // Cloud pane destinations (CloudSurfaceDropGate) cover its tab strips.
                 workspace.cloudVMBinding = WorkspaceCloudVMBinding(vmID: "ui-test-cloud-vm", isBase: false)
@@ -12326,7 +12326,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     self.writeBonsplitTabDragUITestData(["setupError": "Missing right sidebar state"])
                     return
                 }
-                fileExplorerState.mode = env["CMUX_UI_TEST_BONSPLIT_RIGHT_SIDEBAR_MODE"]
+                fileExplorerState.mode = env["WMUX_UI_TEST_BONSPLIT_RIGHT_SIDEBAR_MODE"]
                     .flatMap(RightSidebarMode.init(rawValue:)) ?? .files
                 fileExplorerState.setVisible(true)
             }
@@ -12375,8 +12375,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func bonsplitTabDragUITestDataPath() -> String? {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1",
-              let path = env["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"],
+        guard env["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] == "1",
+              let path = env["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"],
               !path.isEmpty else {
             return nil
         }
@@ -12455,13 +12455,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
     private func isGotoSplitUITestRecordingEnabled() -> Bool {
         let env = ProcessInfo.processInfo.environment
-        return env["CMUX_UI_TEST_GOTO_SPLIT_SETUP"] == "1" || env["CMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] == "1"
+        return env["WMUX_UI_TEST_GOTO_SPLIT_SETUP"] == "1" || env["WMUX_UI_TEST_GOTO_SPLIT_RECORD_ONLY"] == "1"
     }
 
     private func gotoSplitUITestDataPath() -> String? {
         guard isGotoSplitUITestRecordingEnabled() else { return nil }
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["CMUX_UI_TEST_GOTO_SPLIT_PATH"], !path.isEmpty else { return nil }
+        guard let path = env["WMUX_UI_TEST_GOTO_SPLIT_PATH"], !path.isEmpty else { return nil }
         return path
     }
 
@@ -12578,7 +12578,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 "ghosttyGotoSplitNextShortcut": ghosttyGotoSplitNextShortcut?.displayString ?? "",
                 "webViewFocused": "true"
             ])
-            if ProcessInfo.processInfo.environment["CMUX_UI_TEST_GOTO_SPLIT_INPUT_SETUP"] == "1" {
+            if ProcessInfo.processInfo.environment["WMUX_UI_TEST_GOTO_SPLIT_INPUT_SETUP"] == "1" {
                 setupFocusedInputForGotoSplitUITest(panel: panel)
             }
         }
@@ -12848,10 +12848,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
               return input;
             };
 
-            let container = document.getElementById("cmux-ui-test-focus-container");
+            let container = document.getElementById("wmux-ui-test-focus-container");
             if (!container || !container.tagName || container.tagName.toLowerCase() !== "div") {
               container = document.createElement("div");
-              container.id = "cmux-ui-test-focus-container";
+              container.id = "wmux-ui-test-focus-container";
               document.body.appendChild(container);
             }
             container.style.position = "fixed";
@@ -12867,8 +12867,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             container.style.boxShadow = "0 2px 10px rgba(0,0,0,0.2)";
             container.style.zIndex = "2147483647";
 
-            const input = ensureInput("cmux-ui-test-focus-input", "cmux-ui-focus-primary");
-            const secondaryInput = ensureInput("cmux-ui-test-focus-input-secondary", "cmux-ui-focus-secondary");
+            const input = ensureInput("wmux-ui-test-focus-input", "wmux-ui-focus-primary");
+            const secondaryInput = ensureInput("wmux-ui-test-focus-input-secondary", "wmux-ui-focus-secondary");
             if (input.parentElement !== container) {
               container.appendChild(input);
             }
@@ -12884,7 +12884,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
             let trackedFocusId = input.getAttribute("data-cmux-addressbar-focus-id");
             if (!trackedFocusId) {
-              trackedFocusId = "cmux-ui-test-focus-input-tracked";
+              trackedFocusId = "wmux-ui-test-focus-input-tracked";
               input.setAttribute("data-cmux-addressbar-focus-id", trackedFocusId);
             }
             const selectionStart = typeof input.selectionStart === "number" ? input.selectionStart : null;
@@ -13206,7 +13206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     private func gotoSplitUITestExpectedInputId() -> String? {
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["CMUX_UI_TEST_GOTO_SPLIT_PATH"], !path.isEmpty else { return nil }
+        guard let path = env["WMUX_UI_TEST_GOTO_SPLIT_PATH"], !path.isEmpty else { return nil }
         return loadGotoSplitTestData(at: path)["webInputFocusElementId"]
     }
 
@@ -13397,8 +13397,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         didSetupMultiWindowNotificationsUITest = true
 
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] == "1" else { return }
-        guard let path = env["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"], !path.isEmpty else { return }
+        guard env["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_SETUP"] == "1" else { return }
+        guard let path = env["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"], !path.isEmpty else { return }
 
         try? FileManager.default.removeItem(atPath: path)
 
@@ -13608,7 +13608,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         surfaceId: UUID
     ) {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_NOTIFY_SOURCE_TERMINAL_READY"] == "1" else { return }
+        guard env["WMUX_UI_TEST_NOTIFY_SOURCE_TERMINAL_READY"] == "1" else { return }
 
         writeMultiWindowNotificationTestData([
             "sourceTerminalReady": "pending",
@@ -13741,11 +13741,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         socketPath: String
     ) {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_WINDOW_ROUTE_CLI"] == "1" else { return }
+        guard env["WMUX_UI_TEST_WINDOW_ROUTE_CLI"] == "1" else { return }
         let currentStatus = loadMultiWindowNotificationTestData(at: path)["windowRouteStatus"] ?? ""
         guard currentStatus.isEmpty else { return }
 
-        let title = env["CMUX_UI_TEST_WINDOW_ROUTE_CLI_TITLE"] ?? "window-route-\(UUID().uuidString.prefix(8))"
+        let title = env["WMUX_UI_TEST_WINDOW_ROUTE_CLI_TITLE"] ?? "window-route-\(UUID().uuidString.prefix(8))"
         writeMultiWindowNotificationTestData([
             "windowRouteTitle": title,
             "windowRouteStatus": "pending",
@@ -13762,7 +13762,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
 
         let processEnv = env.merging([
-            "CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC": "6",
+            "WMUXTERM_CLI_RESPONSE_TIMEOUT_SEC": "6",
         ]) { _, new in new }
 
         let health = TerminalController.shared.socketListenerHealth(expectedSocketPath: socketPath)
@@ -13835,11 +13835,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         window2Id: UUID? = nil
     ) {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_SOCKET_SANITY"] == "1" else { return }
+        guard env["WMUX_UI_TEST_SOCKET_SANITY"] == "1" else { return }
 
         guard let config = socketListenerConfigurationIfEnabled() else {
             writeMultiWindowNotificationTestData([
-                "socketExpectedPath": env["CMUX_SOCKET_PATH"] ?? "",
+                "socketExpectedPath": env["WMUX_SOCKET_PATH"] ?? "",
                 "socketMode": "off",
                 "socketReady": "0",
                 "socketPingResponse": "",
@@ -13957,7 +13957,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         sidebarSelection: SidebarSelection
     ) {
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"], !path.isEmpty else { return }
+        guard let path = env["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"], !path.isEmpty else { return }
         let sidebarSelectionString: String = {
             switch sidebarSelection {
             case .tabs: return "tabs"
@@ -13979,7 +13979,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         titlebarAccessoryController.attach(to: window)
     }
 
-    // Satisfies CmuxAppKitSupportUI's WindowDecorating seam (see extension below).
+    // Satisfies WmuxAppKitSupportUI's WindowDecorating seam (see extension below).
     func applyWindowDecorations(to window: NSWindow) {
         windowDecorationsController.apply(to: window)
     }
@@ -14011,7 +14011,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     ) -> TerminalNotification? {
         guard let notificationStore else { return nil }
 #if DEBUG
-        if ProcessInfo.processInfo.environment["CMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" {
+        if ProcessInfo.processInfo.environment["WMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" {
             writeJumpUnreadTestData([
                 "jumpUnreadInvoked": "1",
                 "jumpUnreadNotificationCount": String(notificationStore.notifications.count),
@@ -14031,7 +14031,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     /// Forwards to `notificationNavigation` (the extracted
     /// `NotificationNavigationCoordinator` and its `FocusedNotificationMarker`).
     /// The state machine and its workspace/store predicates now live in
-    /// `CmuxNotifications`, reached through the `FocusedNotificationResolving`
+    /// `WmuxNotifications`, reached through the `FocusedNotificationResolving`
     /// seam (see `AppDelegate+NotificationNavSeams.swift`). `preferredWindow` is
     /// passed through as the opaque resolver token.
     @discardableResult
@@ -14115,7 +14115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                 let preludeStart = ProcessInfo.processInfo.systemUptime
                 var preludeMs: Double = 0
                 var shortcutMs: Double = 0
-                CmuxTypingTiming.logEventDelay(path: "appMonitor", event: event)
+                WmuxTypingTiming.logEventDelay(path: "appMonitor", event: event)
                 let shortcutMonitorTraceEnabled =
                     Self.shortcutMonitorTraceEnvironmentEnabled
                     || UserDefaults.standard.bool(forKey: "cmuxShortcutMonitorTrace")
@@ -14129,14 +14129,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     self.logDeveloperToolsShortcutSnapshot(phase: "monitor.pre.\(probeKind)", event: event)
                 }
                 preludeMs = (ProcessInfo.processInfo.systemUptime - preludeStart) * 1000.0
-                let shortcutTimingStart = CmuxTypingTiming.start()
+                let shortcutTimingStart = WmuxTypingTiming.start()
 #endif
                 let shortcutStart = ProcessInfo.processInfo.systemUptime
                 let handledByShortcut = cmuxCloseFocusedTerminalFindForEscape(event: event, appDelegate: self)
                     || self.handleCustomShortcut(event: event)
 #if DEBUG
                 shortcutMs = (ProcessInfo.processInfo.systemUptime - shortcutStart) * 1000.0
-                CmuxTypingTiming.logDuration(
+                WmuxTypingTiming.logDuration(
                     path: "appMonitor.handleCustomShortcut",
                     startedAt: shortcutTimingStart,
                     event: event,
@@ -14149,7 +14149,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
                     elapsedMs: shortcutElapsedMs
                 )
                 let totalMs = (ProcessInfo.processInfo.systemUptime - phaseTotalStart) * 1000.0
-                CmuxTypingTiming.logBreakdown(
+                WmuxTypingTiming.logBreakdown(
                     path: "appMonitor.phase",
                     totalMs: totalMs,
                     event: event,
@@ -14289,7 +14289,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             }
             messagesByStore[String(ObjectIdentifier(store).hashValue)] = messages
         }
-        messagesByStore[CmuxSettingsFileStore.defaultPrimaryPath] =
+        messagesByStore[WmuxSettingsFileStore.defaultPrimaryPath] =
             KeyboardShortcutSettings.settingsFileStore.configurationIssues
         cmuxConfigDiagnosticMessages = messagesByStore
         updateConfigurationDiagnosticsNotice()
@@ -14409,7 +14409,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         refreshCmuxConfigDiagnostics()
     }
 
-    var reloadableConfigStores: [any CmuxConfigStoreReloading] {
+    var reloadableConfigStores: [any WmuxConfigStoreReloading] {
         mainWindowContexts.values.compactMap { $0.cmuxConfigStore }
     }
 
@@ -14493,7 +14493,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // A recorder being armed must suppress every app-level shortcut so the
         // keystroke reaches it to be rebound. The legacy in-app recorder signals
         // this via `KeyboardShortcutRecorderActivity`; the live Settings UI uses
-        // the `CmuxSettingsUI` package recorder, which publishes its own armed
+        // the `WmuxSettingsUI` package recorder, which publishes its own armed
         // flag (it cannot reach the app-target activity type). Honor both — or
         // the numbered ⌃/⌘1–9 handler below silently eats keystrokes mid-record
         // and the recorder never captures (issue #5189).
@@ -14844,7 +14844,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             return true
         }
 
-        if CmuxFeatureFlags.shared.isAgentInboxQuickViewEnabled,
+        if WmuxFeatureFlags.shared.isAgentInboxQuickViewEnabled,
            matchConfiguredShortcut(event: event, action: .agentInbox) {
             let targetWindow = commandPaletteTargetWindow ?? event.window ?? shortcutRoutingActiveWindow
             requestAgentInbox(preferredWindow: targetWindow, source: "shortcut.agentInbox")
@@ -15171,7 +15171,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             return true
         }
 
-        if CmuxFeatureFlags.shared.isWindowHintsEnabled,
+        if WmuxFeatureFlags.shared.isWindowHintsEnabled,
            matchConfiguredShortcut(event: event, action: .showWindowHints),
            let window = mainWindowForShortcutEvent(event) {
             _ = WindowHintController.shared.toggle(in: window)
@@ -15292,7 +15292,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // Check Jump to Unread shortcut
         if matchConfiguredShortcut(event: event, action: .jumpToUnread) {
 #if DEBUG
-            if ProcessInfo.processInfo.environment["CMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" {
+            if ProcessInfo.processInfo.environment["WMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" {
                 writeJumpUnreadTestData(["jumpUnreadShortcutHandled": "1"])
             }
 #endif
@@ -15560,7 +15560,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
         if matchConfiguredShortcut(event: event, action: .closeOtherTabsInPane) {
             if let targetWindow = event.window ?? shortcutRoutingActiveWindow,
-               targetWindow.identifier?.rawValue == "cmux.settings" {
+               targetWindow.identifier?.rawValue == "wmux.settings" {
                 targetWindow.performClose(nil)
             } else if performFocusedDockShortcut(
                 .closeOtherTabsInPane,
@@ -15592,7 +15592,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             // AppKit routes the event through the global shortcut handler first.
             if let targetWindow = auxiliaryWindowForFocusedCloseShortcut(event: event) {
 #if DEBUG
-                let route = targetWindow.identifier?.rawValue == "cmux.browser-popup" ? "browserPopup" : "auxWindow"
+                let route = targetWindow.identifier?.rawValue == "wmux.browser-popup" ? "browserPopup" : "auxWindow"
                 cmuxDebugLog("shortcut.closeTab route=\(route)")
 #endif
                 targetWindow.performClose(nil)
@@ -16565,7 +16565,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         // Defensive gate: the extensions browser is part of the experimental
         // Extensions feature. Its entry points are hidden while disabled, but
         // guard here too so no other path can open it.
-        guard CmuxExtensionSidebarSelection.isEnabled else { return nil }
+        guard WmuxExtensionSidebarSelection.isEnabled else { return nil }
         let preferredWindow = anchorView?.window ?? shortcutRoutingActiveWindow
         let targetTabManager = synchronizeActiveMainWindowContext(preferredWindow: preferredWindow)
         guard let workspace = targetTabManager?.selectedWorkspace,
@@ -17534,13 +17534,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func configuredCmuxShortcutActions(
         for context: MainWindowContext?
-    ) -> [CmuxResolvedConfigAction] {
+    ) -> [WmuxResolvedConfigAction] {
         context?.cmuxConfigStore?.shortcutActions() ?? []
     }
 
     private func handleConfiguredCmuxShortcut(
         event: NSEvent,
-        actions: [CmuxResolvedConfigAction],
+        actions: [WmuxResolvedConfigAction],
         context: MainWindowContext?
     ) -> Bool {
         for action in actions {
@@ -17558,7 +17558,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     private func executeConfiguredCmuxActionShortcut(
-        _ action: CmuxResolvedConfigAction,
+        _ action: WmuxResolvedConfigAction,
         event: NSEvent,
         context: MainWindowContext?
     ) -> Bool {
@@ -17575,7 +17575,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     /// builtIns, joins the newly-created workspace to the given group.
     @discardableResult
     func runWorkspaceGroupConfiguredAction(
-        _ action: CmuxResolvedConfigAction,
+        _ action: WmuxResolvedConfigAction,
         tabManager: TabManager,
         groupId: UUID
     ) -> Bool {
@@ -17704,7 +17704,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     func executeConfiguredCmuxAction(
-        _ action: CmuxResolvedConfigAction,
+        _ action: WmuxResolvedConfigAction,
         context: MainWindowContext,
         preferredWindow: NSWindow? = nil,
         onExecuted: (() -> Void)? = nil,
@@ -17830,7 +17830,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             let rawCwd = context.tabManager.selectedWorkspace?.currentDirectory
             let baseCwd = (rawCwd?.isEmpty == false) ? rawCwd!
                 : FileManager.default.homeDirectoryForCurrentUser.path
-            return CmuxConfigExecutor.execute(
+            return WmuxConfigExecutor.execute(
                 action: action,
                 commands: cmuxConfigStore.loadedCommands,
                 commandSourcePaths: cmuxConfigStore.commandSourcePaths,
@@ -18325,7 +18325,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     @MainActor
     private func handleBrowserWebViewFirstResponderNotification(_ notification: Notification) {
-        guard let webView = notification.object as? CmuxWebView,
+        guard let webView = notification.object as? WmuxWebView,
               let panel = browserPanelOwning(webView) else { return }
         let pointerInitiatedKey = BrowserFirstResponderNotificationUserInfoKey.pointerInitiated
         let pointerInitiated = notification.userInfo?[pointerInitiatedKey] as? Bool ?? false
@@ -18377,11 +18377,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         }
     }
 
-    func browserFindBarIsVisible(for webView: CmuxWebView) -> Bool {
+    func browserFindBarIsVisible(for webView: WmuxWebView) -> Bool {
         browserPanelOwning(webView)?.searchState != nil
     }
 
-    func isBrowserFocusModeActive(for webView: CmuxWebView) -> Bool {
+    func isBrowserFocusModeActive(for webView: WmuxWebView) -> Bool {
         browserPanelOwning(webView)?.isBrowserFocusModeActive == true
     }
 
@@ -18408,13 +18408,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func handleBrowserFocusModeKeyEvent(
         _ event: NSEvent,
-        webView: CmuxWebView,
+        webView: WmuxWebView,
         source: String
     ) -> BrowserFocusModeKeyDecision {
         browserPanelOwning(webView)?.handleBrowserFocusModeKeyEvent(event, reason: source) ?? .inactive
     }
 
-    func browserFocusModeContextMenuState(for webView: CmuxWebView) -> (isActive: Bool, canToggle: Bool) {
+    func browserFocusModeContextMenuState(for webView: WmuxWebView) -> (isActive: Bool, canToggle: Bool) {
         guard let panel = browserPanelOwning(webView) else {
             return (isActive: false, canToggle: false)
         }
@@ -18422,7 +18422,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     }
 
     @discardableResult
-    func toggleBrowserFocusModeFromContextMenu(for webView: CmuxWebView) -> Bool {
+    func toggleBrowserFocusModeFromContextMenu(for webView: WmuxWebView) -> Bool {
         guard let panel = browserPanelOwning(webView) else { return false }
         return panel.toggleBrowserFocusMode(reason: "contextMenu", focusWebView: true)
     }
@@ -18430,7 +18430,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private func shouldLetFocusedBrowserOwnFindShortcut(_ event: NSEvent) -> Bool {
         let shortcutWindow = resolvedShortcutEventWindow(event) ?? shortcutRoutingActiveWindow
         let shortcutResponder = shortcutWindow?.firstResponder
-        let owningWebView = tabManager?.focusedBrowserPanel?.webView as? CmuxWebView
+        let owningWebView = tabManager?.focusedBrowserPanel?.webView as? WmuxWebView
         guard let owningWebView else { return false }
         return shouldRouteBrowserFindCommandEquivalentThroughWebContentFirst(
             event,
@@ -18439,7 +18439,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         )
     }
 
-    private func browserPanelOwning(_ webView: CmuxWebView) -> BrowserPanel? {
+    private func browserPanelOwning(_ webView: WmuxWebView) -> BrowserPanel? {
         browserPanel(owning: webView)
     }
 
@@ -18874,7 +18874,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
             return true
         }
         guard let raw = window.identifier?.rawValue else { return false }
-        return raw == "cmux.main" || raw.hasPrefix("cmux.main.")
+        return raw == "wmux.main" || raw.hasPrefix("wmux.main.")
     }
 
     private func workspaceForMainActor(tabId: UUID) -> Workspace? {
@@ -18986,7 +18986,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         expectedSurfaceId: UUID?
     ) {
         let env = ProcessInfo.processInfo.environment
-        guard env["CMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" else { return }
+        guard env["WMUX_UI_TEST_JUMP_UNREAD_SETUP"] == "1" else { return }
         guard let expectedSurfaceId else { return }
 
         // Ensure the expectation is armed even if the view doesn't become first responder.
@@ -19021,7 +19021,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         reason: String
     ) {
         let env = ProcessInfo.processInfo.environment
-        guard let path = env["CMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"], !path.isEmpty else { return }
+        guard let path = env["WMUX_UI_TEST_MULTI_WINDOW_NOTIF_PATH"], !path.isEmpty else { return }
 
         let contextSummaries: [String] = mainWindowContexts.values.map { ctx in
             let tabIds = ctx.tabManager.tabs.map { $0.id.uuidString }.joined(separator: ",")
@@ -19051,16 +19051,16 @@ private var cmuxFirstResponderGuardHitViewContext: NSView?
 private var cmuxFirstResponderGuardContextWindowNumber: Int?
 private var cmuxFieldEditorOwningWebViewAssociationKey: UInt8 = 0
 
-private final class CmuxFieldEditorOwningWebViewBox: NSObject {
-    weak var webView: CmuxWebView?
+private final class WmuxFieldEditorOwningWebViewBox: NSObject {
+    weak var webView: WmuxWebView?
 
-    init(webView: CmuxWebView?) {
+    init(webView: WmuxWebView?) {
         self.webView = webView
     }
 }
 
 private extension NSApplication {
-    @objc func cmux_accessibilityAttributeValue(_ attribute: NSAccessibility.Attribute) -> Any? {
+    @objc func wmux_accessibilityAttributeValue(_ attribute: NSAccessibility.Attribute) -> Any? {
         if Thread.isMainThread, let cache = AppDelegate.shared?.accessibilityWindowCache {
             switch cache.resolve(
                 attribute: attribute,
@@ -19073,32 +19073,32 @@ private extension NSApplication {
             }
         }
 
-        return cmux_accessibilityAttributeValue(attribute)
+        return wmux_accessibilityAttributeValue(attribute)
     }
 
-    @objc func cmux_applicationSendEvent(_ event: NSEvent) {
+    @objc func wmux_applicationSendEvent(_ event: NSEvent) {
         // WebKit sends a key no page handled back through here, to the key
         // window. For a key browser automation typed into a tab that is the
         // user's window: its terminal would get the text and its menus the
         // Command shortcuts. The page already received the key.
         if event.isResentBrowserAutomationKeyEvent { return }
 #if DEBUG
-        let typingTimingStart = event.type == .keyDown ? CmuxTypingTiming.start() : nil
+        let typingTimingStart = event.type == .keyDown ? WmuxTypingTiming.start() : nil
         let phaseTotalStart = event.type == .keyDown ? ProcessInfo.processInfo.systemUptime : 0
         if event.type == .keyDown {
-            CmuxTypingTiming.logEventDelay(path: "app.sendEvent", event: event)
+            WmuxTypingTiming.logEventDelay(path: "app.sendEvent", event: event)
         }
         defer {
             if event.type == .keyDown {
                 let totalMs = (ProcessInfo.processInfo.systemUptime - phaseTotalStart) * 1000.0
-                CmuxTypingTiming.logBreakdown(
+                WmuxTypingTiming.logBreakdown(
                     path: "app.sendEvent.phase",
                     totalMs: totalMs,
                     event: event,
                     thresholdMs: 1.0,
                     parts: [("dispatchMs", totalMs)]
                 )
-                CmuxTypingTiming.logDuration(
+                WmuxTypingTiming.logDuration(
                     path: "app.sendEvent",
                     startedAt: typingTimingStart,
                     event: event
@@ -19147,10 +19147,10 @@ private extension NSApplication {
             }
             return
         }
-        cmux_applicationSendEvent(event)
+        wmux_applicationSendEvent(event)
     }
 
-    @objc func cmux_sendAction(_ action: Selector, to target: Any?, from sender: Any?) -> Bool {
+    @objc func wmux_sendAction(_ action: Selector, to target: Any?, from sender: Any?) -> Bool {
         if AppDelegate.shared?.handleDetachedInspectorWindowCloseAction(
             action: action,
             target: target,
@@ -19159,7 +19159,7 @@ private extension NSApplication {
             return true
         }
 
-        return cmux_sendAction(action, to: target, from: sender)
+        return wmux_sendAction(action, to: target, from: sender)
     }
 }
 
@@ -19263,7 +19263,7 @@ private extension NSWindow {
         return nil
     }
 
-    @objc func cmux_makeFirstResponder(_ responder: NSResponder?) -> Bool {
+    @objc func wmux_makeFirstResponder(_ responder: NSResponder?) -> Bool {
         if AppDelegate.shared?.browserFirstResponderBypass.isActive == true {
 #if DEBUG
             cmuxDebugLog(
@@ -19382,13 +19382,13 @@ private extension NSWindow {
 #endif
         let result: Bool
         if pointerInitiatedWebFocus, let webView = responderWebView {
-            // `NSWindow.makeFirstResponder` may run before `CmuxWebView.mouseDown(with:)`.
+            // `NSWindow.makeFirstResponder` may run before `WmuxWebView.mouseDown(with:)`.
             // Preserve pointer intent during this synchronous responder change.
             result = webView.withPointerFocusAllowance {
-                cmux_makeFirstResponder(responder)
+                wmux_makeFirstResponder(responder)
             }
         } else {
-            result = cmux_makeFirstResponder(responder)
+            result = wmux_makeFirstResponder(responder)
         }
         if result {
             AppDelegate.shared?.postBrowserInspectorClickIntentIfNeeded(for: responder, in: self, event: currentEvent)
@@ -19404,7 +19404,7 @@ private extension NSWindow {
         return result
     }
 
-    @objc func cmux_sendEvent(_ event: NSEvent) {
+    @objc func wmux_sendEvent(_ event: NSEvent) {
         let cloudMountKeyEventForwarded =
             AppDelegate.shared?.forwardCloudMountKeyEvent(window: self, event: event) == true
         if cloudMountKeyEventForwarded {
@@ -19414,7 +19414,7 @@ private extension NSWindow {
             return
         }
 #if DEBUG
-        let typingTimingStart = event.type == .keyDown ? CmuxTypingTiming.start() : nil
+        let typingTimingStart = event.type == .keyDown ? WmuxTypingTiming.start() : nil
         let phaseTotalStart = event.type == .keyDown ? ProcessInfo.processInfo.systemUptime : 0
         var contextSetupMs: Double = 0
         var focusRepairMs: Double = 0
@@ -19429,7 +19429,7 @@ private extension NSWindow {
             return "browser=\(responderWebView != nil ? 1 : 0) firstResponder=\(firstResponderType)"
         }()
         if event.type == .keyDown {
-            CmuxTypingTiming.logEventDelay(path: "window.sendEvent", event: event)
+            WmuxTypingTiming.logEventDelay(path: "window.sendEvent", event: event)
         }
 #endif
         // recordTypingActivity runs in all builds so the autosave coordinator
@@ -19456,7 +19456,7 @@ private extension NSWindow {
         defer {
             if event.type == .keyDown {
                 let totalMs = (ProcessInfo.processInfo.systemUptime - phaseTotalStart) * 1000.0
-                CmuxTypingTiming.logBreakdown(
+                WmuxTypingTiming.logBreakdown(
                     path: "window.sendEvent.phase",
                     totalMs: totalMs,
                     event: event,
@@ -19469,7 +19469,7 @@ private extension NSWindow {
                     ],
                     extra: typingTimingExtra
                 )
-                CmuxTypingTiming.logDuration(
+                WmuxTypingTiming.logDuration(
                     path: "window.sendEvent",
                     startedAt: typingTimingStart,
                     event: event,
@@ -19515,12 +19515,12 @@ private extension NSWindow {
             if event.type == .keyDown {
                 folderGuardMs = (ProcessInfo.processInfo.systemUptime - folderGuardStart) * 1000.0
                 let originalDispatchStart = ProcessInfo.processInfo.systemUptime
-                cmux_sendEvent(event)
+                wmux_sendEvent(event)
                 originalDispatchMs = (ProcessInfo.processInfo.systemUptime - originalDispatchStart) * 1000.0
                 return
             }
 #endif
-            cmux_sendEvent(event)
+            wmux_sendEvent(event)
             return
         }
 #if DEBUG
@@ -19560,7 +19560,7 @@ private extension NSWindow {
         cmuxDebugLog("window.sendEvent.\(reasonDescription) suppress=1 hit=\(hitDesc) movable=\(isMovable) depth=\(depth)")
         #endif
 
-        cmux_sendEvent(event)
+        wmux_sendEvent(event)
 #if DEBUG
         if event.type == .keyDown {
             originalDispatchMs = (ProcessInfo.processInfo.systemUptime - originalDispatchStart) * 1000.0
@@ -19568,11 +19568,11 @@ private extension NSWindow {
 #endif
     }
 
-    @objc func cmux_performKeyEquivalent(with event: NSEvent) -> Bool {
+    @objc func wmux_performKeyEquivalent(with event: NSEvent) -> Bool {
 #if DEBUG
-        let typingTimingStart = CmuxTypingTiming.start()
+        let typingTimingStart = WmuxTypingTiming.start()
         defer {
-            CmuxTypingTiming.logDuration(
+            WmuxTypingTiming.logDuration(
                 path: "window.performKeyEquivalent",
                 startedAt: typingTimingStart,
                 event: event
@@ -19782,7 +19782,7 @@ private extension NSWindow {
                 return true
             }
             // Reentry of the same in-flight event: use normal dispatch.
-            return cmux_performKeyEquivalent(with: event)
+            return wmux_performKeyEquivalent(with: event)
         }
 
         if shouldDispatchTextBoxInputArrowViaFirstResponderKeyDown(
@@ -19854,7 +19854,7 @@ private extension NSWindow {
             }
             // Forwarding keyDown can re-enter performKeyEquivalent in WebKit/AppKit internals.
             // On re-entry, fall back to normal dispatch to avoid an infinite loop.
-            return cmux_performKeyEquivalent(with: event)
+            return wmux_performKeyEquivalent(with: event)
         }
 
         // Browser content can lose plain arrows when performKeyEquivalent claims them before WebKit.
@@ -19900,7 +19900,7 @@ private extension NSWindow {
                     return true
                 }
                 // Reentry of the same in-flight event: use normal dispatch.
-                return cmux_performKeyEquivalent(with: event)
+                return wmux_performKeyEquivalent(with: event)
             }
 
             // Match the Return/Enter forwarding guard: AppKit/WebKit can re-enter
@@ -19909,7 +19909,7 @@ private extension NSWindow {
             if cmuxForceDispatchKeyDownOnce(event, to: target, reason: "browser arrow") {
                 return true
             }
-            return cmux_performKeyEquivalent(with: event)
+            return wmux_performKeyEquivalent(with: event)
         }
 
         if let firstResponderWebView,
@@ -19935,7 +19935,7 @@ private extension NSWindow {
             )
 #endif
             // The focused web view has already received this editing shortcut once.
-            // `CmuxWebView.performKeyEquivalent` also runs the main-menu fallback
+            // `WmuxWebView.performKeyEquivalent` also runs the main-menu fallback
             // before returning, so falling through here would only replay WebKit.
             return true
         }
@@ -20026,15 +20026,15 @@ private extension NSWindow {
             }
         }
 
-        let result = cmux_performKeyEquivalent(with: event)
+        let result = wmux_performKeyEquivalent(with: event)
 #if DEBUG
         if result { cmuxDebugLog("  → consumed by original performKeyEquivalent") }
 #endif
         return result
     }
 
-    private static func cmuxOwningWebView(for responder: NSResponder) -> CmuxWebView? {
-        if let webView = responder as? CmuxWebView {
+    private static func cmuxOwningWebView(for responder: NSResponder) -> WmuxWebView? {
+        if let webView = responder as? WmuxWebView {
             return webView
         }
 
@@ -20047,7 +20047,7 @@ private extension NSWindow {
         // a responder chain is tearing down can trap with "unowned reference".
         var current = responder.nextResponder
         while let next = current {
-            if let webView = next as? CmuxWebView {
+            if let webView = next as? WmuxWebView {
                 return webView
             }
             if let view = next as? NSView,
@@ -20064,7 +20064,7 @@ private extension NSWindow {
         for responder: NSResponder,
         in window: NSWindow,
         event: NSEvent?
-    ) -> CmuxWebView? {
+    ) -> WmuxWebView? {
         if browserOmnibarPanelId(for: responder) != nil {
             return nil
         }
@@ -20093,14 +20093,14 @@ private extension NSWindow {
         return cmuxTrackedOwningWebView(for: textView)
     }
 
-    private static func cmuxOwningWebView(for view: NSView) -> CmuxWebView? {
-        if let webView = view as? CmuxWebView {
+    private static func cmuxOwningWebView(for view: NSView) -> WmuxWebView? {
+        if let webView = view as? WmuxWebView {
             return webView
         }
 
         var current: NSView? = view.superview
         while let candidate = current {
-            if let webView = candidate as? CmuxWebView {
+            if let webView = candidate as? WmuxWebView {
                 return webView
             }
             if String(describing: type(of: candidate)).contains("WindowBrowserSlotView"),
@@ -20139,11 +20139,11 @@ private extension NSWindow {
         return false
     }
 
-    private static func cmuxUniqueBrowserWebView(in root: NSView) -> CmuxWebView? {
+    private static func cmuxUniqueBrowserWebView(in root: NSView) -> WmuxWebView? {
         var stack: [NSView] = [root]
-        var found: CmuxWebView?
+        var found: WmuxWebView?
         while let current = stack.popLast() {
-            if let webView = current as? CmuxWebView {
+            if let webView = current as? WmuxWebView {
                 if found == nil {
                     found = webView
                 } else if found !== webView {
@@ -20218,12 +20218,12 @@ private extension NSWindow {
         return cmuxTopHitViewForEvent(in: window, event: event)
     }
 
-    private static func cmuxTrackFieldEditor(_ fieldEditor: NSTextView, owningWebView webView: CmuxWebView?) {
+    private static func cmuxTrackFieldEditor(_ fieldEditor: NSTextView, owningWebView webView: WmuxWebView?) {
         if let webView {
             objc_setAssociatedObject(
                 fieldEditor,
                 &cmuxFieldEditorOwningWebViewAssociationKey,
-                CmuxFieldEditorOwningWebViewBox(webView: webView),
+                WmuxFieldEditorOwningWebViewBox(webView: webView),
                 .OBJC_ASSOCIATION_RETAIN_NONATOMIC
             )
         } else {
@@ -20236,11 +20236,11 @@ private extension NSWindow {
         }
     }
 
-    private static func cmuxTrackedOwningWebView(for fieldEditor: NSTextView) -> CmuxWebView? {
+    private static func cmuxTrackedOwningWebView(for fieldEditor: NSTextView) -> WmuxWebView? {
         guard let box = objc_getAssociatedObject(
             fieldEditor,
             &cmuxFieldEditorOwningWebViewAssociationKey
-        ) as? CmuxFieldEditorOwningWebViewBox else {
+        ) as? WmuxFieldEditorOwningWebViewBox else {
             return nil
         }
         guard let webView = box.webView else {
@@ -20264,13 +20264,13 @@ private extension NSWindow {
         return true
     }
 
-    private static func cmuxPointerHitWebView(in window: NSWindow, event: NSEvent) -> CmuxWebView? {
+    private static func cmuxPointerHitWebView(in window: NSWindow, event: NSEvent) -> WmuxWebView? {
         guard cmuxEventAllowsFirstResponderHitTesting(event) else { return nil }
         guard cmuxPointerEventTargetsWindow(event, window) else { return nil }
         if let portalWebView = BrowserWindowPortalRegistry.webViewAtWindowPoint(
             event.locationInWindow,
             in: window
-        ) as? CmuxWebView {
+        ) as? WmuxWebView {
             return portalWebView
         }
         guard let hitView = cmuxHitViewForCurrentEvent(in: window, event: event) else {
@@ -20302,7 +20302,7 @@ private extension NSWindow {
 
     private static func cmuxShouldAllowPointerInitiatedWebViewFocus(
         window: NSWindow,
-        webView: CmuxWebView,
+        webView: WmuxWebView,
         event: NSEvent?
     ) -> Bool {
         guard let event,
@@ -20314,7 +20314,7 @@ private extension NSWindow {
 
 }
 
-// MARK: - CmuxAppKitSupportUI seam conformance
+// MARK: - WmuxAppKitSupportUI seam conformance
 
 extension AppDelegate: WindowDecorating {}
 
@@ -20326,7 +20326,7 @@ extension NSWindow {
         for responder: NSResponder,
         in window: NSWindow,
         event: NSEvent?
-    ) -> CmuxWebView? {
+    ) -> WmuxWebView? {
         cmuxOwningWebView(for: responder, in: window, event: event)
     }
 }

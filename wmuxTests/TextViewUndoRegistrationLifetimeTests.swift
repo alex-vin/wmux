@@ -1,13 +1,13 @@
 import AppKit
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
-/// Regression coverage for the `NSApplication.cmux_sendAction` →
+/// Regression coverage for the `NSApplication.wmux_sendAction` →
 /// `-[NSUndoManager undoNestedGroup]` crash family.
 ///
 /// AppKit leaves an edited text view's undo registrations in the window's

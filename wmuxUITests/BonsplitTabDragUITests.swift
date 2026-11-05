@@ -979,26 +979,26 @@ final class BonsplitTabDragUITests: XCTestCase {
         let dataPath = "/tmp/cmux-ui-test-bonsplit-tab-drag-\(UUID().uuidString).json"
         try? FileManager.default.removeItem(atPath: dataPath)
 
-        app.launchEnvironment["CMUX_UI_TEST_MODE"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
-        app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
+        app.launchEnvironment["WMUX_UI_TEST_MODE"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_SETUP"] = "1"
+        app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_TAB_DRAG_PATH"] = dataPath
         if startWithHiddenSidebar {
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_START_WITH_HIDDEN_SIDEBAR"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_START_WITH_HIDDEN_SIDEBAR"] = "1"
         }
         if let windowSize {
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_WINDOW_SIZE"] = windowSize
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_WINDOW_SIZE"] = windowSize
         }
         if let actionButtonCount {
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_ACTION_BUTTON_COUNT"] = String(actionButtonCount)
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_ACTION_BUTTON_COUNT"] = String(actionButtonCount)
         }
         if fourTabSetup {
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_FOUR_TAB_SETUP"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_FOUR_TAB_SETUP"] = "1"
         }
         if showRightSidebar {
-            app.launchEnvironment["CMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_BONSPLIT_SHOW_RIGHT_SIDEBAR"] = "1"
         }
         if alwaysShowShortcutHints {
-            app.launchEnvironment["CMUX_UI_TEST_SHORTCUT_HINTS_ALWAYS_SHOW"] = "1"
+            app.launchEnvironment["WMUX_UI_TEST_SHORTCUT_HINTS_ALWAYS_SHOW"] = "1"
         }
         app.launchArguments += ["-workspacePresentationMode", presentationMode.rawValue]
         if let rightSidebarMode {

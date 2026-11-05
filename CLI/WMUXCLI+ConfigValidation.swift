@@ -1,10 +1,10 @@
 import Foundation
-import CmuxFoundation
+import WmuxFoundation
 
 extension WMUXCLI {
     struct ConfigDoctorOptions {
         let paths: [String]
-        let scope: CmuxConfigSemanticScope?
+        let scope: WmuxConfigSemanticScope?
     }
 
     struct ConfigDoctorTarget {
@@ -12,7 +12,7 @@ extension WMUXCLI {
         let displayPath: String
         let path: String
         let missingIsError: Bool
-        let scope: CmuxConfigSemanticScope
+        let scope: WmuxConfigSemanticScope
     }
 
     struct ConfigDoctorFinding {
@@ -23,7 +23,7 @@ extension WMUXCLI {
         let message: String?
         let keys: [String]
         let byteCount: Int?
-        let issues: [CmuxConfigSemanticIssue]
+        let issues: [WmuxConfigSemanticIssue]
 
         init(
             label: String,
@@ -33,7 +33,7 @@ extension WMUXCLI {
             message: String?,
             keys: [String],
             byteCount: Int?,
-            issues: [CmuxConfigSemanticIssue] = []
+            issues: [WmuxConfigSemanticIssue] = []
         ) {
             self.label = label
             self.displayPath = displayPath
@@ -122,7 +122,7 @@ extension WMUXCLI {
         commandName: String
     ) throws -> ConfigDoctorOptions {
         var paths: [String] = []
-        var scope: CmuxConfigSemanticScope?
+        var scope: WmuxConfigSemanticScope?
         var index = 0
         while index < arguments.count {
             let argument = arguments[index]
@@ -130,7 +130,7 @@ extension WMUXCLI {
                 let nextIndex = index + 1
                 guard nextIndex < arguments.count else {
                     throw CLIError(
-                        message: CmuxConfigValidationLocalization().format(
+                        message: WmuxConfigValidationLocalization().format(
                             "config.validation.cli.pathRequired",
                             defaultValue: "wmux config %@ --path requires a path",
                             commandName
@@ -145,7 +145,7 @@ extension WMUXCLI {
                 let rawPath = String(argument.dropFirst("--path=".count))
                 guard !rawPath.isEmpty else {
                     throw CLIError(
-                        message: CmuxConfigValidationLocalization().format(
+                        message: WmuxConfigValidationLocalization().format(
                             "config.validation.cli.pathRequired",
                             defaultValue: "wmux config %@ --path requires a path",
                             commandName
@@ -159,9 +159,9 @@ extension WMUXCLI {
             if argument == "--scope" {
                 let nextIndex = index + 1
                 guard nextIndex < arguments.count,
-                      let parsedScope = CmuxConfigSemanticScope(rawValue: arguments[nextIndex].lowercased()) else {
+                      let parsedScope = WmuxConfigSemanticScope(rawValue: arguments[nextIndex].lowercased()) else {
                     throw CLIError(
-                        message: CmuxConfigValidationLocalization().format(
+                        message: WmuxConfigValidationLocalization().format(
                             "config.validation.cli.scopeRequired",
                             defaultValue: "wmux config %@ --scope requires global or project",
                             commandName
@@ -174,9 +174,9 @@ extension WMUXCLI {
             }
             if argument.hasPrefix("--scope=") {
                 let rawScope = String(argument.dropFirst("--scope=".count)).lowercased()
-                guard let parsedScope = CmuxConfigSemanticScope(rawValue: rawScope) else {
+                guard let parsedScope = WmuxConfigSemanticScope(rawValue: rawScope) else {
                     throw CLIError(
-                        message: CmuxConfigValidationLocalization().format(
+                        message: WmuxConfigValidationLocalization().format(
                             "config.validation.cli.scopeRequired",
                             defaultValue: "wmux config %@ --scope requires global or project",
                             commandName
@@ -189,7 +189,7 @@ extension WMUXCLI {
             }
             if argument.hasPrefix("-") {
                 throw CLIError(
-                    message: CmuxConfigValidationLocalization().format(
+                    message: WmuxConfigValidationLocalization().format(
                         "config.validation.cli.unknownOption",
                         defaultValue: "Unknown config %@ option '%@'",
                         commandName,
@@ -198,7 +198,7 @@ extension WMUXCLI {
                 )
             }
             throw CLIError(
-                message: CmuxConfigValidationLocalization().format(
+                message: WmuxConfigValidationLocalization().format(
                     "config.validation.cli.unknownArgument",
                     defaultValue: "Unknown config %@ argument '%@'. Use --path <path>.",
                     commandName,
@@ -291,11 +291,11 @@ extension WMUXCLI {
         var isDirectory = ObjCBool(false)
         guard fileManager.fileExists(atPath: target.path, isDirectory: &isDirectory) else {
             let message = target.missingIsError
-                ? CmuxConfigValidationLocalization().string(
+                ? WmuxConfigValidationLocalization().string(
                     "config.validation.cli.doctor.fileNotFound",
                     defaultValue: "file not found"
                 )
-                : CmuxConfigValidationLocalization().string(
+                : WmuxConfigValidationLocalization().string(
                     "config.validation.cli.doctor.missingDefaults",
                     defaultValue: "not found; wmux will use defaults until this file exists"
                 )
@@ -315,7 +315,7 @@ extension WMUXCLI {
                 displayPath: target.displayPath,
                 path: target.path,
                 status: "error",
-                message: CmuxConfigValidationLocalization().string(
+                message: WmuxConfigValidationLocalization().string(
                     "config.validation.cli.doctor.pathIsDirectory",
                     defaultValue: "path is a directory, expected a file"
                 ),
@@ -334,7 +334,7 @@ extension WMUXCLI {
                     displayPath: target.displayPath,
                     path: target.path,
                     status: "error",
-                    message: CmuxConfigValidationLocalization().string(
+                    message: WmuxConfigValidationLocalization().string(
                         "config.validation.cli.doctor.fileEmpty",
                         defaultValue: "file is empty"
                     ),
@@ -351,7 +351,7 @@ extension WMUXCLI {
                     displayPath: target.displayPath,
                     path: target.path,
                     status: "error",
-                    message: CmuxConfigValidationLocalization().string(
+                    message: WmuxConfigValidationLocalization().string(
                         "config.validation.cli.doctor.topLevelObject",
                         defaultValue: "top-level value must be a JSON object"
                     ),
@@ -359,7 +359,7 @@ extension WMUXCLI {
                     byteCount: data.count
                 )
             }
-            let validator = CmuxConfigSemanticValidator(scope: target.scope)
+            let validator = WmuxConfigSemanticValidator(scope: target.scope)
             let issues = try validator.validate(jsonData: sanitized)
             if !issues.isEmpty {
                 return ConfigDoctorFinding(
@@ -367,7 +367,7 @@ extension WMUXCLI {
                     displayPath: target.displayPath,
                     path: target.path,
                     status: "error",
-                    message: CmuxConfigValidationLocalization().string(
+                    message: WmuxConfigValidationLocalization().string(
                         "config.validation.cli.failed",
                         defaultValue: "semantic validation failed"
                     ),
@@ -381,7 +381,7 @@ extension WMUXCLI {
                 displayPath: target.displayPath,
                 path: target.path,
                 status: "ok",
-                message: CmuxConfigValidationLocalization().string(
+                message: WmuxConfigValidationLocalization().string(
                     "config.validation.cli.passed",
                     defaultValue: "JSONC syntax and semantic validation passed"
                 ),
@@ -406,7 +406,7 @@ extension WMUXCLI {
     }
 
     private func printConfigDoctorReport(_ report: ConfigDoctorReport, commandName: String) {
-        let localization = CmuxConfigValidationLocalization()
+        let localization = WmuxConfigValidationLocalization()
         let pathLabel = localization.string(
             "config.validation.cli.doctor.report.path",
             defaultValue: "path"
@@ -457,7 +457,7 @@ extension WMUXCLI {
     }
 
     private static func localizedConfigDoctorStatus(_ status: String) -> String {
-        let localization = CmuxConfigValidationLocalization()
+        let localization = WmuxConfigValidationLocalization()
         switch status {
         case "ok":
             return localization.string(
@@ -480,7 +480,7 @@ extension WMUXCLI {
     }
 
     private static func localizedConfigDoctorLabel(_ label: String) -> String {
-        let localization = CmuxConfigValidationLocalization()
+        let localization = WmuxConfigValidationLocalization()
         switch label {
         case "primary":
             return localization.string(
@@ -513,7 +513,7 @@ extension WMUXCLI {
         }
     }
 
-    private func configSemanticScope(for path: String) -> CmuxConfigSemanticScope {
+    private func configSemanticScope(for path: String) -> WmuxConfigSemanticScope {
         let normalized = URL(fileURLWithPath: path).standardizedFileURL.path
         let globalPaths = [
             Self.primarySettingsDisplayPath,
@@ -590,7 +590,7 @@ extension WMUXCLI {
                 + localized
         }
         return Self.configDoctorLocationPrefix(error: error, data: data, displayPath: displayPath)
-            + CmuxConfigValidationLocalization().string(
+            + WmuxConfigValidationLocalization().string(
             "config.validation.cli.doctor.unknownParseError",
             defaultValue: "unknown config parse error"
         )

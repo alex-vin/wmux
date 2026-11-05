@@ -1,14 +1,14 @@
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
 
 final class TaskManagerResourcesTests: XCTestCase {
     func testGrokCodingAgentDefinitionMatchesSymlinkLaunch() throws {
-        let definition = try XCTUnwrap(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let definition = try XCTUnwrap(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "grok",
             processPath: "/Users/example/.grok/bin/grok",
             arguments: ["/Users/example/.grok/bin/grok", "--no-alt-screen"],
@@ -21,7 +21,7 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testGrokCodingAgentDefinitionMatchesResolvedBinaryLaunch() throws {
-        let definition = try XCTUnwrap(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let definition = try XCTUnwrap(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "grok-macos-aarch",
             processPath: "/Users/example/.grok/downloads/grok-macos-aarch64",
             arguments: ["/Users/example/.grok/downloads/grok-macos-aarch64"],
@@ -32,7 +32,7 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testAntigravityCodingAgentDefinitionUsesBrandedIconAsset() throws {
-        let definition = try XCTUnwrap(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        let definition = try XCTUnwrap(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "agy",
             processPath: "/Users/example/.local/bin/agy",
             arguments: ["/Users/example/.local/bin/agy", "--conversation", "conversation-123"],
@@ -93,7 +93,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             "pids": [101, 202],
         ]
 
-        let resources = CmuxTaskManagerResources(payload)
+        let resources = WmuxTaskManagerResources(payload)
 
         XCTAssertEqual(resources.memoryBytes, 8192)
         XCTAssertEqual(resources.residentBytes, 4096)
@@ -101,7 +101,7 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testResourceMemoryFallsBackToResidentBytesForLegacyPayloads() {
-        let resources = CmuxTaskManagerResources([
+        let resources = WmuxTaskManagerResources([
             "cpu_percent": 3.5,
             "resident_bytes": 4096,
             "process_count": 2,
@@ -119,7 +119,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             "pids": [101 as Any, "202" as Any],
         ]
 
-        let resources = CmuxTaskManagerResources(payload)
+        let resources = WmuxTaskManagerResources(payload)
 
         XCTAssertEqual(resources.processIds, [101, 202])
     }
@@ -134,7 +134,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             taskManagerRow("workspace-b", level: 1, cpuPercent: 30),
         ]
 
-        let sortedRows = CmuxTaskManagerSortOrder.defaultOrder.sortedRows(rows)
+        let sortedRows = WmuxTaskManagerSortOrder.defaultOrder.sortedRows(rows)
 
         XCTAssertEqual(
             sortedRows.map(\.id),
@@ -149,7 +149,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             taskManagerRow("alpha", level: 1, title: "Alpha"),
         ]
 
-        let sortedRows = CmuxTaskManagerSortOrder(
+        let sortedRows = WmuxTaskManagerSortOrder(
             column: .name,
             direction: .ascending
         ).sortedRows(rows)
@@ -164,11 +164,11 @@ final class TaskManagerResourcesTests: XCTestCase {
             taskManagerRow("large-few", level: 1, residentBytes: 1_000, memoryBytes: 4_000, processCount: 2),
         ]
 
-        let memorySortedRows = CmuxTaskManagerSortOrder(
+        let memorySortedRows = WmuxTaskManagerSortOrder(
             column: .memory,
             direction: .descending
         ).sortedRows(rows)
-        let processSortedRows = CmuxTaskManagerSortOrder(
+        let processSortedRows = WmuxTaskManagerSortOrder(
             column: .processes,
             direction: .descending
         ).sortedRows(rows)
@@ -178,18 +178,18 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testSortOrderTogglesCurrentColumnAndUsesMetricDefaultsForNewColumns() {
-        let cpuDescending = CmuxTaskManagerSortOrder.defaultOrder
+        let cpuDescending = WmuxTaskManagerSortOrder.defaultOrder
         let cpuAscending = cpuDescending.toggled(for: .cpu)
         let memoryDescending = cpuAscending.toggled(for: .memory)
         let nameAscending = memoryDescending.toggled(for: .name)
 
-        XCTAssertEqual(cpuAscending, CmuxTaskManagerSortOrder(column: .cpu, direction: .ascending))
-        XCTAssertEqual(memoryDescending, CmuxTaskManagerSortOrder(column: .memory, direction: .descending))
-        XCTAssertEqual(nameAscending, CmuxTaskManagerSortOrder(column: .name, direction: .ascending))
+        XCTAssertEqual(cpuAscending, WmuxTaskManagerSortOrder(column: .cpu, direction: .ascending))
+        XCTAssertEqual(memoryDescending, WmuxTaskManagerSortOrder(column: .memory, direction: .descending))
+        XCTAssertEqual(nameAscending, WmuxTaskManagerSortOrder(column: .name, direction: .ascending))
     }
 
     func testSnapshotBuildsProgramAggregateRowsForRepeatedProcessNames() throws {
-        let snapshot = CmuxTaskManagerSnapshot(
+        let snapshot = WmuxTaskManagerSnapshot(
             rows: [
                 taskManagerRow(
                     "node-101-a",
@@ -247,7 +247,7 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testSnapshotParsesProgramTotalsFromTopPayloadWithoutProcessRows() throws {
-        let snapshot = CmuxTaskManagerSnapshot(payload: [
+        let snapshot = WmuxTaskManagerSnapshot(payload: [
             "sample": ["sampled_at": "2026-05-13T12:00:00Z"],
             "totals": [:],
             "program_totals": [
@@ -276,7 +276,7 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testSnapshotParsesSingleProcessProgramTotalsFromTopPayload() throws {
-        let snapshot = CmuxTaskManagerSnapshot(payload: [
+        let snapshot = WmuxTaskManagerSnapshot(payload: [
             "sample": ["sampled_at": "2026-05-13T12:00:00Z"],
             "totals": [:],
             "program_totals": [
@@ -303,9 +303,9 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testSnapshotOnlyCountsAsLoadedAfterSamplingOrRowsArrive() {
-        XCTAssertFalse(CmuxTaskManagerSnapshot.empty.hasLoadedResourceUsage)
+        XCTAssertFalse(WmuxTaskManagerSnapshot.empty.hasLoadedResourceUsage)
 
-        let sampledSnapshot = CmuxTaskManagerSnapshot(
+        let sampledSnapshot = WmuxTaskManagerSnapshot(
             rows: [],
             total: .zero,
             sampledAt: Date(timeIntervalSince1970: 0)
@@ -315,7 +315,7 @@ final class TaskManagerResourcesTests: XCTestCase {
     }
 
     func testSnapshotParsesCodingAgentRowsFromTopPayload() throws {
-        let snapshot = CmuxTaskManagerSnapshot(payload: [
+        let snapshot = WmuxTaskManagerSnapshot(payload: [
             "sample": ["sampled_at": "2026-05-13T12:00:00Z"],
             "totals": [:],
             "coding_agents": [
@@ -352,7 +352,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             "process_count": 1,
             "pids": [101],
         ]
-        let snapshot = CmuxTaskManagerSnapshot(payload: [
+        let snapshot = WmuxTaskManagerSnapshot(payload: [
             "sample": ["sampled_at": "2026-05-13T12:00:00Z"],
             "totals": resources,
             "coding_agents": [
@@ -409,7 +409,7 @@ final class TaskManagerResourcesTests: XCTestCase {
 
     func testCodingAgentMatcherUsesSupportedAgentNamesAndLaunchMetadata() {
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "node",
                 processPath: nil,
                 arguments: ["node", "/usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js"],
@@ -418,7 +418,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             "claude"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "acli",
                 processPath: nil,
                 arguments: ["acli", "rovodev", "run"],
@@ -427,7 +427,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             "rovodev"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "claude_code",
                 processPath: nil,
                 arguments: [],
@@ -435,16 +435,16 @@ final class TaskManagerResourcesTests: XCTestCase {
             )?.id,
             "claude"
         )
-        XCTAssertTrue(CmuxTaskManagerCodingAgentDefinition.shouldReadArguments(
+        XCTAssertTrue(WmuxTaskManagerCodingAgentDefinition.shouldReadArguments(
             processName: "2.1.140",
             processPath: "/Users/dev/.local/share/claude/versions/2.1.140"
         ))
-        XCTAssertTrue(CmuxTaskManagerCodingAgentDefinition.shouldReadArguments(
+        XCTAssertTrue(WmuxTaskManagerCodingAgentDefinition.shouldReadArguments(
             processName: "2.1.140",
             processPath: nil
         ))
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "2.1.140",
                 processPath: "/Users/dev/.local/share/claude/versions/2.1.140",
                 arguments: ["/Users/dev/.local/bin/claude", "--resume", "session-id"],
@@ -453,7 +453,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             "claude"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "2.1.140",
                 processPath: nil,
                 arguments: ["/Users/dev/.local/bin/claude", "--resume", "session-id"],
@@ -462,7 +462,7 @@ final class TaskManagerResourcesTests: XCTestCase {
             "claude"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "2.1.140",
                 processPath: "/Users/dev/.local/share/claude/versions/2.1.140",
                 arguments: ["/Users/dev/.local/share/claude/versions/2.1.140", "--resume", "session-id"],
@@ -470,32 +470,32 @@ final class TaskManagerResourcesTests: XCTestCase {
             )?.id,
             "claude"
         )
-        XCTAssertNil(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        XCTAssertNil(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "2.1.140",
             processPath: nil,
             arguments: [],
             environment: [:]
         ))
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "node",
                 processPath: nil,
                 arguments: ["node", "agent.js"],
-                environment: ["CMUX_AGENT_LAUNCH_KIND": "claudeTeams"]
+                environment: ["WMUX_AGENT_LAUNCH_KIND": "claudeTeams"]
             )?.id,
             "claude"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "bun",
                 processPath: nil,
                 arguments: ["bun", "opencode"],
-                environment: ["CMUX_AGENT_LAUNCH_KIND": "omo"]
+                environment: ["WMUX_AGENT_LAUNCH_KIND": "omo"]
             )?.id,
             "opencode"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "omo",
                 processPath: nil,
                 arguments: [],
@@ -504,43 +504,43 @@ final class TaskManagerResourcesTests: XCTestCase {
             "opencode"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "node",
                 processPath: nil,
                 arguments: ["node", "agent.js"],
-                environment: ["CMUX_AGENT_LAUNCH_KIND": "codex"]
+                environment: ["WMUX_AGENT_LAUNCH_KIND": "codex"]
             )?.id,
             "codex"
         )
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "node",
                 processPath: nil,
                 arguments: ["node", "agent.js"],
-                environment: ["CMUX_AGENT_LAUNCH_KIND": "omx"]
+                environment: ["WMUX_AGENT_LAUNCH_KIND": "omx"]
             )?.id,
             "codex"
         )
-        XCTAssertNil(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        XCTAssertNil(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "node",
             processPath: nil,
             arguments: ["node", "api/server.js"],
             environment: [:]
         ))
-        XCTAssertNil(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        XCTAssertNil(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "node",
             processPath: nil,
             arguments: ["node", "/tmp/gemini-api-test/server.js"],
             environment: [:]
         ))
-        XCTAssertNil(CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+        XCTAssertNil(WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
             processName: "node",
             processPath: nil,
             arguments: ["node", "/tmp/factory-reset-tool/index.js"],
             environment: [:]
         ))
         XCTAssertEqual(
-            CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+            WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                 processName: "node",
                 processPath: nil,
                 arguments: ["node", "/usr/local/lib/node_modules/@openai/codex/bin/codex.js"],
@@ -573,7 +573,7 @@ final class TaskManagerResourcesTests: XCTestCase {
 
         for testCase in cases {
             XCTAssertEqual(
-                CmuxTaskManagerCodingAgentDefinition.matchingDefinition(
+                WmuxTaskManagerCodingAgentDefinition.matchingDefinition(
                     processName: testCase.processName,
                     processPath: nil,
                     arguments: [],
@@ -585,8 +585,8 @@ final class TaskManagerResourcesTests: XCTestCase {
         }
     }
 
-    private func resourceSummary() -> CmuxTopResourceSummary {
-        var summary = CmuxTopResourceSummary()
+    private func resourceSummary() -> WmuxTopResourceSummary {
+        var summary = WmuxTopResourceSummary()
         summary.cpuPercent = 42
         summary.memoryBytes = 3001
         summary.residentBytes = 1001
@@ -603,7 +603,7 @@ final class TaskManagerResourcesTests: XCTestCase {
 
     private func taskManagerRow(
         _ id: String,
-        kind: CmuxTaskManagerRow.Kind = .workspace,
+        kind: WmuxTaskManagerRow.Kind = .workspace,
         level: Int,
         title: String? = nil,
         cpuPercent: Double = 0,
@@ -611,15 +611,15 @@ final class TaskManagerResourcesTests: XCTestCase {
         memoryBytes: Int64? = nil,
         processCount: Int = 0,
         processId: Int? = nil
-    ) -> CmuxTaskManagerRow {
+    ) -> WmuxTaskManagerRow {
         let processIds = processId.map { [$0] } ?? []
-        return CmuxTaskManagerRow(
+        return WmuxTaskManagerRow(
             id: id,
             kind: kind,
             level: level,
             title: title ?? id,
             detail: "",
-            resources: CmuxTaskManagerResources(
+            resources: WmuxTaskManagerResources(
                 cpuPercent: cpuPercent,
                 residentBytes: residentBytes,
                 memoryBytes: memoryBytes,

@@ -1,9 +1,9 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -67,7 +67,7 @@ struct AgentHibernationLaunchFidelityTests {
             workingDirectory: cwd,
             environment: [
                 "SUBROUTER_CLAUDE_RESUME_COMMAND": marker,
-                "CMUX_AGENT_LAUNCH_SUBROUTER_CLAUDE_RESUME_COMMAND": marker,
+                "WMUX_AGENT_LAUNCH_SUBROUTER_CLAUDE_RESUME_COMMAND": marker,
             ],
             source: "environment"
         )
@@ -114,7 +114,7 @@ struct AgentHibernationLaunchFidelityTests {
         let index = RestorableAgentSessionIndex.load(
             homeDirectory: home.path,
             fileManager: .default,
-            registry: CmuxVaultAgentRegistry(registrations: []),
+            registry: WmuxVaultAgentRegistry(registrations: []),
             detectedSnapshots: [:]
         )
         return workspace.restorableAgentForHibernation(panelId: panelId, index: index)

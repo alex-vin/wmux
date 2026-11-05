@@ -1,11 +1,11 @@
 import AppKit
-import CmuxTerminal
+import WmuxTerminal
 import Foundation
 import Testing
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -161,7 +161,7 @@ extension AppDelegate {
     func registerMainWindowContextForTesting(
         windowId: UUID = UUID(),
         tabManager: TabManager,
-        cmuxConfigStore: CmuxConfigStore? = nil,
+        cmuxConfigStore: WmuxConfigStore? = nil,
         fileExplorerState: FileExplorerState? = nil,
         window: NSWindow? = nil
     ) -> UUID {
@@ -312,8 +312,8 @@ final class KeyStatusTestWindow: NSWindow {
 /// `AppDelegate()` or reads `shared` across a suspension point takes
 /// `.exclusiveAppContext`, which serializes it with the other app-context tests
 /// and restores `shared` the same way.
-@objc(CmuxTestsPrincipal)
-final class CmuxTestsPrincipal: NSObject, XCTestObservation {
+@objc(WmuxTestsPrincipal)
+final class WmuxTestsPrincipal: NSObject, XCTestObservation {
     private var sharedAtStart: AppDelegate?
 
     override init() {
@@ -336,7 +336,7 @@ final class CmuxTestsPrincipal: NSObject, XCTestObservation {
     }
 }
 
-/// Swift Testing counterpart of `CmuxTestsPrincipal`: runs each test in the
+/// Swift Testing counterpart of `WmuxTestsPrincipal`: runs each test in the
 /// suite inside `AppContextSerialGate`, so suites in parallel cannot swap
 /// `AppDelegate.shared` under each other at a suspension point, and then puts
 /// `shared` and the surface registry's route retirer back.

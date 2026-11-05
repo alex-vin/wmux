@@ -1,6 +1,6 @@
 import AppKit
-import CmuxFoundation
-import CmuxSettingsUI
+import WmuxFoundation
+import WmuxSettingsUI
 import SwiftUI
 import os
 
@@ -68,7 +68,7 @@ enum SettingsWindowFactory {
         // scene/window bridge. On macOS 27 it can alternate SwiftUI content
         // measurement with AppKit window layout while the window is being
         // created, overflowing the main-thread stack before the presenter can
-        // apply its re-entrancy guard (CMUXTERM-MACOS-27J7).
+        // apply its re-entrancy guard (WMUXTERM-MACOS-27J7).
         window.contentView = hostingView
         // [flexible space, sidebar toggle, sidebar tracking separator] is the
         // exact item layout the SwiftUI-owned 0.64.17 window built for its
@@ -88,10 +88,10 @@ enum SettingsWindowFactory {
 /// mutation path in ``SettingsWindowRoot``.
 @MainActor
 final class SettingsSidebarToolbarController: NSObject, NSToolbarDelegate {
-    static let toggleSidebarItemIdentifier = NSToolbarItem.Identifier("cmux.settings.toggleSidebar")
+    static let toggleSidebarItemIdentifier = NSToolbarItem.Identifier("wmux.settings.toggleSidebar")
 
     func makeToolbar() -> NSToolbar {
-        let toolbar = NSToolbar(identifier: "cmux.settings.toolbar")
+        let toolbar = NSToolbar(identifier: "wmux.settings.toolbar")
         toolbar.delegate = self
         toolbar.displayMode = .iconOnly
         toolbar.allowsUserCustomization = false

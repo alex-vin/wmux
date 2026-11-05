@@ -2,8 +2,8 @@ import AppKit
 import ObjectiveC.runtime
 import Testing
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -49,14 +49,14 @@ private func evaluateCloseOutsideXCTest(
 ) throws -> (shouldClose: Bool, terminateCallCount: Int) {
     let environment = ProcessInfo.processInfo.environment
     var markerKeys = [
-        "CMUX_TEST_PROCESS",
+        "WMUX_TEST_PROCESS",
         "XCTestConfigurationFilePath",
         "XCTestBundlePath",
         "XCTestSessionIdentifier",
         "XCInjectBundle",
         "XCInjectBundleInto",
     ]
-    markerKeys.append(contentsOf: environment.keys.filter { $0.hasPrefix("CMUX_UI_TEST_") })
+    markerKeys.append(contentsOf: environment.keys.filter { $0.hasPrefix("WMUX_UI_TEST_") })
     if environment["DYLD_INSERT_LIBRARIES"]?.contains("libXCTest") == true {
         markerKeys.append("DYLD_INSERT_LIBRARIES")
     }
@@ -75,7 +75,7 @@ private func evaluateCloseOutsideXCTest(
             }
         }
     }
-    #expect(ProcessInfo.processInfo.environment["CMUX_TEST_PROCESS"] == nil)
+    #expect(ProcessInfo.processInfo.environment["WMUX_TEST_PROCESS"] == nil)
 
     try ApplicationTerminateSpy.install()
     defer { ApplicationTerminateSpy.uninstall() }

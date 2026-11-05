@@ -1955,7 +1955,7 @@ function renderPage(url: URL, prefix = AUTH_PREFIX): string {
   const css = `:root { ${themeCssVars(currentTheme, { transparent, opacity: Number.isNaN(override) ? undefined : override })} }`;
   // Shell: theme vars first (so the first paint is the terminal bg), the
   // static stylesheet, a mount point, and the bundled React app (Base UI).
-  const script = url.pathname === "/gallery" ? "gallery.js" : "app.js";
+  const script = "app.js";
   const base = prefix ? `${prefix}/` : "/";
   return `<!doctype html>
 <html lang="en"><head>
@@ -2008,11 +2008,10 @@ function formatBytes(n: number): string {
 
 function bundleSizeLine(assets: Map<string, StaticAsset>): string {
   const app = assets.get("/app.js");
-  const gallery = assets.get("/gallery.js");
   const part = (name: string, asset?: StaticAsset) => asset
     ? `${name} ${formatBytes(asset.bytes.byteLength)} raw / ${formatBytes(asset.gzip.byteLength)} gzip`
     : `${name} missing`;
-  return `bundle ready: ${part("app.js", app)}; ${part("gallery.js", gallery)}`;
+  return `bundle ready: ${part("app.js", app)}`;
 }
 
 export async function buildBundles(): Promise<Map<string, StaticAsset>> {
@@ -2027,7 +2026,7 @@ export async function buildBundles(): Promise<Map<string, StaticAsset>> {
 async function buildBundlesFresh(): Promise<Map<string, StaticAsset>> {
   bundleBuildCount += 1;
   const out = await Bun.build({
-    entrypoints: [`${ROOT}/src/main.tsx`, `${ROOT}/src/gallery-main.tsx`],
+    entrypoints: [`${ROOT}/src/main.tsx`],
     target: "browser",
     minify: true,
     splitting: true,
@@ -2041,7 +2040,7 @@ async function buildBundlesFresh(): Promise<Map<string, StaticAsset>> {
   const assets = new Map<string, StaticAsset>();
   for (const output of out.outputs) {
     const base = pathBasename(output.path);
-    const route = base === "main.js" ? "/app.js" : base === "gallery-main.js" ? "/gallery.js" : `/${base}`;
+    const route = base === "main.js" ? "/app.js" : `/${base}`;
     const bytes = await output.arrayBuffer();
     assets.set(route, makeAsset(route, bytes, "application/javascript; charset=utf-8"));
   }
@@ -2120,7 +2119,7 @@ function startServer() {
         : new Response("upgrade failed", { status: 400 });
     }
     if (url.pathname.startsWith("/icons/")) return iconResponse(url);
-    if (url.pathname === "/app.js" || url.pathname === "/gallery.js" || /^\/chunk-[\w-]+\.js$/.test(url.pathname)) {
+    if (url.pathname === "/app.js" || /^\/chunk-[\w-]+\.js$/.test(url.pathname)) {
       try {
         const asset = (await buildBundles()).get(url.pathname);
         if (!asset) return new Response("not found", { status: 404 });

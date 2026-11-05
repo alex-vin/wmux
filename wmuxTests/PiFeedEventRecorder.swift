@@ -1,4 +1,4 @@
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 import Foundation
 
 /// Safety: every access to `recordedEvents` is serialized by `lock`.

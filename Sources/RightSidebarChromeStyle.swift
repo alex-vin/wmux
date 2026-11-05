@@ -1,7 +1,7 @@
 import AppKit
-import CmuxFoundation
-import CmuxAppKitSupportUI
-import CmuxSettings
+import WmuxFoundation
+import WmuxAppKitSupportUI
+import WmuxSettings
 import SwiftUI
 
 func titlebarShortcutHintShouldShow(
@@ -26,7 +26,7 @@ enum HeaderChromeIconStyle {
     }
 
     static func symbol(_ systemName: String) -> some View {
-        CmuxSystemSymbolImage(
+        WmuxSystemSymbolImage(
             systemName: systemName,
             pointSize: RightSidebarChromeMetrics.headerIconSize,
             weight: weight,
@@ -412,7 +412,7 @@ struct ModeBarButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: Self.contentSpacing) {
-                CmuxSystemSymbolImage(
+                WmuxSystemSymbolImage(
                     systemName: item.symbolName,
                     pointSize: RightSidebarChromeControlStyle.modeIconSize,
                     weight: RightSidebarChromeControlStyle.iconWeight,

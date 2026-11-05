@@ -1,9 +1,9 @@
 import Foundation
 import Testing
-import CMUXAgentLaunch
+import WMUXAgentLaunch
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -1004,7 +1004,7 @@ struct FeedCoordinatorTests {
     }
 
     @Test func workstreamPublicationCarriesAuthoritativeTargetAndError() throws {
-        let bus = CmuxEventBus(retainedEventLimit: 4)
+        let bus = WmuxEventBus(retainedEventLimit: 4)
         let workspaceId = UUID().uuidString
         let surfaceId = UUID().uuidString
         let event = WorkstreamEvent(

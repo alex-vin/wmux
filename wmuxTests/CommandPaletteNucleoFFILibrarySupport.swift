@@ -1,8 +1,8 @@
 import Darwin
 import XCTest
 
-#if canImport(cmux_DEV)
-@testable import cmux_DEV
+#if canImport(wmux_DEV)
+@testable import wmux_DEV
 #elseif canImport(cmux)
 @testable import cmux
 #endif
@@ -64,22 +64,22 @@ final class NucleoLibrary {
         }
         self.handle = handle
         self.createIndex = try Self.symbol(
-            "cmux_nucleo_index_create",
+            "wmux_nucleo_index_create",
             from: handle,
             as: CreateIndex.self
         )
         self.destroyIndex = try Self.symbol(
-            "cmux_nucleo_index_destroy",
+            "wmux_nucleo_index_destroy",
             from: handle,
             as: DestroyIndex.self
         )
         self.searchIndex = try Self.symbol(
-            "cmux_nucleo_index_search",
+            "wmux_nucleo_index_search",
             from: handle,
             as: SearchIndex.self
         )
         self.version = try Self.symbol(
-            "cmux_nucleo_ffi_version",
+            "wmux_nucleo_ffi_version",
             from: handle,
             as: Version.self
         )
@@ -90,7 +90,7 @@ final class NucleoLibrary {
                 domain: "CommandPaletteNucleoFFITests",
                 code: 6,
                 userInfo: [
-                    NSLocalizedDescriptionKey: "unsupported cmux_nucleo_ffi_version \(resolvedVersion)"
+                    NSLocalizedDescriptionKey: "unsupported wmux_nucleo_ffi_version \(resolvedVersion)"
                 ]
             )
         }
@@ -98,7 +98,7 @@ final class NucleoLibrary {
 
     private static func defaultLibraryPaths(environment: [String: String]) -> [String] {
         var paths: [String] = []
-        if let environmentPath = environment["CMUX_NUCLEO_FFI_LIB"], !environmentPath.isEmpty {
+        if let environmentPath = environment["WMUX_NUCLEO_FFI_LIB"], !environmentPath.isEmpty {
             paths.append(environmentPath)
         }
         if let privateFrameworksPath = Bundle.main.privateFrameworksPath {
@@ -213,7 +213,7 @@ final class NucleoIndex {
             throw NSError(
                 domain: "CommandPaletteNucleoFFITests",
                 code: 3,
-                userInfo: [NSLocalizedDescriptionKey: "cmux_nucleo_index_create returned null"]
+                userInfo: [NSLocalizedDescriptionKey: "wmux_nucleo_index_create returned null"]
             )
         }
         self.pointer = pointer
@@ -247,7 +247,7 @@ final class NucleoIndex {
             throw NSError(
                 domain: "CommandPaletteNucleoFFITests",
                 code: Int(status),
-                userInfo: [NSLocalizedDescriptionKey: "cmux_nucleo_index_search failed with \(status)"]
+                userInfo: [NSLocalizedDescriptionKey: "wmux_nucleo_index_search failed with \(status)"]
             )
         }
 
@@ -256,7 +256,7 @@ final class NucleoIndex {
                 domain: "CommandPaletteNucleoFFITests",
                 code: 4,
                 userInfo: [
-                    NSLocalizedDescriptionKey: "cmux_nucleo_index_search returned invalid count \(count) for limit \(limit)"
+                    NSLocalizedDescriptionKey: "wmux_nucleo_index_search returned invalid count \(count) for limit \(limit)"
                 ]
             )
         }
@@ -267,7 +267,7 @@ final class NucleoIndex {
                     domain: "CommandPaletteNucleoFFITests",
                     code: 5,
                     userInfo: [
-                        NSLocalizedDescriptionKey: "cmux_nucleo_index_search returned invalid index \(match.index)"
+                        NSLocalizedDescriptionKey: "wmux_nucleo_index_search returned invalid index \(match.index)"
                     ]
                 )
             }

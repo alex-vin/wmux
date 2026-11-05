@@ -6,11 +6,11 @@ import Foundation
 /// controlling TTY of the terminal it was launched from, so the TTY population always has
 /// to be split into processes cmux can prove it owns and processes that merely collide on
 /// the device. See https://github.com/manaflow-ai/cmux/issues/11004.
-enum CmuxTopTTYOwnershipReason: String, Sendable, CaseIterable {
-    /// The process carries an explicit `CMUX_*` scope naming this surface. Strongest
+enum WmuxTopTTYOwnershipReason: String, Sendable, CaseIterable {
+    /// The process carries an explicit `WMUX_*` scope naming this surface. Strongest
     /// evidence, and the one that survives reparenting: hook monitors and browser roots
     /// are intentionally launchd-parented but stay attributed through it.
-    case cmuxProcessScope = "cmux-process-scope"
+    case cmuxProcessScope = "wmux-process-scope"
 
     /// The process was already proven through the surface's cmux-scoped process tree.
     case surfaceProcessTree = "surface-process-tree"
@@ -32,7 +32,7 @@ enum CmuxTopTTYOwnershipReason: String, Sendable, CaseIterable {
 }
 
 /// The minimum a process has to expose for TTY ownership to be decidable.
-struct CmuxTopTTYOwnershipProcess: Sendable, Equatable {
+struct WmuxTopTTYOwnershipProcess: Sendable, Equatable {
     /// The process identifier.
     let pid: Int
     /// The parent process identifier. `1` means launchd, i.e. the process was reparented
@@ -40,7 +40,7 @@ struct CmuxTopTTYOwnershipProcess: Sendable, Equatable {
     let parentPID: Int
     /// The process group identifier, when the snapshot could read one.
     let processGroupID: Int?
-    /// The cmux surface named by the process's `CMUX_*` environment scope, when present.
+    /// The cmux surface named by the process's `WMUX_*` environment scope, when present.
     let cmuxSurfaceID: UUID?
 
     /// Creates the process facts used to decide TTY ownership.
@@ -53,7 +53,7 @@ struct CmuxTopTTYOwnershipProcess: Sendable, Equatable {
 }
 
 /// The result of splitting one TTY's process population by ownership evidence.
-struct CmuxTopTTYOwnership: Sendable {
+struct WmuxTopTTYOwnership: Sendable {
     /// Processes cmux can prove belong to the surface. Safe to use as attribution roots.
     var provenPIDs: Set<Int> = []
 
@@ -62,7 +62,7 @@ struct CmuxTopTTYOwnership: Sendable {
     var unattributedPIDs: Set<Int> = []
 
     /// Per-PID reason, for diagnostics and the Task Manager.
-    var reasonByPID: [Int: CmuxTopTTYOwnershipReason] = [:]
+    var reasonByPID: [Int: WmuxTopTTYOwnershipReason] = [:]
 
     /// String-keyed reasons for the JSON payloads, which cannot carry `Int` keys.
     func reasonPayload() -> [String: String] {
@@ -80,7 +80,7 @@ struct CmuxTopTTYOwnership: Sendable {
 /// Attribution fails closed: a PID is charged to the surface only when the snapshot
 /// carries positive evidence for it, so an unrelated detached workload that merely
 /// inherited the TTY is reported rather than summed into cmux's memory.
-struct CmuxTopTTYOwnershipResolver {
+struct WmuxTopTTYOwnershipResolver {
     /// PIDs known to belong to cmux — the window's app processes and their descendants.
     /// A process launched onto the TTY by one of these is a surface root; without this
     /// evidence an off-TTY parent proves nothing.
@@ -105,11 +105,11 @@ struct CmuxTopTTYOwnershipResolver {
     /// - Returns: the proven set, the unattributed set, and the reason for each PID.
     func resolve(
         candidates: Set<Int>,
-        processes: [Int: CmuxTopTTYOwnershipProcess],
+        processes: [Int: WmuxTopTTYOwnershipProcess],
         surfaceID: UUID?,
         provenPIDs: Set<Int> = []
-    ) -> CmuxTopTTYOwnership {
-        var ownership = CmuxTopTTYOwnership()
+    ) -> WmuxTopTTYOwnership {
+        var ownership = WmuxTopTTYOwnership()
         let livePIDs = candidates.filter { $0 > 0 }
         guard !livePIDs.isEmpty else { return ownership }
 
@@ -129,7 +129,7 @@ struct CmuxTopTTYOwnershipResolver {
         var proven: Set<Int> = []
         var queue: [Int] = []
 
-        func prove(_ pid: Int, _ reason: CmuxTopTTYOwnershipReason) {
+        func prove(_ pid: Int, _ reason: WmuxTopTTYOwnershipReason) {
             guard proven.insert(pid).inserted else { return }
             ownership.reasonByPID[pid] = reason
             queue.append(pid)

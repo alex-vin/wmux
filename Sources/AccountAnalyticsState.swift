@@ -1,4 +1,4 @@
-import CmuxProductAnalytics
+import WmuxProductAnalytics
 
 struct AccountSignInModel: Sendable {
     enum Failure: Sendable {

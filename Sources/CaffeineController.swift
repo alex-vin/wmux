@@ -22,7 +22,7 @@ final class CaffeineController {
         beginActivity: @escaping BeginActivity = {
             ProcessInfo.processInfo.beginActivity(
                 options: [.idleSystemSleepDisabled],
-                reason: "cmux Keep Mac Awake"
+                reason: "wmux Keep Mac Awake"
             )
         },
         endActivity: @escaping EndActivity = { activity in

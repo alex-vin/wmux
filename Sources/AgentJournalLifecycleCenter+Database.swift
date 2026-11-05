@@ -6,7 +6,7 @@ extension AgentJournalLifecycleCenter {
         bundleIdentifier: String? = Bundle.main.bundleIdentifier,
         isRunningUnderAutomatedTests: Bool = SessionRestorePolicy.isRunningUnderAutomatedTests()
     ) -> URL? {
-        if let override = ProcessInfo.processInfo.environment["CMUX_AGENT_JOURNAL_PATH"],
+        if let override = ProcessInfo.processInfo.environment["WMUX_AGENT_JOURNAL_PATH"],
            !override.isEmpty {
             return URL(fileURLWithPath: override)
         }
@@ -14,7 +14,7 @@ extension AgentJournalLifecycleCenter {
             // Notifications use the production admission path under app tests,
             // with a unique temporary journal instead of the user's history.
             return FileManager.default.temporaryDirectory
-                .appendingPathComponent("cmux-agent-journal-test-\(UUID().uuidString).sqlite3")
+                .appendingPathComponent("wmux-agent-journal-test-\(UUID().uuidString).sqlite3")
         }
         guard let appSupport = FileManager.default.urls(
             for: .applicationSupportDirectory,
@@ -30,7 +30,7 @@ extension AgentJournalLifecycleCenter {
             options: .regularExpression
         )
         return appSupport
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("agent-journal-\(safeBundleID).sqlite3", isDirectory: false)
     }
 }
