@@ -2,7 +2,6 @@ import CmuxCloud
 import CmuxCloudBannerCore
 import CmuxProductAnalytics
 import CmuxCloudTui
-import CmuxComputerUse
 import CmuxCloudMachines
 import AppKit
 import CmuxAppKitSupportUI

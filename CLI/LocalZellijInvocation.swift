@@ -188,6 +188,6 @@ struct LocalZellijInvocation {
 
     static var usage: String {
         // A single-line literal keeps the catalog tooling able to read the English source.
-        String(localized: "cli.localZellij.usage", defaultValue: "Usage: cmux local-zellij <start|attach|list|status|close> [session] [options]\n\nOpt-in local zellij sessions survive cmux quit, crash, and app updates. Ordinary cmux terminals are unchanged.\n\nstart <name> [--cwd <path>] [--command <shell>] [--detached]\nattach <name|--id <uuid>> [--workspace <id|ref|index>] [--focus <true|false>] [--headless] [--new-client]\nlist [--json]\nstatus <name|--id <uuid>> [--json]\nclose <name|--id <uuid>>\n\nThe registry and zellij socket directory live under ~/.cmux/local-zellij with user-only permissions. `attach --headless` hands the terminal directly to zellij for a client outside the cmux GUI.")
+        String(localized: "cli.localZellij.usage", defaultValue: "Usage: wmux local-zellij <start|attach|list|status|close> [session] [options]\n\nOpt-in local zellij sessions survive wmux quit, crash, and app updates. Ordinary wmux terminals are unchanged.\n\nstart <name> [--cwd <path>] [--command <shell>] [--detached]\nattach <name|--id <uuid>> [--workspace <id|ref|index>] [--focus <true|false>] [--headless] [--new-client]\nlist [--json]\nstatus <name|--id <uuid>> [--json]\nclose <name|--id <uuid>>\n\nThe registry and zellij socket directory live under ~/.wmux/local-zellij with user-only permissions. `attach --headless` hands the terminal directly to zellij for a client outside the wmux GUI.")
     }
 }

@@ -1,6 +1,6 @@
 import AppKit
 
-extension cmuxApp {
+extension wmuxApp {
     func performNewSimulatorPaneFromMenu() {
         guard let appDelegate = AppDelegate.shared,
               appDelegate.executeConfiguredCmuxAction(

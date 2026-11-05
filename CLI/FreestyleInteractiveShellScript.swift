@@ -18,14 +18,14 @@ struct FreestyleInteractiveShellScript: Sendable {
         hash -r 2>/dev/null || true
         if command -v zsh >/dev/null 2>&1; then
           touch "$HOME/.hushlogin" 2>/dev/null || true
-          if [ ! -e "$HOME/.zshrc" ] || grep -q "cmux-managed zsh defaults" "$HOME/.zshrc" 2>/dev/null; then
+          if [ ! -e "$HOME/.zshrc" ] || grep -q "wmux-managed zsh defaults" "$HOME/.zshrc" 2>/dev/null; then
             cat > "$HOME/.zshrc" <<'CMUX_USER_ZSHRC'
-        # cmux-managed zsh defaults. Edit ~/.zshrc.local for personal overrides.
-        mkdir -p "$HOME/.cmux" 2>/dev/null || true
-        printf '%s' '/tmp/cmux-cloud-cli.sock' > "$HOME/.cmux/socket_addr" 2>/dev/null || true
-        export CMUX_SOCKET_PATH="${CMUX_SOCKET_PATH:-/tmp/cmux-cloud-cli.sock}"
-        if [ -r /etc/cmux/zshrc ]; then
-          source /etc/cmux/zshrc
+        # wmux-managed zsh defaults. Edit ~/.zshrc.local for personal overrides.
+        mkdir -p "$HOME/.wmux" 2>/dev/null || true
+        printf '%s' '/tmp/wmux-cloud-cli.sock' > "$HOME/.wmux/socket_addr" 2>/dev/null || true
+        export CMUX_SOCKET_PATH="${CMUX_SOCKET_PATH:-/tmp/wmux-cloud-cli.sock}"
+        if [ -r /etc/wmux/zshrc ]; then
+          source /etc/wmux/zshrc
         else
           export SHELL="$(command -v zsh)"
           autoload -Uz colors 2>/dev/null && colors
@@ -40,7 +40,7 @@ struct FreestyleInteractiveShellScript: Sendable {
             source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
             ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="${ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE:-fg=8}"
           fi
-          : ${CMUX_PROMPT_USER:=cmux-cloud}
+          : ${CMUX_PROMPT_USER:=wmux-cloud}
           : ${CMUX_PROMPT_CHAR:=$'\\u03bb'}
           PROMPT='%F{magenta}${CMUX_PROMPT_USER}%f in %F{green}%~%f ${CMUX_PROMPT_CHAR} '
         fi
@@ -63,7 +63,7 @@ struct FreestyleInteractiveShellScript: Sendable {
         # Personal zsh overrides for this cloud VM.
         # Examples:
         #   CMUX_CLOUD_WELCOME=0
-        #   CMUX_PROMPT_USER='cmux-cloud'
+        #   CMUX_PROMPT_USER='wmux-cloud'
         #   CMUX_PROMPT_CHAR='>'
         #   PROMPT='%F{cyan}%n%f:%F{green}%~%f %# '
         CMUX_LOCAL_ZSHRC
@@ -77,13 +77,13 @@ struct FreestyleInteractiveShellScript: Sendable {
             cmux_cloud_tty_scope="${cmux_cloud_tty_scope#-}"
             cmux_cloud_tty_scope="${cmux_cloud_tty_scope%-}"
             [ -n "$cmux_cloud_tty_scope" ] || cmux_cloud_tty_scope=default
-            if [ "$cmux_cloud_tty_scope" != default ] && [ "${CMUX_CLOUD_TMUX_SESSION:-}" = "cmux-cloud" ]; then
+            if [ "$cmux_cloud_tty_scope" != default ] && [ "${CMUX_CLOUD_TMUX_SESSION:-}" = "wmux-cloud" ]; then
               unset CMUX_CLOUD_TMUX_SESSION
             fi
             if [ "$cmux_cloud_tty_scope" = default ]; then
-              export CMUX_CLOUD_TMUX_SESSION="${CMUX_CLOUD_TMUX_SESSION:-cmux-cloud}"
+              export CMUX_CLOUD_TMUX_SESSION="${CMUX_CLOUD_TMUX_SESSION:-wmux-cloud}"
             else
-              export CMUX_CLOUD_TMUX_SESSION="${CMUX_CLOUD_TMUX_SESSION:-cmux-cloud-$cmux_cloud_tty_scope}"
+              export CMUX_CLOUD_TMUX_SESSION="${CMUX_CLOUD_TMUX_SESSION:-wmux-cloud-$cmux_cloud_tty_scope}"
             fi
             if ! tmux has-session -t "$CMUX_CLOUD_TMUX_SESSION" >/dev/null 2>&1; then
               tmux new-session -d -s "$CMUX_CLOUD_TMUX_SESSION" "exec zsh -l" >/dev/null 2>&1 || unset CMUX_CLOUD_TMUX_SESSION

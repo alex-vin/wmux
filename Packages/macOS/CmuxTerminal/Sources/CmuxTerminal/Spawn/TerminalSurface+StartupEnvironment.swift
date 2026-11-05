@@ -21,7 +21,7 @@ extension TerminalSurface {
         homeDirectory
             .appendingPathComponent("Library", isDirectory: true)
             .appendingPathComponent("Application Support", isDirectory: true)
-            .appendingPathComponent("cmux", isDirectory: true)
+            .appendingPathComponent("wmux", isDirectory: true)
             .appendingPathComponent("terminal-history", isDirectory: true)
             .appendingPathComponent("surface-\(surfaceID.uuidString).history", isDirectory: false)
     }
@@ -77,12 +77,12 @@ extension TerminalSurface {
         protectedKeys: inout Set<String>
     ) {
         let values = [
-            "CMUX_SURFACE_ID": context.surfaceId.uuidString,
-            "CMUX_WORKSPACE_ID": context.workspaceId.uuidString,
-            "CMUX_PANEL_ID": context.surfaceId.uuidString,
-            "CMUX_TAB_ID": context.workspaceId.uuidString,
-            "CMUX_TERMINAL_LIFECYCLE_ID": context.terminalLifecycleId.uuidString,
-            "CMUX_SOCKET_PATH": context.socketPath
+            "WMUX_SURFACE_ID": context.surfaceId.uuidString,
+            "WMUX_WORKSPACE_ID": context.workspaceId.uuidString,
+            "WMUX_PANEL_ID": context.surfaceId.uuidString,
+            "WMUX_TAB_ID": context.workspaceId.uuidString,
+            "WMUX_TERMINAL_LIFECYCLE_ID": context.terminalLifecycleId.uuidString,
+            "WMUX_SOCKET_PATH": context.socketPath
         ]
 
         for (key, value) in values {
@@ -96,8 +96,8 @@ extension TerminalSurface {
             withIntermediateDirectories: true,
             attributes: [.posixPermissions: 0o700]
         )
-        environment["CMUX_HISTORY_FILE"] = historyURL.path
-        protectedKeys.insert("CMUX_HISTORY_FILE")
+        environment["WMUX_HISTORY_FILE"] = historyURL.path
+        protectedKeys.insert("WMUX_HISTORY_FILE")
     }
 
     /// Applies the sidebar git/PR watch flags and protects them.

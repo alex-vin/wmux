@@ -5,8 +5,8 @@
 set -euo pipefail
 
 SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
-CMUX_CONFIG_ROOT="${REAL_USER_HOME:-$HOME}/.config/cmux"
-SUBAGENTS_DIR="$CMUX_CONFIG_ROOT/subagents"
+WMUX_CONFIG_ROOT="${REAL_USER_HOME:-$HOME}/.config/wmux"
+SUBAGENTS_DIR="$WMUX_CONFIG_ROOT/subagents"
 STATUS_JSON=""
 START_TIME=""
 
@@ -39,26 +39,26 @@ EOF
 
 resolve_cmux_bin() {
     local candidate
-    candidate="${CMUX_BUNDLED_CLI_PATH:-}"
+    candidate="${WMUX_BUNDLED_CLI_PATH:-}"
     if [[ -n "$candidate" && -x "$candidate" ]]; then
         printf '%s' "$candidate"
         return 0
     fi
 
-    candidate="$SELF_DIR/cmux"
+    candidate="$SELF_DIR/wmux"
     if [[ -x "$candidate" ]]; then
         printf '%s' "$candidate"
         return 0
     fi
 
-    candidate="$(command -v cmux || true)"
+    candidate="$(command -v wmux || true)"
     if [[ -n "$candidate" ]]; then
         printf '%s' "$candidate"
         return 0
     fi
 
     # Check common derived data locations
-    local dev_candidate="/Users/wenxinwu/Library/Developer/Xcode/DerivedData/cmux-dev/Build/Products/Debug/cmux"
+    local dev_candidate="/Users/wenxinwu/Library/Developer/Xcode/DerivedData/wmux-dev/Build/Products/Debug/wmux"
     if [[ -x "$dev_candidate" ]]; then
         printf '%s' "$dev_candidate"
         return 0
@@ -92,7 +92,7 @@ resolve_account_id() {
     fi
 
     local surface_id="${2:-}"
-    local tokens_dir="$CMUX_CONFIG_ROOT/gemini_tokens"
+    local tokens_dir="$WMUX_CONFIG_ROOT/gemini_tokens"
 
     # 1. Match surface UUID directly in gemini_tokens/<uuid>.env
     if [[ -n "$surface_id" && -d "$tokens_dir" ]]; then
@@ -104,7 +104,7 @@ resolve_account_id() {
         done
         if [[ -f "$env_file" ]]; then
             local acc
-            acc="$(sed -n 's/.*CMUX_AGY_ISOLATED_ACCOUNT="\{0,1\}\([^" ]*\).*/\1/p' "$env_file" | head -n 1 || true)"
+            acc="$(sed -n 's/.*WMUX_AGY_ISOLATED_ACCOUNT="\{0,1\}\([^" ]*\).*/\1/p' "$env_file" | head -n 1 || true)"
             if [[ -n "$acc" ]]; then
                 printf '%s' "$acc"
                 return 0
@@ -370,10 +370,10 @@ cmd_run() {
         exit 1
     fi
 
-    local CMUX_BIN
-    CMUX_BIN="$(resolve_cmux_bin || true)"
-    if [[ -z "$CMUX_BIN" ]]; then
-        echo "Error: cmux CLI binary could not be found." >&2
+    local WMUX_BIN
+    WMUX_BIN="$(resolve_cmux_bin || true)"
+    if [[ -z "$WMUX_BIN" ]]; then
+        echo "Error: wmux CLI binary could not be found." >&2
         exit 1
     fi
 
@@ -381,20 +381,20 @@ cmd_run() {
     AGY_BIN="$(resolve_agy_bin)"
 
     cmux_invoke() {
-        if [[ -n "${CMUX_SOCKET_PATH:-}" ]]; then
-            "$CMUX_BIN" --socket "$CMUX_SOCKET_PATH" "$@"
+        if [[ -n "${WMUX_SOCKET_PATH:-}" ]]; then
+            "$WMUX_BIN" --socket "$WMUX_SOCKET_PATH" "$@"
         else
-            "$CMUX_BIN" "$@"
+            "$WMUX_BIN" "$@"
         fi
     }
 
-    # Verify cmux socket connectivity
+    # Verify wmux socket connectivity
     if ! cmux_invoke ping >/dev/null 2>&1; then
-        echo "Error: Cannot connect to wmux/cmux control socket." >&2
-        if [[ -n "${CMUX_SOCKET_PATH:-}" ]]; then
-            echo "CMUX_SOCKET_PATH='$CMUX_SOCKET_PATH' is unreachable." >&2
+        echo "Error: Cannot connect to wmux/wmux control socket." >&2
+        if [[ -n "${WMUX_SOCKET_PATH:-}" ]]; then
+            echo "WMUX_SOCKET_PATH='$WMUX_SOCKET_PATH' is unreachable." >&2
         else
-            echo "CMUX_SOCKET_PATH is not set and default socket is not active." >&2
+            echo "WMUX_SOCKET_PATH is not set and default socket is not active." >&2
         fi
         exit 1
     fi
@@ -452,7 +452,7 @@ cmd_run() {
     local SURFACE_FILE="$STATE_DIR/surface_id"
     local WORKSPACE_FILE="$STATE_DIR/workspace_id"
 
-    # Status Bar integration: task status JSON in ~/.config/cmux/subagents
+    # Status Bar integration: task status JSON in ~/.config/wmux/subagents
     mkdir -p "$SUBAGENTS_DIR"
     STATUS_JSON="$SUBAGENTS_DIR/${TASK_ID}.json"
     CLEANUP_STATUS_JSON="$STATUS_JSON"
@@ -471,8 +471,8 @@ TARGET_DIR=$(printf '%q' "$TARGET_DIR")
 TITLE=$(printf '%q' "$TITLE")
 TASK_ID=$(printf '%q' "$TASK_ID")
 AGY_BIN=$(printf '%q' "$AGY_BIN")
-CMUX_BIN=$(printf '%q' "$CMUX_BIN")
-CMUX_SOCKET_PATH=$(printf '%q' "${CMUX_SOCKET_PATH:-}")
+WMUX_BIN=$(printf '%q' "$WMUX_BIN")
+WMUX_SOCKET_PATH=$(printf '%q' "${WMUX_SOCKET_PATH:-}")
 STATUS_JSON=$(printf '%q' "$STATUS_JSON")
 START_TIME=$(printf '%q' "$START_TIME")
 ACCOUNT_ID=$(printf '%q' "${ACCOUNT:-}")
@@ -497,11 +497,11 @@ printf '\033[1;36m%s\033[0m\n' "================================================
 printf '\033[1;36m  wmux Subagent: %s\033[0m\n' "\$TITLE"
 printf '\033[0;33m  Task ID:   \033[0m%s\n' "\$TASK_ID"
 printf '\033[0;33m  Directory: \033[0m%s\n' "\$TARGET_DIR"
-if [[ -n "\${CMUX_SURFACE_ID:-}" ]]; then
-    printf '\033[0;33m  Surface:   \033[0m%s\n' "\$CMUX_SURFACE_ID"
+if [[ -n "\${WMUX_SURFACE_ID:-}" ]]; then
+    printf '\033[0;33m  Surface:   \033[0m%s\n' "\$WMUX_SURFACE_ID"
 fi
-if [[ -n "\${CMUX_AGY_ISOLATED_ACCOUNT:-}" ]]; then
-    printf '\033[0;33m  Account:   \033[0m%s\n' "\$CMUX_AGY_ISOLATED_ACCOUNT"
+if [[ -n "\${WMUX_AGY_ISOLATED_ACCOUNT:-}" ]]; then
+    printf '\033[0;33m  Account:   \033[0m%s\n' "\$WMUX_AGY_ISOLATED_ACCOUNT"
 fi
 printf '\033[1;36m%s\033[0m\n\n' "============================================================"
 
@@ -648,7 +648,7 @@ cat << REPORT_EOF > "\$REPORT_FILE"
 | **Duration** | \`\${DURATION}s\` |
 | **Started** | \`\$START_DATE\` |
 | **Directory** | \`\$TARGET_DIR\` |
-| **Surface** | \`\${CMUX_SURFACE_ID:-unknown}\` |
+| **Surface** | \`\${WMUX_SURFACE_ID:-unknown}\` |
 
 ## Instructions / Prompt
 > \$(cat "\$STATE_DIR/prompt.txt" 2>/dev/null || echo "\$PROMPT")
@@ -678,11 +678,11 @@ printf '\033[0;36m  Execution logs and diffs are preserved above for inspection.
 printf '\033[0;37m  Type \033[1mexit\033[0m\033[0;37m or press \033[1mCtrl+D\033[0m\033[0;37m to close this pane when finished.\033[0m\n'
 printf '\033[1;32m%s\033[0m\n\n' "============================================================"
 
-ACTIVE_SURFACE="\${CMUX_SURFACE_ID:-}"
+ACTIVE_SURFACE="\${WMUX_SURFACE_ID:-}"
 if [[ -z "\$ACTIVE_SURFACE" && -f "\$STATE_DIR/surface_id" ]]; then
     ACTIVE_SURFACE="\$(cat "\$STATE_DIR/surface_id" 2>/dev/null || true)"
 fi
-ACTIVE_WORKSPACE="\${CMUX_WORKSPACE_ID:-}"
+ACTIVE_WORKSPACE="\${WMUX_WORKSPACE_ID:-}"
 if [[ -z "\$ACTIVE_WORKSPACE" && -f "\$STATE_DIR/workspace_id" ]]; then
     ACTIVE_WORKSPACE="\$(cat "\$STATE_DIR/workspace_id" 2>/dev/null || true)"
 fi
@@ -832,7 +832,7 @@ except Exception:
         while [[ ! -f "$DONE_FILE" ]]; do
             sleep 0.5
             (( wait_count++ ))
-            # After grace period (5s), verify target surface still exists in cmux
+            # After grace period (5s), verify target surface still exists in wmux
             if (( wait_count > 10 )) && (( wait_count % 6 == 0 )) && [[ -n "$TARGET_SURFACE" ]]; then
                 if ! cmux_invoke list-panels --id-format both 2>/dev/null | grep -q "$TARGET_SURFACE"; then
                     echo "[wmux-subagent] Notice: Subagent surface $TARGET_SURFACE is no longer active." >&2

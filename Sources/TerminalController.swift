@@ -5,7 +5,6 @@ import AppKit
 import CmuxRemoteSession
 import CmuxCore
 import CmuxAuthRuntime
-import CmuxFeedback
 import CmuxBrowser
 import CmuxControlSocket
 import CmuxFoundation
@@ -29,7 +28,6 @@ import WebKit
 import CmuxSidebar
 import CmuxWorkspaces
 import CmuxNotifications
-import CmuxSimulator
 private let mobileReconnectDebugLog = Logger(subsystem: "dev.cmux", category: "mobile-reconnect-debug")
 extension Notification.Name {
     static let socketListenerDidStart = Notification.Name("cmux.socketListenerDidStart")
@@ -630,28 +628,8 @@ class TerminalController {
                 )
             )
         }
-        let simulatorOwnershipFileManager = FileManager()
-        let simulatorApplicationSupportDirectory = simulatorOwnershipFileManager.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask
-        )[0]
-        let simulatorDurableRecoveryDirectory = simulatorApplicationSupportDirectory
-            .appendingPathComponent(
-                "com.cmux.simulator-ownership",
-                isDirectory: true
-            )
-        let simulatorOwnershipDirectory = simulatorOwnershipFileManager.temporaryDirectory
-            .appendingPathComponent(
-                "com.cmux.simulator-ownership",
-                isDirectory: true
-            )
-        self.simulatorLocationOwnershipScope = SimulatorLocationOwnershipScope(
-            ownershipDirectory: simulatorOwnershipDirectory,
-            recoveryDirectory: simulatorDurableRecoveryDirectory
-        )
-        self.simulatorCameraCleanupOwnershipScope = SimulatorCameraCleanupOwnershipScope(
-            directory: simulatorOwnershipDirectory
-        )
+        self.simulatorLocationOwnershipScope = SimulatorLocationOwnershipScope()
+        self.simulatorCameraCleanupOwnershipScope = SimulatorCameraCleanupOwnershipScope()
         self.nativeSSHConnectionBroker = nativeSSHConnectionBroker
         let serverEventTarget = ServerEventTarget()
         let socketServer = SocketControlServer(
@@ -1135,26 +1113,7 @@ class TerminalController {
     }
 
     func startSimulatorMutationRecovery() {
-        guard simulatorMutationRecoveryTask == nil else { return }
-        let locationOwnershipScope = simulatorLocationOwnershipScope
-        let cameraOwnershipScope = simulatorCameraCleanupOwnershipScope
-        simulatorMutationRecoveryTask = Task { @MainActor [weak self] in
-            let service = SimulatorControlService(
-                locationOwnershipScope: locationOwnershipScope,
-                cameraCleanupOwnershipScope: cameraOwnershipScope
-            )
-            async let cameraSucceeded = service.recoverOrphanedCameraAuthorizations()
-            async let locationSucceeded = service.recoverOrphanedLocationRoutes()
-            let results = await (cameraSucceeded, locationSucceeded)
-            StartupBreadcrumbLog.append(
-                "simulator.mutation.launchRecovery",
-                fields: [
-                    "cameraSucceeded": results.0 ? "1" : "0",
-                    "locationSucceeded": results.1 ? "1" : "0",
-                ]
-            )
-            self?.simulatorMutationRecoveryTask = nil
-        }
+        // No-op for wmux: simulator is disabled
     }
 
     func start(
@@ -6500,51 +6459,7 @@ class TerminalController {
     }
 
     private nonisolated func v2FeedbackSubmit(params: [String: Any]) -> V2CallResult {
-        guard let email = params["email"] as? String else {
-            return .err(code: "invalid_params", message: "Missing email", data: ["field": "email"])
-        }
-        guard let body = params["body"] as? String else {
-            return .err(code: "invalid_params", message: "Missing body", data: ["field": "body"])
-        }
-        let imagePaths = params["image_paths"] as? [String] ?? []
-
-        let semaphore = DispatchSemaphore(value: 0)
-        var result: V2CallResult = .err(code: "internal_error", message: "Feedback submission failed", data: nil)
-
-        Task {
-            let resolved: V2CallResult
-            do {
-                let attachmentCount = try await FeedbackComposerBridge().submit(
-                    email: email,
-                    message: body,
-                    imagePaths: imagePaths
-                )
-                resolved = .ok([
-                    "submitted": true,
-                    "attachment_count": attachmentCount,
-                ])
-            } catch let error as FeedbackComposerBridgeError {
-                let code: String
-                switch error {
-                case .invalidEmail, .emptyMessage, .messageTooLong, .tooManyImages, .invalidImagePath:
-                    code = "invalid_params"
-                case .submissionFailed:
-                    code = "request_failed"
-                }
-                resolved = .err(code: code, message: error.localizedDescription, data: nil)
-            } catch {
-                resolved = .err(code: "internal_error", message: error.localizedDescription, data: nil)
-            }
-
-            result = resolved
-            semaphore.signal()
-        }
-
-        if semaphore.wait(timeout: .now() + 35) == .timedOut {
-            return .err(code: "timeout", message: "Feedback submission timed out", data: nil)
-        }
-
-        return result
+        .err(code: "unsupported", message: "Feedback submission is disabled in local wmux", data: nil)
     }
 
     // MARK: - V2 Feed (workstream) handlers
@@ -15563,42 +15478,7 @@ class TerminalController {
     /// active connection, so this exists in Release builds too (the team can
     /// dogfood beta/prod), and only a Mac that runs the watcher acts on it.
     func v2MobileDogfoodFeedbackSubmit(params: [String: Any]) async -> V2CallResult {
-        // Privilege check at the trust boundary: the mobile data plane only
-        // accepts same-account connections, so the caller is this Mac's own Stack
-        // account. The service re-enforces the @manaflow.ai gate, but we resolve
-        // the authenticated email here because it requires the main-actor
-        // `MobileHostService`. (The phone also gates the route on `@manaflow.ai`
-        // + `dogfood.v1`, but the Mac is the real boundary.)
-        let localEmail = await MobileHostService.shared.currentAuthenticatedLocalUserEmail()
-        let submission = DogfoodFeedbackSubmission(
-            text: v2RawString(params, "text") ?? "",
-            terminalText: v2RawString(params, "terminal_text") ?? "",
-            buildStamp: v2RawString(params, "build_stamp") ?? "",
-            diagnosticBlobBase64: v2RawString(params, "diagnostic_blob_base64") ?? ""
-        )
-        let outcome = await DogfoodFeedbackService().submit(submission, authenticatedEmail: localEmail)
-        switch outcome {
-        case let .written(bundlePath, diagnosticLogBytes):
-            return .ok([
-                "ok": true,
-                "bundle_path": bundlePath,
-                "diagnostic_log_bytes": diagnosticLogBytes,
-            ])
-        case .unauthorized:
-            return .err(
-                code: "unauthorized",
-                message: "Feedback agent sink is restricted to privileged accounts",
-                data: nil
-            )
-        case let .invalidParams(reason):
-            return .err(code: "invalid_params", message: reason, data: nil)
-        case .internalError:
-            return .err(
-                code: "internal_error",
-                message: "Failed to persist dogfood feedback bundle",
-                data: nil
-            )
-        }
+        .err(code: "unsupported", message: "Dogfood feedback is disabled in local wmux", data: nil)
     }
 
     /// Publish a `terminal.set_font` event to connected iOS device(s) so the

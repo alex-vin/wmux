@@ -1,7 +1,10 @@
-import CmuxHive
 import CmuxSettingsUI
 import CmuxSurfaceCatalogModel
 import Foundation
+
+struct HivePairedComputer: Equatable, Sendable, Identifiable {
+    let id: String
+}
 
 @MainActor
 final class HiveComputersService {

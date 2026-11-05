@@ -361,10 +361,10 @@ final class CmuxFeatureFlags {
     }
 
     var isComputerUseUXEnabled: Bool {
-        effectiveValue(for: Self.computerUseUXFlag)
+        false
     }
     var isSimulatorEnabled: Bool {
-        effectiveValue(for: Self.simulatorFlag)
+        false
     }
     var isWorkspaceTodoControlsEnabled: Bool {
         effectiveValue(for: Self.workspaceTodoControlsFlag)

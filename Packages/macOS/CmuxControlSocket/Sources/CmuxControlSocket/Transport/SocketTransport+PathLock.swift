@@ -120,8 +120,15 @@ extension SocketTransport {
         let filename = URL(fileURLWithPath: (path as NSString).standardizingPath)
             .lastPathComponent
             .lowercased()
-        let recoverablePrefixes = ["cmux-debug-", "cmux-nightly-", "cmux-rc-", "cmux-staging-"]
-        return filename == "cmux-debug.sock" ||
+        let recoverablePrefixes = [
+            "wmux-debug-", "wmux-nightly-", "wmux-rc-", "wmux-staging-",
+            "cmux-debug-", "cmux-nightly-", "cmux-rc-", "cmux-staging-"
+        ]
+        return filename == "wmux-debug.sock" ||
+            filename == "wmux-nightly.sock" ||
+            filename == "wmux-rc.sock" ||
+            filename == "wmux-staging.sock" ||
+            filename == "cmux-debug.sock" ||
             filename == "cmux-nightly.sock" ||
             filename == "cmux-rc.sock" ||
             filename == "cmux-staging.sock" ||

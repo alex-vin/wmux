@@ -1,6 +1,9 @@
 import Foundation
 import AppKit
-import CmuxUpdater
+
+protocol UpdateLogging: Sendable {
+    func append(_ message: String)
+}
 
 // @unchecked Sendable: all mutable state (`entries`) is confined to the serial `queue`; the
 // other stored properties are immutable. Conforms to CmuxUpdater's `UpdateLogging` seam so the

@@ -106,7 +106,7 @@ struct CLISocketPathResolution: Sendable {
     var failureMessage: String {
         let header = String(
             localized: "cli.socket.error.discoveryFailed",
-            defaultValue: "No live cmux socket found. Tried:"
+            defaultValue: "No live wmux socket found. Tried:"
         )
         let paths = candidatePaths.map { "  \($0)" }.joined(separator: "\n")
         return paths.isEmpty ? header : "\(header)\n\(paths)"
@@ -117,7 +117,7 @@ struct CLISocketPathResolution: Sendable {
         guard let selectedPath, didReroute else { return nil }
         let template = String(
             localized: "cli.socket.notice.rerouted",
-            defaultValue: "cmux: default socket %@ is unavailable; using %@."
+            defaultValue: "wmux: default socket %@ is unavailable; using %@."
         )
         return String.localizedStringWithFormat(template, requestedPath, selectedPath)
     }
@@ -131,12 +131,12 @@ struct CLISocketPathResolver {
         case inaccessible(errnoCode: Int32)
     }
 
-    private static let stableSocketFileName = "cmux.sock"
-    static let legacyDefaultSocketPath = "/tmp/cmux.sock"
-    private static let fallbackSocketPath = "/tmp/cmux-debug.sock"
-    private static let nightlySocketPath = "/tmp/cmux-nightly.sock"
-    private static let rcSocketPath = "/tmp/cmux-rc.sock"
-    private static let stagingSocketPath = "/tmp/cmux-staging.sock"
+    private static let stableSocketFileName = "wmux.sock"
+    static let legacyDefaultSocketPath = "/tmp/wmux.sock"
+    private static let fallbackSocketPath = "/tmp/wmux-debug.sock"
+    private static let nightlySocketPath = "/tmp/wmux-nightly.sock"
+    private static let rcSocketPath = "/tmp/wmux-rc.sock"
+    private static let stagingSocketPath = "/tmp/wmux-staging.sock"
 
     private let environment: [String: String]
     private let bundleIdentifier: String?
@@ -219,12 +219,12 @@ struct CLISocketPathResolver {
 
     private static func userScopedStableSocketPath(currentUserID: uid_t = getuid()) -> String {
         stableSocketDirectoryURL()?
-            .appendingPathComponent("cmux-\(currentUserID).sock", isDirectory: false)
+            .appendingPathComponent("wmux-\(currentUserID).sock", isDirectory: false)
             .path ?? legacyUserScopedStableSocketPath(currentUserID: currentUserID)
     }
 
     private static func legacyUserScopedStableSocketPath(currentUserID: uid_t = getuid()) -> String {
-        "/tmp/cmux-\(currentUserID).sock"
+        "/tmp/wmux-\(currentUserID).sock"
     }
 
     static func isImplicitDefaultPath(
@@ -347,7 +347,7 @@ struct CLISocketPathResolver {
         Self.dedupe([
             resolvedStableDefaultSocketPath,
             Self.legacyDefaultSocketPath,
-            stateDirectory.appendingPathComponent("cmux-\(currentUserID).sock", isDirectory: false).path,
+            stateDirectory.appendingPathComponent("wmux-\(currentUserID).sock", isDirectory: false).path,
             Self.legacyUserScopedStableSocketPath(currentUserID: currentUserID),
         ])
     }

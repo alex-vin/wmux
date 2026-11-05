@@ -36,6 +36,7 @@ strip_if_macho() {
   local path="$1"
   local mode="${2:-}"
   [ -f "$path" ] || return 0
+  [ ! -L "$path" ] || return 0
   [ -x "$path" ] || return 0
   if ! "$FILE_TOOL" "$path" | grep -q 'Mach-O'; then
     return 0
@@ -57,10 +58,19 @@ strip_executable() {
   strip_if_macho "$1" full
 }
 
-strip_executable "$APP_PATH/Contents/MacOS/cmux"
-strip_executable "$APP_PATH/Contents/Resources/bin/cmux"
-strip_executable "$APP_PATH/Contents/Resources/bin/cmux-tui"
-strip_executable "$APP_PATH/Contents/Resources/bin/cmux-diff-sidecar"
+# Strips application executables in Contents/MacOS (cmux, wmux, etc.)
+if [ -d "$APP_PATH/Contents/MacOS" ]; then
+  for bin in "$APP_PATH/Contents/MacOS"/*; do
+    [ -f "$bin" ] && strip_executable "$bin"
+  done
+fi
+
+# Strips binaries in Contents/Resources/bin
+if [ -d "$APP_PATH/Contents/Resources/bin" ]; then
+  for bin in "$APP_PATH/Contents/Resources/bin"/*; do
+    [ -f "$bin" ] && strip_executable "$bin"
+  done
+fi
 
 # cmux-tui SSH bootstrap payloads are installed 0644, so strip_if_macho's
 # executable check would skip them. Only the macOS builds are Mach-O; the Linux
@@ -84,7 +94,7 @@ fi
 if [ -d "$APP_PATH/Contents/Frameworks" ]; then
   while IFS= read -r -d '' binary; do
     strip_if_macho "$binary"
-  done < <(find "$APP_PATH/Contents/Frameworks" -maxdepth 1 -name 'libcmux_*.dylib' -type f -print0)
+  done < <(find "$APP_PATH/Contents/Frameworks" \( -name '*.dylib' -o -type f \) -print0)
 fi
 
 if [ -d "$APP_PATH/Contents/Library/SystemExtensions" ]; then

@@ -219,7 +219,7 @@ struct CodexTurnLedgerFile: Codable {
     }
 }
 
-extension CMUXCLI {
+extension WMUXCLI {
     /// Builds one Codex invocation identity per hook. The inherited owner PID
     /// remains a claim and never supplies the nested decision alone.
     func codexHookInvocation(environment: [String: String]) -> CodexHookInvocation {

@@ -42,6 +42,17 @@ if [ ! -d "GhosttyKit.xcframework" ]; then
 else
   echo "GhosttyKit.xcframework exists."
 fi
+
+GHOSTTY_ARCHIVE="GhosttyKit.xcframework/macos-arm64_x86_64/ghostty-internal.a"
+if [ -f "$GHOSTTY_ARCHIVE" ]; then
+  if lipo -info "$GHOSTTY_ARCHIVE" 2>/dev/null | grep -q "^Architectures in the fat file:"; then
+    echo "⚡ Thinning GhosttyKit static library to arm64 and stripping debug symbols..."
+    lipo -thin arm64 "$GHOSTTY_ARCHIVE" -output /tmp/ghostty-arm64.a
+    strip -S /tmp/ghostty-arm64.a
+    mv /tmp/ghostty-arm64.a "$GHOSTTY_ARCHIVE"
+    echo "GhosttyKit thinned successfully."
+  fi
+fi
 log_step "GhosttyKit preparation"
 
 echo "=== 3. Compiling macOS Application via xcodebuild (Release) ==="
@@ -81,6 +92,11 @@ else
   exit 1
 fi
 echo "Found application bundle: $APP_PATH"
+
+echo "=== 4.1. Stripping and Pruning Release Bundle ==="
+./scripts/prune-release-bundle.sh "$APP_PATH"
+./scripts/strip-release-bundle.sh "$APP_PATH"
+log_step "Bundle stripping and bloat pruning"
 
 echo "=== 5. Ad-hoc Codesigning App Bundle ==="
 codesign --force --deep -s - "$APP_PATH"

@@ -1,4 +1,3 @@
-import CmuxSimulator
 import Foundation
 
 // SAFETY: `lock` protects the sole result slot shared by the detached command

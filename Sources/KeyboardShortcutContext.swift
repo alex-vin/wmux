@@ -1,6 +1,5 @@
 import AppKit
 import CmuxSettings
-import CmuxSimulatorUI
 import CmuxTerminal
 import WebKit
 

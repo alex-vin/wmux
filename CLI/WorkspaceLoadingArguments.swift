@@ -7,7 +7,7 @@ struct WorkspaceLoadingArguments {
     let window: String?
 }
 
-extension CMUXCLI {
+extension WMUXCLI {
     func validateWorkspaceLoadingCommandBeforeSocket(
         command: String,
         commandArgs: [String]
@@ -22,7 +22,7 @@ extension CMUXCLI {
     func workspaceLoadingUsage() -> String {
         String(
             localized: "cli.workspaceLoading.usage",
-            defaultValue: "Usage: cmux workspace loading <on|off> [--id <name>] [--workspace <id>] [--window <id>] [--json]"
+            defaultValue: "Usage: wmux workspace loading <on|off> [--id <name>] [--workspace <id>] [--window <id>] [--json]"
         )
     }
 

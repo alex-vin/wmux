@@ -21,7 +21,7 @@ struct TmuxWaitForSignal {
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
         fileName = (encoded.isEmpty ? "empty" : encoded) + ".sig"
-        directoryPath = Self.userTemporaryDirectory() + "cmux-wait-for"
+        directoryPath = Self.userTemporaryDirectory() + "wmux-wait-for"
         path = directoryPath + "/" + fileName
     }
 

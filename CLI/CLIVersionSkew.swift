@@ -48,7 +48,7 @@ enum CLIVersionSkew {
     }
 
     /// The product name this CLI belongs to, as `system.identify` reports it.
-    static let cliProduct = "cmux"
+    static let cliProduct = "wmux"
 
     /// The user-facing explanation, or nil when the original error already
     /// says enough: the app is the same build as this CLI, lists the method,
@@ -146,7 +146,7 @@ enum CLIVersionSkew {
                 fix = String(
                     format: String(
                         localized: "cli.versionSkew.fix.otherProductNoPath",
-                        defaultValue: "This socket belongs to %@, which has its own CLI. Run the cmux CLI inside that app's bundle (Contents/Resources/bin/cmux).",
+                        defaultValue: "This socket belongs to %@, which has its own CLI. Run the wmux CLI inside that app's bundle (Contents/Resources/bin/wmux).",
                         bundle: bundle
                     ),
                     locale: .current,
@@ -158,11 +158,11 @@ enum CLIVersionSkew {
             fix = String(
                 format: String(
                     localized: "cli.versionSkew.fix.cliOlder",
-                    defaultValue: "This CLI is older than the app. Run the app's CLI, %@, or remove the older cmux from PATH.",
+                    defaultValue: "This CLI is older than the app. Run the app's CLI, %@, or remove the older wmux from PATH.",
                     bundle: bundle
                 ),
                 locale: .current,
-                peerCLI ?? "Contents/Resources/bin/cmux"
+                peerCLI ?? "Contents/Resources/bin/wmux"
             )
         } else if order == .orderedDescending || (peer != nil && peer?.app == nil && peer?.version == nil) {
             // The app is older, or answers identify without `app` and
@@ -170,7 +170,7 @@ enum CLIVersionSkew {
             // usually an installed update waiting for a relaunch.
             fix = String(
                 localized: "cli.versionSkew.fix.appOlder",
-                defaultValue: "The running app is older than this CLI. Quit and reopen cmux to finish an installed update, or update it with cmux > Check for Updates.",
+                defaultValue: "The running app is older than this CLI. Quit and reopen wmux to finish an installed update, or update it with wmux > Check for Updates.",
                 bundle: bundle
             )
         } else {
@@ -178,7 +178,7 @@ enum CLIVersionSkew {
             // the direction of the skew is unknown, so do not guess it.
             fix = String(
                 localized: "cli.versionSkew.fix.unknown",
-                defaultValue: "Could not read the app's version. Compare it in cmux > About cmux with this CLI, then relaunch or update the older one.",
+                defaultValue: "Could not read the app's version. Compare it in wmux > About wmux with this CLI, then relaunch or update the older one.",
                 bundle: bundle
             )
         }

@@ -377,7 +377,7 @@ final class CLISocketSentryTelemetry {
         event.environment = "production-cli"
 #endif
         event.tags = [
-            "component": "cmux-cli",
+            "component": "wmux-cli",
             "cli_command": command,
             "cli_subcommand": subcommand
         ]
@@ -482,7 +482,7 @@ final class CLISocketSentryTelemetry {
         for (key, value) in data {
             payload[key] = value
         }
-        let crumb = Breadcrumb(level: .info, category: "cmux.cli")
+        let crumb = Breadcrumb(level: .info, category: "wmux.cli")
         crumb.message = message
         crumb.data = payload
         return crumb
@@ -565,7 +565,7 @@ final class CLISocketSentryTelemetry {
         }
         var sockets: [String] = []
         for name in entries.sorted() {
-            guard name.hasPrefix("cmux"), name.hasSuffix(".sock") else { continue }
+            guard name.hasPrefix("wmux"), name.hasSuffix(".sock") else { continue }
             let fullPath = URL(fileURLWithPath: directory)
                 .appendingPathComponent(name, isDirectory: false)
                 .path

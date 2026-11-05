@@ -20,7 +20,7 @@ struct TerminalPastePreparationWorkerClient: Sendable {
         executableURL: URL,
         pasteboardService: TerminalPasteboardService,
         plainTextExecutableURL: URL? = Bundle.main.url(
-            forResource: "cmux-paste-text-worker",
+            forResource: "wmux-paste-text-worker",
             withExtension: nil,
             subdirectory: "bin"
         ),
@@ -50,7 +50,7 @@ struct TerminalPastePreparationWorkerClient: Sendable {
             executableURL: binary,
             pasteboardService: pasteboardService,
             plainTextExecutableURL: Bundle.main.url(
-                forResource: "cmux-paste-text-worker",
+                forResource: "wmux-paste-text-worker",
                 withExtension: nil,
                 subdirectory: "bin"
             ),

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# cmux open wrapper - routes HTTP(S) URLs to cmux's in-app browser
+# wmux open wrapper - routes HTTP(S) URLs to wmux's in-app browser
 #
-# When running inside a cmux terminal (CMUX_SOCKET_PATH is set), this wrapper
-# intercepts `open https://...` invocations and opens them in cmux's built-in
+# When running inside a wmux terminal (WMUX_SOCKET_PATH is set), this wrapper
+# intercepts `open https://...` invocations and opens them in wmux's built-in
 # browser within the same workspace. All other arguments pass through to
 # /usr/bin/open unchanged.
 
-SYSTEM_OPEN_BIN="${CMUX_OPEN_WRAPPER_SYSTEM_OPEN:-/usr/bin/open}"
-DEFAULTS_BIN="${CMUX_OPEN_WRAPPER_DEFAULTS:-/usr/bin/defaults}"
-PYTHON3_BIN="${CMUX_OPEN_WRAPPER_PYTHON3:-}"
+SYSTEM_OPEN_BIN="${WMUX_OPEN_WRAPPER_SYSTEM_OPEN:-/usr/bin/open}"
+DEFAULTS_BIN="${WMUX_OPEN_WRAPPER_DEFAULTS:-/usr/bin/defaults}"
+PYTHON3_BIN="${WMUX_OPEN_WRAPPER_PYTHON3:-}"
 
 if [[ ! -x "$SYSTEM_OPEN_BIN" ]]; then
     SYSTEM_OPEN_BIN="/usr/bin/open"
@@ -26,7 +26,7 @@ elif command -v python3 >/dev/null 2>&1; then
     PYTHON3_BIN="$(command -v python3)"
 fi
 
-settings_domain="${CMUX_BUNDLE_ID:-}"
+settings_domain="${WMUX_BUNDLE_ID:-}"
 whitelist_raw=""
 whitelist_patterns=()
 
@@ -381,7 +381,7 @@ load_whitelist_patterns() {
 }
 
 # Preserve the caller's original locale before forcing C below, so it can be
-# restored for child processes (system_open, the cmux CLI) -- forcing C is
+# restored for child processes (system_open, the wmux CLI) -- forcing C is
 # only needed for this script's own bash pattern matching, not for what it
 # dispatches to. ${LC_ALL+is_set} distinguishes "unset" from "set to empty".
 if [[ -n "${LC_ALL+is_set}" ]]; then
@@ -402,8 +402,8 @@ fi
 # purely literal patterns with no wildcards.
 export LC_ALL=C
 
-# Pass through immediately if not in a cmux terminal.
-if [[ -z "$CMUX_SOCKET_PATH" ]]; then
+# Pass through immediately if not in a wmux terminal.
+if [[ -z "$WMUX_SOCKET_PATH" ]]; then
     system_open "$@"
 fi
 
@@ -413,7 +413,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # Scan for flags that indicate explicit user intent → pass through.
-# Also collect non-flag arguments and route eligible browser targets to cmux.
+# Also collect non-flag arguments and route eligible browser targets to wmux.
 passthrough=false
 cmux_targets=()
 passthrough_args=()
@@ -486,16 +486,16 @@ if [[ -n "$settings_domain" ]]; then
 
 fi
 
-# Find cmux CLI (same directory as this script).
+# Find wmux CLI (same directory as this script).
 SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
-CMUX_CLI="$SELF_DIR/cmux"
+WMUX_CLI="$SELF_DIR/wmux"
 
-if [[ ! -x "$CMUX_CLI" ]]; then
+if [[ ! -x "$WMUX_CLI" ]]; then
     system_open "$@"
     exit $?
 fi
 
-# Open each URL in cmux's in-app browser; track failures individually.
+# Open each URL in wmux's in-app browser; track failures individually.
 # External-open pattern rules are evaluated in-app (NSRegularExpression) so
 # terminal link clicks and intercepted `open` commands share one regex dialect.
 failed_urls=()
@@ -510,8 +510,8 @@ for url in "${cmux_targets[@]}"; do
         else
             unset LC_ALL
         fi
-        export CMUX_RESPECT_EXTERNAL_OPEN_RULES=1
-        exec "$CMUX_CLI" browser open "$url"
+        export WMUX_RESPECT_EXTERNAL_OPEN_RULES=1
+        exec "$WMUX_CLI" browser open "$url"
     ) 2>/dev/null || failed_urls+=("$url")
 done
 

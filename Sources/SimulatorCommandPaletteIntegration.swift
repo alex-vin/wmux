@@ -1,6 +1,5 @@
 import AppKit
 import CmuxCommandPalette
-import CmuxSimulator
 import CmuxSettings
 import Foundation
 
@@ -83,32 +82,6 @@ extension KeyboardShortcutSettings.Action {
 
 extension AppDelegate {
     func handleSimulatorShortcut(_ event: NSEvent) -> Bool {
-        guard CmuxFeatureFlags.shared.isSimulatorEnabled else { return false }
-        let focusContext = shortcutEventFocusContext(event)
-        guard focusContext.allowsSimulatorShortcutRouting,
-              let panel = focusContext.simulatorPanel,
-              let action = KeyboardShortcutSettings.Action.simulatorActions.first(where: {
-                  matchConfiguredShortcut(event: event, action: $0)
-              }) else {
-            return false
-        }
-        guard !event.isARepeat else { return true }
-
-        switch action {
-        case .simulatorHome:
-            panel.coordinator.press(.home)
-        case .simulatorRotateLeft:
-            panel.coordinator.rotateLeft()
-        case .simulatorRotateRight:
-            panel.coordinator.rotateRight()
-        case .simulatorToggleAppearance:
-            let coordinator = panel.coordinator
-            Task { @MainActor [weak coordinator] in await coordinator?.toggleAppearance() }
-        case .simulatorToggleSoftwareKeyboard:
-            panel.coordinator.toggleSoftwareKeyboard()
-        default:
-            return false
-        }
-        return true
+        false
     }
 }

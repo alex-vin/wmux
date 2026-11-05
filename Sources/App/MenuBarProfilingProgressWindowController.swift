@@ -1,6 +1,10 @@
 import AppKit
-import CmuxFeedback
 import Foundation
+
+struct FeedbackComposerSettings: Sendable {
+    let storedEmailKey: String = "sidebarHelpFeedbackEmail"
+    init() {}
+}
 
 @MainActor
 final class MenuBarProfilingProgressWindowController: NSWindowController {

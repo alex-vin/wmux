@@ -90,7 +90,7 @@ struct LocalTmuxSessionRegistry {
             )
         } else {
             root = fileManager.homeDirectoryForCurrentUser
-                .appendingPathComponent(".cmux", isDirectory: true)
+                .appendingPathComponent(".wmux", isDirectory: true)
                 .appendingPathComponent(directoryName, isDirectory: true)
         }
         return LocalTmuxSessionRegistry(rootURL: root, fileManager: fileManager)
