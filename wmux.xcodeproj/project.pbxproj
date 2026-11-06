@@ -16127,8 +16127,6 @@
 					UniformTypeIdentifiers,
 					"-framework",
 					Carbon,
-					"$(BUILT_PRODUCTS_DIR)/WmuxPhonePush.o",
-					"$(BUILT_PRODUCTS_DIR)/WmuxMobileDiagnostics.o",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.alexvin.wmux.debug;
 				PRODUCT_NAME = "wmux DEV";
@@ -16177,8 +16175,6 @@
 					UniformTypeIdentifiers,
 					"-framework",
 					Carbon,
-					"$(BUILT_PRODUCTS_DIR)/WmuxPhonePush.o",
-					"$(BUILT_PRODUCTS_DIR)/WmuxMobileDiagnostics.o",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.alexvin.wmux;
 				PRODUCT_NAME = wmux;
