@@ -1,4 +1,3 @@
-import WmuxRemoteSession
 import WmuxNotifications
 import WmuxSettings
 import Foundation

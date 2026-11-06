@@ -12,8 +12,18 @@ public struct GeminiQuotaSnapshot: Sendable, Codable, Equatable {
     public var isForbidden: Bool
     /// Explanation if access is forbidden.
     public var forbiddenReason: String?
+    /// Whether account is currently rate limited (HTTP 429 / RESOURCE_EXHAUSTED).
+    public var isRateLimited: Bool
+    /// Explanation if rate limited.
+    public var rateLimitReason: String?
     /// Epoch timestamp (seconds) when this snapshot was captured.
     public var lastUpdatedTimestamp: TimeInterval
+
+    /// Compatibility alias for isRateLimited.
+    public var rateLimited: Bool {
+        get { isRateLimited }
+        set { isRateLimited = newValue }
+    }
 
     /// Creates an empty quota snapshot.
     public init(
@@ -22,6 +32,8 @@ public struct GeminiQuotaSnapshot: Sendable, Codable, Equatable {
         tier: GeminiSubscriptionTier = .free,
         isForbidden: Bool = false,
         forbiddenReason: String? = nil,
+        isRateLimited: Bool = false,
+        rateLimitReason: String? = nil,
         lastUpdatedTimestamp: TimeInterval = Date().timeIntervalSince1970
     ) {
         self.models = models
@@ -29,12 +41,30 @@ public struct GeminiQuotaSnapshot: Sendable, Codable, Equatable {
         self.tier = tier
         self.isForbidden = isForbidden
         self.forbiddenReason = forbiddenReason
+        self.isRateLimited = isRateLimited
+        self.rateLimitReason = rateLimitReason
         self.lastUpdatedTimestamp = lastUpdatedTimestamp
+    }
+
+    public enum CodingKeys: String, CodingKey {
+        case models, groups, tier, isForbidden, forbiddenReason, isRateLimited, rateLimitReason, lastUpdatedTimestamp
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.models = try container.decodeIfPresent([GeminiModelQuota].self, forKey: .models) ?? []
+        self.groups = try container.decodeIfPresent([GeminiQuotaGroup].self, forKey: .groups) ?? []
+        self.tier = try container.decodeIfPresent(GeminiSubscriptionTier.self, forKey: .tier) ?? .free
+        self.isForbidden = try container.decodeIfPresent(Bool.self, forKey: .isForbidden) ?? false
+        self.forbiddenReason = try container.decodeIfPresent(String.self, forKey: .forbiddenReason)
+        self.isRateLimited = try container.decodeIfPresent(Bool.self, forKey: .isRateLimited) ?? false
+        self.rateLimitReason = try container.decodeIfPresent(String.self, forKey: .rateLimitReason)
+        self.lastUpdatedTimestamp = try container.decodeIfPresent(TimeInterval.self, forKey: .lastUpdatedTimestamp) ?? Date().timeIntervalSince1970
     }
 
     /// Finds the flagship model representing this account (e.g. Gemini 3.8 Flash).
     public var flagshipModel: GeminiModelQuota? {
-        guard !isForbidden else { return nil }
+        guard !isForbidden && !isRateLimited else { return nil }
         let displayList = displayModels
         guard !displayList.isEmpty else { return nil }
 
@@ -154,14 +184,16 @@ public struct GeminiQuotaSnapshot: Sendable, Codable, Equatable {
         }
         guard let date = targetDate else { return "" }
 
+        let cleanWording = wording.hasPrefix("后") ? String(wording.dropFirst()) : wording
+
         let delta = date.timeIntervalSince(now)
         if delta <= 0 {
-            return "即将\(wording)"
+            return "即将\(cleanWording)"
         }
 
         let totalMinutes = Int((delta / 60.0).rounded())
         if totalMinutes < 1 {
-            return "即将\(wording)"
+            return "即将\(cleanWording)"
         }
         if totalMinutes < 60 {
             return "\(totalMinutes)m\(wording)"
@@ -216,7 +248,7 @@ public struct GeminiQuotaSnapshot: Sendable, Codable, Equatable {
         let base = stripThinkingLevel(from: modelID)
         let parts = base.split(separator: "-")
         for part in parts {
-            if let ver = Double(part) {
+            if Double(part) != nil {
                 let sub = String(part).split(separator: ".").compactMap { Int($0) }
                 if !sub.isEmpty { return sub }
             }

@@ -1,5 +1,4 @@
 import AppKit
-import WmuxRemoteSession
 import Bonsplit
 import WmuxControlSocket
 import WmuxTerminal

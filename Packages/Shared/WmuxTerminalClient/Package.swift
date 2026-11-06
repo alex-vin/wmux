@@ -14,8 +14,8 @@ import PackageDescription
 // Set WMUX_TERMINAL_CLIENT_FORCE_REMOTE_XCFRAMEWORK to ignore a local copy.
 // Set WMUX_TERMINAL_CLIENT_MODEL_ONLY to build and test only the pure Swift
 // model target, for a checkout with no binary available at all.
-let releaseRepository = "manaflow-ai/wmux"
-let releaseTag = "wmux-terminal-client-v0.1.0+6ba5de550cd4"
+let releaseRepository = "manaflow-ai/cmux"
+let releaseTag = "cmux-terminal-client-v0.1.0+6ba5de550cd4"
 let releaseChecksum = "ecda518668cb64ad54c25869dd0996fc99e63c738bfa5e176b2b524d78290681"
 
 let packageDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
@@ -32,7 +32,7 @@ let ffiBinary: Target =
     : .binaryTarget(
         name: "WmuxTerminalClientFFI",
         url:
-            "https://github.com/\(releaseRepository)/releases/download/\(releaseTag)/WmuxTerminalClient.xcframework.zip",
+            "https://github.com/\(releaseRepository)/releases/download/\(releaseTag)/CmuxTerminalClient.xcframework.zip",
         checksum: releaseChecksum)
 
 let modelOnly = ProcessInfo.processInfo.environment["WMUX_TERMINAL_CLIENT_MODEL_ONLY"] != nil

@@ -1,4 +1,3 @@
-import WMUXMobileCore
 import Foundation
 
 extension GhosttySurfaceScrollView {

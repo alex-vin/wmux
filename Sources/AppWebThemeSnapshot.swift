@@ -1,5 +1,4 @@
 import WmuxFoundation
-import WmuxCloud
 import AppKit
 import WmuxBrowser
 import WmuxTerminalCore

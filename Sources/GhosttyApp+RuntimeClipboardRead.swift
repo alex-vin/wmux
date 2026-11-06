@@ -1,4 +1,3 @@
-import WmuxCloud
 import AppKit
 import WmuxTerminal
 import WmuxTerminalCore

@@ -1,6 +1,5 @@
 import AppKit
 import WmuxBrowser
-import WMUXMobileCore
 import Foundation
 import WebKit
 

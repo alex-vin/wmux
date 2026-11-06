@@ -1,8 +1,4 @@
-import WmuxCloud
-import WmuxCloudBannerCore
 import WmuxProductAnalytics
-import WmuxCloudTui
-import WmuxCloudMachines
 import AppKit
 import WmuxAppKitSupportUI
 import WmuxAuthRuntime
@@ -34,7 +30,6 @@ import WmuxFoundation
 import WmuxSidebar
 import WmuxGit
 import WmuxGeminiQuota
-import WmuxCloudTui
 import os
 
 private nonisolated let sudoApprovalLogger = Logger(

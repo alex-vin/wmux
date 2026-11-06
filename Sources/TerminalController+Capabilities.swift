@@ -1,5 +1,4 @@
 import WmuxControlSocket
-import WmuxRemoteWorkspace
 import Foundation
 
 /// Discovery responses for local callers and authenticated remote relays.

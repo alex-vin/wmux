@@ -1,4 +1,3 @@
-import WmuxCloud
 import WmuxControlSocket
 import WmuxSettings
 import WmuxSurfaceCatalogModel

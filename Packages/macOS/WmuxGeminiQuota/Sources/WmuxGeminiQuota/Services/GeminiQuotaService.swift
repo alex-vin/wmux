@@ -24,7 +24,17 @@ public actor GeminiQuotaService {
 
         // 1. loadCodeAssist -> project ID and subscription tier
         let metaBody = ["metadata": ["ideType": "ANTIGRAVITY"]]
-        let (projectJSON, _) = await postJSONSequential(endpoints: GeminiEndpoints.loadCodeAssist, body: metaBody, token: token)
+        let (projectJSON, projectResp) = await postJSONSequential(endpoints: GeminiEndpoints.loadCodeAssist, body: metaBody, token: token)
+
+        if Self.isRateLimited(projectJSON, response: projectResp) {
+            var snap = GeminiQuotaSnapshot()
+            snap.isRateLimited = true
+            snap.rateLimitReason = Self.extractRateLimitReason(projectJSON, response: projectResp)
+            snap.tier = .free
+            snap.lastUpdatedTimestamp = Date().timeIntervalSince1970
+            updated.quota = snap
+            return updated
+        }
 
         var projectID: String? = nil
         var detectedTier: GeminiSubscriptionTier = .free
@@ -54,6 +64,16 @@ public actor GeminiQuotaService {
             return updated
         }
 
+        if Self.isRateLimited(modelsJSON, response: modelsResp) {
+            var snap = GeminiQuotaSnapshot()
+            snap.isRateLimited = true
+            snap.rateLimitReason = Self.extractRateLimitReason(modelsJSON, response: modelsResp)
+            snap.tier = detectedTier
+            snap.lastUpdatedTimestamp = Date().timeIntervalSince1970
+            updated.quota = snap
+            return updated
+        }
+
         guard let modelsJSON else {
             throw URLError(.cannotParseResponse)
         }
@@ -61,8 +81,11 @@ public actor GeminiQuotaService {
         var snapshot = parseModelsResponse(modelsJSON, tier: detectedTier)
 
         // 3. retrieveUserQuotaSummary -> weekly & 5h buckets
-        let (summaryJSON, _) = await postJSONSequential(endpoints: GeminiEndpoints.retrieveUserQuotaSummary, body: modelsBody, token: token)
-        if let summaryJSON, let rawGroups = summaryJSON["groups"] as? [[String: Any]] {
+        let (summaryJSON, summaryResp) = await postJSONSequential(endpoints: GeminiEndpoints.retrieveUserQuotaSummary, body: modelsBody, token: token)
+        if Self.isRateLimited(summaryJSON, response: summaryResp) {
+            snapshot.isRateLimited = true
+            snapshot.rateLimitReason = Self.extractRateLimitReason(summaryJSON, response: summaryResp)
+        } else if let summaryJSON, let rawGroups = summaryJSON["groups"] as? [[String: Any]] {
             fuseSummaryGroups(rawGroups, into: &snapshot)
         }
 
@@ -221,11 +244,14 @@ public actor GeminiQuotaService {
             do {
                 let (data, response) = try await session.data(for: req)
                 if let http = response as? HTTPURLResponse {
+                    let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
                     if http.statusCode == 403 {
-                        return (nil, http)
+                        return (json, http)
+                    }
+                    if http.statusCode == 429 || Self.isRateLimited(json, response: http) {
+                        return (json, http)
                     }
                     if (200...299).contains(http.statusCode) {
-                        let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
                         return (json, http)
                     }
                 }
@@ -234,5 +260,62 @@ public actor GeminiQuotaService {
             }
         }
         return (nil, nil)
+    }
+
+    /// Evaluates whether an HTTP response or JSON payload indicates 429 or RESOURCE_EXHAUSTED.
+    public static func isRateLimited(_ json: [String: Any]?, response: URLResponse?) -> Bool {
+        if let http = response as? HTTPURLResponse, http.statusCode == 429 {
+            return true
+        }
+        guard let json else { return false }
+        if let errorDict = json["error"] as? [String: Any] {
+            if let code = errorDict["code"] as? Int, code == 429 {
+                return true
+            }
+            if let status = errorDict["status"] as? String, status == "RESOURCE_EXHAUSTED" {
+                return true
+            }
+            if let msg = errorDict["message"] as? String {
+                let lower = msg.lowercased()
+                if lower.contains("resource_exhausted") ||
+                   lower.contains("rate limit") ||
+                   lower.contains("quota exceeded") ||
+                   lower.contains("too many requests") {
+                    return true
+                }
+            }
+        }
+        if let errStr = json["error"] as? String {
+            let lower = errStr.lowercased()
+            if lower.contains("resource_exhausted") ||
+               lower.contains("rate limit") ||
+               lower.contains("quota exceeded") ||
+               lower.contains("too many requests") ||
+               lower.contains("429") {
+                return true
+            }
+        }
+        if let status = json["status"] as? String, status == "RESOURCE_EXHAUSTED" {
+            return true
+        }
+        return false
+    }
+
+    /// Extracts a user-facing explanation for 429 / RESOURCE_EXHAUSTED.
+    public static func extractRateLimitReason(_ json: [String: Any]?, response: URLResponse?) -> String {
+        if let json {
+            if let errorDict = json["error"] as? [String: Any] {
+                if let msg = errorDict["message"] as? String, !msg.isEmpty {
+                    return "429 Too Many Requests: \(msg)"
+                }
+                if let status = errorDict["status"] as? String, !status.isEmpty {
+                    return "429 Too Many Requests: \(status)"
+                }
+            }
+            if let errStr = json["error"] as? String, !errStr.isEmpty {
+                return "429 Too Many Requests: \(errStr)"
+            }
+        }
+        return "429 Too Many Requests: Rate limit exceeded"
     }
 }

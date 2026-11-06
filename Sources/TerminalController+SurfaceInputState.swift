@@ -1,6 +1,5 @@
 import WMUXAgentLaunch
 import WmuxTerminal
-import WMUXMobileCore
 import Foundation
 
 extension TerminalController {

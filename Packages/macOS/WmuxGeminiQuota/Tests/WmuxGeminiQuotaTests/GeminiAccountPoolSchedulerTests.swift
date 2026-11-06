@@ -273,4 +273,131 @@ struct GeminiAccountPoolSchedulerTests {
         #expect(coordinator.surfaceBindings[surface2] == nil)
         #expect(coordinator.scheduler.activeSessionCounts["acc2@example.com"] == nil)
     }
+
+    @Test("Cooling accounts persist to disk across restarts")
+    func coolingAccountsPersistence() throws {
+        let (store, tempURL) = makeTestStore()
+        let tempCoolingURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_cooling_\(UUID().uuidString).json")
+
+        defer {
+            try? FileManager.default.removeItem(at: tempURL)
+            try? FileManager.default.removeItem(at: tempCoolingURL)
+        }
+
+        // 1. First scheduler marks acc1 as cooling
+        let scheduler1 = GeminiAccountPoolScheduler(accountStore: store, storageURL: tempCoolingURL)
+        scheduler1.markCooling(accountID: "persisted@example.com", duration: 600)
+        #expect(scheduler1.isCooling(accountID: "persisted@example.com"))
+
+        // Verify file written to disk
+        #expect(FileManager.default.fileExists(atPath: tempCoolingURL.path))
+        let perms = try FileManager.default.attributesOfItem(atPath: tempCoolingURL.path)[.posixPermissions] as? NSNumber
+        #expect(perms?.intValue == 0o600)
+
+        // 2. Second scheduler loads from same storageURL (simulating app restart)
+        let scheduler2 = GeminiAccountPoolScheduler(accountStore: store, storageURL: tempCoolingURL)
+        #expect(scheduler2.isCooling(accountID: "persisted@example.com"))
+
+        // 3. Clear cooling and verify update persists
+        scheduler2.clearCooling(for: "persisted@example.com")
+        #expect(!scheduler2.isCooling(accountID: "persisted@example.com"))
+
+        let scheduler3 = GeminiAccountPoolScheduler(accountStore: store, storageURL: tempCoolingURL)
+        #expect(!scheduler3.isCooling(accountID: "persisted@example.com"))
+    }
+
+    @Test("Expired cooling accounts are pruned on initialization")
+    func expiredCoolingAccountsPruned() throws {
+        let (store, tempURL) = makeTestStore()
+        let tempCoolingURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_expired_\(UUID().uuidString).json")
+
+        defer {
+            try? FileManager.default.removeItem(at: tempURL)
+            try? FileManager.default.removeItem(at: tempCoolingURL)
+        }
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+
+        let expiredTime = formatter.string(from: Date().addingTimeInterval(-300)) // 5 mins ago
+        let activeTime = formatter.string(from: Date().addingTimeInterval(300)) // 5 mins future
+
+        let mockPayload: [String: Any] = [
+            "expired@example.com": expiredTime,
+            "active@example.com": activeTime,
+            "numeric_expired@example.com": Date().addingTimeInterval(-600).timeIntervalSince1970
+        ]
+        let data = try JSONSerialization.data(withJSONObject: mockPayload)
+        try data.write(to: tempCoolingURL)
+
+        // Initialize scheduler -> should prune expired entries
+        let scheduler = GeminiAccountPoolScheduler(accountStore: store, storageURL: tempCoolingURL)
+        #expect(!scheduler.isCooling(accountID: "expired@example.com"))
+        #expect(!scheduler.isCooling(accountID: "numeric_expired@example.com"))
+        #expect(scheduler.isCooling(accountID: "active@example.com"))
+        #expect(scheduler.coolingAccounts.count == 1)
+    }
+
+    @Test("Circuit breaker automatically cools rate-limited account")
+    func circuitBreakerRateLimitedAccount() {
+        let (store, tempURL) = makeTestStore()
+        let tempCoolingURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("test_cb_\(UUID().uuidString).json")
+
+        defer {
+            try? FileManager.default.removeItem(at: tempURL)
+            try? FileManager.default.removeItem(at: tempCoolingURL)
+        }
+
+        var accLimited = makeAccount(id: "limited@example.com", fiveHour: 0.99, weekly: 0.99)
+        accLimited.quota.isRateLimited = true
+        accLimited.quota.rateLimitReason = "429 Too Many Requests"
+
+        let accHealthy = makeAccount(id: "healthy@example.com", fiveHour: 0.60, weekly: 0.60)
+
+        store.addOrUpdateAccount(accLimited)
+        store.addOrUpdateAccount(accHealthy)
+
+        let scheduler = GeminiAccountPoolScheduler(accountStore: store, storageURL: tempCoolingURL)
+
+        // pickOptimalAccount should trigger circuit breaker on accLimited and select accHealthy
+        let picked = scheduler.pickOptimalAccount()
+        #expect(picked?.id == "healthy@example.com")
+        #expect(scheduler.isCooling(accountID: "limited@example.com"))
+    }
+
+    @Test("GeminiQuotaService rate limit detection handles 429 and RESOURCE_EXHAUSTED")
+    func quotaServiceRateLimitDetection() {
+        let url = URL(string: "https://cloudcode-pa.googleapis.com/v1/models")!
+        let http429 = HTTPURLResponse(url: url, statusCode: 429, httpVersion: nil, headerFields: nil)
+        let http200 = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)
+        let http403 = HTTPURLResponse(url: url, statusCode: 403, httpVersion: nil, headerFields: nil)
+
+        // 1. Direct 429 status code
+        #expect(GeminiQuotaService.isRateLimited(nil, response: http429))
+
+        // 2. RESOURCE_EXHAUSTED status in error JSON
+        let jsonResourceExhausted: [String: Any] = [
+            "error": [
+                "code": 429,
+                "message": "Resource has been exhausted (e.g. check quota).",
+                "status": "RESOURCE_EXHAUSTED"
+            ]
+        ]
+        #expect(GeminiQuotaService.isRateLimited(jsonResourceExhausted, response: http200))
+        let reason = GeminiQuotaService.extractRateLimitReason(jsonResourceExhausted, response: http200)
+        #expect(reason.contains("Resource has been exhausted"))
+
+        // 3. String error with Rate limit exceeded
+        let jsonRateLimitStr: [String: Any] = [
+            "error": "Rate limit exceeded for Gemini API"
+        ]
+        #expect(GeminiQuotaService.isRateLimited(jsonRateLimitStr, response: http200))
+
+        // 4. Normal 200 and 403 are not rate limits
+        #expect(!GeminiQuotaService.isRateLimited(["models": [:]], response: http200))
+        #expect(!GeminiQuotaService.isRateLimited(nil, response: http403))
+    }
 }

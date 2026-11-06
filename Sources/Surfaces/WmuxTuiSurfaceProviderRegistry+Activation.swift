@@ -1,5 +1,4 @@
 import WmuxAuthRuntime
-import WmuxCloud
 import WmuxSettings
 
 extension WmuxTuiSurfaceProviderRegistry {

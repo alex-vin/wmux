@@ -4,7 +4,6 @@ import Foundation
 
 @available(macOS 13.0, *)
 @MainActor
-@_spi(WmuxHostTransport)
 public enum WMUXSidebarExtensionBrowserPresenter {
     public static func makeViewController(title: String) -> NSViewController {
         let browserViewController = EXAppExtensionBrowserViewController()

@@ -22,6 +22,12 @@ struct GeminiQuotaParsingTests {
         let date5d18h = Date(timeIntervalSince1970: 1700000000 + (5 * 86400 + 18 * 3600))
         let rfc5d18h = ISO8601DateFormatter().string(from: date5d18h)
         #expect(GeminiQuotaSnapshot.countdownText(fromRFC3339: rfc5d18h, wording: "后重置", now: now) == "5天18h后重置")
+
+        // Immediate / already expired
+        let datePast = Date(timeIntervalSince1970: 1700000000 - 10)
+        let rfcPast = ISO8601DateFormatter().string(from: datePast)
+        #expect(GeminiQuotaSnapshot.countdownText(fromRFC3339: rfcPast, wording: "后刷新", now: now) == "即将刷新")
+        #expect(GeminiQuotaSnapshot.countdownText(fromRFC3339: rfcPast, wording: "后重置", now: now) == "即将重置")
     }
 
     @Test("Model thinking level stripping")

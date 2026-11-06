@@ -255,6 +255,18 @@ struct GeminiQuotaPopoverView: View {
                 Text(account.disabledReason ?? "账号已失效")
                     .font(.system(size: 10))
                     .foregroundColor(.red)
+            } else if account.quota.isRateLimited {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock.badge.exclamationmark")
+                            .font(.system(size: 11))
+                            .foregroundColor(.orange)
+                        Text(account.quota.rateLimitReason ?? "429 Too Many Requests - 额度耗尽或请求频繁，冷却中")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.orange)
+                    }
+                }
+                .padding(.vertical, 2)
             } else if let flagship = account.quota.flagshipModel {
                 let b5h = account.quota.bucket5h(for: flagship)
                 let bWeek = account.quota.bucketWeekly(for: flagship)
@@ -275,9 +287,17 @@ struct GeminiQuotaPopoverView: View {
                             countdown: GeminiQuotaSnapshot.countdownText(fromRFC3339: bWeek.resetTime, wording: "后重置")
                         )
                     }
+
+                    if b5h == nil && bWeek == nil {
+                        quotaRow(
+                            label: flagship.displayName,
+                            percentage: flagship.percentage,
+                            countdown: GeminiQuotaSnapshot.countdownText(fromRFC3339: flagship.resetTime, wording: "后刷新")
+                        )
+                    }
                 }
             } else if account.quota.isForbidden {
-                Text("403 Forbidden - 账号受限或无访问权限")
+                Text(account.quota.forbiddenReason ?? "403 Forbidden - 账号受限或无访问权限")
                     .font(.system(size: 10))
                     .foregroundColor(.red)
             }

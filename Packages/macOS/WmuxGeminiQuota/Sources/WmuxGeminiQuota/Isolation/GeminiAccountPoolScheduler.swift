@@ -8,17 +8,39 @@ public final class GeminiAccountPoolScheduler {
     /// Account store providing pool candidates.
     public let accountStore: GeminiAccountStore
 
+    /// Storage location for cooling accounts JSON.
+    public let storageURL: URL
+
     /// Cooldown expiration timestamps by account ID (e.g. after encountering 429 RESOURCE_EXHAUSTED).
     public var coolingAccounts: [String: Date] = [:]
 
     /// Active terminal surface count per account ID.
     public var activeSessionCounts: [String: Int] = [:]
 
+    /// Primary configuration file for wmux cooling accounts.
+    public static var defaultStorageURL: URL {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        return home.appendingPathComponent(".config/wmux/cooling_accounts.json")
+    }
+
+    /// Fallback configuration file for cmux cooling accounts.
+    public static var fallbackStorageURL: URL {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        return home.appendingPathComponent(".config/cmux/cooling_accounts.json")
+    }
+
     /// Initializes an account pool scheduler.
     ///
-    /// - Parameter accountStore: The active Gemini account store.
-    public init(accountStore: GeminiAccountStore) {
+    /// - Parameters:
+    ///   - accountStore: The active Gemini account store.
+    ///   - storageURL: Optional custom storage path for cooling accounts (defaults to ~/.config/wmux/cooling_accounts.json).
+    public init(
+        accountStore: GeminiAccountStore,
+        storageURL: URL = GeminiAccountPoolScheduler.defaultStorageURL
+    ) {
         self.accountStore = accountStore
+        self.storageURL = storageURL
+        loadFromDisk()
     }
 
     /// Evaluates candidate accounts and selects the optimal account based on health scoring.
@@ -33,8 +55,16 @@ public final class GeminiAccountPoolScheduler {
     /// - Returns: The account with the highest score, or `nil` if no viable accounts exist.
     public func pickOptimalAccount(excludingAccountID: String? = nil) -> GeminiAccount? {
         let now = Date()
+
+        // Auto circuit breaker: if any account in store is rate-limited, ensure it is cooled down
+        for account in accountStore.accounts {
+            if (account.quota.isRateLimited || (account.quota.isForbidden && account.quota.forbiddenReason?.contains("429") == true)) && !isCooling(accountID: account.id, now: now) {
+                markCooling(accountID: account.id, duration: 900)
+            }
+        }
+
         var availableAccounts = accountStore.accounts.filter { account in
-            if account.isDisabled || account.quota.isForbidden {
+            if account.isDisabled || account.quota.isForbidden || account.quota.isRateLimited {
                 return false
             }
             if let excludingAccountID, account.id == excludingAccountID {
@@ -52,7 +82,7 @@ public final class GeminiAccountPoolScheduler {
         // If excluding parent account leaves no options, gracefully fall back to all healthy accounts
         if availableAccounts.isEmpty, excludingAccountID != nil {
             availableAccounts = accountStore.accounts.filter { account in
-                if account.isDisabled || account.quota.isForbidden {
+                if account.isDisabled || account.quota.isForbidden || account.quota.isRateLimited {
                     return false
                 }
                 if let coolUntil = coolingAccounts[account.id], coolUntil > now {
@@ -103,13 +133,14 @@ public final class GeminiAccountPoolScheduler {
         }
     }
 
-    /// Marks an account into cooling status for a specified duration.
+    /// Marks an account into cooling status for a specified duration and persists to disk.
     ///
     /// - Parameters:
     ///   - accountID: Identifier of the account.
     ///   - duration: Cooldown duration in seconds (default is 900s / 15 minutes).
     public func markCooling(accountID: String, duration: TimeInterval = 900) {
         coolingAccounts[accountID] = Date().addingTimeInterval(duration)
+        saveToDisk()
     }
 
     /// Checks whether an account is currently cooling down.
@@ -125,7 +156,7 @@ public final class GeminiAccountPoolScheduler {
         return false
     }
 
-    /// Clears cooling status for a specific account or all accounts.
+    /// Clears cooling status for a specific account or all accounts and persists to disk.
     ///
     /// - Parameter accountID: Optional account ID to clear. If `nil`, all cooldowns are cleared.
     public func clearCooling(for accountID: String? = nil) {
@@ -133,6 +164,80 @@ public final class GeminiAccountPoolScheduler {
             coolingAccounts.removeValue(forKey: accountID)
         } else {
             coolingAccounts.removeAll()
+        }
+        saveToDisk()
+    }
+
+    private func loadFromDisk() {
+        let fm = FileManager.default
+        let urlToLoad: URL?
+        if fm.fileExists(atPath: storageURL.path) {
+            urlToLoad = storageURL
+        } else if storageURL == Self.defaultStorageURL && fm.fileExists(atPath: Self.fallbackStorageURL.path) {
+            urlToLoad = Self.fallbackStorageURL
+        } else {
+            urlToLoad = nil
+        }
+
+        guard let urlToLoad, let data = try? Data(contentsOf: urlToLoad) else { return }
+        try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: urlToLoad.path)
+
+        guard let raw = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return }
+
+        let formatterWithFrac = ISO8601DateFormatter()
+        formatterWithFrac.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let formatterStd = ISO8601DateFormatter()
+        formatterStd.formatOptions = [.withInternetDateTime]
+
+        let now = Date()
+        var valid: [String: Date] = [:]
+        for (accountID, value) in raw {
+            var expiry: Date? = nil
+            if let str = value as? String {
+                expiry = formatterWithFrac.date(from: str) ?? formatterStd.date(from: str)
+            } else if let num = value as? NSNumber {
+                expiry = Date(timeIntervalSince1970: num.doubleValue)
+            }
+            if let expiry, expiry > now {
+                valid[accountID] = expiry
+            }
+        }
+
+        self.coolingAccounts = valid
+
+        // Prune expired entries from disk if any expired accounts were removed
+        if valid.count < raw.count {
+            saveToDisk()
+        }
+    }
+
+    private func saveToDisk() {
+        let parentDir = storageURL.deletingLastPathComponent()
+        try? FileManager.default.createDirectory(at: parentDir, withIntermediateDirectories: true)
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        var payload: [String: String] = [:]
+        for (accID, date) in coolingAccounts {
+            payload[accID] = formatter.string(from: date)
+        }
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(payload) else { return }
+
+        do {
+            try data.write(to: storageURL, options: .atomic)
+            try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: storageURL.path)
+        } catch {
+            // Fallback to cmux if primary write failed and using default path
+            if storageURL == Self.defaultStorageURL {
+                let fallback = Self.fallbackStorageURL
+                let fallbackDir = fallback.deletingLastPathComponent()
+                try? FileManager.default.createDirectory(at: fallbackDir, withIntermediateDirectories: true)
+                try? data.write(to: fallback, options: .atomic)
+                try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fallback.path)
+            }
         }
     }
 }

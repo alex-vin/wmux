@@ -65,18 +65,39 @@ else
   export WMUX_SWIFT_FRONTEND_WORKAROUND=1
   export WMUX_SWIFT_DISABLE_GLOBAL_ISEL=1
   export WMUX_SKIP_ZIG_BUILD=1
+  export CMUX_SWIFT_FRONTEND_WORKAROUND=1
+  export CMUX_SWIFT_DISABLE_GLOBAL_ISEL=1
+  export CMUX_SKIP_ZIG_BUILD=1
+  export XCBUILD_FILE_SYSTEM_MODE=checksum-only
+
+  SPM_FLAGS=""
+  if [ -d "build/SourcePackages/checkouts" ]; then
+    echo "⚡ Warm SPM cache detected; enabling -skipPackageUpdates"
+    SPM_FLAGS="-skipPackageUpdates"
+  fi
+
+  NCPU="$(sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+  echo "⚡ Compiling with $NCPU parallel jobs..."
 
   # Run xcodebuild with timing summary
-  xcodebuild -scheme wmux \
+  xcodebuild -workspace wmux.xcworkspace \
+    -scheme wmux \
     -configuration Release \
     -derivedDataPath build \
     -destination 'generic/platform=macOS' \
+    -parallelizeTargets \
+    -jobs "$NCPU" \
+    -skipPackagePluginValidation \
+    -skipMacroValidation \
+    $SPM_FLAGS \
     ARCHS="arm64" \
     ONLY_ACTIVE_ARCH=NO \
     CODE_SIGNING_ALLOWED=NO \
     COMPILER_INDEX_STORE_ENABLE=NO \
     DEBUG_INFORMATION_FORMAT=dwarf \
     GCC_GENERATE_DEBUGGING_SYMBOLS=NO \
+    SWIFT_EMIT_LOC_STRINGS=NO \
+    CLANG_ENABLE_MODULE_DEBUGGING=NO \
     OTHER_SWIFT_FLAGS='$(inherited) -Xllvm -aarch64-enable-global-isel-at-O=-1' \
     -showBuildTimingSummary \
     build
@@ -100,6 +121,15 @@ echo "=== 4.1. Stripping and Pruning Release Bundle ==="
 log_step "Bundle stripping and bloat pruning"
 
 echo "=== 5. Ad-hoc Codesigning App Bundle ==="
+# Codesign inside-out: Mach-O binaries under Contents/Resources/bin are considered resources
+# by `codesign --deep` and will not be re-signed after strip unless signed explicitly first.
+if [ -d "$APP_PATH/Contents/Resources/bin" ]; then
+  for bin in "$APP_PATH/Contents/Resources/bin"/*; do
+    if [ -f "$bin" ] && [ -x "$bin" ] && file -b "$bin" | grep -q 'Mach-O'; then
+      codesign --force -s - "$bin"
+    fi
+  done
+fi
 codesign --force --deep -s - "$APP_PATH"
 log_step "Codesigning"
 

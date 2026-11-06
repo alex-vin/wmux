@@ -1,8 +1,6 @@
 import Foundation
-import WmuxCloudImagePaste
 import WmuxTerminal
 import AppKit
-import WmuxRemoteSession
 import UniformTypeIdentifiers
 
 enum TerminalImageTransferMode: Codable, Sendable {

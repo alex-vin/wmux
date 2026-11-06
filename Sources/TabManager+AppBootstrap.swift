@@ -1,4 +1,3 @@
-import WmuxRemoteSession
 import WmuxWorkspaces
 import Foundation
 

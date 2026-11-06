@@ -264,6 +264,41 @@ struct WorkspaceContentView: View {
                     isWorkspaceManuallyUnread: isWorkspaceManuallyUnread,
                     isWorkspaceManualUnreadRepresentative: workspaceManualUnreadPanelId == panel.id
                 )
+                let onFocusAction: () -> Void = {
+                    // Keep bonsplit focus in sync with the AppKit first responder for the
+                    // active workspace. This prevents divergence between the blue focused-tab
+                    // indicator and where keyboard input/flash-focus actually lands.
+                    guard isWorkspaceInputActive else { return }
+                    guard workspace.panels[panel.id] != nil else { return }
+                    workspace.focusPanel(
+                        panel.id,
+                        trigger: .terminalFirstResponder,
+                        focusTransactionId: workspace.activeFocusTransactionId
+                    )
+                }
+                let onRequestPanelFocusAction: () -> Void = {
+                    guard isWorkspaceInputActive else { return }
+                    guard workspace.panels[panel.id] != nil else { return }
+                    AppDelegate.shared?.noteMainPanelKeyboardFocusIntent(
+                        workspaceId: workspace.id,
+                        panelId: panel.id,
+                        in: NSApp.keyWindow ?? NSApp.mainWindow
+                    )
+                    workspace.focusPanel(panel.id)
+                }
+                let onResumeAgentHibernationAction: () -> Void = {
+                    guard isWorkspaceInputActive else { return }
+                    guard workspace.panels[panel.id] != nil else { return }
+                    workspace.resumeAgentHibernation(panelId: panel.id, focus: true)
+                }
+                let onAutoResumeAgentHibernationAction: () -> Void = {
+                    guard isWorkspaceInputActive else { return }
+                    guard workspace.panels[panel.id] != nil else { return }
+                    workspace.resumeAgentHibernation(panelId: panel.id, focus: false)
+                }
+                let onTriggerFlashAction: () -> Void = {
+                    workspace.triggerDebugFlash(panelId: panel.id)
+                }
                 WorkspacePanelContentHostView(
                     workspace: workspace,
                     panel: panel,
@@ -280,39 +315,11 @@ struct WorkspaceContentView: View {
                     windowAppearance: windowAppearance,
                     customSidebarTabManager: workspace.owningTabManager,
                     hasUnreadNotification: showsNotificationRing && !overlayTarget.usesWorkspacePaneOverlay,
-                    onFocus: {
-                        // Keep bonsplit focus in sync with the AppKit first responder for the
-                        // active workspace. This prevents divergence between the blue focused-tab
-                        // indicator and where keyboard input/flash-focus actually lands.
-                        guard isWorkspaceInputActive else { return }
-                        guard workspace.panels[panel.id] != nil else { return }
-                        workspace.focusPanel(
-                            panel.id,
-                            trigger: .terminalFirstResponder,
-                            focusTransactionId: workspace.activeFocusTransactionId
-                        )
-                    },
-                    onRequestPanelFocus: {
-                        guard isWorkspaceInputActive else { return }
-                        guard workspace.panels[panel.id] != nil else { return }
-                        AppDelegate.shared?.noteMainPanelKeyboardFocusIntent(
-                            workspaceId: workspace.id,
-                            panelId: panel.id,
-                            in: NSApp.keyWindow ?? NSApp.mainWindow
-                        )
-                        workspace.focusPanel(panel.id)
-                    },
-                    onResumeAgentHibernation: {
-                        guard isWorkspaceInputActive else { return }
-                        guard workspace.panels[panel.id] != nil else { return }
-                        workspace.resumeAgentHibernation(panelId: panel.id, focus: true)
-                    },
-                    onAutoResumeAgentHibernation: {
-                        guard isWorkspaceInputActive else { return }
-                        guard workspace.panels[panel.id] != nil else { return }
-                        workspace.resumeAgentHibernation(panelId: panel.id, focus: false)
-                    },
-                    onTriggerFlash: { workspace.triggerDebugFlash(panelId: panel.id) }
+                    onFocus: onFocusAction,
+                    onRequestPanelFocus: onRequestPanelFocusAction,
+                    onResumeAgentHibernation: onResumeAgentHibernationAction,
+                    onAutoResumeAgentHibernation: onAutoResumeAgentHibernationAction,
+                    onTriggerFlash: onTriggerFlashAction
                 )
                 .onTapGesture {
                     workspace.bonsplitController.focusPane(paneId)
@@ -385,9 +392,9 @@ struct WorkspaceContentView: View {
             let foregroundHex = (notification.userInfo?[GhosttyNotificationKey.foregroundColor] as? NSColor)?.hexString() ?? "nil"
             let eventId = (notification.userInfo?[GhosttyNotificationKey.backgroundEventId] as? NSNumber)?.uint64Value
             let source = (notification.userInfo?[GhosttyNotificationKey.backgroundSource] as? String) ?? "nil"
-            logTheme(
-                "theme notification workspace=\(workspace.id.uuidString) event=\(eventId.map(String.init) ?? "nil") source=\(source) payload=\(payloadHex) payloadFg=\(foregroundHex) appBg=\(GhosttyApp.shared.defaultBackgroundColor.hexString()) appFg=\(GhosttyApp.shared.defaultForegroundColor.hexString()) appOpacity=\(String(format: "%.3f", GhosttyApp.shared.defaultBackgroundOpacity))"
-            )
+            let eventIdStr: String = eventId != nil ? String(eventId!) : "nil"
+            let msg = "theme notification workspace=" + workspace.id.uuidString + " event=" + eventIdStr + " source=" + source
+            logTheme(msg)
             // Resolve from Ghostty's runtime state because notification payload ordering can lag.
             refreshGhosttyAppearanceConfig(
                 reason: "ghosttyDefaultBackgroundDidChange",

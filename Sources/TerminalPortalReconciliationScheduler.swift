@@ -1,5 +1,4 @@
 import Foundation
-import WMUXMobileCore
 
 /// Owns the boundary between SwiftUI/AppKit callbacks and terminal portal mutations.
 ///

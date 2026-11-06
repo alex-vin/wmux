@@ -1,5 +1,4 @@
 import AppKit
-import WMUXMobileCore
 import ObjectiveC
 import WmuxAppKitSupportUI
 import WmuxFoundation

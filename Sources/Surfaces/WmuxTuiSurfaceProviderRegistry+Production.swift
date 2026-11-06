@@ -1,5 +1,3 @@
-import WmuxCloud
-import WmuxCloudTui
 import Foundation
 
 extension WmuxTuiSurfaceProviderRegistry {

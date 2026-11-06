@@ -1,7 +1,6 @@
 import AppKit
 import Bonsplit
 import WmuxCore
-import WmuxRemoteSession
 import WmuxTerminal
 import WmuxTerminalCore
 import WmuxWorkspaces

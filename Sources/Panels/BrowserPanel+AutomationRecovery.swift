@@ -1,5 +1,4 @@
 import WmuxCore
-import WmuxCloud
 import AppKit
 import WmuxBrowser
 import WebKit

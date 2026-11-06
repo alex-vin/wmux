@@ -28,10 +28,19 @@ public final class GeminiAccountStore {
     private let quotaService: GeminiQuotaService
     private let callbackServer: GeminiOAuthCallbackServer
 
-    /// Default configuration directory for cmux gemini storage.
+    /// Default configuration storage file for wmux/cmux gemini accounts.
     public static var defaultStorageURL: URL {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        return home.appendingPathComponent(".config/cmux/gemini_accounts.json")
+        let fm = FileManager.default
+        let home = fm.homeDirectoryForCurrentUser
+        let wmuxURL = home.appendingPathComponent(".config/wmux/gemini_accounts.json")
+        let cmuxURL = home.appendingPathComponent(".config/cmux/gemini_accounts.json")
+        if fm.fileExists(atPath: wmuxURL.path) {
+            return wmuxURL
+        }
+        if fm.fileExists(atPath: cmuxURL.path) {
+            return cmuxURL
+        }
+        return wmuxURL
     }
 
     /// Creates an account store with injected dependencies.
@@ -92,13 +101,18 @@ public final class GeminiAccountStore {
     /// Evaluates health status for a given account.
     public func healthStatus(for account: GeminiAccount) -> GeminiQuotaHealthStatus {
         guard !account.isDisabled else { return .disabled }
+        if account.quota.isForbidden || account.quota.isRateLimited {
+            return .critical
+        }
         guard let flagship = account.quota.flagshipModel else {
-            return account.quota.isForbidden ? .critical : .healthy
+            return .healthy
         }
         let fiveHourPct = account.quota.bucket5h(for: flagship)?.remainingPercentage ?? flagship.percentage
-        if fiveHourPct <= 20 {
+        let weeklyPct = account.quota.bucketWeekly(for: flagship)?.remainingPercentage ?? 100
+        let minPct = min(fiveHourPct, weeklyPct)
+        if minPct <= 20 {
             return .critical
-        } else if fiveHourPct <= 50 {
+        } else if minPct <= 50 {
             return .warning
         }
         return .healthy

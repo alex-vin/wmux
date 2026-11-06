@@ -1,4 +1,3 @@
-import WmuxCloud
 import WmuxCore
 import WmuxPanes
 import WmuxSurfaceCatalogModel

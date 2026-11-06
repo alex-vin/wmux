@@ -1,4 +1,3 @@
-import WmuxCloud
 import Foundation
 
 enum WmuxSSHURLParseError: Error, Equatable {

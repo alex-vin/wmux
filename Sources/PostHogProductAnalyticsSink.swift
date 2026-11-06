@@ -1,4 +1,3 @@
-import WMUXMobileCore
 import WmuxProductAnalytics
 import Foundation
 

@@ -85,7 +85,7 @@ extension SubagentTaskItem: Codable {
     }
 }
 
-/// `@MainActor @Observable` store that tracks active subagent tasks by monitoring `~/.config/cmux/subagents/*.json`.
+/// `@MainActor @Observable` store that tracks active subagent tasks by monitoring `~/.config/wmux/subagents/*.json` (or `~/.config/cmux/subagents/*.json`).
 @MainActor
 @Observable
 public final class SubagentTaskStore {
@@ -103,8 +103,18 @@ public final class SubagentTaskStore {
     private var tickerTask: Task<Void, Never>?
 
     nonisolated public static var defaultDirectoryURL: URL {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        return home.appendingPathComponent(".config/cmux/subagents")
+        let fm = FileManager.default
+        let home = fm.homeDirectoryForCurrentUser
+        let wmuxURL = home.appendingPathComponent(".config/wmux/subagents")
+        let cmuxURL = home.appendingPathComponent(".config/cmux/subagents")
+        if fm.fileExists(atPath: wmuxURL.path) {
+            return wmuxURL
+        }
+        if fm.fileExists(atPath: cmuxURL.path) {
+            return cmuxURL
+        }
+        try? fm.createDirectory(at: wmuxURL, withIntermediateDirectories: true)
+        return wmuxURL
     }
 
     public init(directoryURL: URL = SubagentTaskStore.defaultDirectoryURL) {
@@ -222,7 +232,11 @@ public final class SubagentTaskStore {
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 guard let self else { break }
-                self.reloadTasks()
+                guard !self.activeTasks.isEmpty else {
+                    // Idles when there are no active tasks to save battery and avoid unnecessary UI re-renders
+                    continue
+                }
+                self.currentTimestamp = Date()
             }
         }
 

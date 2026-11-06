@@ -1,7 +1,6 @@
 import WmuxProductAnalytics
 import AppKit
 import WmuxAgentChat
-import WmuxCloudMachines
 import WmuxFoundation
 import WmuxTerminalCore
 import SwiftUI
@@ -12,7 +11,6 @@ import WmuxBrowser
 import WmuxGit
 import WmuxNotifications
 import WmuxPanes
-import WmuxRemoteSession
 import WmuxSettings
 import WmuxSidebar
 import WmuxSidebarGit

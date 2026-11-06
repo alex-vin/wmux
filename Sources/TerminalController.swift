@@ -1,16 +1,11 @@
-import WmuxCloud
-import WmuxMobileHost
 import WmuxSettingsUI
 import AppKit
-import WmuxRemoteSession
 import WmuxCore
 import WmuxAuthRuntime
 import WmuxBrowser
 import WmuxControlSocket
 import WmuxFoundation
 import WmuxPanes
-import WmuxRemoteDaemon
-import WmuxRemoteWorkspace
 import WmuxSurfaceCatalogModel
 import WmuxTerminal
 import WmuxTerminalSharing
@@ -18,7 +13,6 @@ import WmuxTerminalSizing
 import WmuxSettings
 import WmuxSwiftRenderUI
 import Carbon.HIToolbox
-import WMUXMobileCore
 import WMUXAgentLaunch
 import WmuxAgentChat
 import Foundation
@@ -567,9 +561,7 @@ class TerminalController {
         terminalArtifactAuthorizationStore: TerminalArtifactAuthorizationStore = .init(),
         panelArtifactAuthorizationStore: PanelArtifactAuthorizationStore? = nil,
         agentHookDeliveryQueue: AgentHookDeliveryQueue = AgentHookDeliveryQueue(),
-        remoteProxyBroker: any RemoteProxyBrokering = RemoteProxyBroker(
-            tunnelProvider: RemoteDaemonProxyTunnelProvider(strings: .appLocalized, ptyBridgeStrings: AppRemotePTYBridgeStrings())
-        ),
+        remoteProxyBroker: any RemoteProxyBrokering = MinimalRemoteProxyBroker(),
         nativeSSHConnectionBroker: NativeSSHConnectionBroker = NativeSSHConnectionBroker()
     ) {
         self.passwordStore = passwordStore

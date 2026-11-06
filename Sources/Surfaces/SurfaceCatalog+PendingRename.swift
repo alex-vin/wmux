@@ -1,4 +1,3 @@
-import WmuxCloud
 import Foundation
 
 extension SurfaceCatalog {

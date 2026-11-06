@@ -13,7 +13,7 @@ START_TIME=""
 show_help() {
     cat <<'EOF'
 Usage:
-  wmux-subagent run --title <title> --prompt <prompt> [--account <id>] [--worktree] [--wait]
+  wmux-subagent run --title <title> --prompt <prompt> [--account <id>] [--worktree] [--wait] [--timeout <seconds>]
   wmux-subagent report [--latest | --list | <task-id>]
   wmux-subagent help | --help | -h
 
@@ -27,11 +27,12 @@ Options:
   --account <id>          Explicit Gemini account ID (default: auto from pool)
   --worktree              Run in an isolated git worktree (.wmux/worktrees/<task-id>)
   --wait                  Wait for subtask completion, retrieve output, and print to stdout
+  --timeout <seconds>     Maximum execution time in seconds (used with --wait)
   -h, --help              Show this help message
 
 Examples:
   wmux-subagent run --title "Code Review" --prompt "Review recent changes in auth module"
-  wmux-subagent run --title "Bugfix" --prompt "Fix null pointer in parser" --worktree --wait
+  wmux-subagent run --title "Bugfix" --prompt "Fix null pointer in parser" --worktree --wait --timeout 120
   wmux-subagent report --latest
   wmux-subagent report --list
 EOF
@@ -311,6 +312,7 @@ cmd_run() {
     local ACCOUNT=""
     local WORKTREE=0
     local WAIT=0
+    local TIMEOUT=""
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -349,6 +351,15 @@ cmd_run() {
                 WAIT=1
                 shift
                 ;;
+            --timeout)
+                [[ $# -ge 2 ]] || { echo "Error: --timeout requires an argument" >&2; exit 1; }
+                TIMEOUT="$2"
+                shift 2
+                ;;
+            --timeout=*)
+                TIMEOUT="${1#*=}"
+                shift
+                ;;
             -h|--help)
                 show_help
                 exit 0
@@ -359,6 +370,13 @@ cmd_run() {
                 ;;
         esac
     done
+
+    if [[ -n "$TIMEOUT" ]]; then
+        if ! [[ "$TIMEOUT" =~ ^[0-9]+$ ]] || (( TIMEOUT <= 0 )); then
+            echo "Error: --timeout must be a positive integer" >&2
+            exit 1
+        fi
+    fi
 
     if [[ -z "$TITLE" ]]; then
         echo "Error: --title <title> is required." >&2
@@ -478,6 +496,8 @@ START_TIME=$(printf '%q' "$START_TIME")
 ACCOUNT_ID=$(printf '%q' "${ACCOUNT:-}")
 WAIT=$(printf '%q' "$WAIT")
 
+echo \$\$ > "\$STATE_DIR/pid"
+
 cleanup_runner() {
     if [[ -n "\$STATUS_JSON" && -f "\$STATUS_JSON" ]]; then
         rm -f "\$STATUS_JSON"
@@ -508,10 +528,18 @@ printf '\033[1;36m%s\033[0m\n\n' "==============================================
 STREAMER_PY="\$STATE_DIR/streamer.py"
 cat << 'STREAMER_EOF' > "\$STREAMER_PY"
 import sys, json
+from collections import deque
 
 output_log = sys.argv[1] if len(sys.argv) > 1 else None
+log_file = None
+if output_log:
+    try:
+        log_file = open(output_log, "w", encoding="utf-8")
+    except Exception:
+        log_file = None
+
 final_response = []
-raw_lines = []
+raw_lines = deque(maxlen=1000)
 
 try:
     sys.stdin.reconfigure(encoding="utf-8", errors="replace")
@@ -543,6 +571,13 @@ sys.stdout.flush()
 
 for line in sys.stdin:
     raw_lines.append(line)
+    if log_file:
+        try:
+            log_file.write(line)
+            log_file.flush()
+        except Exception:
+            pass
+
     line_str = line.strip()
     if not line_str:
         continue
@@ -583,12 +618,19 @@ for line in sys.stdin:
             sys.stdout.write("\n\n\033[1;32m★ [Subagent Task Completed]\033[0m\n")
             sys.stdout.flush()
 
+if log_file:
+    try:
+        log_file.close()
+    except Exception:
+        pass
+
 if output_log:
     try:
-        with open(output_log, "w", encoding="utf-8") as f:
-            if final_response:
+        if final_response:
+            with open(output_log, "w", encoding="utf-8") as f:
                 f.write(final_response[0])
-            elif raw_lines:
+        elif not log_file and raw_lines:
+            with open(output_log, "w", encoding="utf-8") as f:
                 f.write("".join(raw_lines))
     except Exception:
         pass
@@ -828,10 +870,21 @@ except Exception:
     # Handle completion / waiting
     if [[ "$WAIT" == "1" ]]; then
         local wait_count=0
+        local wait_start
+        wait_start="$(date +%s)"
+        local timed_out=0
         # Wait for subagent runner to complete with watchdog
         while [[ ! -f "$DONE_FILE" ]]; do
             sleep 0.5
             (( wait_count++ ))
+            if [[ -n "$TIMEOUT" ]] && (( TIMEOUT > 0 )); then
+                local now
+                now="$(date +%s)"
+                if (( now - wait_start >= TIMEOUT )); then
+                    timed_out=1
+                    break
+                fi
+            fi
             # After grace period (5s), verify target surface still exists in wmux
             if (( wait_count > 10 )) && (( wait_count % 6 == 0 )) && [[ -n "$TARGET_SURFACE" ]]; then
                 if ! cmux_invoke list-panels --id-format both 2>/dev/null | grep -q "$TARGET_SURFACE"; then
@@ -840,6 +893,30 @@ except Exception:
                 fi
             fi
         done
+
+        if (( timed_out == 1 )); then
+            echo "[wmux-subagent] Warning: Execution timed out after ${TIMEOUT}s. Terminating subagent..." >&2
+            if [[ -f "$STATE_DIR/pid" ]]; then
+                local runner_pid
+                runner_pid="$(cat "$STATE_DIR/pid" 2>/dev/null | tr -d '[:space:]')"
+                if [[ -n "$runner_pid" ]]; then
+                    pkill -TERM -P "$runner_pid" 2>/dev/null || true
+                    pkill -9 -P "$runner_pid" 2>/dev/null || true
+                    kill -9 "$runner_pid" 2>/dev/null || true
+                fi
+            fi
+            if [[ -n "$TARGET_SURFACE" ]]; then
+                if [[ -n "$SUBAGENT_WORKSPACE_ID" ]]; then
+                    cmux_invoke close-surface --surface "$TARGET_SURFACE" --workspace "$SUBAGENT_WORKSPACE_ID" --force >/dev/null 2>&1 || true
+                else
+                    cmux_invoke close-surface --surface "$TARGET_SURFACE" --force >/dev/null 2>&1 || true
+                fi
+            fi
+            if [[ -f "$STATUS_JSON" ]]; then
+                rm -f "$STATUS_JSON"
+            fi
+            exit 124
+        fi
 
         local EXIT_CODE=0
         if [[ -f "$STATUS_FILE" ]]; then

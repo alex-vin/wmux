@@ -1,5 +1,4 @@
 import AppKit
-import WMUXMobileCore
 import WmuxFoundation
 import Foundation
 import os
@@ -37,7 +36,7 @@ struct AgentChatThemePayload: Codable, Equatable {
     }
 
     init(config: GhosttyConfig, accent: WmuxAccentColor = WmuxAccentColor()) {
-        let terminalTheme = TerminalTheme(ghosttyConfig: config)
+        let terminalTheme = WmuxFoundation.TerminalTheme(ghosttyConfig: config)
         let webTheme = AgentSessionWebTheme.resolve(appearance: .fromConfig(config), accent: accent)
         let trimmedFontFamily = config.fontFamily.trimmingCharacters(in: .whitespacesAndNewlines)
         let fontSize = Double(config.fontSize)

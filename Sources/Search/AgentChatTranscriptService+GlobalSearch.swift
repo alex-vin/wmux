@@ -1,5 +1,4 @@
 import WmuxAgentChat
-import WmuxMobileHost
 import Foundation
 
 extension AgentChatTranscriptService {

@@ -106,4 +106,19 @@ struct GeminiAccountTests {
         let perms = attributes[.posixPermissions] as? NSNumber
         #expect(perms?.intValue == 0o600)
     }
+
+    @Test("Health status takes minimum of 5h and weekly quotas")
+    @MainActor
+    func healthStatusConsidersWeekly() {
+        let store = GeminiAccountStore()
+        let group = GeminiQuotaGroup(displayName: "Gemini Models", buckets: [
+            GeminiQuotaBucket(id: "gemini-5h", window: "5h", remainingFraction: 1.0),
+            GeminiQuotaBucket(id: "gemini-weekly", window: "weekly", remainingFraction: 0.15),
+        ])
+        let model = GeminiModelQuota(id: "gemini-3.8-flash", displayName: "Gemini 3.8 Flash", percentage: 15)
+        let snapshot = GeminiQuotaSnapshot(models: [model], groups: [group])
+        let account = GeminiAccount(id: "test@example.com", email: "test@example.com", quota: snapshot)
+
+        #expect(store.healthStatus(for: account) == .critical)
+    }
 }

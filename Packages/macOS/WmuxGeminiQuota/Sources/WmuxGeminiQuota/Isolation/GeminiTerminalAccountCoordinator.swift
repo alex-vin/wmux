@@ -25,14 +25,32 @@ public final class GeminiTerminalAccountCoordinator {
 
     /// Default base directory for per-surface token bridge files.
     public static var defaultTokenCacheDirectory: URL {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        return home.appendingPathComponent(".config/cmux/gemini_tokens")
+        let fm = FileManager.default
+        let home = fm.homeDirectoryForCurrentUser
+        let wmuxURL = home.appendingPathComponent(".config/wmux/gemini_tokens")
+        let cmuxURL = home.appendingPathComponent(".config/cmux/gemini_tokens")
+        if fm.fileExists(atPath: wmuxURL.path) {
+            return wmuxURL
+        }
+        if fm.fileExists(atPath: cmuxURL.path) {
+            return cmuxURL
+        }
+        return wmuxURL
     }
 
     /// Default base directory for per-account shadow home and keychain storage.
     public static var defaultAccountsBaseDirectory: URL {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        return home.appendingPathComponent(".config/cmux/accounts")
+        let fm = FileManager.default
+        let home = fm.homeDirectoryForCurrentUser
+        let wmuxURL = home.appendingPathComponent(".config/wmux/accounts")
+        let cmuxURL = home.appendingPathComponent(".config/cmux/accounts")
+        if fm.fileExists(atPath: wmuxURL.path) {
+            return wmuxURL
+        }
+        if fm.fileExists(atPath: cmuxURL.path) {
+            return cmuxURL
+        }
+        return wmuxURL
     }
 
     /// Backwards compatibility aliases
@@ -177,11 +195,28 @@ public final class GeminiTerminalAccountCoordinator {
 
         // Share cmux/wmux config so new panes never trigger first-run onboarding or settings prompts
         let accountConfigDir = accountHome.appendingPathComponent(".config")
-        let accountCmuxDir = accountConfigDir.appendingPathComponent("wmux")
+        let accountWmuxDir = accountConfigDir.appendingPathComponent("wmux")
+        let accountCmuxDir = accountConfigDir.appendingPathComponent("cmux")
+        try? fm.createDirectory(at: accountWmuxDir, withIntermediateDirectories: true)
         try? fm.createDirectory(at: accountCmuxDir, withIntermediateDirectories: true)
-        symlinkIfMissing(source: userHome.appendingPathComponent(".config/cmux/cmux.json"), target: accountCmuxDir.appendingPathComponent("wmux.json"))
-        symlinkIfMissing(source: userHome.appendingPathComponent(".config/cmux/subagents"), target: accountCmuxDir.appendingPathComponent("subagents"))
-        symlinkIfMissing(source: userHome.appendingPathComponent(".config/cmux/gemini_tokens"), target: accountCmuxDir.appendingPathComponent("gemini_tokens"))
+
+        let wmuxConfig = userHome.appendingPathComponent(".config/wmux/wmux.json")
+        let cmuxConfig = userHome.appendingPathComponent(".config/cmux/cmux.json")
+        let sourceConfig = fm.fileExists(atPath: wmuxConfig.path) ? wmuxConfig : cmuxConfig
+        symlinkIfMissing(source: sourceConfig, target: accountWmuxDir.appendingPathComponent("wmux.json"))
+        symlinkIfMissing(source: sourceConfig, target: accountCmuxDir.appendingPathComponent("cmux.json"))
+
+        let wmuxSubagents = userHome.appendingPathComponent(".config/wmux/subagents")
+        let cmuxSubagents = userHome.appendingPathComponent(".config/cmux/subagents")
+        let sourceSubagents = fm.fileExists(atPath: wmuxSubagents.path) ? wmuxSubagents : cmuxSubagents
+        symlinkIfMissing(source: sourceSubagents, target: accountWmuxDir.appendingPathComponent("subagents"))
+        symlinkIfMissing(source: sourceSubagents, target: accountCmuxDir.appendingPathComponent("subagents"))
+
+        let wmuxTokens = userHome.appendingPathComponent(".config/wmux/gemini_tokens")
+        let cmuxTokens = userHome.appendingPathComponent(".config/cmux/gemini_tokens")
+        let sourceTokens = fm.fileExists(atPath: wmuxTokens.path) ? wmuxTokens : cmuxTokens
+        symlinkIfMissing(source: sourceTokens, target: accountWmuxDir.appendingPathComponent("gemini_tokens"))
+        symlinkIfMissing(source: sourceTokens, target: accountCmuxDir.appendingPathComponent("gemini_tokens"))
 
         // 3. Populate dedicated keychain
         let token = account.agyKeyringSecretValue()
@@ -294,6 +329,7 @@ public final class GeminiTerminalAccountCoordinator {
 
         let filtered = currentPaths.filter { path in
             !path.contains(".config/cmux/accounts") &&
+            !path.contains(".config/wmux/accounts") &&
             !path.contains("/private/tmp/") &&
             !path.contains("/tmp/") &&
             FileManager.default.fileExists(atPath: path)

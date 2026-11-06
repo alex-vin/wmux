@@ -1,4 +1,3 @@
-import WmuxCloud
 import AppKit
 
 extension AppDelegate {

@@ -1,6 +1,5 @@
 import AppKit
 import Bonsplit
-import WmuxCloud
 import WmuxTerminal
 import WmuxTerminalSharing
 import WmuxTerminalSizing

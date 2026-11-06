@@ -8,6 +8,8 @@ on:
         required: false
         default: ''
   push:
+    branches:
+      - main
     tags:
       - 'v*'
       - '[0-9]*'
@@ -41,9 +43,20 @@ jobs:
           toolchain: 1.88.0
           targets: aarch64-apple-darwin
 
+      - name: Cache create-dmg
+        id: cache-create-dmg
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/homebrew/bin/create-dmg
+            /opt/homebrew/share/create-dmg
+            /opt/homebrew/Cellar/create-dmg
+          key: brew-create-dmg-${{ runner.os }}-v1
+
       - name: Install create-dmg
+        if: steps.cache-create-dmg.outputs.cache-hit != 'true'
         run: |
-          brew list create-dmg &>/dev/null || HOMEBREW_NO_AUTO_UPDATE=1 brew install create-dmg
+          brew list create-dmg &>/dev/null || HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew install create-dmg
           create-dmg --version
 
       - name: Cache GhosttyKit
@@ -51,13 +64,24 @@ jobs:
         uses: actions/cache@v4
         with:
           path: GhosttyKit.xcframework
-          key: ghosttykit-${{ runner.os }}-${{ hashFiles('scripts/ghosttykit-checksums.txt') }}
+          key: ghosttykit-arm64-${{ runner.os }}-${{ hashFiles('scripts/ghosttykit-checksums.txt') }}
 
-      - name: Download Prebuilt GhosttyKit
+      - name: Download & Thin Prebuilt GhosttyKit
         if: steps.cache-ghosttykit.outputs.cache-hit != 'true'
         run: |
           export GHOSTTY_SHA="cb1ef7091cdef0b581ee2cbd83742b653253523e"
           ./scripts/download-prebuilt-ghosttykit.sh
+          # Thin GhosttyKit static library to arm64 and strip debug symbols to speed up linking and reduce cache size
+          GHOSTTY_ARCHIVE="GhosttyKit.xcframework/macos-arm64_x86_64/ghostty-internal.a"
+          if [ -f "$GHOSTTY_ARCHIVE" ]; then
+            if lipo -info "$GHOSTTY_ARCHIVE" 2>/dev/null | grep -q "^Architectures in the fat file:"; then
+              echo "⚡ Thinning GhosttyKit static library to arm64 and stripping debug symbols..."
+              lipo -thin arm64 "$GHOSTTY_ARCHIVE" -output /tmp/ghostty-arm64.a
+              strip -S /tmp/ghostty-arm64.a
+              mv /tmp/ghostty-arm64.a "$GHOSTTY_ARCHIVE"
+              echo "GhosttyKit thinned and stripped successfully."
+            fi
+          fi
 
       - name: Cache Cargo & Rust Artifacts
         uses: actions/cache@v4
@@ -67,9 +91,9 @@ jobs:
             ~/.cargo/registry/cache
             ~/.cargo/git/db
             ~/Library/Caches/cmux
-            Native/CommandPaletteNucleoFFI/target
-            Native/DiffSidecar/target
-          key: cargo-rust-${{ runner.os }}-${{ hashFiles('Native/**/Cargo.lock') }}
+            ~/Library/Caches/wmux
+            wmux-tui/target
+          key: cargo-rust-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             cargo-rust-${{ runner.os }}-
 
@@ -86,6 +110,18 @@ jobs:
           restore-keys: |
             spm-${{ runner.os }}-
 
+      - name: Cache Xcode Intermediates & Module Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/Build/Intermediates.noindex
+            build/ModuleCache.noindex
+            build/XCBuildData
+          key: xcode-intermediates-${{ runner.os }}-${{ hashFiles('**/Package.resolved', 'wmux.xcodeproj/project.pbxproj', 'wmux.xcworkspace/contents.xcworkspacedata') }}-${{ github.sha }}
+          restore-keys: |
+            xcode-intermediates-${{ runner.os }}-${{ hashFiles('**/Package.resolved', 'wmux.xcodeproj/project.pbxproj', 'wmux.xcworkspace/contents.xcworkspacedata') }}-
+            xcode-intermediates-${{ runner.os }}-
+
       - name: Sanitize SwiftPM State
         run: |
           # Prevent Xcode crashes caused by cached absolute paths in workspace-state.json
@@ -99,7 +135,12 @@ jobs:
           CMUX_SWIFT_FRONTEND_WORKAROUND: 1
           CMUX_SWIFT_DISABLE_GLOBAL_ISEL: 1
           CMUX_SKIP_ZIG_BUILD: 1
+          WMUX_SWIFT_FRONTEND_WORKAROUND: 1
+          WMUX_SWIFT_DISABLE_GLOBAL_ISEL: 1
+          WMUX_SKIP_ZIG_BUILD: 1
           XCBUILD_FILE_SYSTEM_MODE: checksum-only
+          CLANG_ENABLE_PREFIX_MAPPING: "YES"
+          SWIFT_ENABLE_PROJECT_PREFIX_MAPPING: "YES"
         run: |
           SPM_FLAGS=""
           if [ -d "build/SourcePackages/checkouts" ]; then
@@ -107,12 +148,16 @@ jobs:
             SPM_FLAGS="-skipPackageUpdates"
           fi
 
-          xcodebuild -scheme cmux \
+          NCPU="$(sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+          echo "Building with $NCPU parallel jobs..."
+
+          xcodebuild -workspace wmux.xcworkspace \
+            -scheme wmux \
             -configuration Release \
             -derivedDataPath build \
             -destination 'generic/platform=macOS' \
             -parallelizeTargets \
-            -jobs 3 \
+            -jobs "$NCPU" \
             -skipPackagePluginValidation \
             -skipMacroValidation \
             $SPM_FLAGS \
@@ -122,9 +167,22 @@ jobs:
             COMPILER_INDEX_STORE_ENABLE=NO \
             DEBUG_INFORMATION_FORMAT=dwarf \
             GCC_GENERATE_DEBUGGING_SYMBOLS=NO \
+            SWIFT_EMIT_LOC_STRINGS=NO \
+            CLANG_ENABLE_MODULE_DEBUGGING=NO \
             OTHER_SWIFT_FLAGS='$(inherited) -Xllvm -aarch64-enable-global-isel-at-O=-1' \
             -showBuildTimingSummary \
             build
+
+      - name: Prune & Strip App Bundle
+        run: |
+          if [ -d "build/Build/Products/Release/wmux.app" ]; then
+            APP_PATH="build/Build/Products/Release/wmux.app"
+          else
+            APP_PATH="build/Build/Products/Release/cmux.app"
+          fi
+          echo "=== Stripping and pruning release bundle at $APP_PATH ==="
+          ./scripts/prune-release-bundle.sh "$APP_PATH"
+          ./scripts/strip-release-bundle.sh "$APP_PATH"
 
       - name: Package DMG
         run: |
@@ -137,11 +195,27 @@ jobs:
             APP_NAME="cmux.app"
           fi
           
-          # Ad-hoc code sign app bundle
+          # Codesign inside-out: Mach-O binaries under Contents/Resources/bin are considered resources
+          # by `codesign --deep` and will not be re-signed after strip unless signed explicitly first.
+          if [ -d "$APP_PATH/Contents/Resources/bin" ]; then
+            for bin in "$APP_PATH/Contents/Resources/bin"/*; do
+              if [ -f "$bin" ] && [ -x "$bin" ] && file -b "$bin" | grep -q 'Mach-O'; then
+                codesign --force -s - "$bin"
+              fi
+            done
+          fi
           codesign --force --deep -s - "$APP_PATH"
           
           rm -f dist/wmux-macos-arm64.dmg dist/rw.*.dmg 2>/dev/null || true
+
+          # Provide hdiutil translation shim for reliable unmount retries in create-dmg
+          HDIUTIL_SHIM_DIR="$(mktemp -d)"
+          printf '#!/bin/bash\n/usr/bin/hdiutil "$@" 2>&1 | sed -e "s/资源忙/Resource busy/g"\nexit "${PIPESTATUS[0]}"\n' > "$HDIUTIL_SHIM_DIR/hdiutil"
+          chmod +x "$HDIUTIL_SHIM_DIR/hdiutil"
+          OLD_PATH="$PATH"
+          export PATH="$HDIUTIL_SHIM_DIR:$PATH"
           export LC_ALL=C
+
           create-dmg \
             --volname "wmux" \
             --window-pos 200 120 \
@@ -154,6 +228,9 @@ jobs:
             --overwrite \
             dist/wmux-macos-arm64.dmg \
             "$APP_PATH"
+
+          export PATH="$OLD_PATH"
+          rm -rf "$HDIUTIL_SHIM_DIR"
 
       - name: Upload DMG as Artifact
         uses: actions/upload-artifact@v4

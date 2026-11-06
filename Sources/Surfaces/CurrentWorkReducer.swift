@@ -1,4 +1,3 @@
-import WmuxCloud
 import Foundation
 
 /// Reduces an immutable owner capture. It performs no I/O and owns no mutable graph.
@@ -79,17 +78,38 @@ struct CurrentWorkReducer {
                 CurrentWorkSnapshot.Receipt(kind: mutation.kind.rawValue, cursor: mutation.receipt,
                                             evidence: .init(owner: "SurfaceCatalog", reference: resource.id.rawValue, observedAt: observedAt))
             }
+            let durableSurfaceID: UUID? = (local && stableIDs.count == 1) ? stableIDs.first : nil
+            let itemCwd: String? = (resource.kind == .terminal) ? resource.detail.map { bounded($0) } : nil
+            let itemPlacement = CurrentWorkSnapshot.Placement(kind: resource.machine.kind, machine: resource.machine.rawValue)
+            let omittedCounts: [String: Int] = [
+                "projections": max(0, allProjections.count - 16),
+                "agents": max(0, agents.count - 8),
+                "attention": max(0, attention.count - 24),
+                "pull_requests": max(0, prs.count - 16),
+                "project_hints": max(0, projects.count - 8),
+                "repository_hints": max(0, repositories.count - 8),
+                "receipt_refs": max(0, pending.count - 8)
+            ]
             return CurrentWorkSnapshot.Item(
-                resourceRef: resource.id.rawValue, durableSurfaceID: local && stableIDs.count == 1 ? stableIDs.first : nil,
-                label: bounded(resource.title), kind: resource.kind.rawValue, lifecycle: resource.lifecycle.rawValue,
-                placement: .init(kind: resource.machine.kind, machine: resource.machine.rawValue), projections: projected,
-                cwd: resource.kind == .terminal ? resource.detail.map { bounded($0) } : nil,
-                projectHints: Array(projects.prefix(8)), repositoryHints: Array(repositories.prefix(8)), agents: boundedAgents, attention: Array(attention.prefix(24)),
-                pullRequests: Array(prs.prefix(16)), freshness: fresh, cursor: state?.cursor, receiptRefs: receipts,
-                possibleHumanObligations: obligations, evidence: evidence,
-                omitted: ["projections": max(0, allProjections.count - 16), "agents": max(0, agents.count - 8),
-                          "attention": max(0, attention.count - 24), "pull_requests": max(0, prs.count - 16),
-                          "project_hints": max(0, projects.count - 8), "repository_hints": max(0, repositories.count - 8), "receipt_refs": max(0, pending.count - 8)]
+                resourceRef: resource.id.rawValue,
+                durableSurfaceID: durableSurfaceID,
+                label: bounded(resource.title),
+                kind: resource.kind.rawValue,
+                lifecycle: resource.lifecycle.rawValue,
+                placement: itemPlacement,
+                projections: projected,
+                cwd: itemCwd,
+                projectHints: Array(projects.prefix(8)),
+                repositoryHints: Array(repositories.prefix(8)),
+                agents: boundedAgents,
+                attention: Array(attention.prefix(24)),
+                pullRequests: Array(prs.prefix(16)),
+                freshness: fresh,
+                cursor: state?.cursor,
+                receiptRefs: receipts,
+                possibleHumanObligations: obligations,
+                evidence: evidence,
+                omitted: omittedCounts
             )
         }
         return CurrentWorkSnapshot(observedAt: observedAt, totalObserved: catalog.resources.count,

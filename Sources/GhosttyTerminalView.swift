@@ -1,5 +1,3 @@
-import WmuxCloudBannerCore
-import WmuxCloud
 import Foundation
 import WmuxAppKitSupportUI
 import WmuxTerminal
@@ -22,7 +20,6 @@ import Carbon.HIToolbox
 import os
 import Bonsplit
 import WMUXAgentLaunch
-import WMUXMobileCore
 import IOSurface
 import UniformTypeIdentifiers
 enum GhosttyStartupAppearancePreviewState {

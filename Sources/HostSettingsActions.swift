@@ -1,6 +1,4 @@
-import WmuxCloud
 import AppKit
-import WMUXMobileCore
 import WmuxWorkspaces
 import WmuxSettings
 import WmuxSettingsUI

@@ -1,4 +1,3 @@
-import WmuxCloud
 import AppKit
 import WmuxAppKitSupportUI
 import WmuxCommandPalette

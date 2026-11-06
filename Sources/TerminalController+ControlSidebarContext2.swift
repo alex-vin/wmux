@@ -1,5 +1,4 @@
 import WmuxControlSocket
-import WmuxRemoteSession
 import Foundation
 import WmuxWorkspaces
 import WmuxSidebar

@@ -1,5 +1,4 @@
 import AppKit
-import WMUXMobileCore
 import Bonsplit
 import WmuxTerminal
 import QuartzCore

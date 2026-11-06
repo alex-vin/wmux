@@ -1,5 +1,4 @@
 import WmuxAgentJournal
-import WMUXMobileCore
 import WmuxSettings
 import WmuxSidebar
 import WmuxTerminal

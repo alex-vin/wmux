@@ -1,16 +1,12 @@
 import WmuxAgentChat
 import WmuxAuthRuntime
-import WmuxCloud
-import WmuxCloudTui
 import WmuxControlSocket
 import WmuxFoundation
 import WmuxSettingsUI
 import WmuxProductAnalytics
-import WmuxMobileHost
 import WmuxSurfaceCatalogModel
 import WmuxTerminal
 import WmuxTerminalCore
-import WMUXMobileCore
 import Foundation
 import Observation
 import SwiftUI
@@ -897,23 +893,23 @@ extension TerminalController {
     func attachAuth(coordinator: Any? = nil) {}
 }
 
-extension TerminalTheme {
+extension WmuxFoundation.TerminalTheme {
     init(ghosttyConfig config: GhosttyConfig) {
-        let monokai = TerminalTheme.monokai
+        let monokai = WmuxFoundation.TerminalTheme.monokai
         let palette: [String] = (0...15).map { index in
             config.palette[index]?.hexString() ?? monokai.palette[index]
         }
         let cursorColorSemantic = config.cursorColorSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let cursorTextSemantic = config.cursorTextColorSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let selectionBackgroundSemantic = config.selectionBackgroundSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let selectionForegroundSemantic = config.selectionForegroundSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let cursorText = config.hasParsedCursorTextColor && cursorTextSemantic == nil
             ? config.cursorTextColor.hexString()

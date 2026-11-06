@@ -1,4 +1,3 @@
-import WmuxCloud
 import WmuxSurfaceCatalogModel
 import Foundation
 import WmuxFoundation
@@ -15,10 +14,10 @@ extension WmuxTuiSurfaceProvider {
     var displayResources: [SurfaceResource] {
         let base: [SurfaceResource]
         if let snapshot = displayCoordinator.displaySnapshot {
-            base = snapshot.displays.map { $0.resource(on: machine, address: info.privateAddress) }
+            base = snapshot.displays.map { $0.resource(on: machine, address: self.info.privateAddress) }
         } else {
             base = [WmuxTuiSnapshotParser.display(machine: machine,
-                directURL: info.privateAddress.map { Self.privateDesktopURL(privateAddress: $0) })]
+                directURL: self.info.privateAddress.map { Self.privateDesktopURL(privateAddress: $0) })]
         }
         // A named display carries its name everywhere it is listed or shown.
         let names = cloudState?.displayNames ?? [:]
@@ -115,7 +114,7 @@ extension WmuxTuiSurfaceProvider {
         guard let display = snapshot.displays.first(where: { $0.id == snapshot.created }) else {
             throw SurfaceCatalogError.unsupported(CloudGuestDisplaySnapshot.unavailableMessage)
         }
-        return display.resource(on: machine, address: info.privateAddress)
+        return display.resource(on: machine, address: self.info.privateAddress)
     }
 
     private func publishDisplays() {
