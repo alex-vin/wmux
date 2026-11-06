@@ -1,4 +1,5 @@
 import Foundation
+import WmuxSurfaceCatalogModel
 
 /// Shared tab-title action for UI, socket, agent hooks, restore and daemon reconciliation.
 extension Workspace {

@@ -1,8 +1,10 @@
 import Foundation
 import WMUXAgentLaunch
 
+typealias WmuxTuiRemoteRouting = CmuxTuiRemoteRouting
+
 /// Pure remote catalog selector and placement resolution shared by the app and CLI.
-enum WmuxTuiRemoteRouting {
+enum CmuxTuiRemoteRouting {
     /// Every `cmux vm agent` option that takes a value, so the alias walk and
     /// the help scan skip the value instead of reading it as the first provider
     /// argument (or as `--help`).

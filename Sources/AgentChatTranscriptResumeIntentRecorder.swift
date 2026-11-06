@@ -897,23 +897,23 @@ extension TerminalController {
     func attachAuth(coordinator: Any? = nil) {}
 }
 
-extension TerminalTheme {
+extension WmuxFoundation.TerminalTheme {
     init(ghosttyConfig config: GhosttyConfig) {
-        let monokai = TerminalTheme.monokai
+        let monokai = WmuxFoundation.TerminalTheme.monokai
         let palette: [String] = (0...15).map { index in
             config.palette[index]?.hexString() ?? monokai.palette[index]
         }
         let cursorColorSemantic = config.cursorColorSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let cursorTextSemantic = config.cursorTextColorSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let selectionBackgroundSemantic = config.selectionBackgroundSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let selectionForegroundSemantic = config.selectionForegroundSemantic.flatMap {
-            TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
+            WmuxFoundation.TerminalTheme.CellRelativeColor(rawValue: $0.rawValue)
         }
         let cursorText = config.hasParsedCursorTextColor && cursorTextSemantic == nil
             ? config.cursorTextColor.hexString()

@@ -17,6 +17,14 @@ struct TerminalGeometryDiagnostics {
         Interval()
     }
 
+    /// App boundary for geometry refresh and diagnostics.
+    func context(
+        workspaceID: UUID?,
+        transition: TerminalWorkContext.Transition = .unknown
+    ) -> TerminalWorkContext {
+        .init(transition: transition)
+    }
+
     /// Only an active native window or owned divider drag establishes resize.
     func resizeTransition(in window: NSWindow?) -> TerminalWorkContext.Transition {
         guard let window else { return .unknown }

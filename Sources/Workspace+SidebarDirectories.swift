@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import WmuxSidebar
+import WmuxSurfaceCatalogModel
 
 extension Workspace {
     private func normalizedSidebarDirectory(_ directory: String?) -> String? {
