@@ -1,6 +1,16 @@
 # cmux shell integration for zsh
 # Injected automatically — do not source manually
 
+# Normalize WMUX_* and CMUX_* variables for backwards compatibility
+: "${CMUX_SHELL_INTEGRATION:=${WMUX_SHELL_INTEGRATION:-1}}"
+: "${CMUX_SHELL_INTEGRATION_DIR:=${WMUX_SHELL_INTEGRATION_DIR:-}}"
+: "${CMUX_SURFACE_ID:=${WMUX_SURFACE_ID:-}}"
+: "${CMUX_WORKSPACE_ID:=${WMUX_WORKSPACE_ID:-}}"
+: "${CMUX_PANEL_ID:=${WMUX_PANEL_ID:-}}"
+: "${CMUX_TAB_ID:=${WMUX_TAB_ID:-}}"
+: "${CMUX_SOCKET_PATH:=${WMUX_SOCKET_PATH:-}}"
+: "${CMUX_CLAUDE_WRAPPER_SHIM_ROOT:=${WMUX_CLAUDE_WRAPPER_SHIM_ROOT:-}}"
+
 # Socket sends exec a unix-socket-capable client in a detached child. The
 # historical zsocket fast path (zmodload zsh/net/unix) never activated because
 # that module does not exist (zsocket lives in zsh/net/socket). Enabling it
@@ -583,7 +593,7 @@ _cmux_install_cli_wrapper() {
     # Keep the bundled wrapper ahead of later PATH mutations. Install it
     # via eval so an existing alias cannot break parsing.
     typeset -g "$wrapper_variable=$wrapper_path"
-    if [[ "$command_name" == "claude" ]]; then
+    if [[ "$command_name" == "claude" || "$command_name" == "agy" ]]; then
         _cmux_install_cli_command_shim "$command_name" "$wrapper_path"
     fi
     builtin unalias "$command_name" >/dev/null 2>&1 || true
@@ -593,7 +603,8 @@ _cmux_install_cli_wrapper() {
         eval "$command_name() { \"\${$wrapper_variable}\" \"\$@\"; }"
     fi
 }
-_cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER cmux-claude-wrapper
+_cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER wmux-claude-wrapper
+[[ -n "${_CMUX_CLAUDE_WRAPPER:-}" ]] || _cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER cmux-claude-wrapper
 _cmux_install_cli_wrapper agy _CMUX_AGY_WRAPPER
 _cmux_install_cli_wrapper grok _CMUX_GROK_WRAPPER
 _cmux_install_cli_wrapper muse _CMUX_MUSE_WRAPPER
@@ -2406,7 +2417,9 @@ _cmux_fix_path() {
             PATH="$REPLY"
         fi
     fi
-    _cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER cmux-claude-wrapper
+    local claude_wrapper="wmux-claude-wrapper"
+    [[ -x "$bin_dir/$claude_wrapper" ]] || claude_wrapper="cmux-claude-wrapper"
+    _cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER "$claude_wrapper"
     _cmux_install_cli_wrapper agy _CMUX_AGY_WRAPPER
     _cmux_install_cli_wrapper grok _CMUX_GROK_WRAPPER
     _cmux_install_cli_wrapper muse _CMUX_MUSE_WRAPPER

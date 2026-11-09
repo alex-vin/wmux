@@ -7,9 +7,16 @@ find_real_agy() {
     local IFS=:
     for d in $PATH; do
         [[ "$d" == "$self_dir" ]] && continue
+        case "$d" in
+            */wmux-cli-shims/*|*/wmux-cli-shims|*/cmux-cli-shims/*|*/cmux-cli-shims) continue ;;
+            */Contents/Resources/bin|*/Resources/bin) continue ;;
+        esac
         local candidate="$d/agy"
         [[ -x "$candidate" ]] || continue
         if [[ "$candidate" -ef "$0" ]]; then
+            continue
+        fi
+        if [[ -n "${WMUX_AGY_WRAPPER_SHIM:-}" && -e "$candidate" && "$candidate" -ef "$WMUX_AGY_WRAPPER_SHIM" ]]; then
             continue
         fi
         printf '%s' "$candidate"
@@ -131,18 +138,27 @@ should_install_agy_hooks() {
 REAL_AGY="$(find_real_agy)" || { echo "Error: agy not found in PATH" >&2; exit 127; }
 
 IN_CMUX=0
-if [[ -n "${WMUX_SURFACE_ID:-}" ]]; then
+SURFACE_ID="${WMUX_SURFACE_ID:-${CMUX_SURFACE_ID:-}}"
+if [[ -n "$SURFACE_ID" ]]; then
     IN_CMUX=1
     # Check for per-surface Gemini account isolation
     USER_HOME="${REAL_USER_HOME:-$(eval echo ~"${USER:-$(id -un)}")}"
-    SURFACE_ENV="$USER_HOME/.config/wmux/gemini_tokens/${WMUX_SURFACE_ID}.env"
+    SURFACE_ENV="$USER_HOME/.config/wmux/gemini_tokens/${SURFACE_ID}.env"
+    if [[ ! -f "$SURFACE_ENV" ]]; then
+        SURFACE_ENV="$USER_HOME/.config/cmux/gemini_tokens/${SURFACE_ID}.env"
+    fi
     if [[ -f "$SURFACE_ENV" ]]; then
         source "$SURFACE_ENV"
     fi
     if [[ -f "$HOME/Library/Keychains/account.keychain-db" ]]; then
         /usr/bin/security unlock-keychain -p "" "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
         /usr/bin/security default-keychain -d user -s "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
-        /usr/bin/security list-keychains -d user -s "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
+        host_login_kc="$USER_HOME/Library/Keychains/login.keychain-db"
+        if [[ -f "$host_login_kc" ]]; then
+            /usr/bin/security list-keychains -d user -s "$HOME/Library/Keychains/account.keychain-db" "$host_login_kc" >/dev/null 2>&1 || true
+        else
+            /usr/bin/security list-keychains -d user -s "$HOME/Library/Keychains/account.keychain-db" >/dev/null 2>&1 || true
+        fi
     elif [[ -f "$HOME/Library/Keychains/login.keychain-db" ]]; then
         /usr/bin/security unlock-keychain -p "" "$HOME/Library/Keychains/login.keychain-db" >/dev/null 2>&1 || true
     fi

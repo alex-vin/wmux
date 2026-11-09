@@ -36,6 +36,9 @@ public struct TerminalSurfaceSpawnPolicy: Sendable {
         if !piHooksEnabled {
             commands.remove(.pi)
         }
+        if !geminiHooksEnabled {
+            commands.remove(.agy)
+        }
         return commands
     }
 

@@ -82,7 +82,12 @@ extension TerminalSurface {
             "WMUX_PANEL_ID": context.surfaceId.uuidString,
             "WMUX_TAB_ID": context.workspaceId.uuidString,
             "WMUX_TERMINAL_LIFECYCLE_ID": context.terminalLifecycleId.uuidString,
-            "WMUX_SOCKET_PATH": context.socketPath
+            "WMUX_SOCKET_PATH": context.socketPath,
+            "CMUX_SURFACE_ID": context.surfaceId.uuidString,
+            "CMUX_WORKSPACE_ID": context.workspaceId.uuidString,
+            "CMUX_PANEL_ID": context.surfaceId.uuidString,
+            "CMUX_TAB_ID": context.workspaceId.uuidString,
+            "CMUX_SOCKET_PATH": context.socketPath
         ]
 
         for (key, value) in values {

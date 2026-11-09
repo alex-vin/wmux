@@ -234,6 +234,8 @@ extension TerminalSurface {
             appliedShellIntegrationDirectory = integrationDir
             setManagedEnvironmentValue("WMUX_SHELL_INTEGRATION", "1")
             setManagedEnvironmentValue("WMUX_SHELL_INTEGRATION_DIR", integrationDir)
+            setManagedEnvironmentValue("CMUX_SHELL_INTEGRATION", "1")
+            setManagedEnvironmentValue("CMUX_SHELL_INTEGRATION_DIR", integrationDir)
             Self.applyManagedGitWatchEnvironment(
                 watchGitStatusEnabled: spawnPolicy.watchGitStatusEnabled,
                 showPullRequestsEnabled: spawnPolicy.showPullRequestsEnabled,

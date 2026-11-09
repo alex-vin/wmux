@@ -4,7 +4,17 @@
 
 set -euo pipefail
 
-SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
+resolve_self_dir() {
+    local target="$0"
+    while [[ -L "$target" ]]; do
+        local dir
+        dir="$(cd -P "$(dirname "$target")" && pwd)"
+        target="$(readlink "$target")"
+        [[ "$target" != /* ]] && target="$dir/$target"
+    done
+    cd -P "$(dirname "$target")" && pwd
+}
+SELF_DIR="$(resolve_self_dir)"
 WMUX_CONFIG_ROOT="${REAL_USER_HOME:-$HOME}/.config/wmux"
 SUBAGENTS_DIR="$WMUX_CONFIG_ROOT/subagents"
 STATUS_JSON=""
@@ -71,6 +81,19 @@ resolve_cmux_bin() {
 resolve_agy_bin() {
     if [[ -x "$SELF_DIR/agy" ]]; then
         printf '%s' "$SELF_DIR/agy"
+        return 0
+    fi
+
+    # Check bundled wmux app Resources/bin
+    if [[ -x "/Applications/wmux.app/Contents/Resources/bin/agy" ]]; then
+        printf '%s' "/Applications/wmux.app/Contents/Resources/bin/agy"
+        return 0
+    fi
+
+    local repo_bin
+    repo_bin="$(cd "$SELF_DIR/../../Resources/bin" 2>/dev/null && pwd)/agy"
+    if [[ -x "$repo_bin" ]]; then
+        printf '%s' "$repo_bin"
         return 0
     fi
 
@@ -513,6 +536,21 @@ cd "\$TARGET_DIR" || {
     exit 1
 }
 
+# Source per-surface isolation env if available
+TARGET_SURFACE="\${WMUX_SURFACE_ID:-\$(cat "\$STATE_DIR/surface_id" 2>/dev/null || true)}"
+if [[ -n "\$TARGET_SURFACE" ]]; then
+    SURFACE_ENV="\${REAL_USER_HOME:-\$HOME}/.config/wmux/gemini_tokens/\${TARGET_SURFACE}.env"
+    if [[ ! -f "\$SURFACE_ENV" ]]; then
+        SURFACE_ENV="\${REAL_USER_HOME:-\$HOME}/.config/cmux/gemini_tokens/\${TARGET_SURFACE}.env"
+    fi
+    if [[ -f "\$SURFACE_ENV" ]]; then
+        source "\$SURFACE_ENV"
+    fi
+fi
+if [[ -z "\$ACCOUNT_ID" && -n "\${WMUX_AGY_ISOLATED_ACCOUNT:-}" ]]; then
+    ACCOUNT_ID="\$WMUX_AGY_ISOLATED_ACCOUNT"
+fi
+
 printf '\033[1;36m%s\033[0m\n' "============================================================"
 printf '\033[1;36m  wmux Subagent: %s\033[0m\n' "\$TITLE"
 printf '\033[0;33m  Task ID:   \033[0m%s\n' "\$TASK_ID"
@@ -684,13 +722,13 @@ cat << REPORT_EOF > "\$REPORT_FILE"
 
 | Attribute | Details |
 | :--- | :--- |
-| **Task ID** | \`\$TASK_ID\` |
+| **Task ID** | \\\`\$TASK_ID\\\` |
 | **Status** | **\$STATUS_LABEL** |
-| **Account** | \`\${ACCOUNT_ID:-pool}\` |
-| **Duration** | \`\${DURATION}s\` |
-| **Started** | \`\$START_DATE\` |
-| **Directory** | \`\$TARGET_DIR\` |
-| **Surface** | \`\${WMUX_SURFACE_ID:-unknown}\` |
+| **Account** | \\\`\${ACCOUNT_ID:-\${WMUX_AGY_ISOLATED_ACCOUNT:-pool}}\\\` |
+| **Duration** | \\\`\${DURATION}s\\\` |
+| **Started** | \\\`\$START_DATE\\\` |
+| **Directory** | \\\`\$TARGET_DIR\\\` |
+| **Surface** | \\\`\${WMUX_SURFACE_ID:-unknown}\\\` |
 
 ## Instructions / Prompt
 > \$(cat "\$STATE_DIR/prompt.txt" 2>/dev/null || echo "\$PROMPT")

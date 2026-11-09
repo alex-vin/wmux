@@ -43,7 +43,7 @@ fi
        && -z "${ZSH_EXECUTION_STRING:-}" \
        && "${CMUX_SHELL_INTEGRATION:-1}" != "0" \
        && -n "${CMUX_SHELL_INTEGRATION_DIR:-}" \
-       && -r "${CMUX_SHELL_INTEGRATION_DIR}/cmux-zsh-integration.zsh" \
+       && ( -r "${CMUX_SHELL_INTEGRATION_DIR}/wmux-zsh-integration.zsh" || -r "${CMUX_SHELL_INTEGRATION_DIR}/cmux-zsh-integration.zsh" ) \
        && "${TERM:-}" == "xterm-256color" \
        && -z "${CMUX_ZSH_RESTORE_TERM:-}" ]]; then
         # Keep startup TERM-compatible prompt/theme selection during shell init,
@@ -70,9 +70,10 @@ fi
             [[ -r "$_cmux_ghostty" ]] && builtin source -- "$_cmux_ghostty"
         fi
 
-        # Load cmux integration (unless disabled)
+        # Load cmux/wmux integration (unless disabled)
         if [[ "${CMUX_SHELL_INTEGRATION:-1}" != "0" && -n "${CMUX_SHELL_INTEGRATION_DIR:-}" ]]; then
-            builtin typeset _cmux_integ="$CMUX_SHELL_INTEGRATION_DIR/cmux-zsh-integration.zsh"
+            builtin typeset _cmux_integ="$CMUX_SHELL_INTEGRATION_DIR/wmux-zsh-integration.zsh"
+            [[ -r "$_cmux_integ" ]] || _cmux_integ="$CMUX_SHELL_INTEGRATION_DIR/cmux-zsh-integration.zsh"
             [[ -r "$_cmux_integ" ]] && builtin source -- "$_cmux_integ"
         fi
     fi

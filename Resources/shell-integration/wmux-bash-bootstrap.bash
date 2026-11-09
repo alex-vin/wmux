@@ -41,7 +41,8 @@ if [[ "${CMUX_LOAD_GHOSTTY_BASH_INTEGRATION:-0}" == "1" && -n "${GHOSTTY_RESOURC
     [[ -r "$_cmux_ghostty_bash" ]] && source "$_cmux_ghostty_bash"
 fi
 if [[ "${CMUX_SHELL_INTEGRATION:-1}" != "0" && -n "${CMUX_SHELL_INTEGRATION_DIR:-}" ]]; then
-    _cmux_bash_integration="$CMUX_SHELL_INTEGRATION_DIR/cmux-bash-integration.bash"
+    _cmux_bash_integration="$CMUX_SHELL_INTEGRATION_DIR/wmux-bash-integration.bash"
+    [[ -r "$_cmux_bash_integration" ]] || _cmux_bash_integration="$CMUX_SHELL_INTEGRATION_DIR/cmux-bash-integration.bash"
     [[ -r "$_cmux_bash_integration" ]] && source "$_cmux_bash_integration"
 fi
 # The bootstrap must be exported for its first evaluation, but the composed

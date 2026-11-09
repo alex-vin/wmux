@@ -17,7 +17,13 @@ public final class GeminiAccountStore {
     /// List of registered Google accounts.
     public private(set) var accounts: [GeminiAccount] = []
     /// The globally active or default account ID.
-    public var defaultAccountID: String?
+    public var defaultAccountID: String? {
+        didSet {
+            if defaultAccountID != oldValue {
+                saveToDisk()
+            }
+        }
+    }
     /// Whether a quota refresh is currently in progress.
     public private(set) var isRefreshing: Bool = false
     /// Last error encountered during account operations.
@@ -96,6 +102,52 @@ public final class GeminiAccountStore {
             defaultAccountID = accounts.first?.id
         }
         saveToDisk()
+    }
+
+    /// Sets an account as the global default, persists it, and syncs to host credential store.
+    public func setDefaultAccount(id: String) {
+        guard let account = account(for: id) else { return }
+        defaultAccountID = id
+        saveToDisk()
+        syncDefaultAccountCredentials(account)
+    }
+
+    /// Syncs the given account's credentials to the host user keychain and ~/.gemini/google_accounts.json.
+    public func syncDefaultAccountCredentials(_ account: GeminiAccount) {
+        let secret = account.agyKeyringSecretValue()
+        let fm = FileManager.default
+        let home = fm.homeDirectoryForCurrentUser
+        let hostKeychain = home.appendingPathComponent("Library/Keychains/login.keychain-db")
+        if fm.fileExists(atPath: hostKeychain.path) {
+            let p1 = Process()
+            p1.executableURL = URL(fileURLWithPath: "/usr/bin/security")
+            p1.arguments = ["delete-generic-password", "-s", "gemini", "-a", "antigravity", hostKeychain.path]
+            try? p1.run()
+            p1.waitUntilExit()
+
+            let p2 = Process()
+            p2.executableURL = URL(fileURLWithPath: "/usr/bin/security")
+            p2.arguments = ["add-generic-password", "-s", "gemini", "-a", "antigravity", "-w", secret, "-A", hostKeychain.path]
+            try? p2.run()
+            p2.waitUntilExit()
+        }
+
+        let googleAccountsURL = home.appendingPathComponent(".gemini/google_accounts.json")
+        if fm.fileExists(atPath: googleAccountsURL.path) {
+            if var obj = (try? JSONSerialization.jsonObject(with: Data(contentsOf: googleAccountsURL))) as? [String: Any] {
+                obj["active"] = account.email
+                if let updated = try? JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted]) {
+                    try? updated.write(to: googleAccountsURL)
+                }
+            }
+        }
+
+        let jetskiTokenURL = home.appendingPathComponent(".gemini/jetski-standalone-oauth-token")
+        let payloadJSON = account.agyPayloadJSON()
+        if let data = payloadJSON.data(using: .utf8) {
+            try? data.write(to: jetskiTokenURL, options: .atomic)
+            try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: jetskiTokenURL.path)
+        }
     }
 
     /// Evaluates health status for a given account.

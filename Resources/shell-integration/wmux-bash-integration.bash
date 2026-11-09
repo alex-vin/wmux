@@ -1,5 +1,15 @@
 # cmux shell integration for bash
 
+# Normalize WMUX_* and CMUX_* variables for backwards compatibility
+: "${CMUX_SHELL_INTEGRATION:=${WMUX_SHELL_INTEGRATION:-1}}"
+: "${CMUX_SHELL_INTEGRATION_DIR:=${WMUX_SHELL_INTEGRATION_DIR:-}}"
+: "${CMUX_SURFACE_ID:=${WMUX_SURFACE_ID:-}}"
+: "${CMUX_WORKSPACE_ID:=${WMUX_WORKSPACE_ID:-}}"
+: "${CMUX_PANEL_ID:=${WMUX_PANEL_ID:-}}"
+: "${CMUX_TAB_ID:=${WMUX_TAB_ID:-}}"
+: "${CMUX_SOCKET_PATH:=${WMUX_SOCKET_PATH:-}}"
+: "${CMUX_CLAUDE_WRAPPER_SHIM_ROOT:=${WMUX_CLAUDE_WRAPPER_SHIM_ROOT:-}}"
+
 # Cache which send tool is available to avoid repeated PATH lookups.
 _CMUX_SEND_TOOL=""
 _cmux_detect_send_tool() {
@@ -539,7 +549,7 @@ _cmux_install_cli_wrapper() {
 
     existing_type="$(type -t "$command_name" 2>/dev/null || true)"
     printf -v "$wrapper_variable" '%s' "$wrapper_path"
-    if [[ "$command_name" == "claude" ]]; then
+    if [[ "$command_name" == "claude" || "$command_name" == "agy" ]]; then
         _cmux_install_cli_command_shim "$command_name" "$wrapper_path"
     fi
     case "$existing_type" in
@@ -557,7 +567,8 @@ _cmux_install_cli_wrapper() {
         eval "$command_name() { \"\${$wrapper_variable}\" \"\$@\"; }"
     fi
 }
-_cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER cmux-claude-wrapper
+_cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER wmux-claude-wrapper
+[[ -n "${_CMUX_CLAUDE_WRAPPER:-}" ]] || _cmux_install_cli_wrapper claude _CMUX_CLAUDE_WRAPPER cmux-claude-wrapper
 _cmux_install_cli_wrapper agy _CMUX_AGY_WRAPPER
 _cmux_install_cli_wrapper grok _CMUX_GROK_WRAPPER
 _cmux_install_cli_wrapper muse _CMUX_MUSE_WRAPPER

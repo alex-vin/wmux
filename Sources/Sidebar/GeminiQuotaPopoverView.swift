@@ -230,7 +230,7 @@ struct GeminiQuotaPopoverView: View {
                 Menu {
                     if !isDefault {
                         Button("设为全局默认") {
-                            store.defaultAccountID = account.id
+                            store.setDefaultAccount(id: account.id)
                         }
                     }
                     Button("立即刷新该账号") {

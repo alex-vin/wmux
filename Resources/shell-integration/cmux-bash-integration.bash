@@ -1,0 +1,1 @@
+wmux-bash-integration.bash
