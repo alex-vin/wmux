@@ -1,1 +1,9 @@
-// Stripped for wmux: ComputerUse feature removed
+import Foundation
+
+/// The validated recent driver states produced by one state-directory scan.
+struct ComputerUseStateScan: Equatable, Sendable {
+    static let empty = ComputerUseStateScan(newestStateByScopeID: [:], hasRecentStateFiles: false)
+
+    let newestStateByScopeID: [String: ComputerUseCuaState]
+    let hasRecentStateFiles: Bool
+}

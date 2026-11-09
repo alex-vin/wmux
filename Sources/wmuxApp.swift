@@ -1,4 +1,5 @@
 import AppKit
+import WmuxComputerUse
 import WmuxAppKitSupportUI
 import WmuxFoundation
 import WmuxPanes

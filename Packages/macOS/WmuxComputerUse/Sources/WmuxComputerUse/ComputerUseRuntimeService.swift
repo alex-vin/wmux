@@ -27,7 +27,7 @@ public enum ComputerUseDirectScreenCaptureVerification: Equatable, Sendable {
 /// LaunchServices, and reads permission status exclusively over the daemon UDS.
 @MainActor
 public final class ComputerUseRuntimeService {
-    static let helperAppName = "wmux Computer Use"
+    public static let helperAppName = "wmux Computer Use"
 
     private static let systemSettingsBundleIdentifier = "com.apple.systempreferences"
 

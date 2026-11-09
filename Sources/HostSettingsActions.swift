@@ -1,4 +1,5 @@
 import AppKit
+import WmuxComputerUse
 import WmuxWorkspaces
 import WmuxSettings
 import WmuxSettingsUI

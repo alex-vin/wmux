@@ -3487,6 +3487,52 @@ public struct MachinePlanSnapshot: Sendable {
 }
 public protocol RemoteTransferCancelling { var cancellationError: any Error { get } }
 
+public protocol RemoteSessionProcessRunning: Sendable {
+    func run(
+        _ request: RemoteProcessRequest,
+        operation: (any RemoteTransferCancelling)?
+    ) throws -> RemoteCommandResult
+}
+
+public struct RemoteProcessRequest: Sendable {
+    public let executable: String
+    public let arguments: [String]
+    public let environment: [String: String]?
+    public let currentDirectory: URL?
+    public let stdin: Data?
+    public let stdinFile: URL?
+    public let timeout: TimeInterval
+
+    public init(
+        executable: String = "",
+        arguments: [String] = [],
+        environment: [String: String]? = nil,
+        currentDirectory: URL? = nil,
+        stdin: Data? = nil,
+        timeout: TimeInterval = 0
+    ) {
+        self.executable = executable
+        self.arguments = arguments
+        self.environment = environment
+        self.currentDirectory = currentDirectory
+        self.stdin = stdin
+        self.stdinFile = nil
+        self.timeout = timeout
+    }
+}
+
+public struct RemoteCommandResult: Sendable {
+    public let status: Int32
+    public let stdout: String
+    public let stderr: String
+
+    public init(status: Int32 = 0, stdout: String = "", stderr: String = "") {
+        self.status = status
+        self.stdout = stdout
+        self.stderr = stderr
+    }
+}
+
 extension CurrentWorkInput {
     public typealias WorkspaceFacts = CurrentWorkObservation.WorkspaceFacts
 }
@@ -3532,5 +3578,217 @@ public enum CloudImagePasteError: Error, Sendable { case unavailable }
 extension CloudWireGuardHub {
     public func prepareForCloudUse(allowWhenCloudDisabled: Bool = true, expectedTeamScope: Any? = nil, _ args: Any...) async {}
 }
+
+// MARK: - Cloud Tree Style Stubs
+
+public struct CloudSidebarChromeMetrics: Equatable, Sendable {
+    public static let sidebar = CloudSidebarChromeMetrics()
+    public var barHorizontalPadding: CGFloat
+    public var barVerticalPadding: CGFloat
+
+    public init(
+        barHorizontalPadding: CGFloat = 8,
+        barVerticalPadding: CGFloat = 4
+    ) {
+        self.barHorizontalPadding = barHorizontalPadding
+        self.barVerticalPadding = barVerticalPadding
+    }
+}
+
+public struct CloudTreeRowGrid: Equatable, Sendable {
+    public var disclosureSlot: CGFloat = 16
+    public var disclosureGap: CGFloat = 2
+    public var attentionSlot: CGFloat = 12
+    public var dotGap: CGFloat = 4
+    public var detailGap: CGFloat = 5
+    public var trailingGap: CGFloat = 10
+    var trailingSlot: CGFloat = 16
+    public var trailingPadding: CGFloat = CloudSidebarChromeMetrics.sidebar.barHorizontalPadding
+    public var machineLineSpacing: CGFloat = 1
+
+    public init(
+        disclosureSlot: CGFloat = 16,
+        disclosureGap: CGFloat = 2,
+        attentionSlot: CGFloat = 12,
+        dotGap: CGFloat = 4,
+        detailGap: CGFloat = 5,
+        trailingGap: CGFloat = 10,
+        trailingSlot: CGFloat = 16,
+        trailingPadding: CGFloat = CloudSidebarChromeMetrics.sidebar.barHorizontalPadding,
+        machineLineSpacing: CGFloat = 1
+    ) {
+        self.disclosureSlot = disclosureSlot
+        self.disclosureGap = disclosureGap
+        self.attentionSlot = attentionSlot
+        self.dotGap = dotGap
+        self.detailGap = detailGap
+        self.trailingGap = trailingGap
+        self.trailingSlot = trailingSlot
+        self.trailingPadding = trailingPadding
+        self.machineLineSpacing = machineLineSpacing
+    }
+}
+
+public struct CloudTreeStyle: Equatable, Identifiable, Sendable {
+    public enum MachineRowLayout: String, Sendable {
+        case twoLine
+        case singleLine
+    }
+
+    public enum LeafLayout: String, Sendable {
+        case singleLine
+        case twoLine
+    }
+
+    public enum IconTreatment: String, Sendable {
+        case monochrome
+        case tinted
+        case chips
+    }
+
+    public enum GroupLabelStyle: String, Sendable {
+        case plain
+        case uppercased
+    }
+
+    public enum MetaPlacement: String, Sendable {
+        case inline
+        case trailing
+    }
+
+    public let id: String
+    public let name: String
+    public let rowHeight: CGFloat
+    public let machineRowLayout: MachineRowLayout
+    public let leafLayout: LeafLayout
+    public let iconTreatment: IconTreatment
+    public let groupLabelStyle: GroupLabelStyle
+    public let metaPlacement: MetaPlacement
+    public let machineBand: Bool
+    public let monospacedText: Bool
+    public let rowSeparators: Bool
+    public let indentPerLevel: CGFloat
+    public let machineNameSize: CGFloat
+    public let titleSize: CGFloat
+    public let detailSize: CGFloat
+    let groupLabelSize: CGFloat
+    public let iconSize: CGFloat
+    public let iconSlot: CGFloat
+    public let iconGap: CGFloat
+    let showsGroupCounts: Bool
+    let showsViewBadges: Bool
+    public let showsMachineStats: Bool
+    public let machineVerticalPadding: CGFloat
+    public var rowGrid = CloudTreeRowGrid()
+
+    public var emptyStateRowHeight: CGFloat { id == Self.compact.id ? 18 : rowHeight }
+
+    public var fontDesign: Font.Design { monospacedText ? .monospaced : .default }
+    public var machineNameLineHeight: CGFloat { machineNameSize + 3.5 }
+    public var machineSubtitleLineHeight: CGFloat { detailSize + 3.5 }
+    var machineResourceHeight: CGFloat { detailSize + 3.5 }
+    public var machineBandVerticalPadding: CGFloat { machineBand ? 4 : 0 }
+
+    public func machineRowHeight(hasStats: Bool, hasUsage: Bool = false) -> CGFloat {
+        switch machineRowLayout {
+        case .singleLine:
+            let identityHeight = machineNameLineHeight
+                + 2 * (machineVerticalPadding + machineBandVerticalPadding)
+            return max(rowHeight + 2 * machineBandVerticalPadding, identityHeight)
+        case .twoLine:
+            let statsHeight = hasStats && showsMachineStats ? 1 + machineResourceHeight : 0
+            let usageHeight = hasUsage ? 1 + machineResourceHeight : 0
+            return machineVerticalPadding * 2 + machineNameLineHeight + 1 + machineSubtitleLineHeight
+                + statsHeight + usageHeight + 2 * machineBandVerticalPadding
+        }
+    }
+
+    public static let compact = CloudTreeStyle(
+        id: "compact", name: "Compact",
+        rowHeight: 22, machineRowLayout: .singleLine, leafLayout: .singleLine,
+        iconTreatment: .monochrome, groupLabelStyle: .plain, metaPlacement: .inline,
+        machineBand: false, monospacedText: false, rowSeparators: false,
+        indentPerLevel: 10,
+        machineNameSize: 13, titleSize: 13, detailSize: 11, groupLabelSize: 11.5,
+        iconSize: 11, iconSlot: 16, iconGap: 4,
+        showsGroupCounts: true, showsViewBadges: true, showsMachineStats: true,
+        machineVerticalPadding: 2
+    )
+
+    public static let chips = CloudTreeStyle(
+        id: "chips", name: "Chips",
+        rowHeight: 26, machineRowLayout: .singleLine, leafLayout: .singleLine,
+        iconTreatment: .chips, groupLabelStyle: .plain, metaPlacement: .inline,
+        machineBand: false, monospacedText: false, rowSeparators: false,
+        indentPerLevel: 11,
+        machineNameSize: 12.5, titleSize: 12, detailSize: 10.5, groupLabelSize: 11,
+        iconSize: 10.5, iconSlot: 22, iconGap: 7,
+        showsGroupCounts: true, showsViewBadges: true, showsMachineStats: true,
+        machineVerticalPadding: 3
+    )
+
+    public static let sections = CloudTreeStyle(
+        id: "sections", name: "Sections",
+        rowHeight: 21, machineRowLayout: .singleLine, leafLayout: .singleLine,
+        iconTreatment: .tinted, groupLabelStyle: .uppercased, metaPlacement: .inline,
+        machineBand: true, monospacedText: false, rowSeparators: false,
+        indentPerLevel: 10,
+        machineNameSize: 12, titleSize: 11.5, detailSize: 10, groupLabelSize: 9,
+        iconSize: 10, iconSlot: 15, iconGap: 6,
+        showsGroupCounts: true, showsViewBadges: true, showsMachineStats: true,
+        machineVerticalPadding: 3
+    )
+
+    public static let ledger = CloudTreeStyle(
+        id: "ledger", name: "Ledger",
+        rowHeight: 18, machineRowLayout: .singleLine, leafLayout: .singleLine,
+        iconTreatment: .monochrome, groupLabelStyle: .uppercased, metaPlacement: .trailing,
+        machineBand: false, monospacedText: true, rowSeparators: true,
+        indentPerLevel: 8,
+        machineNameSize: 11, titleSize: 10.5, detailSize: 9.5, groupLabelSize: 8.5,
+        iconSize: 8.5, iconSlot: 11, iconGap: 5,
+        showsGroupCounts: true, showsViewBadges: true, showsMachineStats: true,
+        machineVerticalPadding: 2
+    )
+
+    public static let aero = CloudTreeStyle(
+        id: "aero", name: "Aero",
+        rowHeight: 34, machineRowLayout: .twoLine, leafLayout: .twoLine,
+        iconTreatment: .tinted, groupLabelStyle: .plain, metaPlacement: .inline,
+        machineBand: false, monospacedText: false, rowSeparators: false,
+        indentPerLevel: 13,
+        machineNameSize: 13, titleSize: 12.5, detailSize: 10.5, groupLabelSize: 11,
+        iconSize: 14, iconSlot: 22, iconGap: 8,
+        showsGroupCounts: true, showsViewBadges: true, showsMachineStats: true,
+        machineVerticalPadding: 4
+    )
+
+    public static let presets: [CloudTreeStyle] = [.compact, .chips, .sections, .ledger, .aero]
+    public static let defaultStyle: CloudTreeStyle = .compact
+
+    public static func preset(id: String) -> CloudTreeStyle? {
+        presets.first { $0.id == id }
+    }
+}
+
+public enum CloudTreeStyleStore: Sendable {
+    public static let defaultsKey = "cloudTree.style"
+    public static let didChangeNotification = Notification.Name("cmux.cloudTree.styleDidChange")
+
+    public static var current: CloudTreeStyle {
+        get {
+            guard let raw = UserDefaults.standard.string(forKey: defaultsKey),
+                  let style = CloudTreeStyle.preset(id: raw) else {
+                return .defaultStyle
+            }
+            return style
+        }
+        set {
+            UserDefaults.standard.set(newValue.id, forKey: defaultsKey)
+            NotificationCenter.default.post(name: didChangeNotification, object: nil)
+        }
+    }
+}
+
 
 
