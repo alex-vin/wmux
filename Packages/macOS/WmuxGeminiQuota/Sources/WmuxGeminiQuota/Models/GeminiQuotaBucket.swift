@@ -1,4 +1,4 @@
-public import Foundation
+import Foundation
 
 /// Represents a quota bucket from Google's `retrieveUserQuotaSummary` endpoint.
 public struct GeminiQuotaBucket: Sendable, Codable, Identifiable, Equatable {
@@ -38,5 +38,25 @@ public struct GeminiQuotaBucket: Sendable, Codable, Identifiable, Equatable {
         self.remainingFraction = max(0.0, min(1.0, remainingFraction))
         self.resetTime = resetTime
         self.displayName = displayName
+    }
+
+    public enum CodingKeys: String, CodingKey {
+        case id, window, remainingFraction, resetTime, displayName
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try? decoder.container(keyedBy: CodingKeys.self)
+        self.id = (try? container?.decodeIfPresent(String.self, forKey: .id)) ?? "unknown"
+        self.window = (try? container?.decodeIfPresent(String.self, forKey: .window)) ?? ""
+        if let fraction = try? container?.decodeIfPresent(Double.self, forKey: .remainingFraction) {
+            self.remainingFraction = max(0.0, min(1.0, fraction))
+        } else if let str = try? container?.decodeIfPresent(String.self, forKey: .remainingFraction),
+                  let d = Double(str) {
+            self.remainingFraction = max(0.0, min(1.0, d))
+        } else {
+            self.remainingFraction = 1.0
+        }
+        self.resetTime = try? container?.decodeIfPresent(String.self, forKey: .resetTime)
+        self.displayName = try? container?.decodeIfPresent(String.self, forKey: .displayName)
     }
 }

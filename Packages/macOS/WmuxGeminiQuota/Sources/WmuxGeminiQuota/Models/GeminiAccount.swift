@@ -59,6 +59,32 @@ public struct GeminiAccount: Sendable, Codable, Identifiable, Equatable {
         self.disabledReason = disabledReason
     }
 
+    public enum CodingKeys: String, CodingKey {
+        case id, email, name, accessToken, refreshToken, idToken, expiryTimestamp, quota, isDisabled, disabledReason
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let decodedEmail = (try? container.decodeIfPresent(String.self, forKey: .email)) ?? ""
+        let decodedID = (try? container.decodeIfPresent(String.self, forKey: .id)) ?? ""
+        guard !decodedEmail.isEmpty || !decodedID.isEmpty else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Account must have email or id")
+            )
+        }
+        let effectiveID = !decodedID.isEmpty ? decodedID : decodedEmail
+        self.id = effectiveID
+        self.email = !decodedEmail.isEmpty ? decodedEmail : effectiveID
+        self.name = try? container.decodeIfPresent(String.self, forKey: .name)
+        self.accessToken = try? container.decodeIfPresent(String.self, forKey: .accessToken)
+        self.refreshToken = try? container.decodeIfPresent(String.self, forKey: .refreshToken)
+        self.idToken = try? container.decodeIfPresent(String.self, forKey: .idToken)
+        self.expiryTimestamp = (try? container.decodeIfPresent(TimeInterval.self, forKey: .expiryTimestamp)) ?? 0
+        self.quota = (try? container.decodeIfPresent(GeminiQuotaSnapshot.self, forKey: .quota)) ?? GeminiQuotaSnapshot()
+        self.isDisabled = (try? container.decodeIfPresent(Bool.self, forKey: .isDisabled)) ?? false
+        self.disabledReason = try? container.decodeIfPresent(String.self, forKey: .disabledReason)
+    }
+
     /// Serializes the token payload into the format expected by the Antigravity `agy` CLI.
     ///
     /// - Returns: JSON string representing the token dictionary.

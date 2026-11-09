@@ -1703,6 +1703,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         if !isRunningUnderXCTest {
             SharedLiveAgentIndex.shared.scheduleRefreshIfStale()
             AgentMessageCenter.warmStoreOffMain()
+            geminiAccountStore.performStartupSelfHealing()
         }
 
         claimAuthCallbackURLSchemes()

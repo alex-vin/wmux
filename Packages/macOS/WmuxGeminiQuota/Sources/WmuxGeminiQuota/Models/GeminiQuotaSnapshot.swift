@@ -51,15 +51,15 @@ public struct GeminiQuotaSnapshot: Sendable, Codable, Equatable {
     }
 
     public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.models = try container.decodeIfPresent([GeminiModelQuota].self, forKey: .models) ?? []
-        self.groups = try container.decodeIfPresent([GeminiQuotaGroup].self, forKey: .groups) ?? []
-        self.tier = try container.decodeIfPresent(GeminiSubscriptionTier.self, forKey: .tier) ?? .free
-        self.isForbidden = try container.decodeIfPresent(Bool.self, forKey: .isForbidden) ?? false
-        self.forbiddenReason = try container.decodeIfPresent(String.self, forKey: .forbiddenReason)
-        self.isRateLimited = try container.decodeIfPresent(Bool.self, forKey: .isRateLimited) ?? false
-        self.rateLimitReason = try container.decodeIfPresent(String.self, forKey: .rateLimitReason)
-        self.lastUpdatedTimestamp = try container.decodeIfPresent(TimeInterval.self, forKey: .lastUpdatedTimestamp) ?? Date().timeIntervalSince1970
+        let container = try? decoder.container(keyedBy: CodingKeys.self)
+        self.models = (try? container?.decodeIfPresent([GeminiModelQuota].self, forKey: .models)) ?? []
+        self.groups = (try? container?.decodeIfPresent([GeminiQuotaGroup].self, forKey: .groups)) ?? []
+        self.tier = (try? container?.decodeIfPresent(GeminiSubscriptionTier.self, forKey: .tier)) ?? .free
+        self.isForbidden = (try? container?.decodeIfPresent(Bool.self, forKey: .isForbidden)) ?? false
+        self.forbiddenReason = try? container?.decodeIfPresent(String.self, forKey: .forbiddenReason)
+        self.isRateLimited = (try? container?.decodeIfPresent(Bool.self, forKey: .isRateLimited)) ?? false
+        self.rateLimitReason = try? container?.decodeIfPresent(String.self, forKey: .rateLimitReason)
+        self.lastUpdatedTimestamp = (try? container?.decodeIfPresent(TimeInterval.self, forKey: .lastUpdatedTimestamp)) ?? Date().timeIntervalSince1970
     }
 
     /// Finds the flagship model representing this account (e.g. Gemini 3.8 Flash).

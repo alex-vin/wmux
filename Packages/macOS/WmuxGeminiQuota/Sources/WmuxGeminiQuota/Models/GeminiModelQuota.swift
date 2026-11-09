@@ -1,4 +1,4 @@
-public import Foundation
+import Foundation
 
 /// Represents the quota status of an individual AI model.
 public struct GeminiModelQuota: Sendable, Codable, Identifiable, Equatable {
@@ -23,5 +23,18 @@ public struct GeminiModelQuota: Sendable, Codable, Identifiable, Equatable {
         self.displayName = displayName
         self.percentage = max(0, min(100, percentage))
         self.resetTime = resetTime
+    }
+
+    public enum CodingKeys: String, CodingKey {
+        case id, displayName, percentage, resetTime
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try? decoder.container(keyedBy: CodingKeys.self)
+        self.id = (try? container?.decodeIfPresent(String.self, forKey: .id)) ?? "unknown"
+        self.displayName = (try? container?.decodeIfPresent(String.self, forKey: .displayName)) ?? ""
+        let pct = (try? container?.decodeIfPresent(Int.self, forKey: .percentage)) ?? 100
+        self.percentage = max(0, min(100, pct))
+        self.resetTime = try? container?.decodeIfPresent(String.self, forKey: .resetTime)
     }
 }

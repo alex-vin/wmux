@@ -1,4 +1,4 @@
-public import Foundation
+import Foundation
 
 /// Represents the subscription tier of a Google Gemini user account.
 public enum GeminiSubscriptionTier: String, Sendable, Codable, CaseIterable {
@@ -22,5 +22,19 @@ public enum GeminiSubscriptionTier: String, Sendable, Codable, CaseIterable {
             return .pro
         }
         return .free
+    }
+
+    public init(from decoder: any Decoder) throws {
+        if let container = try? decoder.singleValueContainer(),
+           let raw = try? container.decode(String.self) {
+            self = Self.normalize(raw)
+        } else {
+            self = .free
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 }

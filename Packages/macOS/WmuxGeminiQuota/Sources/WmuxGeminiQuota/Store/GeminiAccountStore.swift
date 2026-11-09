@@ -1,6 +1,9 @@
 import AppKit
 public import Foundation
 public import Observation
+import os.log
+
+private let logger = Logger(subsystem: "com.wmux.gemini", category: "AccountStore")
 
 /// Status indicator color semantics for Gemini quota.
 public enum GeminiQuotaHealthStatus: Sendable, Equatable {
@@ -34,19 +37,47 @@ public final class GeminiAccountStore {
     private let quotaService: GeminiQuotaService
     private let callbackServer: GeminiOAuthCallbackServer
 
+    /// Canonical authoritative configuration storage file for wmux gemini accounts.
+    public static var canonicalStorageURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/wmux/gemini_accounts.json")
+    }
+
+    /// Legacy configuration storage file for cmux gemini accounts.
+    public static var legacyStorageURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/cmux/gemini_accounts.json")
+    }
+
     /// Default configuration storage file for wmux/cmux gemini accounts.
+    /// Automatically performs seamless migration from cmux to wmux if wmux does not exist yet.
     public static var defaultStorageURL: URL {
+        migrateLegacyStorageIfNeeded()
+        return canonicalStorageURL
+    }
+
+    /// Seamlessly migrates existing accounts from ~/.config/cmux/gemini_accounts.json
+    /// to ~/.config/wmux/gemini_accounts.json if the wmux destination does not exist yet.
+    @discardableResult
+    public static func migrateLegacyStorageIfNeeded() -> Bool {
         let fm = FileManager.default
-        let home = fm.homeDirectoryForCurrentUser
-        let wmuxURL = home.appendingPathComponent(".config/wmux/gemini_accounts.json")
-        let cmuxURL = home.appendingPathComponent(".config/cmux/gemini_accounts.json")
-        if fm.fileExists(atPath: wmuxURL.path) {
-            return wmuxURL
+        let wmuxURL = canonicalStorageURL
+        let cmuxURL = legacyStorageURL
+
+        guard !fm.fileExists(atPath: wmuxURL.path),
+              fm.fileExists(atPath: cmuxURL.path) else {
+            return false
         }
-        if fm.fileExists(atPath: cmuxURL.path) {
-            return cmuxURL
+
+        do {
+            let parentDir = wmuxURL.deletingLastPathComponent()
+            try fm.createDirectory(at: parentDir, withIntermediateDirectories: true)
+            try fm.copyItem(at: cmuxURL, to: wmuxURL)
+            try fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: wmuxURL.path)
+            logger.info("Successfully migrated Gemini accounts from cmux to canonical wmux storage: \(wmuxURL.path)")
+            return true
+        } catch {
+            logger.error("Failed to migrate Gemini accounts from \(cmuxURL.path) to \(wmuxURL.path): \(error.localizedDescription)")
+            return false
         }
-        return wmuxURL
     }
 
     /// Creates an account store with injected dependencies.
@@ -145,6 +176,8 @@ public final class GeminiAccountStore {
         let jetskiTokenURL = home.appendingPathComponent(".gemini/jetski-standalone-oauth-token")
         let payloadJSON = account.agyPayloadJSON()
         if let data = payloadJSON.data(using: .utf8) {
+            let geminiDir = jetskiTokenURL.deletingLastPathComponent()
+            try? fm.createDirectory(at: geminiDir, withIntermediateDirectories: true)
             try? data.write(to: jetskiTokenURL, options: .atomic)
             try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: jetskiTokenURL.path)
         }
@@ -219,8 +252,32 @@ public final class GeminiAccountStore {
         }
 
         addOrUpdateAccount(newAccount)
-        defaultAccountID = newAccount.id
+        setDefaultAccount(id: newAccount.id)
         return newAccount
+    }
+
+    /// Performs a background credential self-healing check on startup.
+    ///
+    /// Verifies keychain and local credentials for the default active account,
+    /// refreshes expired/expiring access tokens, and resyncs them.
+    public func performStartupSelfHealing() {
+        guard let activeAccount = defaultAccount, !activeAccount.isDisabled else {
+            return
+        }
+
+        // 1. Immediately ensure credentials are up-to-date in keychain and ~/.gemini/
+        syncDefaultAccountCredentials(activeAccount)
+
+        // 2. If token is near expiration or expired, trigger background refresh and re-sync
+        if activeAccount.needsTokenRefresh() && activeAccount.refreshToken != nil {
+            Task { [weak self] in
+                guard let self else { return }
+                await self.refreshAccount(id: activeAccount.id)
+                if let refreshed = self.account(for: activeAccount.id), !refreshed.isDisabled {
+                    self.syncDefaultAccountCredentials(refreshed)
+                }
+            }
+        }
     }
 
     /// Refreshes all non-disabled accounts concurrently.
@@ -291,16 +348,105 @@ public final class GeminiAccountStore {
     }
 
     private func loadFromDisk() {
-        guard FileManager.default.fileExists(atPath: storageURL.path) else { return }
-        try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: storageURL.path)
-        do {
-            let data = try Data(contentsOf: storageURL)
-            let decoded = try JSONDecoder().decode(GeminiStoragePayload.self, from: data)
-            self.accounts = decoded.accounts
-            self.defaultAccountID = decoded.defaultAccountID
-        } catch {
-            // Silently ignore or initialize empty
+        let fm = FileManager.default
+        if !fm.fileExists(atPath: storageURL.path) && storageURL == Self.canonicalStorageURL {
+            Self.migrateLegacyStorageIfNeeded()
         }
+
+        guard fm.fileExists(atPath: storageURL.path) else { return }
+        try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: storageURL.path)
+
+        guard let data = try? Data(contentsOf: storageURL), !data.isEmpty else { return }
+
+        // Strategy 1: Standard GeminiStoragePayload decode
+        do {
+            let decoded = try JSONDecoder().decode(GeminiStoragePayload.self, from: data)
+            if !decoded.accounts.isEmpty {
+                self.accounts = decoded.accounts
+                self.defaultAccountID = decoded.defaultAccountID ?? decoded.accounts.first?.id
+                return
+            }
+        } catch {
+            let errorMsg = "Failed to decode GeminiStoragePayload from \(storageURL.path): \(error)"
+            self.lastErrorMessage = errorMsg
+            logger.error("\(errorMsg)")
+        }
+
+        // Backup corrupted file to avoid accidental data loss before attempting recovery
+        backupCorruptedFile(data: data)
+
+        // Strategy 2: Attempt raw [GeminiAccount] array decode
+        if let rawAccounts = try? JSONDecoder().decode([GeminiAccount].self, from: data), !rawAccounts.isEmpty {
+            logger.info("Recovered \(rawAccounts.count) accounts from array format")
+            self.accounts = rawAccounts
+            self.defaultAccountID = rawAccounts.first?.id
+            saveToDisk()
+            return
+        }
+
+        // Strategy 3: Tolerant element-by-element recovery
+        if let recoveredAccounts = recoverAccountsTolerantly(from: data), !recoveredAccounts.isEmpty {
+            logger.info("Tolerantly recovered \(recoveredAccounts.count) accounts from damaged payload")
+            self.accounts = recoveredAccounts
+            self.defaultAccountID = recoveredAccounts.first?.id
+            saveToDisk()
+            return
+        }
+
+        // Strategy 4: Fallback to legacy cmux storage if wmux was empty or unrecoverable
+        if storageURL == Self.canonicalStorageURL && fm.fileExists(atPath: Self.legacyStorageURL.path) {
+            if let legacyData = try? Data(contentsOf: Self.legacyStorageURL),
+               let legacyDecoded = try? JSONDecoder().decode(GeminiStoragePayload.self, from: legacyData),
+               !legacyDecoded.accounts.isEmpty {
+                logger.info("Recovered \(legacyDecoded.accounts.count) accounts from legacy cmux backup")
+                self.accounts = legacyDecoded.accounts
+                self.defaultAccountID = legacyDecoded.defaultAccountID ?? legacyDecoded.accounts.first?.id
+                saveToDisk()
+                return
+            }
+        }
+    }
+
+    private func backupCorruptedFile(data: Data) {
+        let timestamp = Int(Date().timeIntervalSince1970)
+        let backupURL = storageURL.deletingPathExtension().appendingPathExtension("corrupted.\(timestamp).json")
+        do {
+            try data.write(to: backupURL, options: .atomic)
+            try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: backupURL.path)
+            logger.warning("Backed up corrupted Gemini accounts file to \(backupURL.path)")
+        } catch {
+            logger.error("Failed to write corrupted backup file: \(error.localizedDescription)")
+        }
+    }
+
+    private func recoverAccountsTolerantly(from data: Data) -> [GeminiAccount]? {
+        guard let jsonObject = try? JSONSerialization.jsonObject(with: data) else {
+            return nil
+        }
+        var rawList: [Any] = []
+        if let dict = jsonObject as? [String: Any] {
+            if let accList = dict["accounts"] as? [Any] {
+                rawList = accList
+            }
+        } else if let arr = jsonObject as? [Any] {
+            rawList = arr
+        }
+
+        guard !rawList.isEmpty else { return nil }
+
+        var results: [GeminiAccount] = []
+        let decoder = JSONDecoder()
+        for item in rawList {
+            guard let dict = item as? [String: Any],
+                  JSONSerialization.isValidJSONObject(dict),
+                  let itemData = try? JSONSerialization.data(withJSONObject: dict) else {
+                continue
+            }
+            if let account = try? decoder.decode(GeminiAccount.self, from: itemData) {
+                results.append(account)
+            }
+        }
+        return results.isEmpty ? nil : results
     }
 
     private func saveToDisk() {
@@ -319,4 +465,19 @@ public final class GeminiAccountStore {
 private struct GeminiStoragePayload: Codable {
     let accounts: [GeminiAccount]
     let defaultAccountID: String?
+
+    enum CodingKeys: String, CodingKey {
+        case accounts, defaultAccountID
+    }
+
+    init(accounts: [GeminiAccount], defaultAccountID: String?) {
+        self.accounts = accounts
+        self.defaultAccountID = defaultAccountID
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.accounts = (try? container.decodeIfPresent([GeminiAccount].self, forKey: .accounts)) ?? []
+        self.defaultAccountID = try? container.decodeIfPresent(String.self, forKey: .defaultAccountID)
+    }
 }

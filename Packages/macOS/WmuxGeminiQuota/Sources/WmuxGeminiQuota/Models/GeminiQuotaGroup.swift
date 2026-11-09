@@ -1,4 +1,4 @@
-public import Foundation
+import Foundation
 
 /// Represents a group of quota buckets (e.g. Gemini Models, Third-Party Models).
 public struct GeminiQuotaGroup: Sendable, Codable, Equatable {
@@ -15,5 +15,15 @@ public struct GeminiQuotaGroup: Sendable, Codable, Equatable {
     public init(displayName: String, buckets: [GeminiQuotaBucket]) {
         self.displayName = displayName
         self.buckets = buckets
+    }
+
+    public enum CodingKeys: String, CodingKey {
+        case displayName, buckets
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try? decoder.container(keyedBy: CodingKeys.self)
+        self.displayName = (try? container?.decodeIfPresent(String.self, forKey: .displayName)) ?? ""
+        self.buckets = (try? container?.decodeIfPresent([GeminiQuotaBucket].self, forKey: .buckets)) ?? []
     }
 }
