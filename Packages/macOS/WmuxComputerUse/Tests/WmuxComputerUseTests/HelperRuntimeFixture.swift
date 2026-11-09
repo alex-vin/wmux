@@ -16,7 +16,7 @@ struct HelperRuntimeFixture {
     init() throws {
         files = try HelperBundleFixture()
         let host = files.root.appendingPathComponent("Host.app")
-        nestedHelper = host.appendingPathComponent("Contents/Library/cmux Computer Use.app")
+        nestedHelper = host.appendingPathComponent("Contents/Library/wmux Computer Use.app")
         try FileManager.default.createDirectory(at: nestedHelper.deletingLastPathComponent(), withIntermediateDirectories: true)
         try FileManager.default.copyItem(at: files.bundle, to: nestedHelper)
         let info = try PropertyListSerialization.data(fromPropertyList: [

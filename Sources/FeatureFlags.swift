@@ -360,7 +360,7 @@ final class WmuxFeatureFlags {
     }
 
     var isComputerUseUXEnabled: Bool {
-        false
+        effectiveValue(for: Self.computerUseUXFlag)
     }
     var isSimulatorEnabled: Bool {
         false

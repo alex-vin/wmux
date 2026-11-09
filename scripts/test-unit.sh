@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PROJECT="wmux.xcodeproj"
-SCHEME="cmux-unit"
+SCHEME="wmux-unit"
 CONFIGURATION="${CMUX_TEST_CONFIGURATION:-Debug}"
 DESTINATION="${CMUX_TEST_DESTINATION:-platform=macOS}"
 
@@ -26,10 +26,13 @@ fi
 no_module_settings=(
   'SWIFT_USE_INTEGRATED_DRIVER=$(CMUX_TEST_INTEGRATED_DRIVER_$(TARGET_NAME):default=YES)'
   CMUX_TEST_INTEGRATED_DRIVER_cmuxTests=NO
+  CMUX_TEST_INTEGRATED_DRIVER_wmuxTests=NO
   'OTHER_SWIFT_FLAGS=$(inherited) $(CMUX_TEST_SWIFT_FLAGS_$(TARGET_NAME))'
   CMUX_TEST_SWIFT_FLAGS_cmuxTests=-no-emit-module-separately
+  CMUX_TEST_SWIFT_FLAGS_wmuxTests=-no-emit-module-separately
   'SWIFT_INSTALL_MODULE=$(CMUX_TEST_INSTALL_MODULE_$(TARGET_NAME):default=YES)'
   CMUX_TEST_INSTALL_MODULE_cmuxTests=NO
+  CMUX_TEST_INSTALL_MODULE_wmuxTests=NO
 )
 if [ "${CMUX_TEST_EMIT_MODULE:-0}" = 1 ]; then
   no_module_settings=()

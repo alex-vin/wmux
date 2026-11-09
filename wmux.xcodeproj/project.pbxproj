@@ -877,7 +877,6 @@
 		7A0CE1000000000000000730 /* CloudTunnelBannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0CE100000000000000072F /* CloudTunnelBannerTests.swift */; };
 		7A0CE1000000000000000104 /* CloudTunnelCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0CE1000000000000000103 /* CloudTunnelCoordinatorTests.swift */; };
 		5C33764324981C59B407B84B /* CloudTunnelLaunchGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12AA4D8BC110BC7543621C26 /* CloudTunnelLaunchGateTests.swift */; };
-		7A0CE1000000000000000803 /* CloudTunnelProviderStartGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0CE1000000000000000802 /* CloudTunnelProviderStartGateTests.swift */; };
 		7A0CE1000000000000000402 /* CloudTunnelTestFakes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A0CE1000000000000000401 /* CloudTunnelTestFakes.swift */; };
 		458AB4E63D92348857D1CFFF /* CloudVMFileExplorerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC4A90979F30508429FEC0E /* CloudVMFileExplorerProvider.swift */; };
 		CD30641F0699A780E9C88139 /* CloudVMLoadingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA8FC96362D904141DF3249 /* CloudVMLoadingPanel.swift */; };
@@ -3371,6 +3370,8 @@
 		C0DE64950000000000000003 /* WMUXCLITestAssertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE64950000000000000004 /* WMUXCLITestAssertions.swift */; };
 		5E55500000000000000000E3 /* WmuxCommandPalette in Frameworks */ = {isa = PBXBuildFile; productRef = 5E55500000000000000000E2 /* WmuxCommandPalette */; };
 		5E55500000000000000000E4 /* WmuxCommandPalette in Frameworks */ = {isa = PBXBuildFile; productRef = 5E55500000000000000000E2 /* WmuxCommandPalette */; };
+		C0C0A2026091900000000003 /* WmuxComputerUse in Frameworks */ = {isa = PBXBuildFile; productRef = C0C0A2026091900000000002 /* WmuxComputerUse */; };
+		C0C0A2026091900000000004 /* WmuxComputerUse in Frameworks */ = {isa = PBXBuildFile; productRef = C0C0A2026091900000000002 /* WmuxComputerUse */; };
 		A5001650 /* WmuxConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5001651 /* WmuxConfig.swift */; };
 		A5FB1209 /* WmuxConfigActionDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5FB120A /* WmuxConfigActionDefinition.swift */; };
 		A5FB1201 /* WmuxConfigActionSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5FB1202 /* WmuxConfigActionSaver.swift */; };
@@ -4781,7 +4782,6 @@
 		7A0CE100000000000000072F /* CloudTunnelBannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudTunnelBannerTests.swift; sourceTree = "<group>"; };
 		7A0CE1000000000000000103 /* CloudTunnelCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudTunnelCoordinatorTests.swift; sourceTree = "<group>"; };
 		12AA4D8BC110BC7543621C26 /* CloudTunnelLaunchGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudTunnelLaunchGateTests.swift; sourceTree = "<group>"; };
-		7A0CE1000000000000000802 /* CloudTunnelProviderStartGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packages/macOS/WmuxCloudTunnelCore/Tests/WmuxCloudTunnelCoreTests/CloudTunnelProviderStartGateTests.swift; sourceTree = SOURCE_ROOT; };
 		7A0CE1000000000000000401 /* CloudTunnelTestFakes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudTunnelTestFakes.swift; sourceTree = "<group>"; };
 		DCC4A90979F30508429FEC0E /* CloudVMFileExplorerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudVMFileExplorerProvider.swift; sourceTree = "<group>"; };
 		9CA8FC96362D904141DF3249 /* CloudVMLoadingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Panels/CloudVMLoadingPanel.swift; sourceTree = "<group>"; };
@@ -7680,6 +7680,7 @@
 				CA52A003CA52A003CA52A003 /* WmuxCanvas in Frameworks */,
 				CA53A003CA53A003CA53A003 /* WmuxCanvasUI in Frameworks */,
 				5E55500000000000000000E3 /* WmuxCommandPalette in Frameworks */,
+				C0C0A2026091900000000003 /* WmuxComputerUse in Frameworks */,
 				C750100000000000000000A3 /* WmuxControlSocket in Frameworks */,
 				CC0DE00000000000000000A3 /* WmuxCore in Frameworks */,
 				CC0033E15A1B2C3D4E5F0013 /* WmuxDiffComments in Frameworks */,
@@ -7763,6 +7764,7 @@
 				D7032A060000000000000001 /* WmuxBrowser in Frameworks */,
 				CA52A007CA52A007CA52A007 /* WmuxCanvas in Frameworks */,
 				5E55500000000000000000E4 /* WmuxCommandPalette in Frameworks */,
+				C0C0A2026091900000000004 /* WmuxComputerUse in Frameworks */,
 				A79840010000000000000003 /* WmuxControlSocket in Frameworks */,
 				CC0DE00000000000000000A4 /* WmuxCore in Frameworks */,
 				A500D015A1B2C3D4E5F60718 /* WMUXDebugLog in Frameworks */,
@@ -10637,7 +10639,6 @@
 				5C0C4A1E0000000000000004 /* RCChannelIdentityTests.swift */,
 				5C0C4A1E0000000000000006 /* RCChannelSuiteTests.swift */,
 				7A0CE1000000000000000103 /* CloudTunnelCoordinatorTests.swift */,
-				7A0CE1000000000000000802 /* CloudTunnelProviderStartGateTests.swift */,
 
 				D01100800000000000000007 /* WmuxTuiSurfaceProviderRegistryDiscoveryTests.swift */,
 				7A1D4C000000000000000105 /* WmuxTuiSurfaceProviderRegistryPollingTests.swift */,
@@ -11709,6 +11710,7 @@
 			);
 			name = wmux;
 			packageProductDependencies = (
+				C0C0A2026091900000000002 /* WmuxComputerUse */,
 				D0F6A0000000000000000002 /* WmuxAgentDeliveryCore */,
 				5CA7A1060000000000000002 /* WmuxSurfaceCatalogModel */,
 				A1329A000000000000000101 /* WmuxTerminalSizing */,
@@ -11840,6 +11842,7 @@
 			);
 			name = wmuxTests;
 			packageProductDependencies = (
+				C0C0A2026091900000000002 /* WmuxComputerUse */,
 				D0F6A0000000000000000002 /* WmuxAgentDeliveryCore */,
 				5CA7A1060000000000000003 /* WmuxSurfaceCatalogModel */,
 				A1329A000000000000000101 /* WmuxTerminalSizing */,
@@ -11913,6 +11916,8 @@
 			);
 			mainGroup = A5001040;
 			packageReferences = (
+				E3B7A30000000000000000E1 /* XCLocalSwiftPackageReference "WmuxGeminiQuota" */,
+				C0C0A2026091900000000001 /* XCLocalSwiftPackageReference "WmuxComputerUse" */,
 				5CA7A1060000000000000001 /* XCLocalSwiftPackageReference "WmuxSurfaceCatalogModel" */,
 				A1329A000000000000000100 /* XCLocalSwiftPackageReference "WmuxTerminalSizing" */,
 				A1329B000000000000000100 /* XCLocalSwiftPackageReference "WmuxTerminalSharing" */,
@@ -15148,7 +15153,6 @@
 				7A0CE1000000000000000730 /* CloudTunnelBannerTests.swift in Sources */,
 				7A0CE1000000000000000104 /* CloudTunnelCoordinatorTests.swift in Sources */,
 				5C33764324981C59B407B84B /* CloudTunnelLaunchGateTests.swift in Sources */,
-				7A0CE1000000000000000803 /* CloudTunnelProviderStartGateTests.swift in Sources */,
 				7A0CE1000000000000000402 /* CloudTunnelTestFakes.swift in Sources */,
 				C7F29A7CD7C6410F87BB8540 /* CloudVMLoadingPanelTests.swift in Sources */,
 				C75740010000000000000001 /* CloudVMMenuItemMetricsTests.swift in Sources */,
@@ -16400,6 +16404,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		C0C0A2026091900000000001 /* XCLocalSwiftPackageReference "WmuxComputerUse" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/macOS/WmuxComputerUse;
+		};
 		5CA7A1060000000000000001 /* XCLocalSwiftPackageReference "WmuxSurfaceCatalogModel" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/macOS/WmuxSurfaceCatalogModel;
@@ -16600,6 +16608,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C0C0A2026091900000000002 /* WmuxComputerUse */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0C0A2026091900000000001 /* XCLocalSwiftPackageReference "WmuxComputerUse" */;
+			productName = WmuxComputerUse;
+		};
 		5CA7A1060000000000000002 /* WmuxSurfaceCatalogModel */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5CA7A1060000000000000001 /* XCLocalSwiftPackageReference "WmuxSurfaceCatalogModel" */;

@@ -19,9 +19,12 @@ GHOSTTY_SHELL_SRC="${SRCROOT}/ghostty/src/shell-integration"
 CMUX_GHOSTTY_ZSH_SRC="${SRCROOT}/ghostty/src/shell-integration/zsh/ghostty-integration"
 BUILD_GHOSTTY_HELPER="${SRCROOT}/scripts/build-ghostty-cli-helper.sh"
 GHOSTTY_HELPER_DEST="${BIN_DEST}/ghostty"
-BUILD_CMUX_CUA="${SRCROOT}/scripts/build-cmux-cua.sh"
-APPLY_CMUX_CUA_PATCH="${SRCROOT}/scripts/apply-cmux-cua-patch.sh"
-CMUX_CUA_PATCH="${SRCROOT}/scripts/cmux-cua-codex-delivery-mode.patch"
+BUILD_CMUX_CUA="${SRCROOT}/scripts/build-wmux-cua.sh"
+[ -f "$BUILD_CMUX_CUA" ] || BUILD_CMUX_CUA="${SRCROOT}/scripts/build-cmux-cua.sh"
+APPLY_CMUX_CUA_PATCH="${SRCROOT}/scripts/apply-wmux-cua-patch.sh"
+[ -f "$APPLY_CMUX_CUA_PATCH" ] || APPLY_CMUX_CUA_PATCH="${SRCROOT}/scripts/apply-cmux-cua-patch.sh"
+CMUX_CUA_PATCH="${SRCROOT}/scripts/wmux-cua-codex-delivery-mode.patch"
+[ -f "$CMUX_CUA_PATCH" ] || CMUX_CUA_PATCH="${SRCROOT}/scripts/cmux-cua-codex-delivery-mode.patch"
 # The cmux-cua engine ships once, as the Computer Use helper's executable.
 # Builds before that also copied it, with its license, into Resources/bin.
 LEGACY_CMUX_CUA_CLIENT="${BIN_DEST}/cmux-cua"
@@ -316,7 +319,17 @@ if [ ! -x "$GHOSTTY_HELPER_DEST" ]; then
   echo "error: Ghostty CLI helper was not created at $GHOSTTY_HELPER_DEST" >&2
   exit 1
 fi
-# cmux-cua compilation disabled (R2)
+if [ ! -x "$BUILD_CMUX_CUA" ]; then
+  echo "error: missing cmux-cua/wmux-cua build script at $BUILD_CMUX_CUA" >&2
+  exit 1
+fi
+# The standalone build output is scratch; only the helper bundle ships.
+"$BUILD_CMUX_CUA" --output "${DERIVED_FILE_DIR}/cmux-cua/cmux-cua" \
+  --helper-app "$CMUX_CUA_HELPER_APP" --archs "${ARCHS:-}"
+if [ ! -x "$CMUX_CUA_HELPER_EXEC" ]; then
+  echo "error: cmux-cua was not created at $CMUX_CUA_HELPER_EXEC" >&2
+  exit 1
+fi
 update_commit
 
 

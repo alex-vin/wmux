@@ -1,5 +1,6 @@
 import WmuxProductAnalytics
 import AppKit
+import WmuxComputerUse
 import WmuxAppKitSupportUI
 import WmuxAuthRuntime
 import WmuxBrowser

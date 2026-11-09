@@ -26,11 +26,11 @@ struct HelperBundleFixture {
             "wmux-computer-use-helper-\(UUID().uuidString)",
             isDirectory: true
         )
-        bundle = root.appendingPathComponent("wmux Computer Use.app", isDirectory: true)
+        bundle = root.appendingPathComponent("cmux Computer Use.app", isDirectory: true)
         let contents = bundle.appendingPathComponent("Contents", isDirectory: true)
         let macOSDirectory = contents.appendingPathComponent("MacOS", isDirectory: true)
         let resources = contents.appendingPathComponent("Resources", isDirectory: true)
-        executable = macOSDirectory.appendingPathComponent("wmux-cua", isDirectory: false)
+        executable = macOSDirectory.appendingPathComponent("cmux-cua", isDirectory: false)
         infoPlist = contents.appendingPathComponent("Info.plist", isDirectory: false)
         hiddenMarker = resources.appendingPathComponent(
             ".cmux-cua-managed-helper",

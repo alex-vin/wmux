@@ -33,7 +33,8 @@ struct ComputerUseHelperLifecycleTests {
             #expect(await runtime.ensureStandaloneHelperInstalled() == installed)
             #expect(try inode(at: installed) == originalInode)
         }
-        #expect(try applicationNames(in: fixture.paths.installedHelperDirectoryURL) == ["wmux Computer Use.app"])
+        let names = try applicationNames(in: fixture.paths.installedHelperDirectoryURL)
+        #expect(names == ["wmux Computer Use.app"])
     }
 
     @Test func startupAndLaterMaintenanceRemoveReadOnlyOrphansWhenDisabled() async throws {
