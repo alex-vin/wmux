@@ -115,7 +115,13 @@ else
 fi
 echo "Found application bundle: $APP_PATH"
 
-echo "=== 4.1. Stripping and Pruning Release Bundle ==="
+echo "=== 4.1. Syncing Bundled Resources & CLI Helpers ==="
+if [ -d "Resources/bin" ]; then
+  mkdir -p "$APP_PATH/Contents/Resources/bin"
+  cp -p Resources/bin/* "$APP_PATH/Contents/Resources/bin/" 2>/dev/null || true
+fi
+
+echo "=== 4.2. Stripping and Pruning Release Bundle ==="
 ./scripts/prune-release-bundle.sh "$APP_PATH"
 ./scripts/strip-release-bundle.sh "$APP_PATH"
 log_step "Bundle stripping and bloat pruning"

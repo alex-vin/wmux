@@ -6986,6 +6986,13 @@ struct WMUXCLI {
         let capturesSocketErrorsInsideCommand = ["claude-hook", "codex-hook", "feed-hook", "hooks"].contains(command) // Backwards compatibility aliases stay hidden from help.
         do {
         switch command {
+        case "rpc":
+            guard let method = commandArgs.first, !method.isEmpty else {
+                throw CLIError(message: "Usage: wmux rpc <method> [json-params]")
+            }
+            let params = try parseRPCParams(Array(commandArgs.dropFirst()))
+            let response = try client.sendV2(method: method, params: params)
+            print(jsonString(response))
         case "automation":
             try runAutomationCommand(commandArgs: commandArgs, client: client, jsonOutput: jsonOutput)
         case "__sidebar_footer_icon_balance":

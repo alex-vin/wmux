@@ -3311,6 +3311,22 @@ class TerminalController {
         diffViewerRegistration: DiffViewerSessionPreparation
     ) -> String {
             switch method {
+        case "subagent.bind_account":
+            guard let rawSurface = params["surface_id"] as? String,
+                  let surfaceID = UUID(uuidString: rawSurface),
+                  let accountID = params["account_id"] as? String,
+                  !accountID.isEmpty else {
+                return v2Error(id: id, code: "invalid_params", message: "surface_id and account_id are required")
+            }
+            guard let delegate = AppDelegate.shared,
+                  delegate.locateSurface(surfaceId: surfaceID) != nil else {
+                return v2Error(id: id, code: "not_found", message: "Surface not found")
+            }
+            guard let account = delegate.geminiAccountStore.account(for: accountID), !account.isDisabled else {
+                return v2Error(id: id, code: "not_found", message: "Account not found or disabled")
+            }
+            delegate.geminiTerminalCoordinator.bind(surfaceID: surfaceID, to: accountID)
+            return v2Ok(id: id, result: ["surface_id": surfaceID.uuidString, "account_id": accountID])
         case "system.ping":
             return v2Ok(id: id, result: ["pong": true])
         case "system.capabilities":
