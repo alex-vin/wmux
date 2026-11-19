@@ -290,9 +290,42 @@ CLEANUP_WORKTREE_DIR=""
 CLEANUP_REPO_ROOT=""
 CLEANUP_BRANCH_NAME=""
 
+cleanup_subagent_process() {
+    if [[ -n "${CLEANUP_STATE_DIR:-}" && -d "$CLEANUP_STATE_DIR" ]]; then
+        if [[ -f "$CLEANUP_STATE_DIR/pid" ]]; then
+            local r_pid
+            r_pid="$(cat "$CLEANUP_STATE_DIR/pid" 2>/dev/null || true)"
+            if [[ -n "$r_pid" ]] && kill -0 "$r_pid" 2>/dev/null; then
+                pkill -P "$r_pid" 2>/dev/null || true
+                kill -TERM "$r_pid" 2>/dev/null || true
+                sleep 0.1
+                kill -9 "$r_pid" 2>/dev/null || true
+            fi
+        fi
+        if [[ -f "$CLEANUP_STATE_DIR/surface_id" ]]; then
+            local r_surf
+            r_surf="$(cat "$CLEANUP_STATE_DIR/surface_id" 2>/dev/null || true)"
+            local w_bin
+            w_bin="$(resolve_cmux_bin 2>/dev/null || echo "")"
+            if [[ -n "$r_surf" && -n "$w_bin" && -x "$w_bin" ]]; then
+                if [[ -n "${WMUX_SOCKET_PATH:-}" ]]; then
+                    "$w_bin" --socket "$WMUX_SOCKET_PATH" close-surface --surface "$r_surf" --force >/dev/null 2>&1 || true
+                else
+                    "$w_bin" close-surface --surface "$r_surf" --force >/dev/null 2>&1 || true
+                fi
+            fi
+        fi
+    fi
+}
+
 cleanup_on_exit() {
     local exit_code=$?
     trap - EXIT ERR INT TERM
+
+    # If interrupted or failed unexpectedly, proactively terminate the spawned runner process and surface
+    if [[ $exit_code -ne 0 ]]; then
+        cleanup_subagent_process
+    fi
 
     # 1. Clean up status file if interrupted or failed unexpectedly
     if [[ -n "${CLEANUP_STATUS_JSON:-}" && -f "$CLEANUP_STATUS_JSON" ]]; then
@@ -590,14 +623,27 @@ import sys, json, time, threading
 from collections import deque
 
 output_log = sys.argv[1] if len(sys.argv) > 1 else None
-log_file = None
-if output_log:
+progress_log = sys.argv[2] if len(sys.argv) > 2 else None
+raw_stream_log = sys.argv[3] if len(sys.argv) > 3 else None
+
+raw_file = None
+if raw_stream_log:
     try:
-        log_file = open(output_log, "w", encoding="utf-8")
+        raw_file = open(raw_stream_log, "w", encoding="utf-8")
     except Exception:
-        log_file = None
+        raw_file = None
+
+def write_progress(msg):
+    if not progress_log:
+        return
+    try:
+        with open(progress_log, "a", encoding="utf-8") as f:
+            f.write(msg.strip() + "\n")
+    except Exception:
+        pass
 
 final_response = []
+collected_deltas = []
 raw_lines = deque(maxlen=1000)
 
 try:
@@ -657,10 +703,10 @@ sys.stdout.flush()
 for line in sys.stdin:
     last_activity = time.time()
     raw_lines.append(line)
-    if log_file:
+    if raw_file:
         try:
-            log_file.write(line)
-            log_file.flush()
+            raw_file.write(line)
+            raw_file.flush()
         except Exception:
             pass
 
@@ -689,23 +735,27 @@ for line in sys.stdin:
                 detail = format_tool(tname, params)
                 sys.stdout.write(f"\033[1;33m● [Tool]\033[0m \033[1m{tname}\033[0m {detail}\n")
                 sys.stdout.flush()
+                write_progress(f"[Tool] {tname} {detail}".strip())
             elif state == "DONE":
                 clear_heartbeat()
                 dur = step.get("duration_seconds")
                 dur_str = f" ({dur:.1f}s)" if dur else ""
                 sys.stdout.write(f"\033[1;32m✔ [Done]\033[0m{dur_str}\n")
                 sys.stdout.flush()
+                write_progress(f"✔ [Done] {tname}{dur_str}".strip())
         elif stype == "agent_response":
             delta = step.get("text_delta", "")
             if delta:
                 clear_heartbeat()
                 sys.stdout.write(delta)
                 sys.stdout.flush()
+                collected_deltas.append(delta)
         elif stype == "error_message":
             clear_heartbeat()
             err_msg = step.get("error") or data.get("error", "API temporary notice")
             sys.stdout.write(f"\033[1;33m⚠️ [Cloud API Notice]\033[0m \033[0;33m{clean_arg(err_msg, 75)} (retrying...)\033[0m\n")
             sys.stdout.flush()
+            write_progress(f"⚠️ [Notice] {clean_arg(err_msg, 75)}")
     elif event == "result":
         clear_heartbeat()
         resp = data.get("result", {}).get("response", "")
@@ -713,24 +763,26 @@ for line in sys.stdin:
             final_response = [resp]
             sys.stdout.write("\n\n\033[1;32m★ [Subagent Task Completed]\033[0m\n")
             sys.stdout.flush()
+            write_progress("★ [Subagent Task Completed]")
 
 stop_heartbeat = True
 clear_heartbeat()
 
-if log_file:
+if raw_file:
     try:
-        log_file.close()
+        raw_file.close()
     except Exception:
         pass
 
 if output_log:
     try:
-        if final_response:
-            with open(output_log, "w", encoding="utf-8") as f:
-                f.write(final_response[0])
-        elif not log_file and raw_lines:
-            with open(output_log, "w", encoding="utf-8") as f:
-                f.write("".join(raw_lines))
+        with open(output_log, "w", encoding="utf-8") as f:
+            if final_response:
+                f.write(final_response[0].strip() + "\n")
+            elif collected_deltas:
+                f.write("".join(collected_deltas).strip() + "\n")
+            else:
+                f.write("(Subagent execution ended without a final response)\n")
     except Exception:
         pass
 STREAMER_EOF
@@ -744,7 +796,7 @@ fi
 
 SUBAGENT_EXIT=0
 if command -v python3 >/dev/null 2>&1; then
-    "\$AGY_BIN" -p "\$PROMPT" "\${MODEL_ARGS[@]}" --dangerously-skip-permissions --output-format stream-json 2>&1 | python3 "\$STREAMER_PY" "\$STATE_DIR/output.log"
+    "\$AGY_BIN" -p "\$PROMPT" "\${MODEL_ARGS[@]}" --dangerously-skip-permissions --output-format stream-json 2>&1 | python3 "\$STREAMER_PY" "\$STATE_DIR/output.log" "\$STATE_DIR/progress.log" "\$STATE_DIR/raw_stream.jsonl"
     SUBAGENT_EXIT="\${PIPESTATUS[0]}"
 else
     "\$AGY_BIN" -p "\$PROMPT" "\${MODEL_ARGS[@]}" --dangerously-skip-permissions 2>&1 | tee "\$STATE_DIR/output.log"
@@ -987,10 +1039,25 @@ except Exception:
         local wait_start
         wait_start="$(date +%s)"
         local timed_out=0
-        # Wait for subagent runner to complete with watchdog
+        local PROG_FILE="$STATE_DIR/progress.log"
+        local last_prog_line=0
+
+        # Wait for subagent runner to complete with watchdog & live progress streaming
         while [[ ! -f "$DONE_FILE" ]]; do
             sleep 0.5
             (( ++wait_count ))
+
+            # Stream live progress lines from subagent to stdout in real-time
+            if [[ -f "$PROG_FILE" ]]; then
+                local current_lines
+                current_lines="$(wc -l < "$PROG_FILE" 2>/dev/null || echo 0)"
+                current_lines=$(( current_lines + 0 ))
+                if (( current_lines > last_prog_line )); then
+                    sed -n "$(( last_prog_line + 1 )),${current_lines}p" "$PROG_FILE" 2>/dev/null || true
+                    last_prog_line="$current_lines"
+                fi
+            fi
+
             if [[ -n "$TIMEOUT" ]] && (( TIMEOUT > 0 )); then
                 local now
                 now="$(date +%s)"
@@ -1013,8 +1080,19 @@ except Exception:
             fi
         done
 
+        # Flush any remaining progress lines
+        if [[ -f "$PROG_FILE" ]]; then
+            local current_lines
+            current_lines="$(wc -l < "$PROG_FILE" 2>/dev/null || echo 0)"
+            current_lines=$(( current_lines + 0 ))
+            if (( current_lines > last_prog_line )); then
+                sed -n "$(( last_prog_line + 1 )),${current_lines}p" "$PROG_FILE" 2>/dev/null || true
+            fi
+        fi
+
         if (( timed_out == 1 )); then
-            echo "[wmux-subagent] Wait timed out after ${TIMEOUT}s; the task remains running in its pane." >&2
+            echo "[wmux-subagent] Wait timed out after ${TIMEOUT}s; stopping task." >&2
+            cleanup_subagent_process
             touch "$STATE_DIR/detached"
             CLEANUP_STATE_DIR=""
             CLEANUP_STATUS_JSON=""
